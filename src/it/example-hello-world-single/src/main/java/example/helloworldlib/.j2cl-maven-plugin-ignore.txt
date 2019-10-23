@@ -1,0 +1,4 @@
+# Patterns in this file should match files in this package and its sub package.
+
+IgnoredFile.*
+
