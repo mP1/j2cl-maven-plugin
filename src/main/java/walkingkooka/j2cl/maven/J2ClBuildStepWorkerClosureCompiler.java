@@ -51,6 +51,9 @@ final class J2ClBuildStepWorkerClosureCompiler extends J2ClBuildStepWorker2 {
             logger.indent();
             {
                 for (final J2clDependency dependency : artifact.dependenciesIncludingTransitives()) {
+                    if(dependency.isExcluded()) {
+                        continue;
+                    }
                     sources.addAll(this.addSources(dependency, logger));
                 }
             }

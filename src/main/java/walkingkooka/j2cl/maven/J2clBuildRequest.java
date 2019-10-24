@@ -22,7 +22,6 @@ import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -55,6 +54,9 @@ final class J2clBuildRequest {
                                  final J2clPath base,
                                  final Predicate<J2clArtifactCoords> bootstrap,
                                  final Predicate<J2clArtifactCoords> jre,
+                                 final Predicate<J2clArtifactCoords> excluded,
+                                 final Map<J2clArtifactCoords, J2clArtifactCoords> replacedDependencies,
+                                 final J2clSourcesKind sourcesKind,
                                  final J2clPath buildTarget,
                                  final J2clMavenMiddleware middleware,
                                  final ExecutorService executor,
@@ -68,6 +70,9 @@ final class J2clBuildRequest {
                 base,
                 bootstrap,
                 jre,
+                excluded,
+                replacedDependencies,
+                sourcesKind,
                 buildTarget,
                 middleware,
                 executor,
@@ -83,6 +88,9 @@ final class J2clBuildRequest {
                              final J2clPath base,
                              final Predicate<J2clArtifactCoords> javacBootstrap,
                              final Predicate<J2clArtifactCoords> jre,
+                             final Predicate<J2clArtifactCoords> excluded,
+                             final Map<J2clArtifactCoords, J2clArtifactCoords> replacedDependencies,
+                             final J2clSourcesKind sourcesKind,
                              final J2clPath buildTarget,
                              final J2clMavenMiddleware middleware,
                              final ExecutorService executor,
@@ -98,8 +106,14 @@ final class J2clBuildRequest {
         this.initialScriptFilename = initialScriptFilename;
 
         this.base = base;
+
         this.javacBootstrap = javacBootstrap;
         this.jre = jre;
+        this.excluded = excluded;
+        this.replacedDependencies = replacedDependencies;
+
+        this.sourcesKind = sourcesKind;
+
         this.buildTarget = buildTarget;
 
         this.middleware = middleware;
@@ -130,10 +144,18 @@ final class J2clBuildRequest {
 
     final J2clPath base;
 
+    final J2clSourcesKind sourcesKind;
+
     /**
      * The target or base directory recieving all build files.
      */
     final J2clPath buildTarget;
+
+    boolean isExcluded(final J2clArtifactCoords coords) {
+        return this.excluded.test(coords) || this.replacedDependencies.containsKey(coords);
+    }
+
+    private final Predicate<J2clArtifactCoords> excluded;
 
     boolean isJavacBootstrap(final J2clArtifactCoords coords) {
         return this.javacBootstrap.test(coords);
@@ -146,6 +168,26 @@ final class J2clBuildRequest {
     }
 
     private final Predicate<J2clArtifactCoords> jre;
+
+    // dependency........................................................................................................
+
+    /**
+     * Accepts the given coords and returns the {@link J2clDependency} honouring any replacements.
+     */
+    J2clDependency dependency(final J2clArtifactCoords coords) {
+        J2clArtifactCoords lookup = this.replacedDependencies.get(coords);
+        if (null == lookup) {
+            lookup = coords;
+        }
+
+        final J2clDependency dependency = J2clDependency.getOrFail(lookup);
+        if (null == dependency) {
+            throw new IllegalArgumentException("Unknown dependency coords " + coords);
+        }
+        return dependency;
+    }
+
+    private final Map<J2clArtifactCoords, J2clArtifactCoords> replacedDependencies;
 
     // MAVEN..............................................................................................................
 
@@ -191,6 +233,7 @@ final class J2clBuildRequest {
     void execute(final J2clDependency project) throws Throwable {
         project.prettyPrintDependencies();
         this.verifyBootstrapAndJreIdentified(project);
+        this.verifyReplacements();
 
         this.prepareJobs(project);
 
@@ -217,17 +260,45 @@ final class J2clBuildRequest {
         }
     }
 
+    private void verifyReplacements() {
+        final Set<J2clArtifactCoords> unknown = Sets.sorted();
+
+        for (final Entry<J2clArtifactCoords, J2clArtifactCoords> originalToReplacement : this.replacedDependencies.entrySet()) {
+            {
+                final J2clArtifactCoords test = originalToReplacement.getKey();
+                if (false == J2clDependency.isArtifactDeclared(test)) {
+                    unknown.add(test);
+                }
+            }
+            {
+                final J2clArtifactCoords test = originalToReplacement.getValue();
+                if (false == J2clDependency.isArtifactDeclared(test)) {
+                    unknown.add(test);
+                }
+            }
+        }
+
+        final int missing = unknown.size();
+        if (missing > 0) {
+            throw new J2clException(missing + " mappings in <replacement-dependencies> are missing <dependency> entries in this POM, " +
+                    unknown.stream().map(J2clArtifactCoords::toString).collect(Collectors.joining(", ")));
+        }
+    }
+
     /**
-     * Traverses the dependency graph creating job for each. When this completes
+     * Traverses the dependency graph creating job for each, for dependencies that are included.
      */
     private void prepareJobs(final J2clDependency artifact) {
-        final Set<J2clDependency> dependencies = artifact.dependencies();
+        if(artifact.isIncluded()) {
+            final Set<J2clDependency> dependencies = artifact.dependencies();
 
-        // keep transitive dependencies alphabetical sorted for better readability when trySubmitJob pretty prints queue processing.
-        this.jobs.put(artifact,
-                dependencies.stream()
-                        .peek(this::prepareJobs)
-                        .collect(Collectors.toCollection(() -> Sets.sorted(J2clDependency.ALPHABETICAL_SORTER))));
+            // keep transitive dependencies alphabetical sorted for better readability when trySubmitJob pretty prints queue processing.
+            this.jobs.put(artifact,
+                    dependencies.stream()
+                            .filter(J2clDependency::isIncluded)
+                            .peek(this::prepareJobs)
+                            .collect(Collectors.toCollection(Sets::sorted)));
+        }
     }
 
     /**
@@ -246,25 +317,25 @@ final class J2clBuildRequest {
         this.executeWithLock(() -> {
 
             //for readability sort jobs alphabetically as they will be printed and possibly submitted.....................
-            final SortedMap<J2clDependency, Set<J2clDependency>> alphaSortedJobs = Maps.sorted(J2clDependency.ALPHABETICAL_SORTER);
+            final SortedMap<J2clDependency, Set<J2clDependency>> alphaSortedJobs = Maps.sorted();
             alphaSortedJobs.putAll(this.jobs);
 
             for (final Entry<J2clDependency, Set<J2clDependency>> artifactAndDependencies : alphaSortedJobs.entrySet()) {
                 final J2clDependency artifact = artifactAndDependencies.getKey();
                 final Set<J2clDependency> required = artifactAndDependencies.getValue();
 
-                logger.printLine(artifact.coords().toString());
+                logger.printLine(artifact.toString());
                 logger.indent();
 
                 if (required.isEmpty()) {
                     this.jobs.remove(artifact);
                     submit.add(artifact.job());
-                    logger.printLine("Queued " + artifact.coords() + " for submission " + submit.size());
+                    logger.printLine("Queued " + artifact + " for submission " + submit.size());
                 } else {
                     logger.printLine("Waiting for " + required.size() + " dependencies");
                     logger.indent();
 
-                    required.forEach(r -> logger.printLine(r.coords().toString()));
+                    required.forEach(r -> logger.printLine(r.toString()));
 
                     logger.outdent();
                 }

@@ -39,9 +39,11 @@
                                 <jsinterop.checks>DISABLED</jsinterop.checks>
                             </defines>
                             <entry-points>j2cl.samples.app</entry-points>
+                            <excluded-dependencies></excluded-dependencies>
                             <externs></externs>
                             <javac-bootstrap>com.vertispan.j2cl:javac-bootstrap-classpath</javac-bootstrap>
                             <jre-jar-file>com.vertispan.j2cl:jre</jre-jar-file>
+                            <replaced-dependencies></replaced-dependencies>
                             <thread-pool-size>0</thread-pool-size>
                         </configuration>
                     </execution>

@@ -200,6 +200,17 @@ A Closure compiler argument containing one or more entry point(s).
 ```
 
 
+## excluded-dependencies
+A list of artifacts (group-id colon artifact-id) that may appear as transitive dependencies that must be excluded from
+the build process. The sample below is useful when requiring gwt-user.
+
+```xml
+<excluded-dependencies>
+    <param>javax.servlet:javax.servlet-api</param>
+    <param>javax.validation:validation-api</param>
+</excluded-dependencies>
+```
+
 
 ## externs
 Key value pairs that define externs for the Closure compiler. For more info click [here](https://developers.google.com/closure/compiler/docs/api-tutorial3#externs).
@@ -228,6 +239,18 @@ here.
 
 ## output
 This path is the final location of the final javascript.
+
+
+## replaced-dependencies
+
+A Map of dependencies with replacements as the value. The artifact-id, group-id and version-id must be used for both.
+Due to colons being present in the coords, a list of strings is used to express the original to replacement.
+
+```xml
+<replaced-dependencies>
+    <param>com.google.gwt:gwt-user:2.8.2=walkingkooka:example-excluded-dependencies-gwt-entrypoint:1.0</param>
+</replaced-dependencies>
+```
 
 
 

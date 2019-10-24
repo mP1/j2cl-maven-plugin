@@ -17,7 +17,7 @@
 
 package walkingkooka.j2cl.maven;
 
-import afu.org.checkerframework.checker.oigj.qual.O;
+
 import com.google.javascript.jscomp.CompilationLevel;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
@@ -30,8 +30,10 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.repository.RemoteRepository;
+import walkingkooka.collect.list.Lists;
+import walkingkooka.collect.map.Maps;
+import walkingkooka.text.CharSequences;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,6 +44,7 @@ import java.util.SortedSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -54,9 +57,7 @@ public final class J2clMojoBuild extends J2clMojo {
     public void execute() throws MojoExecutionException {
         try {
             final J2clBuildRequest request = this.request();
-            request.execute(J2clDependency.gather(this.project,
-                    J2clSourcesKind.SRC,
-                    request));
+            request.execute(J2clDependency.gather(this.project, request));
         } catch (final Throwable e) {
             throw new MojoExecutionException("Failed to build project, check logs above", e);
         }
@@ -72,6 +73,9 @@ public final class J2clMojoBuild extends J2clMojo {
                 this.cache(),
                 this.isJavacBootstrap(),
                 this.isJre(),
+                this.excludedDependencies(),
+                this.replacedDependencies(),
+                J2clSourcesKind.SRC,
                 this.output(),
                 this.mavenMiddleware(),
                 this.executor(),
@@ -132,6 +136,65 @@ public final class J2clMojoBuild extends J2clMojo {
 
     @Parameter(alias = "entry-points", required = true)
     private List<String> entrypoints = new ArrayList<>();
+
+    // excludedDependencies..............................................................................................
+
+    /**
+     * A {@link Predicate} that matches any transitive dependencies that should be removed from the dependency graph.
+     * This should be applied during the dependency discover phase.
+     */
+    private Predicate<J2clArtifactCoords> excludedDependencies() {
+        final List<Predicate<J2clArtifactCoords>> filter = this.excludedDependencies.stream()
+                .map(this::groupArtifactAndVersionPredicate)
+                .collect(Collectors.toList());
+
+        return new Predicate<>() {
+            @Override
+            public boolean test(final J2clArtifactCoords coords) {
+                boolean exclude = false;
+
+                for (final Predicate<J2clArtifactCoords> possible : filter) {
+                    exclude = possible.test(coords);
+                    if (exclude) {
+                        break;
+                    }
+                }
+
+                return exclude;
+            }
+
+            @Override
+            public String toString() {
+                return J2clMojoBuild.this.excludedDependencies.stream().collect(Collectors.joining(","));
+            }
+        };
+    }
+
+    @Parameter(alias = "excluded-dependencies", required = true)
+    private List<String> excludedDependencies = new ArrayList<>();
+
+    // replacedDependencies.............................................................................................
+
+    Map<J2clArtifactCoords, J2clArtifactCoords> replacedDependencies() {
+        final Map<J2clArtifactCoords, J2clArtifactCoords> lookup = Maps.sorted();
+
+        for (final String mapping : this.replacedDependencies) {
+            final int equalsSign = mapping.indexOf('=');
+            if (-1 == equalsSign) {
+                throw new IllegalArgumentException("Replacement dependency missing '=' in " + CharSequences.quoteAndEscape(mapping));
+            }
+            lookup.put(J2clArtifactCoords.parse(mapping.substring(0, equalsSign)), J2clArtifactCoords.parse(mapping.substring(equalsSign + 1)));
+        }
+
+        return Maps.readOnly(lookup);
+    }
+
+    /**
+     * A list of artifact to artifact separated by equals sign. A {@link Map} cant be used because of maven coords
+     * containing a colon.
+     */
+    @Parameter(alias = "replaced-dependencies", required = true)
+    private List<String> replacedDependencies = Lists.array();
 
     // externs..........................................................................................................
 
@@ -241,7 +304,7 @@ public final class J2clMojoBuild extends J2clMojo {
     // javaBootstrap.....................................................................................................
 
     private Predicate<J2clArtifactCoords> isJavacBootstrap() {
-        return this.artifactDependency(this.javacBootstrap);
+        return this.groupAndArtifactPredicate(this.javacBootstrap);
     }
 
     /**
@@ -253,18 +316,32 @@ public final class J2clMojoBuild extends J2clMojo {
     // jre..............................................................................................................
 
     private Predicate<J2clArtifactCoords> isJre() {
-        return this.artifactDependency(this.jre);
+        return this.groupAndArtifactPredicate(this.jre);
     }
 
     /**
-     * Only matches using the group-id and artifact-id the version is ignored.
+     * The JRE dependency as maven coordinates. This is necessary as the JRE jar file is a special case during building.
      */
-    private Predicate<J2clArtifactCoords> artifactDependency(final String groupAndArtifact) {
-        return new Predicate<> () {
+    @Parameter(alias = "jre-jar-file", required = true)
+    private String jre;
+
+    /**
+     * Factory that creates a {@link Predicate} that returns true if the group and artifact id match.
+     */
+    private Predicate<J2clArtifactCoords> groupAndArtifactPredicate(final String groupAndArtifact) {
+        final int colon = groupAndArtifact.indexOf(':');
+        if (-1 == colon) {
+            throw new IllegalArgumentException("Invalid coords, expected 2 components (groupId and artifactId): " + CharSequences.quoteAndEscape(groupAndArtifact));
+        }
+
+        CharSequences.failIfNullOrEmpty(groupAndArtifact.substring(0, colon), "group-id");
+        CharSequences.failIfNullOrEmpty(groupAndArtifact.substring(colon + 1), "artifact-id");
+
+        return new Predicate<>() {
 
             @Override
-            public boolean test(final J2clArtifactCoords coords) {
-                return groupAndArtifact.equals(coords.groupId() + ":" + coords.artifactId());
+            public boolean test(final J2clArtifactCoords test) {
+                return groupAndArtifact.equals(test.groupId() + ":" + test.artifactId());
             }
 
             @Override
@@ -275,8 +352,33 @@ public final class J2clMojoBuild extends J2clMojo {
     }
 
     /**
-     * The JRE dependency as maven coordinates. This is necessary as the JRE jar file is a special case during building.
+     * Only matches using the group-id and artifact-id the base or original version not the resolved version is ignored.
      */
-    @Parameter(alias = "jre-jar-file", required = true)
-    private String jre;
+    private Predicate<J2clArtifactCoords> groupArtifactAndVersionPredicate(final String coords) {
+        final String[] components = coords.split(":");
+        if (3 != components.length) {
+            throw new IllegalArgumentException("Invalid coords, expected 3 components (groupId, artifactId, version): " + CharSequences.quoteAndEscape(coords));
+        }
+
+        final String groupId = components[0];
+        final String artifactId = components[1];
+        final String version = components[2];
+
+        CharSequences.failIfNullOrEmpty(groupId, "group-id");
+        CharSequences.failIfNullOrEmpty(artifactId, "artifact-id");
+        CharSequences.failIfNullOrEmpty(version, "version");
+
+        return new Predicate<>() {
+
+            @Override
+            public boolean test(final J2clArtifactCoords test) {
+                return groupId.equals(test.groupId()) && artifactId.equals(test.artifactId()) && version.equals(test.baseVersion());
+            }
+
+            @Override
+            public String toString() {
+                return coords;
+            }
+        };
+    }
 }

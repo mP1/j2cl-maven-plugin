@@ -59,14 +59,13 @@ final class J2clBuildStepWorkerJ2ClTranspiler extends J2ClBuildStepWorker2 {
 
         J2clBuildStepResult result;
         if (sourceFiles.size() > 0) {
-            final J2clBuildRequest request = artifact.request();
-
             final List<J2clPath> classpath = Lists.array();
             classpath.addAll(J2clDependency.javacBootstrap().artifactFile().map(Lists::of).orElse(Lists.empty()));
             classpath.addAll(J2clDependency.jre().artifactFile().map(Lists::of).orElse(Lists.empty()));
 
             classpath.addAll(artifact.dependenciesIncludingTransitives()
                     .stream()
+                    .filter(J2clDependency::isIncluded) // remove excludeds
                     .flatMap(d -> d.artifactFile().stream())
                     .collect(Collectors.toList()));
 
