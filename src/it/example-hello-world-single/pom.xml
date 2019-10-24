@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>walkingkooka</groupId>
-    <artifactId>sample-pom</artifactId>
+    <artifactId>example-hello-world-single</artifactId>
     <version>1.0</version>
     <packaging>war</packaging>
 
