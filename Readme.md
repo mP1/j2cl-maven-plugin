@@ -44,6 +44,27 @@ A sample POM with the minimal dependencies and this plugin declaration is presen
 As a guide the following dependencies below may be considered a minimal requirement, and these were the implied or default
 dependencies that were defaulted.
 
+Sample required plugin repositories
+```xml
+<pluginRepositories>
+    <pluginRepository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </pluginRepository>
+
+    <pluginRepository>
+        <id>github.com/mP1 maven repo</id>
+        <url>https://maven-repo-254709.appspot.com</url>
+        <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>daily</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+        </snapshots>
+    </pluginRepository>
+</pluginRepositories>
+```
+
+
 The fragment below was taken directly from the integration tests present in this project.
 
 ```xml

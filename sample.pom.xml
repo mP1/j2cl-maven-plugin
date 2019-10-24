@@ -8,11 +8,8 @@
     <packaging>jar</packaging>
 
     <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
 
+        <!-- mixture of j2cl and google tooling -->
         <repository>
             <id>google-snapshots</id>
             <name>google-snapshots</name>
@@ -72,19 +69,6 @@
     <dependencies>
         <dependency>
             <groupId>com.vertispan.j2cl</groupId>
-            <artifactId>jre</artifactId>
-            <version>0.4-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.vertispan.j2cl</groupId>
-            <artifactId>jre</artifactId>
-            <version>0.4-SNAPSHOT</version>
-            <type>zip</type>
-        </dependency>
-
-        <dependency>
-            <groupId>com.vertispan.j2cl</groupId>
             <artifactId>bootstrap</artifactId>
             <version>0.4-SNAPSHOT</version>
             <type>zip</type>
@@ -92,9 +76,29 @@
         </dependency>
 
         <dependency>
-            <groupId>walkingkooka</groupId>
-            <artifactId>jsinterop-base</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <groupId>com.vertispan.j2cl</groupId>
+            <artifactId>javac-bootstrap-classpath</artifactId>
+            <version>0.4-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vertispan.j2cl</groupId>
+            <artifactId>jre</artifactId>
+            <version>0.4-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vertispan.j2cl</groupId>
+            <artifactId>jre</artifactId>
+            <version>0.4-SNAPSHOT</version>
+            <type>zip</type>
+            <classifier>jszip</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vertispan.jsinterop</groupId>
+            <artifactId>base</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -104,12 +108,29 @@
         </dependency>
     </dependencies>
 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </pluginRepository>
+
+        <pluginRepository>
+            <id>github.com/mP1 maven repo</id>
+            <url>https://maven-repo-254709.appspot.com</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
     <build>
         <plugins>
             <plugin>
                 <groupId>walkingkooka</groupId>
                 <artifactId>j2cl-maven-plugin</artifactId>
-                <version>0.9-SNAPSHOT</version>
+                <version>1.0-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <id>build-js</id>
@@ -125,9 +146,10 @@
                                 <jre.checks.checkLevel>MINIMAL</jre.checks.checkLevel>
                                 <jsinterop.checks>DISABLED</jsinterop.checks>
                             </defines>
-                            <entry-points>helloworld.app</entry-points>
-                            <javac-bootstrap>com.vertispan.j2cl:javac-bootstrap-classpath:0.4-SNAPSHOT</javac-bootstrap>
-                            <jre-jar-file>com.vertispan.j2cl:jre:0.4-SNAPSHOT</jre-jar-file>
+                            <entry-points>example.helloworld.app</entry-points>
+                            <externs></externs>
+                            <javac-bootstrap>com.vertispan.j2cl:javac-bootstrap-classpath</javac-bootstrap>
+                            <jre-jar-file>com.vertispan.j2cl:jre</jre-jar-file>
                             <thread-pool-size>0</thread-pool-size>
                         </configuration>
                     </execution>
