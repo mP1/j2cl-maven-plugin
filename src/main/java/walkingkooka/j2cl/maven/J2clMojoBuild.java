@@ -264,8 +264,6 @@ public final class J2clMojoBuild extends J2clMojo {
 
             @Override
             public boolean test(final J2clArtifactCoords coords) {
-                System.out.println("->" + groupAndArtifact + "=" + coords.groupId() + ":" + coords.artifactId() + "===> " +
-                        (groupAndArtifact.equals(coords.groupId() + ":" + coords.artifactId())));
                 return groupAndArtifact.equals(coords.groupId() + ":" + coords.artifactId());
             }
 
