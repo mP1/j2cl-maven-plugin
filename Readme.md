@@ -347,10 +347,55 @@ As previously mentioned sub directories are created in the directory set in `out
 and the project itself. All the steps for each artifact are also given a directory and log with all debug statements. Each
 log file will only contain output for the owning step, concurrent steps produce independent log files. All these logs are
 also printed to the console but with multiple threads running concurrently it might be confusing with interleved messages.
-It might be useful to change the `thread-pool-size` parameter to 1 to simply console printing.
+It might be useful to change the `thread-pool-size` parameter to 1 to simplify console printing.
+
+To aide readability and faster location of a parameter or file, everything is sorted alphabetically, along with nesting
+and tree views for a file listing such as a classpath.
+
+```text
+walkingkooka:sample-pom:war:1.0-TRANSPILE
+  Directory
+    /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-sample-pom-war-1.0-79dc060b493e5f27c56e0fa7225828b65d5f8565/5-transpiled-java-to-javascriptPreparing...
+        Sources
+          /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-sample-pom-war-1.0-79dc060b493e5f27c56e0fa7225828b65d5f8565/3-gwt-incompatible-stripped-source/output
+        3 *.java, *.js, *.native.js files
+          /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-sample-pom-war-1.0-79dc060b493e5f27c56e0fa7225828b65d5f8565/3-gwt-incompatible-stripped-source/output/example/helloworld/app.js
+          /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-sample-pom-war-1.0-79dc060b493e5f27c56e0fa7225828b65d5f8565/3-gwt-incompatible-stripped-source/output/example/helloworldlib/HelloWorld.java
+          /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-sample-pom-war-1.0-79dc060b493e5f27c56e0fa7225828b65d5f8565/3-gwt-incompatible-stripped-source/output/example/helloworldlib/hello.js
+      J2clTranspiler
+        Parameters
+          11 Classpath(s)
+            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/j2cl/javac-bootstrap-classpath/0.4-SNAPSHOT/javac-bootstrap-classpath-0.4-SNAPSHOT.jar
+            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/j2cl/jre/0.4-SNAPSHOT/jre-0.4-SNAPSHOT.jar
+            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/google/jsinterop/jsinterop-annotations/1.0.2/jsinterop-annotations-1.0.2.jar
+            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/google/jsinterop/jsinterop-annotations/2.0.0/jsinterop-annotations-2.0.0.jar
+            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/j2cl/bootstrap/0.4-SNAPSHOT/bootstrap-0.4-SNAPSHOT-jszip.zip
+            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/j2cl/gwt-internal-annotations/0.4-SNAPSHOT/gwt-internal-annotations-0.4-SNAPSHOT.jar
+            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/j2cl/javac-bootstrap-classpath/0.4-SNAPSHOT/javac-bootstrap-classpath-0.4-SNAPSHOT.jar
+            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/j2cl/jre/0.4-SNAPSHOT/jre-0.4-SNAPSHOT.jar
+            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/j2cl/jre/0.4-SNAPSHOT/jre-0.4-SNAPSHOT-jszip.zip
+            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/jsinterop/base/1.0.0-SNAPSHOT/base-1.0.0-SNAPSHOT.jar
+            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/javax/annotation/jsr250-api/1.0/jsr250-api-1.0.jar
+          1 Source(s)
+            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-sample-pom-war-1.0-79dc060b493e5f27c56e0fa7225828b65d5f8565/3-gwt-incompatible-stripped-source/output/example/helloworldlib/HelloWorld.java
+          0 Native source(s)
+          2 Other (ignored) file(s)
+            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-sample-pom-war-1.0-79dc060b493e5f27c56e0fa7225828b65d5f8565/3-gwt-incompatible-stripped-source/output/example/helloworld/app.js
+            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-sample-pom-war-1.0-79dc060b493e5f27c56e0fa7225828b65d5f8565/3-gwt-incompatible-stripped-source/output/example/helloworldlib/hello.js
+          Output
+            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-sample-pom-war-1.0-79dc060b493e5f27c56e0fa7225828b65d5f8565/5-transpiled-java-to-javascript/output
+        J2clTranspiler
+          0 problem(s)
+            *** END ***
+    
+    Log file
+      /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-sample-pom-war-1.0-79dc060b493e5f27c56e0fa7225828b65d5f8565/5-transpiled-java-to-javascript/log.txt
+    
+```
 
 The image below contains two panel views, the left shows a directory tree showing the output directory showing all artifacts
-and some log files expanded, and the right shows a sample log file.
+and some log files expanded, and the right shows a sample log file. The log shows a successful Closure compile build, with
+numerous warning level messages. All the parameters and paths to files are above the area of the log shown.
 
 ![Sample output](output-directory.png)
 
