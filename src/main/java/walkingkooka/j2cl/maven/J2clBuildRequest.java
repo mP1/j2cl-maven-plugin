@@ -335,7 +335,7 @@ final class J2clBuildRequest {
                 this.cancel(cause);
                 throw cause;
             }
-            if (this.executor.isTerminated() || this.jobs.isEmpty()) {
+            if (this.executor.isTerminated() && this.jobs.isEmpty()) {
                 break;
             }
         }
