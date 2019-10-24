@@ -341,6 +341,21 @@ This is the final step and only run for the project, it uses the Closure compile
 
 
 
+# Troubleshooting
+
+As previously mentioned sub directories are created in the directory set in `output` parameter for each and every dependency
+and the project itself. All the steps for each artifact are also given a directory and log with all debug statements. Each
+log file will only contain output for the owning step, concurrent steps produce independent log files. All these logs are
+also printed to the console but with multiple threads running concurrently it might be confusing with interleved messages.
+It might be useful to change the `thread-pool-size` parameter to 1 to simply console printing.
+
+The image below contains two panel views, the left shows a directory tree showing the output directory showing all artifacts
+and some log files expanded, and the right shows a sample log file.
+
+![Sample output](output-directory.png)
+
+ 
+
 # Contributions
 
 Suggestions via the issue tracker, and pull requests are most welcomed.
