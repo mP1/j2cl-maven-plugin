@@ -44,6 +44,8 @@ A sample POM with the minimal dependencies and this plugin declaration is presen
 As a guide the following dependencies below may be considered a minimal requirement, and these were the implied or default
 dependencies that were defaulted.
 
+## Plugin Repositories
+
 Sample required plugin repositories
 ```xml
 <pluginRepositories>
@@ -64,6 +66,45 @@ Sample required plugin repositories
 </pluginRepositories>
 ```
 
+## Plugin
+
+Sample plugins declaration to use this Maven Plugin. The parameters under the `configuration` are described in further
+detail below.
+
+```xml
+<plugins>
+    <plugin>
+        <groupId>walkingkooka</groupId>
+        <artifactId>j2cl-maven-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <executions>
+            <execution>
+                <id>build-js</id>
+                <phase>prepare-package</phase>
+                <goals>
+                    <goal>build</goal>
+                </goals>
+                <configuration>
+                    <classpath-scope>runtime</classpath-scope>
+                    <compilation-level>ADVANCED</compilation-level>
+                    <defines>
+                        <jre.checkedMode>DISABLED</jre.checkedMode>
+                        <jre.checks.checkLevel>MINIMAL</jre.checks.checkLevel>
+                        <jsinterop.checks>DISABLED</jsinterop.checks>
+                    </defines>
+                    <entry-points>example.helloworld.app</entry-points>
+                    <externs></externs>
+                    <javac-bootstrap>com.vertispan.j2cl:javac-bootstrap-classpath</javac-bootstrap>
+                    <jre-jar-file>com.vertispan.j2cl:jre</jre-jar-file>
+                    <thread-pool-size>0</thread-pool-size>
+                 </configuration>
+            </execution>
+        </executions>
+    </plugin>
+</plugins>
+```
+
+## Dependencies
 
 The fragment below was taken directly from the integration tests present in this project.
 
