@@ -1,0 +1,29 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>walkingkooka</groupId>
+  <artifactId>example-dependency-exclusions</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+
+  <!-- gwt-entrypoint must be built first as its referenced by app -->
+  <modules>
+    <module>example-dependency-exclusions-gwt-entrypoint</module>
+    <module>example-dependency-exclusions-app</module>
+  </modules>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.build.outputEncoding>UTF-8</project.build.outputEncoding>
+    <maven.compiler.source>1.9</maven.compiler.source>
+    <maven.compiler.target>1.9</maven.compiler.target>
+  </properties>
+
+  <repositories>
+    <repository>
+      <id>google-snapshots</id>
+      <url>https://oss.sonatype.org/content/repositories/google-snapshots/</url>
+    </repository>
+  </repositories>
+</project>

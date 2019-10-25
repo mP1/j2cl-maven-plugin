@@ -77,19 +77,21 @@ final class J2ClBuildStepWorkerHash extends J2clBuildStepWorker {
 
         for (final J2clDependency dependency : dependencies) {
             logger.printLine(dependency.toString());
-            logger.indent();
+            if(dependency.isIncluded()) {
+                logger.indent();
 
-            final String dependencyHash = dependency.hashOrFail();
-            {
-                hash.append(dependencyHash);
+                final String dependencyHash = dependency.hashOrFail();
+                {
+                    hash.append(dependencyHash);
 
-                final J2clPath directory = dependency.directory();
-                logger.printLine(directory.toString());
-                logger.printIndentedLine(dependencyHash);
+                    final J2clPath directory = dependency.directory();
+                    logger.printLine(directory.toString());
+                    logger.printIndentedLine(dependencyHash);
+                }
+
+                logger.printLine(dependencyHash);
+                logger.outdent();
             }
-
-            logger.printLine(dependencyHash);
-            logger.outdent();
         }
 
         logger.printEndOfList();

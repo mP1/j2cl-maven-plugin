@@ -30,6 +30,18 @@ import java.util.function.Function;
  */
 final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
 
+    static J2clArtifactCoords parse(final String coords) {
+        final org.eclipse.aether.artifact.DefaultArtifact artifact = new org.eclipse.aether.artifact.DefaultArtifact(coords);
+        final String classifier = artifact.getClassifier();
+
+        return new J2clArtifactCoords(artifact.getGroupId(),
+                artifact.getArtifactId(),
+                artifact.getExtension(),
+                Optional.ofNullable(classifier.isEmpty() ? null : classifier),
+                artifact.getVersion(),
+                artifact.getVersion());
+    }
+
     static J2clArtifactCoords with(final Artifact artifact) {
         return with(artifact.getGroupId(),
                 artifact.getArtifactId(),
@@ -73,6 +85,10 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
                 Optional.of("sources"),
                 this.baseVersion,
                 this.baseVersion);
+    }
+
+    String baseVersion() {
+        return this.baseVersion;
     }
 
     /**
