@@ -47,8 +47,6 @@ abstract class J2ClBuildStepWorkerJavacCompiler extends J2ClBuildStepWorker2 {
 
         J2clBuildStepResult result;
         if (javaSourceFiles.size() > 0) {
-            final J2clBuildRequest request = artifact.request();
-
             final Set<J2clPath> classpath = artifact.dependenciesIncludingTransitives()
                     .stream()
                     .filter(a -> false == a.isJreBinary())
