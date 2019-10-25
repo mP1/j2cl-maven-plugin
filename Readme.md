@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/mP1/j2cl-maven-plugin.svg?branch=master)](https://travis-ci.com/mP1/j2cl-maven-plugin.svg.svg?branch=master)
+
 J2CL Maven plugin
 =================
 
