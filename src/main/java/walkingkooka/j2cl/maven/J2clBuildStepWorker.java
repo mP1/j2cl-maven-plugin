@@ -30,7 +30,7 @@ abstract class J2clBuildStepWorker {
 
     final static J2clBuildStepWorker COMPILE_STRIP_GWT_INCOMPAT = J2ClBuildStepWorkerJavacCompilerGwtIncompatibleStrippedSource.instance();
 
-    final static J2clBuildStepWorker TRANSPILER = J2clBiildStepWorkerJ2ClTranspiler.instance();
+    final static J2clBuildStepWorker TRANSPILER = J2clBuildStepWorkerJ2ClTranspiler.instance();
 
     final static J2clBuildStepWorker CLOSURE = J2ClBuildStepWorkerClosureCompiler.instance();
 

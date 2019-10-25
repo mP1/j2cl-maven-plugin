@@ -25,16 +25,16 @@ import java.util.stream.Collectors;
 /**
  * Transpiles the stripped source into javascript equivalents.
  */
-final class J2clBiildStepWorkerJ2ClTranspiler extends J2ClBuildStepWorker2 {
+final class J2clBuildStepWorkerJ2ClTranspiler extends J2ClBuildStepWorker2 {
 
     /**
      * Singleton
      */
     static J2clBuildStepWorker instance() {
-        return new J2clBiildStepWorkerJ2ClTranspiler();
+        return new J2clBuildStepWorkerJ2ClTranspiler();
     }
 
-    private J2clBiildStepWorkerJ2ClTranspiler() {
+    private J2clBuildStepWorkerJ2ClTranspiler() {
         super();
     }
 
