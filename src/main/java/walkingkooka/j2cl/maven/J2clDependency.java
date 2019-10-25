@@ -209,9 +209,6 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
         printer.printLine("Dependencies graph");
 
-        final AtomicBoolean javacBootstrap = new AtomicBoolean();
-        final AtomicBoolean jre = new AtomicBoolean();
-
         printer.indent();
         this.prettyPrintDependencies0(printer);
         printer.outdent();
@@ -228,7 +225,6 @@ final class J2clDependency implements Comparable<J2clDependency> {
         printer.indent();
         this.dependencies().forEach(d -> d.prettyPrintDependencies0(printer));
         printer.outdent();
-        printer.flush();
     }
 
     // coords...........................................................................................................
@@ -402,10 +398,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     // dependencies.....................................................................................................
 
-    /**
-     * Dont want to sort dependencies now, because that will result in {@link #depth} being initialized before all dependencies including transitives are set.
-     */
-    private final Set<J2clDependency> dependencies = new HashSet<>();
+    private final Set<J2clDependency> dependencies = Sets.sorted(ALPHABETICAL_SORTER);
 
     /**
      * Returns the immediate dependencies without any transitives.
