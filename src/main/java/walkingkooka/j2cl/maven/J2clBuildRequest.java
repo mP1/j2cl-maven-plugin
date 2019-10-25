@@ -22,6 +22,7 @@ import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,7 +32,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -275,17 +278,18 @@ final class J2clBuildRequest {
             logger.printLine(submit.size() + " job(s) submitted, " + waiting + " waiting!!");
             logger.flush();
 
-            submit.forEach(this.completionService::submit);
-
-            if (submit.isEmpty() && 0 == waiting) {
-                if (false == this.executor.isShutdown()) {
-                    this.executor.shutdown();
-                }
-            }
+            submit.forEach(this::submitTask);
         });
 
         return submit.size();
     }
+
+    private void submitTask(final Callable<J2clDependency> task) {
+        this.completionService.submit(task);
+        this.running.incrementAndGet();
+    }
+
+    private final AtomicInteger running = new AtomicInteger();
 
     /**
      * Finds all jobs that have the given artifact as a dependency and remove that dependency from the waiting list.
@@ -327,16 +331,18 @@ final class J2clBuildRequest {
      * Waits (aka Blocks) for all outstanding tasks to complete.
      */
     private void await() throws Throwable {
-        for (; ; ) {
+        while (false == this.executor.isTerminated()) {
             try {
-                this.executor.awaitTermination(10, TimeUnit.SECONDS);
+                final Future<?> task = this.completionService.poll(5, TimeUnit.SECONDS);
+                if(null != task) {
+                    if( 0 == this.running.decrementAndGet()) {
+                        this.executor.shutdown();
+                    }
+                }
             } catch (final Exception cause) {
                 cause.printStackTrace();
                 this.cancel(cause);
                 throw cause;
-            }
-            if (this.executor.isTerminated() && this.jobs.isEmpty()) {
-                break;
             }
         }
 
