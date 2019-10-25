@@ -160,7 +160,6 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     private final boolean dependency;
 
-
     /**
      * Returns the JAVAC BOOTSTRAP dependency
      */
@@ -225,9 +224,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private void prettyPrintDependencies0(final J2clLinePrinter printer) {
-        final J2clBuildRequest request = this.request();
-
-        printer.printLine(this.coords() + (request.isJre(this.coords()) ? " (JRE)" : request.isJavacBootstrap(this.coords()) ? "(javac bootstrap)" : ""));
+        printer.printLine(this.toString());
         printer.indent();
         this.dependencies().forEach(d -> d.prettyPrintDependencies0(printer));
         printer.outdent();
@@ -256,11 +253,15 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     // jre..............................................................................................................
 
+    boolean isJre() {
+        return this.request().isJre(this.coords);
+    }
+
     /**
      * Only returns true for artifacts that are actually the JRE binaries in some form, but not the jszip form.
      */
     boolean isJreBinary() {
-        return this.request().isJre(this.coords) && false == JSZIP.equals(this.coords().classifier());
+        return this.isJre() && false == JSZIP.equals(this.coords().classifier());
     }
 
     private final static Optional<String> JSZIP = Optional.of("jszip");
@@ -435,10 +436,11 @@ final class J2clDependency implements Comparable<J2clDependency> {
     // toString.........................................................................................................
     @Override
     public String toString() {
-        return this.coords.toString() +
-                this.artifactFile().map(f -> " (" + f + ") ").orElse("") +
-                Optional.ofNullable(this.artifact().getScope()).map(s -> " " + CharSequences.quoteAndEscape(s)).orElse("") +
-                (GATHERING ? "" : String.valueOf(this.depth() - 1));
+        return this.coords +
+                (Optional.ofNullable(this.artifact().getScope()).map(s -> " " + CharSequences.quoteAndEscape(s)).orElse("")) +
+                (this.isJre() ? " (JRE)" : "") +
+                (this.isJavacBootstrap() ? " (JAVAC BOOTSTRAP)" : "") +
+                (GATHERING ? "" : " " + (this.depth() - 1));
     }
 
     // Comparable.......................................................................................................
