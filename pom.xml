@@ -279,9 +279,9 @@
     </dependency>
 
     <dependency>
-        <groupId>com.github.mP1</groupId>
-        <artifactId>walkingkooka</artifactId>
-        <version>4fcef61be7</version>
+      <groupId>com.github.mP1</groupId>
+      <artifactId>walkingkooka-text-printer</artifactId>
+      <version>master-SNAPSHOT</version>
     </dependency>
 
     <!-- Test -->
