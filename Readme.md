@@ -14,6 +14,21 @@ artifacts, nothing is assumed, everything must be declared in the pom in some fo
 defaulted and must be present in the POM.
 
 
+# Usage
+
+The preferred way to use the plugin is to checkout the source
+
+```
+git clone git://github.com/mP1/j2cl-maven-plugin.git
+```
+
+and build and install with Maven.
+
+```
+mvn clean install
+```
+
+
 # Goals
 
 The plugin has two goals
@@ -429,14 +444,3 @@ numerous warning level messages. All the parameters and paths to files are above
 # Contributions
 
 Suggestions via the issue tracker, and pull requests are most welcomed.
-
-
-
-# Getting the source
-
-You can either download the source using the "ZIP" button at the top
-of the github page, or you can make a clone using git:
-
-```
-git clone git://github.com/mP1/j2cl-maven-plugin.git
-```
