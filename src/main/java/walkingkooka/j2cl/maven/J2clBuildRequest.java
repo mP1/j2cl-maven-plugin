@@ -280,7 +280,7 @@ final class J2clBuildRequest {
 
         final int missing = unknown.size();
         if (missing > 0) {
-            throw new J2clException(missing + " mappings in <replacement-dependencies> are missing <dependency> entries in this POM, " +
+            throw new J2clException(missing + " mappings in <replacement-dependencies> contains unknown dependency references in this POM, " +
                     unknown.stream().map(J2clArtifactCoords::toString).collect(Collectors.joining(", ")));
         }
     }
