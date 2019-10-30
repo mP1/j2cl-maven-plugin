@@ -21,6 +21,7 @@ import com.google.javascript.jscomp.CompilationLevel;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.text.CharSequences;
 
 import java.util.List;
 import java.util.Map;
@@ -284,9 +285,15 @@ final class J2clBuildRequest {
 
         final int missing = unknown.size();
         if (missing > 0) {
-            throw new J2clException(missing + " mappings in <replacement-dependencies> contains unknown dependency references in this POM, " +
-                    unknown.stream().map(J2clArtifactCoords::toString).collect(Collectors.joining(", ")));
+            throw new J2clException(missing + " mapping(s) in <replaced-dependencies> contains unknown dependencies, " +
+                    unknown.stream()
+                            .map(J2clBuildRequest::format)
+                            .collect(Collectors.joining(", ")));
         }
+    }
+
+    private static String format(final J2clArtifactCoords coords) {
+        return CharSequences.quoteAndEscape(coords.toString()).toString();
     }
 
     /**
