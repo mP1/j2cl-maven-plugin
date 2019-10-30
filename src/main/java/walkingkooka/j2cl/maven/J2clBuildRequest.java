@@ -180,11 +180,15 @@ final class J2clBuildRequest {
             lookup = coords;
         }
 
-        final J2clDependency dependency = J2clDependency.getOrFail(lookup);
-        if (null == dependency) {
-            throw new IllegalArgumentException("Unknown dependency coords " + coords);
+        try {
+            return J2clDependency.getOrFail(lookup);
+        } catch (final IllegalArgumentException cause) {
+            if (null == lookup) {
+                throw cause;
+            }
+
+            throw new IllegalArgumentException("Unknown coords " + coords + "->" + lookup);
         }
-        return dependency;
     }
 
     private final Map<J2clArtifactCoords, J2clArtifactCoords> replacedDependencies;
