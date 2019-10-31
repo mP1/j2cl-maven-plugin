@@ -147,10 +147,16 @@
                                 <jsinterop.checks>DISABLED</jsinterop.checks>
                             </defines>
                             <entry-points>example.helloworld.app</entry-points>
+                            <excluded-dependencies>
+                                <param>com.google.gwt:gwt-user:2.8.2</param>
+                            </excluded-dependencies>
                             <externs></externs>
                             <javac-bootstrap>com.vertispan.j2cl:javac-bootstrap-classpath</javac-bootstrap>
                             <jre-jar-file>com.vertispan.j2cl:jre</jre-jar-file>
-                            <thread-pool-size>0</thread-pool-size>
+                            <replaced-dependencies>
+                                <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT=walkingkooka:jsinterop-base:1.0.1-SNAPSHOT</param>
+                            </replaced-dependencies>
+                            <thread-pool-size>1</thread-pool-size>
                         </configuration>
                     </execution>
                 </executions>
