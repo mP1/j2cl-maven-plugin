@@ -98,7 +98,7 @@ class ClosureCompiler {
             logger.printLine("Parameters");
             logger.indent();
             {
-                final Path initialScriptFilenamePath = Paths.get(output.path().toString(), initialScriptFilename.toString());
+                final Path initialScriptFilenamePath = initialScriptFilename.path();
                 final Path parentOf = initialScriptFilenamePath.getParent();
                 Files.createDirectories(parentOf);
 

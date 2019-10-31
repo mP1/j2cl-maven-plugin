@@ -35,6 +35,7 @@ import walkingkooka.collect.map.Maps;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -245,13 +246,13 @@ public final class J2clMojoBuild extends J2clMojo {
     // initial-script-filename..........................................................................................
 
     private J2clPath initialScriptFilename() {
-        return J2clPath.with(this.initialScriptFilename.toPath());
+        return J2clPath.with(Paths.get(this.initialScriptFilename));
     }
 
     @Parameter(alias = "initial-script-filename",
             defaultValue = "${project.groupId}/${project.artifactId}.js",
             required = true)
-    private File initialScriptFilename;
+    private String initialScriptFilename;
 
     // output...........................................................................................................
 
