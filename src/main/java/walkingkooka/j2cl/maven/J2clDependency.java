@@ -93,16 +93,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
             if (false == parent.dependencyCoords.contains(added)) {
                 J2clDependency child = COORD_TO_DEPENDENCY.get(added);
                 if (null == child) {
-                    final DefaultArtifact defaultArtifact = new DefaultArtifact(added.groupId(),
-                            added.artifactId(),
-                            added.baseVersion(),
-                            scope.scope,
-                            added.type(),
-                            added.classifier().orElse(null),
-                            parentArtifact.getArtifactHandler());
-
                     final MavenProject mavenProject = request.mavenMiddleware()
-                            .mavenProject(defaultArtifact);
+                            .mavenProject(added.mavenArtifact(scope, parentArtifact.getArtifactHandler()));
                     gatherDependencies(mavenProject,
                             mavenProject.getArtifact(),
                             true, // dependency=true
