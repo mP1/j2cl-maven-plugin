@@ -19,7 +19,6 @@ package walkingkooka.j2cl.maven;
 
 
 import com.google.javascript.jscomp.CompilationLevel;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
@@ -138,7 +137,12 @@ public final class J2clMojoBuild extends J2clMojo {
     // compilationLevel.................................................................................................
 
     private CompilationLevel compilationLevel() {
-        return CompilationLevel.fromString(this.compilationLevel);
+        final String parameter = this.compilationLevel;
+        final CompilationLevel level = CompilationLevel.fromString(parameter);
+        if (null == level) {
+            throw new IllegalStateException("Invalid compilation-level was " + CharSequences.quoteAndEscape(parameter));
+        }
+        return level;
     }
 
     /**
