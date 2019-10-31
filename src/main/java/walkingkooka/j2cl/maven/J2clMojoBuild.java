@@ -249,7 +249,7 @@ public final class J2clMojoBuild extends J2clMojo {
     }
 
     @Parameter(alias = "initial-script-filename",
-            defaultValue = "${project.artifactId}/${project.artifactId}.js",
+            defaultValue = "${project.groupId}/${project.artifactId}.js",
             required = true)
     private File initialScriptFilename;
 
