@@ -49,7 +49,7 @@ final class J2ClBuildStepWorkerOutputAssembler extends J2ClBuildStepWorker2 {
         final Collection<J2clPath> files = source.gatherFiles();
         logger.printIndented("Source", files);
 
-        logger.print("Copying");
+        logger.printLine("Copying");
         logger.indent();
         {
             target.copyFiles(source, files, logger::printLine);
