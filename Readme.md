@@ -364,7 +364,10 @@ coordinates and used to create a directory if one did not previously exist.
 
 ## Step 2 Unpack
 
-The source from the project or the sources jar file for an artifact will be extracted.
+An attempt will be made to locate the sources jar and unpack if found. If no java source files (`*.java`) are found the
+original artifact itself will be unpacked over the first unpack. If no java source files are found in either the remaining
+steps will be aborted, otherwise the next step will be attemped trying to eventually transpile the unpacked java to
+javascript.
 
 
 

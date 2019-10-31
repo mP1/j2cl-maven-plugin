@@ -105,9 +105,7 @@
               </excluded-dependencies>
               <javac-bootstrap>com.vertispan.j2cl:javac-bootstrap-classpath</javac-bootstrap>
               <jre-jar-file>com.vertispan.j2cl:jre</jre-jar-file>
-              <replaced-dependencies>
-                <param>com.google.gwt:gwt-user:2.8.2=walkingkooka:example-dependency-exclusions-gwt-entrypoint:jar:1.0</param>
-              </replaced-dependencies>
+              <replaced-dependencies/>
               <thread-pool-size>0</thread-pool-size>
             </configuration>
           </execution>

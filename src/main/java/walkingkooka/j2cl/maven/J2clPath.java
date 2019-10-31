@@ -73,6 +73,10 @@ final class J2clPath implements Comparable<J2clPath> {
         this.path = path;
     }
 
+    boolean isJavaFile() {
+        return this.path().toString().endsWith(".java");
+    }
+
     boolean isFile() {
         return Files.isRegularFile(this.path());
     }
