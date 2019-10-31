@@ -14,6 +14,7 @@ artifacts, nothing is assumed, everything must be declared in the pom in some fo
 defaulted and must be present in the POM.
 
 
+
 # Usage
 
 The preferred way to use the plugin is to checkout the source
@@ -28,6 +29,7 @@ and build and install with Maven.
 mvn clean install
 ```
 
+*STATUS* More integration tests need to be done to guarantee to establish that this is building correctly.
 
 # Goals
 
