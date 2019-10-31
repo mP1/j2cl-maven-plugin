@@ -116,8 +116,6 @@ public final class J2clMojoBuild extends J2clMojo {
     // classpathScope...................................................................................................
 
     private J2clClasspathScope classpathScope() {
-        //return
-        J2clClasspathScope.commandLineOption(Artifact.SCOPE_COMPILE_PLUS_RUNTIME); // compile+runtime
         return J2clClasspathScope.commandLineOption(this.classpathScope);
     }
 
