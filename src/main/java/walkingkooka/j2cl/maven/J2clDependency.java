@@ -125,15 +125,6 @@ final class J2clDependency implements Comparable<J2clDependency> {
     static J2clDependency getOrFail(final J2clArtifactCoords coords) {
         final J2clDependency dependency = COORD_TO_DEPENDENCY.get(coords);
         if (null == dependency) {
-
-            System.err.println("COORD_TO_DEPENDENCY BEGIN");
-            COORD_TO_DEPENDENCY.entrySet()
-                    .stream()
-                    .forEach(e -> {
-                        System.err.println(e.getKey() + "\t=\t" + e.getValue());
-                    });
-            System.err.println("COORD_TO_DEPENDENCY END");
-
             throw new IllegalArgumentException("Unknown coords " + coords);
         }
         return dependency;
