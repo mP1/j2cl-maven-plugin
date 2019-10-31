@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.project.MavenProject;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
@@ -58,11 +59,10 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     private static J2clDependency gatherDependencies(final MavenProject project,
                                                      final Artifact parentArtifact,
-                                                     //final J2clSourcesKind sources,
                                                      final boolean dependency,
                                                      final J2clBuildRequest request) {
-        final J2clArtifactCoords projectCoords = J2clArtifactCoords.with(parentArtifact);
-        final J2clDependency parent = new J2clDependency(projectCoords,
+        final J2clArtifactCoords parentCoords = J2clArtifactCoords.with(parentArtifact);
+        final J2clDependency parent = new J2clDependency(parentCoords,
                 parentArtifact,
                 project,
                 dependency,
@@ -82,11 +82,34 @@ final class J2clDependency implements Comparable<J2clDependency> {
             J2clDependency child = COORD_TO_DEPENDENCY.get(dependencyCoords);
             if (null == child) {
                 gatherDependencies(request.mavenMiddleware().mavenProject(dependencyArtifact),
-                        dependencyArtifact,
+                        dependencyArtifact, //
                         true, // dependency=true
                         request);
             }
             parent.dependencyCoords.add(dependencyCoords);
+        }
+
+        for (final J2clArtifactCoords added : request.addedDependencies(parentCoords)) {
+            if (false == parent.dependencyCoords.contains(added)) {
+                J2clDependency child = COORD_TO_DEPENDENCY.get(added);
+                if (null == child) {
+                    final DefaultArtifact defaultArtifact = new DefaultArtifact(added.groupId(),
+                            added.artifactId(),
+                            added.baseVersion(),
+                            scope.scope,
+                            added.type(),
+                            added.classifier().orElse(null),
+                            parentArtifact.getArtifactHandler());
+
+                    final MavenProject mavenProject = request.mavenMiddleware()
+                            .mavenProject(defaultArtifact);
+                    gatherDependencies(mavenProject,
+                            mavenProject.getArtifact(),
+                            true, // dependency=true
+                            request);
+                }
+                parent.dependencyCoords.add(added);
+            }
         }
 
         return parent;
@@ -102,6 +125,15 @@ final class J2clDependency implements Comparable<J2clDependency> {
     static J2clDependency getOrFail(final J2clArtifactCoords coords) {
         final J2clDependency dependency = COORD_TO_DEPENDENCY.get(coords);
         if (null == dependency) {
+
+            System.err.println("COORD_TO_DEPENDENCY BEGIN");
+            COORD_TO_DEPENDENCY.entrySet()
+                    .stream()
+                    .forEach(e -> {
+                        System.err.println(e.getKey() + "\t=\t" + e.getValue());
+                    });
+            System.err.println("COORD_TO_DEPENDENCY END");
+
             throw new IllegalArgumentException("Unknown coords " + coords);
         }
         return dependency;
