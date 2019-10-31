@@ -31,6 +31,9 @@
                             <goal>build</goal>
                         </goals>
                         <configuration>
+                            <added-dependencies>
+                                <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:0.4-SNAPSHOT</param>
+                            </added-dependencies>
                             <classpath-scope>runtime</classpath-scope>
                             <compilation-level>ADVANCED</compilation-level>
                             <defines>

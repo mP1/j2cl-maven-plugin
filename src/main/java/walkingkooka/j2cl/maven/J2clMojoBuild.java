@@ -37,6 +37,7 @@ import walkingkooka.text.CharSequences;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +65,8 @@ public final class J2clMojoBuild extends J2clMojo {
     }
 
     private J2clBuildRequest request() {
-        return J2clBuildRequest.with(this.classpathScope(),
+        return J2clBuildRequest.with(this.addedDependencies(),
+                this.classpathScope(),
                 this.compilationLevel(),
                 this.defines(),
                 this.externs(),
@@ -81,6 +83,35 @@ public final class J2clMojoBuild extends J2clMojo {
                 this.executor(),
                 this.logger());
     }
+
+    // autoAddedDependencies.............................................................................................
+
+    private Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies() {
+        final Map<J2clArtifactCoords, List<J2clArtifactCoords>> lookup = Maps.sorted();
+
+        for (final String mapping : this.addedDependencies) {
+            final int equalsSign = mapping.indexOf('=');
+            if (-1 == equalsSign) {
+                throw new IllegalArgumentException("Replacement dependency missing '=' in " + CharSequences.quoteAndEscape(mapping));
+            }
+
+            final String autoAdded =mapping.substring(equalsSign + 1);
+
+            lookup.put(J2clArtifactCoords.parse(mapping.substring(0, equalsSign)), Arrays.stream(autoAdded.split(","))
+                    .map(J2clArtifactCoords::parse)
+                    .collect(Collectors.toList())
+            );
+        }
+
+        return Maps.readOnly(lookup);
+    }
+
+    /**
+     * A {@link List} of parent artifact to a comma separated list of dependencies to auto add, with the former separated
+     * from the later by an equals sign.
+     */
+    @Parameter(alias = "added-dependencies", required = true)
+    private List<String> addedDependencies = Lists.array();
 
     // classpathScope...................................................................................................
 

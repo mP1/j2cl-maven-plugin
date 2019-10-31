@@ -176,6 +176,27 @@ The fragment below was taken directly from the integration tests present in this
 Many parameters are actually used to tweak and configure the Closure compiler. Refer to the Closure documentation for
 more information.
 
+
+
+## added-dependencies
+A list of artifacts (group-id colon artifact-id) followed by a comma separated list of artifacts that will become
+dependencies of the former. This is equivalent to defining the later as `<dependency>` in the former `pom.xml`.
+
+This is necessary in a few dependencies such as [com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT](https://github.com/Vertispan/jsinterop-base)
+requiring annotations like `javaemul.internal.annotations.DoNotAutobox` but are missing a `<dependency>` declaration
+for [com.vertispan.j2cl:gwt-internal-annotations:0.4-SNAPSHOT](https://github.com/Vertispan/j2cl/blob/rebased_master/maven/gwt-internal-annotations/pom.xml);
+This mechanism provides support for adding such missing dependencies at an individual artifact level.
+
+The same is true for the original google artifacts such as `com.google.jsinterop:jsinterop-annotations:1.0.2`
+
+```xml
+<added-dependencies>
+    <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:0.4-SNAPSHOT</param>
+</added-dependencies>
+```
+
+
+
 ## classpath-scope
 The suggested value is typically `runtime`, for more info click [here](https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html)
 

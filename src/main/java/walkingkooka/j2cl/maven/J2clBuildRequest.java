@@ -46,7 +46,8 @@ import java.util.stream.Collectors;
  */
 final class J2clBuildRequest {
 
-    static J2clBuildRequest with(final J2clClasspathScope scope,
+    static J2clBuildRequest with(final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies,
+                                 final J2clClasspathScope scope,
                                  final CompilationLevel level,
                                  final Map<String, String> defines,
                                  final Set<String> externs,
@@ -62,7 +63,8 @@ final class J2clBuildRequest {
                                  final J2clMavenMiddleware middleware,
                                  final ExecutorService executor,
                                  final J2clLogger logger) {
-        return new J2clBuildRequest(scope,
+        return new J2clBuildRequest(addedDependencies,
+                scope,
                 level,
                 defines,
                 externs,
@@ -80,7 +82,8 @@ final class J2clBuildRequest {
                 logger);
     }
 
-    private J2clBuildRequest(final J2clClasspathScope scope,
+    private J2clBuildRequest(final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies,
+                             final J2clClasspathScope scope,
                              final CompilationLevel level,
                              final Map<String, String> defines,
                              final Set<String> externs,
@@ -97,6 +100,8 @@ final class J2clBuildRequest {
                              final ExecutorService executor,
                              final J2clLogger logger) {
         super();
+
+        this.addedDependencies = addedDependencies;
 
         this.scope = scope;
         this.level = level;
@@ -134,6 +139,19 @@ final class J2clBuildRequest {
         this.hash = hash
                 .toString();
     }
+
+    /**
+     * Get all dependencies added via the added-dependencies maven plugin parameter
+     * or an empty list.
+     */
+    List<J2clArtifactCoords> addedDependencies(final J2clArtifactCoords coords) {
+        return this.addedDependencies.getOrDefault(coords, Lists.empty());
+    }
+
+    /**
+     * Added to each discovered dependency as they are discovered.
+     */
+    private final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies;
 
     final J2clClasspathScope scope;
     final CompilationLevel level;
