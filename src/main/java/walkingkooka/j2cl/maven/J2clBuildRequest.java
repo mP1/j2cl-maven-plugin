@@ -132,9 +132,22 @@ final class J2clBuildRequest {
         final HashBuilder hash = HashBuilder.empty()
                 .append(scope.toString())
                 .append(level.toString());
+        addedDependencies.forEach((k, v) -> {
+            hash.append(k.toString());
+
+            v.forEach(a -> hash.append(a.toString()));
+        });
         defines.forEach((k, v) -> hash.append(k).append(v));
-        externs.forEach(hash::append);
         entryPoints.forEach(hash::append);
+        hash.append(excluded.toString());
+        externs.forEach(hash::append);
+        hash.append(javacBootstrap.toString());
+        hash.append(jre.toString());
+        replacedDependencies.forEach((k, v)-> {
+            hash.append(k.toString());
+            hash.append(v.toString());
+        });
+        hash.append(sourcesKind.name());
 
         this.hash = hash
                 .toString();
