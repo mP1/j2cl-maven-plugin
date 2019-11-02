@@ -62,11 +62,15 @@ abstract class J2ClBuildStepWorkerJavacCompiler extends J2ClBuildStepWorker2 {
                     J2clBuildStepResult.SUCCESS :
                     J2clBuildStepResult.FAILED;
         } else {
-            logger.printIndentedLine("No files found - javac aborted.");
-
-            directory.aborted().emptyOrFail();
-
-            result = J2clBuildStepResult.ABORTED;
+            if (artifact.isDependency()) {
+                logger.printIndentedLine("No files found - javac aborted.");
+                directory.aborted().emptyOrFail();
+                result = J2clBuildStepResult.ABORTED;
+            } else {
+                logger.printIndentedLine("No files found - javac skipped.");
+                directory.skipped().emptyOrFail();
+                result = J2clBuildStepResult.SKIPPED;
+            }
         }
 
         return result;
