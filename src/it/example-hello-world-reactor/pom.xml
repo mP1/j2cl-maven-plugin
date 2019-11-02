@@ -8,8 +8,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>lib</module>
-        <module>app</module>
+        <module>example-hello-world-reactor-lib</module>
+        <module>example-hello-world-reactor-app</module>
     </modules>
 
     <repositories>
