@@ -24,7 +24,6 @@ import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.text.CharSequences;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -48,67 +47,10 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     static J2clDependency gather(final MavenProject project,
                                  final J2clBuildRequest request) {
-        return gatherDependencies(project,
-                project.getArtifact(),
-                false, // dependency=false
-                request);
-    }
-
-    /**
-     * Collects all immediate dependencies for each dependency while walking the entire tree of dependencies.
-     */
-    private static J2clDependency gatherDependencies(final MavenProject project,
-                                                     final Artifact parentArtifact,
-                                                     final boolean dependency,
-                                                     final J2clBuildRequest request) {
-        final J2clArtifactCoords parentCoords = J2clArtifactCoords.with(parentArtifact);
-        final J2clDependency parent = new J2clDependency(parentCoords,
-                parentArtifact,
+        return new J2clDependency(J2clArtifactCoords.with(project.getArtifact()),
                 project,
-                dependency,
+                null,
                 request);
-        final J2clClasspathScope scope = request.scope;
-
-        for (final Artifact dependencyArtifact : project.getArtifacts()) {
-            if (isSystem(dependencyArtifact)) {
-                continue;
-            }
-
-            if (false == scope.scopeFilter().test(dependencyArtifact)) {
-                continue;
-            }
-
-            final J2clArtifactCoords dependencyCoords = J2clArtifactCoords.with(dependencyArtifact);
-            J2clDependency child = COORD_TO_DEPENDENCY.get(dependencyCoords);
-            if (null == child) {
-                gatherDependencies(request.mavenMiddleware().mavenProject(dependencyArtifact),
-                        dependencyArtifact, //
-                        true, // dependency=true
-                        request);
-            }
-            parent.dependencyCoords.add(dependencyCoords);
-        }
-
-        for (final J2clArtifactCoords added : request.addedDependencies(parentCoords)) {
-            if (false == parent.dependencyCoords.contains(added)) {
-                J2clDependency child = COORD_TO_DEPENDENCY.get(added);
-                if (null == child) {
-                    final MavenProject mavenProject = request.mavenMiddleware()
-                            .mavenProject(added.mavenArtifact(scope, parentArtifact.getArtifactHandler()));
-                    gatherDependencies(mavenProject,
-                            mavenProject.getArtifact(),
-                            true, // dependency=true
-                            request);
-                }
-                parent.dependencyCoords.add(added);
-            }
-        }
-
-        return parent;
-    }
-
-    private static boolean isSystem(final Artifact artifact) {
-        return Artifact.SCOPE_SYSTEM.equals(artifact.getScope());
     }
 
     /**
@@ -131,25 +73,98 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     private final static Map<J2clArtifactCoords, J2clDependency> COORD_TO_DEPENDENCY = Maps.sorted();
 
+    /**
+     * Switch that becomes true when gathering the JRE or any of its dependencies. When true dependencies are
+     * added to {@link #JRE_OR_JRE_DEPENDENCIES}
+     */
+    private static boolean GATHERING_JRE_DEPENDENCIES = false;
+
+    /**
+     * Holds the coords of any dependencies that are JRE dependencies.
+     */
+    private final static Set<J2clArtifactCoords> JRE_OR_JRE_DEPENDENCIES = Sets.sorted();
+
     // ctor.............................................................................................................
 
     /**
      * Private ctor use public static methods.
      */
     private J2clDependency(final J2clArtifactCoords coords,
-                           final Artifact artifact,
                            final MavenProject mavenProject,
-                           final boolean dependency,
+                           final J2clPath artifactFile,
                            final J2clBuildRequest request) {
+        final Artifact artifact = mavenProject.getArtifact();
         this.coords = coords;
         this.artifact = artifact;
         this.mavenProject = mavenProject;
-        this.dependency = dependency;
+        this.artifactFile = artifactFile;
         this.request = request;
 
         if (null != COORD_TO_DEPENDENCY.put(coords, this)) {
             throw new IllegalArgumentException("Duplicate artifact " + CharSequences.quote(coords.toString()));
         }
+
+        final boolean jre = this.isJre();
+        if (jre) {
+            GATHERING_JRE_DEPENDENCIES = true;
+            JRE_OR_JRE_DEPENDENCIES.add(coords);
+        }
+        this.gatherDeclaredDependencies();
+        this.addAddedDependencies();
+        GATHERING_JRE_DEPENDENCIES = false;
+    }
+
+    private void gatherDeclaredDependencies() {
+        final J2clBuildRequest request = this.request();
+        final J2clClasspathScope scope = request.scope;
+
+        for (final Artifact artifact : this.mavenProject.getArtifacts()) {
+            if (isSystemScope(artifact)) {
+                continue;
+            }
+
+            if (false == scope.scopeFilter().test(artifact)) {
+                continue;
+            }
+
+            this.dependencyCoords.add(this.getOrCreate(J2clArtifactCoords.with(artifact)).coords());
+        }
+    }
+
+    private static boolean isSystemScope(final Artifact artifact) {
+        return Artifact.SCOPE_SYSTEM.equals(artifact.getScope());
+    }
+
+    private void addAddedDependencies() {
+        final J2clBuildRequest request = this.request();
+
+        for (final J2clArtifactCoords added : request.addedDependencies(this.coords())) {
+            if (false == this.dependencyCoords.contains(added)) {
+                this.getOrCreate(added);
+                this.dependencyCoords.add(added);
+            }
+        }
+    }
+
+    private J2clDependency getOrCreate(final J2clArtifactCoords coords) {
+        if (GATHERING_JRE_DEPENDENCIES) {
+            JRE_OR_JRE_DEPENDENCIES.add(coords);
+        }
+        final J2clDependency dependency = COORD_TO_DEPENDENCY.get(coords);
+        return null != dependency ?
+                dependency :
+                this.loadDependency(coords);
+    }
+
+    private J2clDependency loadDependency(final J2clArtifactCoords coords) {
+        final J2clBuildRequest request = this.request();
+        final MavenProject project = request.mavenMiddleware()
+                .mavenProject(coords.mavenArtifact(request.scope, this.artifact.getArtifactHandler()));
+
+        return new J2clDependency(coords,
+                project,
+                request.mavenMiddleware().mavenFile(coords.toString()).orElseThrow(() -> new IllegalArgumentException("Archive file missing archive for " + CharSequences.quote(coords.toString())))/*.map(J2clPath.with())*/,
+                request);
     }
 
     // dependencies.....................................................................................................
@@ -157,15 +172,25 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private final Set<J2clArtifactCoords> dependencyCoords = Sets.sorted();
 
     /**
-     * Returns the immediate dependencies without any transitives.
+     * Returns the immediate dependencies without any transitives. If this is a non JRE dependency, and has no dependencies
+     * the JRE will be added as a dependency.
      */
     Set<J2clDependency> dependencies() {
         if (null == this.dependencies) {
-            final J2clBuildRequest request = this.request();
-            final Set<J2clDependency> dependencies = this.dependencyCoords
-                    .stream()
-                    .map(request::dependency)
-                    .collect(Collectors.toCollection(Sets::sorted));
+            final Set<J2clArtifactCoords> dependencyCoords = this.dependencyCoords;
+            final Set<J2clDependency> dependencies;
+
+            if (dependencyCoords.isEmpty()) {
+                dependencies = JRE_OR_JRE_DEPENDENCIES.contains(this.coords()) ?
+                        Sets.empty() :
+                        Sets.of(jre());
+            } else {
+                final J2clBuildRequest request = this.request();
+                dependencies = this.dependencyCoords
+                        .stream()
+                        .map(request::dependency)
+                        .collect(Collectors.toCollection(Sets::sorted));
+            }
             this.dependencies = Sets.readOnly(dependencies);
         }
 
@@ -195,11 +220,10 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     // isDependency.....................................................................................................
 
-    public boolean isDependency() {
-        return this.dependency;
+    boolean isDependency() {
+        return null != this.artifactFile;
     }
 
-    private final boolean dependency;
 
     /**
      * Returns the JAVAC BOOTSTRAP dependency
@@ -427,7 +451,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private List<J2clPath> sourcesArchivePath() {
         return this.request.mavenMiddleware()
                 .mavenFile(this.coords.source().toString())
-                .map(f -> Lists.of(J2clPath.with(f.toPath())))
+                .map(f -> Lists.of(f))
                 .orElse(Lists.empty());
     }
 
@@ -443,10 +467,10 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Returns the archive file attached to this archive, and never any target/classes directory.
      */
     Optional<J2clPath> artifactFile() {
-        return Optional.ofNullable(this.artifact().getFile())
-                .filter(File::isFile)
-                .map(f -> J2clPath.with(f.toPath()));
+        return Optional.ofNullable(this.artifactFile);
     }
+
+    private final J2clPath artifactFile;
 
     private final MavenProject mavenProject;
 

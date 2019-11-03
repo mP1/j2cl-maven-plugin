@@ -406,7 +406,7 @@ public final class J2clMojoBuild extends J2clMojo {
 
             @Override
             public boolean test(final J2clArtifactCoords test) {
-                return groupId.equals(test.groupId()) && artifactId.equals(test.artifactId()) && version.equals(test.baseVersion());
+                return groupId.equals(test.groupId()) && artifactId.equals(test.artifactId()) && version.equals(test.version());
             }
 
             @Override
