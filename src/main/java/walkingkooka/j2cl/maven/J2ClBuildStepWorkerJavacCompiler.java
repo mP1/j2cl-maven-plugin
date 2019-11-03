@@ -19,6 +19,7 @@ package walkingkooka.j2cl.maven;
 
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.text.CharSequences;
 
 import java.util.List;
 import java.util.Set;
@@ -77,10 +78,11 @@ abstract class J2ClBuildStepWorkerJavacCompiler extends J2ClBuildStepWorker2 {
     }
 
     private List<J2clPath> bootstrap() {
-        return J2clDependency.javacBootstrap()
-                .artifactFile()
+        final J2clDependency bootstrap = J2clDependency.javacBootstrap();
+
+        return bootstrap.artifactFile()
                 .map(Lists::of)
-                .orElseThrow(() -> new IllegalStateException("javac Bootstrap artifact missing"));
+                .orElseThrow(() -> new IllegalStateException("javac Bootstrap artifact " + CharSequences.quote(bootstrap.coords().toString()) + " missing"));
     }
 
     /**

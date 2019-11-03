@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import com.google.common.collect.Lists;
+import walkingkooka.text.CharSequences;
 
 import java.io.IOException;
 import java.net.URI;
@@ -106,7 +107,7 @@ final class J2ClBuildStepWorkerHash extends J2clBuildStepWorker {
 
         if (compileSourcesRoot.isEmpty()) {
             final J2clPath file = artifact.artifactFile()
-                    .orElseThrow(() -> new IllegalStateException("File missing from " + artifact));
+                    .orElseThrow(() -> new IllegalStateException("File missing from " + CharSequences.quote(artifact.coords().toString())));
             try (final FileSystem zip = FileSystems.newFileSystem(URI.create("jar:" + file.file().toURI()), Collections.emptyMap())) {
                 this.hashCompileSourceRoots(hash, zip.getRootDirectories(), logger);
             }

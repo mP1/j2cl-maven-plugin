@@ -18,7 +18,6 @@
 package walkingkooka.j2cl.maven;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.project.MavenProject;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
@@ -36,6 +35,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -148,7 +148,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
         this.request = request;
 
         if (null != COORD_TO_DEPENDENCY.put(coords, this)) {
-            throw new IllegalArgumentException("Duplicate artifact " + this);
+            throw new IllegalArgumentException("Duplicate artifact " + CharSequences.quote(coords.toString()));
         }
     }
 
@@ -206,11 +206,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     static J2clDependency javacBootstrap() {
         if (null == javaBootstrap) {
-            javaBootstrap = COORD_TO_DEPENDENCY.values()
-                    .stream()
-                    .filter(J2clDependency::isJavacBootstrap)
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Unable to find javac bootstrap dependency: " + COORD_TO_DEPENDENCY.values()));
+            javaBootstrap = findDependency(J2clDependency::isJavacBootstrap, "Java bootstrap");
         }
         return javaBootstrap;
     }
@@ -222,16 +218,21 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     static J2clDependency jre() {
         if (null == jre) {
-            jre = COORD_TO_DEPENDENCY.values()
-                    .stream()
-                    .filter(J2clDependency::isJreBinary)
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Unable to find JRE dependency: " + COORD_TO_DEPENDENCY.values()));
+            jre = findDependency(J2clDependency::isJreBinary, "JRE");
         }
         return jre;
     }
 
     private static J2clDependency jre;
+
+    private static J2clDependency findDependency(final Predicate<J2clDependency> filter,
+                                                 final String label) {
+        return COORD_TO_DEPENDENCY.values()
+                .stream()
+                .filter(filter)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Unable to find " + label + " dependency: " + COORD_TO_DEPENDENCY.values().stream().map(d -> CharSequences.quote(d.coords().toString())).collect(Collectors.joining(","))));
+    }
 
     // pretty...........................................................................................................
 
@@ -370,7 +371,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
         final J2clPath create = J2clPath.with(Paths.get(this.request.base.toString(), this.coords.directorySafeName() + "-" + hash));
         final J2clPath previous = this.directory.compareAndExchange(null, create);
         if (null != previous) {
-            throw new IllegalStateException("HashBuilder already set for this artifact: " + create);
+            throw new IllegalStateException("HashBuilder already set for this artifact: " + CharSequences.quote(create.toString()));
         }
 
         create.createIfNecessary();
@@ -391,7 +392,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     J2clPath directory() {
         final J2clPath directory = this.directory.get();
         if (null == directory) {
-            throw new IllegalStateException("Directory under " + this.request().base + " missing for " + this);
+            throw new IllegalStateException("Directory under " + this.request().base + " missing for " + CharSequences.quote(this.coords().toString()));
         }
         return directory;
     }

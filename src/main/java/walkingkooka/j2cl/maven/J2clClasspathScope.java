@@ -19,6 +19,7 @@ package walkingkooka.j2cl.maven;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
+import walkingkooka.text.CharSequences;
 
 import java.util.Arrays;
 import java.util.function.Predicate;
@@ -64,7 +65,10 @@ enum J2clClasspathScope {
         return Arrays.stream(values())
                 .filter(s -> s.scope.equals(text))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unknown option " + text + " expected one of " + Arrays.stream(values()).map(s -> s.scope).collect(Collectors.joining(", "))));
+                .orElseThrow(() -> new IllegalArgumentException("Unknown option " +
+                        CharSequences.quote(text) +
+                        " expected one of " +
+                        Arrays.stream(values()).map(s -> s.scope).collect(Collectors.joining(", "))));
     }
 }
 

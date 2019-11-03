@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import walkingkooka.collect.map.Maps;
+import walkingkooka.text.CharSequences;
 
 import java.io.IOException;
 import java.net.URI;
@@ -65,7 +66,7 @@ final class J2ClBuildStepWorkerUnpack extends J2ClBuildStepWorker2 {
 
             if (false == javaFilesFound) {
                 if (artifact.isJreBinary()) {
-                    throw new J2clException("JRE sources missing " + artifact);
+                    throw new J2clException("JRE sources " + CharSequences.quote(artifact.coords().toString()) + " missing.");
                 }
 
                 // if no source is available unpack the binary might be a jszip.

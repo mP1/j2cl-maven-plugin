@@ -219,7 +219,7 @@ final class J2clBuildRequest {
                 throw cause;
             }
 
-            throw new IllegalArgumentException("Unknown coords " + coords + "->" + lookup);
+            throw new IllegalArgumentException("Unknown coords " + CharSequences.quote(coords.toString()) + "->" + CharSequences.quote(lookup.toString()));
         }
     }
 
@@ -289,10 +289,10 @@ final class J2clBuildRequest {
         }
 
         if (false == javacBootstrap) {
-            throw new J2clException("Javac bootstrap dependency (" + this.javacBootstrap + ") not found in dependencies");
+            throw new J2clException("Javac bootstrap dependency not found in dependencies");
         }
         if (false == jre) {
-            throw new J2clException("JRE dependency (" + this.jre + ") with classes not found in dependencies");
+            throw new J2clException("JRE dependency with classes not found in dependencies");
         }
     }
 

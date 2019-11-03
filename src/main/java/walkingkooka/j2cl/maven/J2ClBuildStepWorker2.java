@@ -17,6 +17,8 @@
 
 package walkingkooka.j2cl.maven;
 
+import walkingkooka.text.CharSequences;
+
 /**
  * Any step that requires its working directory to be created before it can work.
  */
@@ -34,7 +36,7 @@ abstract class J2ClBuildStepWorker2 extends J2clBuildStepWorker {
                                       final J2clBuildStep step,
                                       final J2clLinePrinter logger) throws Exception {
         if(artifact.isExcluded()) {
-            throw new IllegalArgumentException("Excluded dependency should not have tasks scheduled: " + artifact);
+            throw new IllegalArgumentException("Excluded dependency should not have tasks scheduled: " + CharSequences.quote(artifact.coords().toString()));
         }
         final J2clBuildStepResult result;
 
