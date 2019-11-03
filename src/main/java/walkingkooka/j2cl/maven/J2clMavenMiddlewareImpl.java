@@ -71,20 +71,21 @@ final class J2clMavenMiddlewareImpl implements J2clMavenMiddleware {
         try {
             return this.projectBuilder.build(artifact, false, request)
                     .getProject();
+
         } catch (final ProjectBuildingException cause) {
             throw new J2clException("Unable to fetch MavenProject for " + CharSequences.quoteAndEscape(artifact.toString()), cause);
         }
     }
 
     @Override
-    public Optional<File> mavenFile(final String coords) {
+    public Optional<J2clPath> mavenFile(final String coords) {
         final ArtifactRequest request = new ArtifactRequest()
                 .setRepositories(this.remoteRepositories)
                 .setArtifact(new DefaultArtifact(coords));
 
-        File file;
+        J2clPath file;
         try {
-            file = this.repositorySystem.resolveArtifact(this.repositorySession, request).getArtifact().getFile();
+            file = J2clPath.with(this.repositorySystem.resolveArtifact(this.repositorySession, request).getArtifact().getFile().toPath());
         } catch (final ArtifactResolutionException cause) {
             file = null;
         }

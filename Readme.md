@@ -181,20 +181,15 @@ more information.
 
 
 ## added-dependencies
-A list of artifacts (group-id colon artifact-id) followed by a comma separated list of artifacts that will become
-dependencies of the former. This is equivalent to defining the later as `<dependency>` in the former `pom.xml`.
-
-This is necessary in a few dependencies such as [com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT](https://github.com/Vertispan/jsinterop-base)
-requiring annotations like `javaemul.internal.annotations.DoNotAutobox` but are missing a `<dependency>` declaration
-for [com.vertispan.j2cl:gwt-internal-annotations:0.4-SNAPSHOT](https://github.com/Vertispan/j2cl/blob/rebased_master/maven/gwt-internal-annotations/pom.xml);
-This mechanism provides support for adding such missing dependencies at an individual artifact level.
-
-The same is true for the original google artifacts such as `com.google.jsinterop:jsinterop-annotations:1.0.2`
+A list of artifacts (full maven coords) followed by a comma separated list of artifacts that will become dependencies of
+ the former. This is necessary as several J2CL specific artifacts such as those in the example below are referenced
+ and required in the special JRE, but not declared as actual `<dependency>` in their `pom.xml`.
 
 ```xml
 <added-dependencies>
     <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:0.4-SNAPSHOT</param>
 </added-dependencies>
+
 ```
 
 
@@ -285,6 +280,8 @@ This path is the final location of the final javascript.
 
 A Map of dependencies with replacements as the value. The artifact-id, group-id and version-id must be used for both.
 Due to colons being present in the coords, a list of strings is used to express the original to replacement.
+This is useful if your application requires a few gwt-user classes/interfaces and referencing the entire jar file
+would be problematic and a customized substitute is available as a replacement.
 
 ```xml
 <replaced-dependencies>
@@ -419,21 +416,20 @@ To aide readability and faster location of a parameter or file, everything is so
 and tree views for a file listing such as a classpath.
 
 ```text
-walkingkooka:sample-pom:war:1.0-TRANSPILE
+walkingkooka:example-hello-world-single:war:1.0-TRANSPILE
   Directory
-    /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-sample-pom-war-1.0-79dc060b493e5f27c56e0fa7225828b65d5f8565/5-transpiled-java-to-javascriptPreparing...
+    /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-a73d49fe3a86d585659f6a7a23a96c19d6cd580b/5-transpiled-java-to-javascriptPreparing...
         Sources
-          /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-sample-pom-war-1.0-79dc060b493e5f27c56e0fa7225828b65d5f8565/3-gwt-incompatible-stripped-source/output
+          /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-a73d49fe3a86d585659f6a7a23a96c19d6cd580b/3-gwt-incompatible-stripped-source/output
         3 *.java, *.js, *.native.js files
-          /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-sample-pom-war-1.0-79dc060b493e5f27c56e0fa7225828b65d5f8565/3-gwt-incompatible-stripped-source/output/example/helloworld/app.js
-          /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-sample-pom-war-1.0-79dc060b493e5f27c56e0fa7225828b65d5f8565/3-gwt-incompatible-stripped-source/output/example/helloworldlib/HelloWorld.java
-          /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-sample-pom-war-1.0-79dc060b493e5f27c56e0fa7225828b65d5f8565/3-gwt-incompatible-stripped-source/output/example/helloworldlib/hello.js
+          /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-a73d49fe3a86d585659f6a7a23a96c19d6cd580b/3-gwt-incompatible-stripped-source/output/example/helloworld/app.js
+          /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-a73d49fe3a86d585659f6a7a23a96c19d6cd580b/3-gwt-incompatible-stripped-source/output/example/helloworldlib/HelloWorld.java
+          /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-a73d49fe3a86d585659f6a7a23a96c19d6cd580b/3-gwt-incompatible-stripped-source/output/example/helloworldlib/hello.js
       J2clTranspiler
         Parameters
-          11 Classpath(s)
+          10 Classpath(s)
             /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/j2cl/javac-bootstrap-classpath/0.4-SNAPSHOT/javac-bootstrap-classpath-0.4-SNAPSHOT.jar
             /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/j2cl/jre/0.4-SNAPSHOT/jre-0.4-SNAPSHOT.jar
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/google/jsinterop/jsinterop-annotations/1.0.2/jsinterop-annotations-1.0.2.jar
             /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/google/jsinterop/jsinterop-annotations/2.0.0/jsinterop-annotations-2.0.0.jar
             /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/j2cl/bootstrap/0.4-SNAPSHOT/bootstrap-0.4-SNAPSHOT-jszip.zip
             /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/j2cl/gwt-internal-annotations/0.4-SNAPSHOT/gwt-internal-annotations-0.4-SNAPSHOT.jar
@@ -443,19 +439,20 @@ walkingkooka:sample-pom:war:1.0-TRANSPILE
             /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/jsinterop/base/1.0.0-SNAPSHOT/base-1.0.0-SNAPSHOT.jar
             /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/javax/annotation/jsr250-api/1.0/jsr250-api-1.0.jar
           1 Source(s)
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-sample-pom-war-1.0-79dc060b493e5f27c56e0fa7225828b65d5f8565/3-gwt-incompatible-stripped-source/output/example/helloworldlib/HelloWorld.java
+            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-a73d49fe3a86d585659f6a7a23a96c19d6cd580b/3-gwt-incompatible-stripped-source/output/example/helloworldlib/HelloWorld.java
           0 Native source(s)
           2 Other (ignored) file(s)
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-sample-pom-war-1.0-79dc060b493e5f27c56e0fa7225828b65d5f8565/3-gwt-incompatible-stripped-source/output/example/helloworld/app.js
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-sample-pom-war-1.0-79dc060b493e5f27c56e0fa7225828b65d5f8565/3-gwt-incompatible-stripped-source/output/example/helloworldlib/hello.js
+            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-a73d49fe3a86d585659f6a7a23a96c19d6cd580b/3-gwt-incompatible-stripped-source/output/example/helloworld/app.js
+            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-a73d49fe3a86d585659f6a7a23a96c19d6cd580b/3-gwt-incompatible-stripped-source/output/example/helloworldlib/hello.js
           Output
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-sample-pom-war-1.0-79dc060b493e5f27c56e0fa7225828b65d5f8565/5-transpiled-java-to-javascript/output
+            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-a73d49fe3a86d585659f6a7a23a96c19d6cd580b/5-transpiled-java-to-javascript/output
         J2clTranspiler
           0 problem(s)
             *** END ***
     
     Log file
-      /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-sample-pom-war-1.0-79dc060b493e5f27c56e0fa7225828b65d5f8565/5-transpiled-java-to-javascript/log.txt
+      /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-a73d49fe3a86d585659f6a7a23a96c19d6cd580b/5-transpiled-java-to-javascript/log.txt
+    
     
 ```
 

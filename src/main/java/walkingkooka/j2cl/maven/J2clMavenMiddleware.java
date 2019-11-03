@@ -45,5 +45,5 @@ public interface J2clMavenMiddleware {
      */
     MavenProject mavenProject(final Artifact artifact);
 
-    Optional<File> mavenFile(final String coords);
+    Optional<J2clPath> mavenFile(final String coords);
 }

@@ -26,7 +26,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * Maven coordinates that identifies a single artifact.
+ * Maven coordinates that identifies a single dependency or artifact.
  */
 final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
 
@@ -38,8 +38,7 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
                 artifact.getArtifactId(),
                 artifact.getExtension(),
                 Optional.ofNullable(classifier.isEmpty() ? null : classifier),
-                artifact.getVersion(),
-                artifact.getVersion());
+                artifact.getBaseVersion());
     }
 
     static J2clArtifactCoords with(final Artifact artifact) {
@@ -47,7 +46,6 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
                 artifact.getArtifactId(),
                 artifact.getType(),
                 Optional.ofNullable(artifact.getClassifier()),
-                artifact.getVersion(),
                 artifact.getBaseVersion());
     }
 
@@ -55,24 +53,20 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
                                            final String artifactId,
                                            final String type,
                                            final Optional<String> classifier,
-                                           final String version,
-                                           final String baseVersion) {
-        return new J2clArtifactCoords(groupId, artifactId, type, classifier, version, baseVersion);
+                                           final String version) {
+        return new J2clArtifactCoords(groupId, artifactId, type, classifier, version);
     }
 
     private J2clArtifactCoords(final String groupId,
                                final String artifactId,
                                final String type,
                                final Optional<String> classifier,
-                               final String version,
-                               final String baseVersion) {
+                               final String version) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.type = type;
         this.classifier = classifier;
         this.version = version;
-
-        this.baseVersion = baseVersion;
     }
 
     /**
@@ -83,18 +77,8 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
                 this.artifactId,
                 this.type,
                 Optional.of("sources"),
-                this.baseVersion,
-                this.baseVersion);
+                this.version);
     }
-
-    String baseVersion() {
-        return this.baseVersion;
-    }
-
-    /**
-     * This is kept so the original coordinates are available allowing #source to work.
-     */
-    private final String baseVersion;
 
     /**
      * Creates a {@link Artifact}
@@ -128,7 +112,7 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
         if (0 == result) {
             result = this.artifactId.compareTo(other.artifactId);
             if (0 == result) {
-                result = this.baseVersion.compareTo(other.baseVersion);
+                result = this.version.compareTo(other.version);
                 if (0 == result) {
                     result = this.type.compareTo(other.type);
                     if (0 == result) {

@@ -156,9 +156,7 @@
                             <externs></externs>
                             <javac-bootstrap>com.vertispan.j2cl:javac-bootstrap-classpath</javac-bootstrap>
                             <jre-jar-file>com.vertispan.j2cl:jre</jre-jar-file>
-                            <replaced-dependencies>
-                                <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT=walkingkooka:jsinterop-base:1.0.1-SNAPSHOT</param>
-                            </replaced-dependencies>
+                            <replaced-dependencies/>
                             <thread-pool-size>1</thread-pool-size>
                         </configuration>
                     </execution>
