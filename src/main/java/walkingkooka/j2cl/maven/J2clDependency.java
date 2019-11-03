@@ -457,7 +457,6 @@ final class J2clDependency implements Comparable<J2clDependency> {
                 (this.isJre() ? " (JRE)" : "") +
                 (this.isJavacBootstrap() ? " (JAVAC BOOTSTRAP)" : "") +
                 (this.isExcluded() ? " (EXCLUDED)" : "");// +
-        //(GATHERING ? "" : " " + (this.depth() - 1));
     }
 
     // Comparable.......................................................................................................
