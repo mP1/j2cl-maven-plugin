@@ -22,6 +22,7 @@ import com.google.j2cl.tools.gwtincompatible.JavaPreprocessor;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.text.CharSequences;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,7 +50,7 @@ final class GwtIncompatibleStripPreprocessor {
                                        final J2clPath output,
                                        final J2clLinePrinter logger) throws IOException {
         output.exists()
-                .orElseThrow(() -> new IllegalArgumentException("Output not a directory or does not exist: " + output));
+                .orElseThrow(() -> new IllegalArgumentException("Output not a directory or does not exist: " + CharSequences.quote(output.toString())));
 
         return execute0(new TreeSet<>(sourceRoots), output, logger);
     }
