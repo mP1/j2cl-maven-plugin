@@ -261,39 +261,35 @@ final class J2clDependency implements Comparable<J2clDependency> {
     // pretty...........................................................................................................
 
     /**
-     * Pretty prints all dependencies with indentation.
+     * Pretty prints all dependencies with after sorting by coords.
      */
     J2clDependency prettyPrintDependencies() {
+        final Set<J2clDependency> sorted = Sets.sorted();
+        sorted.addAll(COORD_TO_DEPENDENCY.values());
+
         final J2clLogger logger = this.request.logger();
 
         final J2clLinePrinter printer = J2clLinePrinter.with(logger.printer(logger::debug));
         printer.printLine(this.coords.toString());
         printer.indent();
 
-        printer.printLine("Dependencies graph");
-
+        printer.printLine("Dependencies graph for all artifacts");
         printer.indent();
-        this.prettyPrintDependencies0(printer);
-        printer.outdent();
 
-        printer.printLine(COORD_TO_DEPENDENCY.values().stream().filter(J2clDependency::isIncluded).count() + " unique artifacts");
+        for (J2clDependency artifact : sorted) {
+            printer.printLine(artifact.toString());
+            printer.indent();
+            {
+                for (J2clDependency dependency : artifact.dependenciesIncludingTransitives()) {
+                    printer.printLine(dependency.toString());
+                }
+            }
+            printer.outdent();
+        }
         printer.outdent();
         printer.flush();
 
         return this;
-    }
-
-    private void prettyPrintDependencies0(final J2clLinePrinter printer) {
-        final J2clDependency replacement = this.request().dependency(this.coords());
-        if (this.equals(replacement)) {
-            printer.printLine(this.toString());
-        } else {
-            printer.printLine(this.toString() + " -> " + replacement.toString());
-        }
-
-        printer.indent();
-        replacement.dependencies().forEach(d -> d.prettyPrintDependencies0(printer));
-        printer.outdent();
     }
 
     // coords...........................................................................................................
