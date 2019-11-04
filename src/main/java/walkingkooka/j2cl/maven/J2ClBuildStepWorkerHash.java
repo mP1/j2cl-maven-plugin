@@ -18,7 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import com.google.common.collect.Lists;
-import walkingkooka.text.CharSequences;
+import walkingkooka.collect.set.Sets;
 
 import java.io.IOException;
 import java.net.URI;
@@ -28,6 +28,7 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
 import java.util.List;
@@ -69,30 +70,24 @@ final class J2ClBuildStepWorkerHash extends J2clBuildStepWorker {
 
     private void hashDependencies(final J2clDependency artifact,
                                   final HashBuilder hash,
-                                  final J2clLinePrinter logger) {
-        final Set<J2clDependency> dependencies = artifact.dependencies();
-        logger.printLine(dependencies.size() + " Dependencies (transitives not counted)");
+                                  final J2clLinePrinter logger) throws IOException {
+        final Set<J2clDependency> dependencies = artifact.dependencies(); // dependencies();
+        logger.printLine(dependencies.size() + " Dependencies");
         logger.indent();
 
         // printLine dependency and their hashes...this assumes dependencies have had their hash code already computed.
 
         for (final J2clDependency dependency : dependencies) {
             logger.printLine(dependency.toString());
-            if(dependency.isIncluded()) {
-                logger.indent();
-
-                final String dependencyHash = dependency.hashOrFail();
-                {
-                    hash.append(dependencyHash);
-
-                    final J2clPath directory = dependency.directory();
-                    logger.printLine(directory.toString());
-                    logger.printIndentedLine(dependencyHash);
+            logger.indent();
+            {
+                if(dependency.isProcessingRequired()) {
+                    hash.append(dependency.directory().toString());
+                } else {
+                    hash.append(dependency.toString());
                 }
-
-                logger.printLine(dependencyHash);
-                logger.outdent();
             }
+            logger.outdent();
         }
 
         logger.printEndOfList();
@@ -106,17 +101,23 @@ final class J2ClBuildStepWorkerHash extends J2clBuildStepWorker {
         final List<J2clPath> compileSourcesRoot = artifact.sourcesRoot();
 
         if (compileSourcesRoot.isEmpty()) {
-            final J2clPath file = artifact.artifactFile()
-                    .orElseThrow(() -> new IllegalStateException("File missing from " + CharSequences.quote(artifact.coords().toString())));
-            try (final FileSystem zip = FileSystems.newFileSystem(URI.create("jar:" + file.file().toURI()), Collections.emptyMap())) {
-                this.hashCompileSourceRoots(hash, zip.getRootDirectories(), logger);
-            }
+            this.hashArchiveFile(artifact, hash, logger);
         } else {
             this.hashCompileSourceRoots(hash,
                     compileSourcesRoot.stream().map(J2clPath::path).collect(Collectors.toList()),
                     logger);
         }
     }
+
+    private void hashArchiveFile(final J2clDependency artifact,
+                                 final HashBuilder hash,
+                                 final J2clLinePrinter logger) throws IOException {
+        final J2clPath file = artifact.artifactFileOrFail();
+        try (final FileSystem zip = FileSystems.newFileSystem(URI.create("jar:" + file.file().toURI()), Collections.emptyMap())) {
+            this.hashCompileSourceRoots(hash, zip.getRootDirectories(), logger);
+        }
+    }
+
 
     private void hashCompileSourceRoots(final HashBuilder hash,
                                         final Iterable<Path> roots,
@@ -125,16 +126,16 @@ final class J2ClBuildStepWorkerHash extends J2clBuildStepWorker {
         logger.indent();
 
         for (final Path root : roots) {
-            this.hashCompileSourceRoot(hash, root, logger);
+            this.hashDirectoryTree(hash, root, logger);
         }
 
         logger.printEndOfList();
         logger.outdent();
     }
 
-    private void hashCompileSourceRoot(final HashBuilder hash,
-                                       final Path root,
-                                       final J2clLinePrinter logger) throws IOException {
+    private void hashDirectoryTree(final HashBuilder hash,
+                                   final Path root,
+                                   final J2clLinePrinter logger) throws IOException {
         logger.printLine(root.toString());
         logger.indent();
 

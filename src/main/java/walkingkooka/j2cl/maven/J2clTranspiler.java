@@ -22,44 +22,52 @@ import com.google.j2cl.transpiler.J2clTranspilerOptions;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.text.CharSequences;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 final class J2clTranspiler {
 
     static boolean execute(final List<J2clPath> classpath,
-                           final List<J2clPath> sourceFiles,
+                           final J2clPath sourcePath,
                            final J2clPath output,
-                           final J2clLinePrinter logger) {
+                           final J2clLinePrinter logger) throws IOException {
         logger.printLine("J2clTranspiler");
         logger.indent();
 
         boolean success;
         {
             final List<J2clPath> javaInput = Lists.array();
-            final List<J2clPath> nativeInput = Lists.array();
-            final List<J2clPath> other = Lists.array();
+            final List<J2clPath> nativeJsInput = Lists.array();
+            final List<J2clPath> jsInput = Lists.array();// probably js
+            final List<J2clPath> nativeJsAndJsInput = Lists.array();
 
-            sourceFiles.forEach(f -> {
-                final String filename = f.filename();
-                if (CharSequences.endsWith(filename, ".java")) {
-                    javaInput.add(f);
-                } else {
-                    if (CharSequences.endsWith(filename, ".native.js")) {
-                        nativeInput.add(f);
-                    } else {
-                        other.add(f);
-                    }
-                }
-            });
+            if (sourcePath.exists().isPresent()) {
+                sourcePath.gatherFiles((p, a) -> J2clPath.JAVA_FILES.test(p, a) || J2clPath.JAVASCRIPT_FILES.test(p, a) || J2clPath.NATIVE_JAVASCRIPT_FILES.test(p, a))
+                        .forEach(f -> {
+                            final String filename = f.filename();
+                            if (CharSequences.endsWith(filename, ".java")) {
+                                javaInput.add(f);
+                            } else {
+                                if (CharSequences.endsWith(filename, ".native.js")) {
+                                    nativeJsInput.add(f);
+                                } else {
+                                    if (CharSequences.endsWith(filename, ".js")) {
+                                        jsInput.add(f);
+                                    }
+                                }
+                                nativeJsAndJsInput.add(f);
+                            }
+                        });
+            }
 
             logger.printLine("Parameters");
             logger.indent();
             {
                 logger.printIndented("Classpath(s)", classpath);
-                logger.printIndented("Source(s)", javaInput);
-                logger.printIndented("Native source(s)", nativeInput);
-                logger.printIndented("Other (ignored) file(s)", other);
+                logger.printIndented("*.java Source(s)", javaInput);
+                logger.printIndented("*.native.js source(s)", nativeJsInput);
+                logger.printIndented("*.js source(s)", jsInput);
                 logger.printIndented("Output", output);
             }
             logger.outdent();
@@ -77,9 +85,10 @@ final class J2clTranspiler {
                         .setEmitReadableLibraryInfo(false)
                         .setEmitReadableSourceMap(false)
                         .setGenerateKytheIndexingMetadata(false)
-                        .setSources(J2clPath.toFileInfo(javaInput))
-                        .setNativeSources(J2clPath.toFileInfo((nativeInput)))
+                        .setSources(J2clPath.toFileInfo(javaInput, sourcePath))
+                        .setNativeSources(J2clPath.toFileInfo(nativeJsInput, sourcePath))
                         .build();
+
                 final Problems problems = com.google.j2cl.transpiler.J2clTranspiler.transpile(options);
                 success = !problems.hasErrors();
 
@@ -96,6 +105,24 @@ final class J2clTranspiler {
                         logger.outdent();
                     }
                     logger.printEndOfList();
+                    logger.outdent();
+                }
+
+                if (success) {
+                    logger.printLine("Copy js to output");
+                    logger.indent();
+                    {
+                        output.copyFiles(sourcePath,
+                                jsInput,
+                                logger::printLine);
+                    }
+                    logger.outdent();
+
+                    logger.printLine("Output file(s) *.*");
+                    logger.indent();
+                    {
+                        logger.printIndented("Output file(s) after copy", output.gatherFiles(J2clPath.ALL_FILES));
+                    }
                     logger.outdent();
                 }
             }

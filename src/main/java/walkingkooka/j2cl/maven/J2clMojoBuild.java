@@ -73,8 +73,9 @@ public final class J2clMojoBuild extends J2clMojo {
                 this.entryPoints(),
                 this.initialScriptFilename(),
                 this.cache(),
-                this.isJavacBootstrap(),
-                this.isJre(),
+                this.classpathRequired(),
+                this.javascriptSourceRequired(),
+                this.processingSkipped(),
                 this.excludedDependencies(),
                 this.replacedDependencies(),
                 J2clSourcesKind.SRC,
@@ -200,6 +201,37 @@ public final class J2clMojoBuild extends J2clMojo {
             @Override
             public String toString() {
                 return J2clMojoBuild.this.excludedDependencies.stream().collect(Collectors.joining(","));
+            }
+        };
+    }
+
+    /**
+     * Only matches using the group-id and artifact-id the base or original version not the resolved version is ignored.
+     */
+    private Predicate<J2clArtifactCoords> groupArtifactAndVersionPredicate(final String coords) {
+        final String[] components = coords.split(":");
+        if (3 != components.length) {
+            throw new IllegalArgumentException("Invalid coords, expected 3 components (groupId, artifactId, version): " + CharSequences.quoteAndEscape(coords));
+        }
+
+        final String groupId = components[0];
+        final String artifactId = components[1];
+        final String version = components[2];
+
+        CharSequences.failIfNullOrEmpty(groupId, "group-id");
+        CharSequences.failIfNullOrEmpty(artifactId, "artifact-id");
+        CharSequences.failIfNullOrEmpty(version, "version");
+
+        return new Predicate<>() {
+
+            @Override
+            public boolean test(final J2clArtifactCoords test) {
+                return groupId.equals(test.groupId()) && artifactId.equals(test.artifactId()) && version.equals(test.version());
+            }
+
+            @Override
+            public String toString() {
+                return coords;
             }
         };
     }
@@ -335,84 +367,47 @@ public final class J2clMojoBuild extends J2clMojo {
             required = true)
     private List<RemoteRepository> repositories;
 
-    // javaBootstrap.....................................................................................................
 
-    private Predicate<J2clArtifactCoords> isJavacBootstrap() {
-        return this.groupAndArtifactPredicate(this.javacBootstrap);
+    // classpathRequired................................................................................................
+
+    private List<J2clArtifactCoords> classpathRequired() {
+        return parseList(this.classpathRequired);
     }
 
     /**
-     * The JRE dependency as maven coordinates. This is necessary as the JAVAC BOOTSTRAP jar file is a special case during building.
+     * List of artifacts required on java classpaths.
      */
-    @Parameter(alias = "javac-bootstrap", required = true)
-    private String javacBootstrap;
+    @Parameter(alias = "classpath-required", required = true)
+    private List<String> classpathRequired;
 
-    // jre..............................................................................................................
+    // javascriptSourceRequired........................................................................................
 
-    private Predicate<J2clArtifactCoords> isJre() {
-        return this.groupAndArtifactPredicate(this.jre);
+    private List<J2clArtifactCoords> javascriptSourceRequired() {
+        return parseList(this.javascriptSourceRequired);
     }
 
     /**
-     * The JRE dependency as maven coordinates. This is necessary as the JRE jar file is a special case during building.
+     * List of artifacts required when javascript sources are passed as arguments.
      */
-    @Parameter(alias = "jre-jar-file", required = true)
-    private String jre;
+    @Parameter(alias = "javascript-source-required", required = true)
+    private List<String> javascriptSourceRequired;
 
-    /**
-     * Factory that creates a {@link Predicate} that returns true if the group and artifact id match.
-     */
-    private Predicate<J2clArtifactCoords> groupAndArtifactPredicate(final String groupAndArtifact) {
-        final int colon = groupAndArtifact.indexOf(':');
-        if (-1 == colon) {
-            throw new IllegalArgumentException("Invalid coords, expected 2 components (groupId and artifactId): " + CharSequences.quoteAndEscape(groupAndArtifact));
-        }
+    // processingSkipped................................................................................................
 
-        CharSequences.failIfNullOrEmpty(groupAndArtifact.substring(0, colon), "group-id");
-        CharSequences.failIfNullOrEmpty(groupAndArtifact.substring(colon + 1), "artifact-id");
-
-        return new Predicate<>() {
-
-            @Override
-            public boolean test(final J2clArtifactCoords test) {
-                return groupAndArtifact.equals(test.groupId() + ":" + test.artifactId());
-            }
-
-            @Override
-            public String toString() {
-                return groupAndArtifact;
-            }
-        };
+    private List<J2clArtifactCoords> processingSkipped() {
+        return parseList(this.processingSkipped);
     }
 
     /**
-     * Only matches using the group-id and artifact-id the base or original version not the resolved version is ignored.
+     * List of artifacts that will not be processed at all. When required on the java classpath or source,
+     * the archive file will be added.
      */
-    private Predicate<J2clArtifactCoords> groupArtifactAndVersionPredicate(final String coords) {
-        final String[] components = coords.split(":");
-        if (3 != components.length) {
-            throw new IllegalArgumentException("Invalid coords, expected 3 components (groupId, artifactId, version): " + CharSequences.quoteAndEscape(coords));
-        }
+    @Parameter(alias = "processing-skipped", required = true)
+    private List<String> processingSkipped;
 
-        final String groupId = components[0];
-        final String artifactId = components[1];
-        final String version = components[2];
-
-        CharSequences.failIfNullOrEmpty(groupId, "group-id");
-        CharSequences.failIfNullOrEmpty(artifactId, "artifact-id");
-        CharSequences.failIfNullOrEmpty(version, "version");
-
-        return new Predicate<>() {
-
-            @Override
-            public boolean test(final J2clArtifactCoords test) {
-                return groupId.equals(test.groupId()) && artifactId.equals(test.artifactId()) && version.equals(test.version());
-            }
-
-            @Override
-            public String toString() {
-                return coords;
-            }
-        };
+    private List<J2clArtifactCoords> parseList(final List<String> coords) {
+        return coords.stream()
+                .map(J2clArtifactCoords::parse)
+                .collect(Collectors.toList());
     }
 }

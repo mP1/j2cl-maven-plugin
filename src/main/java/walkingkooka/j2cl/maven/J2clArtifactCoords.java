@@ -114,10 +114,7 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
             if (0 == result) {
                 result = this.version.compareTo(other.version);
                 if (0 == result) {
-                    result = this.type.compareTo(other.type);
-                    if (0 == result) {
-                        result = this.compareToClassifier().compareTo(other.compareToClassifier());
-                    }
+                    result = this.compareToClassifier().compareTo(other.compareToClassifier());
                 }
             }
         }

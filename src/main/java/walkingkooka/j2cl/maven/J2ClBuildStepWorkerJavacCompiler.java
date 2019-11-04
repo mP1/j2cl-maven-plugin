@@ -17,13 +17,11 @@
 
 package walkingkooka.j2cl.maven;
 
+import com.google.common.collect.Iterables;
 import walkingkooka.collect.list.Lists;
-import walkingkooka.collect.set.Sets;
-import walkingkooka.text.CharSequences;
 
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Compiles the java source from sources and the given target.
@@ -38,62 +36,51 @@ abstract class J2ClBuildStepWorkerJavacCompiler extends J2ClBuildStepWorker2 {
     }
 
     @Override
-    final J2clBuildStepResult execute0(final J2clDependency artifact,
+    final J2clBuildStepResult execute1(final J2clDependency artifact,
                                        final J2clStepDirectory directory,
                                        final J2clLinePrinter logger) throws Exception {
-        // in the end only the project is compiled, all other dependencies remain untouched.
-        final List<J2clPath> sourceRoots = this.sourceRoots(artifact);
-        final List<J2clPath> javaSourceFiles = J2clPath.findFiles(sourceRoots,
-                J2clPath.JAVA_FILES);//, // files being compiled
+        J2clBuildStepResult result = null;
+        final J2clBuildStep step = this.sourcesStep();
 
-        J2clBuildStepResult result;
-        if (javaSourceFiles.size() > 0) {
-            final Set<J2clPath> classpath = artifact.dependenciesIncludingTransitives()
-                    .stream()
-                    .filter(a -> false == a.isJreBinary())
-                    .flatMap(a -> a.artifactFile().stream())
-                    .collect(Collectors.toCollection(Sets::sorted));
-
-            result = JavacCompiler.execute(bootstrap(),
-                    classpath,
-                    javaSourceFiles,
-                    sourceRoots,
-                    directory.output().emptyOrFail(),
-                    logger) ?
-                    J2clBuildStepResult.SUCCESS :
-                    J2clBuildStepResult.FAILED;
-        } else {
-            if (artifact.isDependency()) {
-                logger.printIndentedLine("No files found - javac aborted.");
-                directory.aborted().emptyOrFail();
-                result = J2clBuildStepResult.ABORTED;
+        J2clPath source = artifact.step(step).output().exists().orElse(null);
+        if (null != source) {
+            final List<J2clPath> javaSourceFiles = Lists.array();
+            javaSourceFiles.addAll(artifact.step(step)
+                    .output()
+                    .gatherFiles(J2clPath.JAVA_FILES));
+            if (javaSourceFiles.isEmpty()) {
+                source = null;
             } else {
-                logger.printIndentedLine("No files found - javac skipped.");
-                directory.skipped().emptyOrFail();
-                result = J2clBuildStepResult.SKIPPED;
+                final List<J2clPath> classpath = Lists.array();
+
+                for (final J2clDependency dependency : artifact.classpathAndDependencies()) {
+                    if(dependency.dependencies().contains(artifact)) {
+                        continue; // dont add a classpath required that is a parent of this artifact.
+                    }
+
+                    if (dependency.isProcessingSkipped()) {
+                        classpath.add(dependency.artifactFileOrFail());
+                    } else {
+                        classpath.add(dependency.step(J2clBuildStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED).output());
+                    }
+                }
+
+                result = JavacCompiler.execute(classpath.subList(0, 1),
+                        classpath.subList(1, classpath.size()),
+                        javaSourceFiles,
+                        directory.output().emptyOrFail(),
+                        logger) ?
+                        J2clBuildStepResult.SUCCESS :
+                        J2clBuildStepResult.FAILED;
             }
         }
 
+        if (null == source) {
+            logger.printIndentedLine("No files found");
+            result = J2clBuildStepResult.ABORTED;
+        }
+
         return result;
-    }
-
-    private List<J2clPath> bootstrap() {
-        final J2clDependency bootstrap = J2clDependency.javacBootstrap();
-
-        return bootstrap.artifactFile()
-                .map(Lists::of)
-                .orElseThrow(() -> new IllegalStateException("javac Bootstrap artifact " + CharSequences.quote(bootstrap.coords().toString()) + " missing"));
-    }
-
-    /**
-     * Use the gwt-incompatible-strip step output as the source roots input to the compiler.
-     */
-    private List<J2clPath> sourceRoots(final J2clDependency artifact) {
-        return artifact.step(this.sourcesStep())
-                .output()
-                .exists()
-                .map(Lists::of)
-                .orElse(Lists.empty());
     }
 
     /**

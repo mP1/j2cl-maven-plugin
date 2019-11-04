@@ -39,17 +39,10 @@ final class JavacCompiler {
     static boolean execute(final List<J2clPath> bootstrap,
                            final Collection<J2clPath> classpath,
                            final List<J2clPath> newSourceFiles, // files being compiled
-                           final List<J2clPath> sourcePaths,
+                           //final List<J2clPath> sourcePaths,
                            final J2clPath newClassFilesOutput,
                            final J2clLinePrinter logger) throws IOException {
-        final List<String> javacOptions;
-
-        final String bootstrapString = toClasspathStringList(bootstrap);
-        if (sourcePaths == null) {
-            javacOptions = Arrays.asList("-proc:none", "-implicit:none", "-bootclasspath", bootstrapString);
-        } else {
-            javacOptions = Arrays.asList("-implicit:none", "-bootclasspath", bootstrapString);
-        }
+        final List<String> javacOptions = Arrays.asList("-implicit:none", "-bootclasspath", toClasspathStringList(bootstrap));
 
         final boolean success;
         {
@@ -59,7 +52,6 @@ final class JavacCompiler {
                 logger.printIndented("Bootstrap", bootstrap);
                 logger.printIndented("Classpath(s)", classpath);
                 //noinspection ConstantConditions
-                logger.printIndented("Source path(s)", sourcePaths);
                 logger.printIndented("New java file(s)", newSourceFiles); // printLine full paths here might be mixed sources...
                 logger.printIndented("Output", newClassFilesOutput);
             }
@@ -72,7 +64,6 @@ final class JavacCompiler {
                 final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
                 final StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
                 fileManager.setLocation(StandardLocation.SOURCE_PATH, Collections.emptyList()); // Location to search for existing source files.
-                //fileManager.setLocation(StandardLocation.SOURCE_OUTPUT, J2clPath.toFiles(sourcePaths)); // Location of new source files.
                 fileManager.setLocation(StandardLocation.CLASS_PATH, J2clPath.toFiles(classpath)); /// Location to search for user class files.
                 fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Collections.singleton(newClassFilesOutput.file())); /// Location of new class files
 

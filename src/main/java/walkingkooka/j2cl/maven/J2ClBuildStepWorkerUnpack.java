@@ -53,7 +53,7 @@ final class J2ClBuildStepWorkerUnpack extends J2ClBuildStepWorker2 {
     }
 
     @Override
-    J2clBuildStepResult execute0(final J2clDependency artifact,
+    J2clBuildStepResult execute1(final J2clDependency artifact,
                                  final J2clStepDirectory directory,
                                  final J2clLinePrinter logger) throws Exception {
         J2clBuildStepResult result;
@@ -65,29 +65,21 @@ final class J2ClBuildStepWorkerUnpack extends J2ClBuildStepWorker2 {
             boolean javaFilesFound = this.extractSourceRoots(artifact, dest, logger);
 
             if (false == javaFilesFound) {
-                if (artifact.isJreBinary()) {
-                    throw new J2clException("JRE sources " + CharSequences.quote(artifact.coords().toString()) + " missing.");
-                }
-
                 // if no source is available unpack the binary might be a jszip.
                 final Optional<J2clPath> archive = artifact.artifactFile();
                 if (archive.isPresent()) {
                     final J2clPath path = archive.get();
                     logger.printIndented("Archive", path);
                     logger.indent();
-                    javaFilesFound = this.extractArchiveFiles(archive.get().path(), dest, logger);
+                    //javaFilesFound = this.extractArchiveFiles(archive.get().path(), dest, logger);
+                    javaFilesFound = archive.get().extractArchiveFiles(dest, logger).size() > 0;
                     logger.outdent();
                 }
             }
 
             if(javaFilesFound) {
-                if(artifact.isJre()) {
-                    logger.printLine("JRE artifact, Java sources found will be ignored, transpiling will not be attempted");
-                    result = J2clBuildStepResult.ABORTED;
-                } else {
                     logger.printLine("Java source found, transpiling will happen");
                     result = J2clBuildStepResult.SUCCESS;
-                }
             } else {
                 logger.printLine("No java source found, transpiling will not be attempted");
                 result = J2clBuildStepResult.SUCCESS;
@@ -102,18 +94,17 @@ final class J2ClBuildStepWorkerUnpack extends J2ClBuildStepWorker2 {
                                        final J2clLinePrinter logger) throws Exception {
         boolean javaFilesFound = false;
 
-        final List<J2clPath> sources = artifact.sourcesRoot();
-        logger.printIndented("Source root(s)", sources);
+        final List<J2clPath> sourceRoots = artifact.sourcesRoot();
+        logger.printIndented("Source root(s)", sourceRoots);
         logger.indent();
         {
-            for (final J2clPath source : sources) {
+            for (final J2clPath source : sourceRoots) {
                 logger.indent();
                 logger.printLine(source.toString());
                 {
-                    final Path sourcePath = source.path();
                     javaFilesFound |= source.isFile() ?
-                            this.extractArchiveFiles(sourcePath, dest, logger) :
-                            this.gatherFilesSortThenCopy(sourcePath, dest, logger);
+                            source.extractArchiveFiles(dest, logger).size() > 0 :
+                            dest.copyFiles(source, source.gatherFiles(J2clPath.ALL_FILES), logger::printLine).size() > 0;
                 }
                 logger.outdent();
             }
@@ -122,56 +113,5 @@ final class J2ClBuildStepWorkerUnpack extends J2ClBuildStepWorker2 {
         logger.outdent();
 
         return javaFilesFound;
-    }
-
-    private boolean extractArchiveFiles(final Path archive,
-                                        final J2clPath target,
-                                        final J2clLinePrinter logger) throws IOException {
-        try (final FileSystem zip = FileSystems.newFileSystem(URI.create("jar:" + archive.toAbsolutePath().toUri()), Maps.empty())) {
-            return this.gatherFilesSortThenCopy(zip.getPath("/"),
-                    target,
-                    logger);
-        }
-    }
-
-    /**
-     * First gets an alphabetical listing of all files in the given source and then proceeds to copy them to the destination.
-     * This produces output that shows the files processed in alphabetical order.
-     */
-    private boolean gatherFilesSortThenCopy(final Path source,
-                                            final J2clPath target,
-                                            final J2clLinePrinter logger) throws IOException {
-        final Set<J2clPath> files = J2clPath.with(source).gatherFiles();
-        if (files.isEmpty()) {
-            logger.printIndentedLine("No files");
-        } else {
-            this.extractFiles(source, target, files, logger);
-        }
-
-        return files.stream()
-                .anyMatch(J2clPath::isJavaFile);
-    }
-
-    private void extractFiles(final Path root,
-                              final J2clPath target,
-                              final Set<J2clPath> files,
-                              final J2clLinePrinter logger) throws IOException {
-        logger.indent();
-        logger.indent();
-
-        for (final J2clPath file : files) {
-            final Path filePath = file.path();
-            final Path pathInZip = root.relativize(filePath);
-            final Path copyTarget = Paths.get(target.toString()).resolve(pathInZip.toString());
-
-            Files.createDirectories(copyTarget.getParent());
-            Files.copy(filePath, copyTarget);
-
-            logger.printLine(file.toString());
-        }
-
-        logger.outdent();
-        logger.printLine(files.size() + " file(s) copied");
-        logger.outdent();
     }
 }

@@ -189,7 +189,22 @@ A list of artifacts (full maven coords) followed by a comma separated list of ar
 <added-dependencies>
     <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:0.4-SNAPSHOT</param>
 </added-dependencies>
+```
 
+
+
+## classpath-required
+A list of artifacts that will be added to all classpaths. The first entry will be used as the bootstrap archive. If a
+dependency is present here but absent in `javascript-source-required` then it will never appear when js files are required.
+
+The snippet below is a good starting point and forcibly includes a few minimally required artifacts.
+
+```xml
+<classpath-required>
+    <param>com.vertispan.j2cl:javac-bootstrap-classpath:0.4-SNAPSHOT</param>
+    <param>com.vertispan.j2cl:jre:0.4-SNAPSHOT</param>
+    <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT</param>
+</classpath-required>
 ```
 
 
@@ -235,9 +250,11 @@ A Closure compiler argument containing one or more entry point(s).
 ```
 
 
+
 ## excluded-dependencies
 A list of artifacts (group-id colon artifact-id) that may appear as transitive dependencies that must be excluded from
-the build process. The sample below is useful when requiring gwt-user.
+the build process. The sample below is useful when requiring gwt-user, which contains a combination of client/translatable
+and server/untranslatable packages/classes.
 
 ```xml
 <excluded-dependencies>
@@ -258,22 +275,48 @@ The path to the initial script filename.
 
 
 
-## javac-bootstrap, jre-jarfile
+## javascript-source-required
+A list of artifacts that will be added to when javascript sources are being processed. If a dependency is present here
+but absent in `classpath-required` then it will never appear on a classpath.
 
-These two parameters are not a dependency declaration, but the maven coordinates that identify TWO special artifacts defined
-as regular `<dependency>`. The values must for these parameters must match a dependency artifact otherwise the build will
-complain and fail. Only the group-id and artifact-id is necessary separated by a colon ':', the version should not be included
-here.
+The bootstrap and jre artifacts mentioned below are the transpiled versions of similar artifacts that appear in `<classpath-required`,
+and the later includes numerous classes and mostly annotations that provide hints to the transpilation process.
+
+The snippet below is a good starting point and forcibly includes a few minimally required artifacts.
 
 ```xml
-<javac-bootstrap>com.vertispan.j2cl:javac-bootstrap-classpath</javac-bootstrap>
-<jre-jar-file>com.vertispan.j2cl:jre</jre-jar-file>
+<javascript-source-required>
+    <param>com.vertispan.j2cl:bootstrap:zip:jszip:0.4-SNAPSHOT</param>
+    <param>com.vertispan.j2cl:jre:zip:jszip:0.4-SNAPSHOT</param>
+    <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT</param>
+</javascript-source-required>
 ```
 
 
 
 ## output
 This path is the final location of the final javascript.
+
+
+
+# processing-skipped
+A list of artifacts that will not be processed. This is used to avoid processing any bootstrap and jre artifacts, 
+as they come pre-processed, or only contain annotations that are not required during transpiling (j2cl) but necessary
+for compiling (javac).
+
+```xml
+<processing-skipped>
+    <!-- jre & bootstrap transpiled versions also included as dependencies, skip transpiling-->
+    <param>com.vertispan.j2cl:javac-bootstrap-classpath:0.4-SNAPSHOT</param>
+    <param>com.vertispan.j2cl:jre:0.4-SNAPSHOT</param>
+    <param>com.vertispan.j2cl:bootstrap:zip:jszip:0.4-SNAPSHOT</param>
+    <param>com.vertispan.j2cl:jre:zip:jszip:0.4-SNAPSHOT</param>
+    <!-- 2x dependencies below only contain annotations -->
+    <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
+    <param>com.vertispan.j2cl:gwt-internal-annotations:jar:0.4-SNAPSHOT</param>
+</processing-skipped>
+```
+
 
 
 ## replaced-dependencies

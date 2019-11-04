@@ -36,7 +36,7 @@ final class J2ClBuildStepWorkerOutputAssembler extends J2ClBuildStepWorker2 {
     }
 
     @Override
-    final J2clBuildStepResult execute0(final J2clDependency artifact,
+    final J2clBuildStepResult execute1(final J2clDependency artifact,
                                        final J2clStepDirectory directory,
                                        final J2clLinePrinter logger) throws Exception {
         final J2clPath target = artifact.request().buildTarget;
@@ -46,7 +46,7 @@ final class J2ClBuildStepWorkerOutputAssembler extends J2ClBuildStepWorker2 {
 
         final J2clPath source = artifact.step(J2clBuildStep.CLOSURE_COMPILER).output();
 
-        final Collection<J2clPath> files = source.gatherFiles();
+        final Collection<J2clPath> files = source.gatherFiles(J2clPath.ALL_FILES);
         logger.printIndented("Source", files);
 
         logger.printLine("Copying");

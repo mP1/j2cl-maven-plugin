@@ -19,6 +19,8 @@ package walkingkooka.j2cl.maven;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
+import walkingkooka.ToStringBuilder;
+import walkingkooka.ToStringBuilderOption;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
@@ -30,12 +32,13 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Represents a single artifact including the project or any of its dependencies. These will in turn have java files etc.
@@ -56,33 +59,19 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Lookup the coords returning the dependency
      */
+    static Optional<J2clDependency> get(final J2clArtifactCoords coords) {
+        return Optional.ofNullable(COORD_TO_DEPENDENCY.get(coords));
+    }
+
+    /**
+     * Lookup the coords returning the dependency
+     */
     static J2clDependency getOrFail(final J2clArtifactCoords coords) {
-        final J2clDependency dependency = COORD_TO_DEPENDENCY.get(coords);
-        if (null == dependency) {
-            throw new IllegalArgumentException("Unknown coords " + coords);
-        }
-        return dependency;
+        return get(coords)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown coords " + CharSequences.quote(coords.toString())));
     }
 
-    /**
-     * Tests if the given coords are also declared as an artifact.
-     */
-    static boolean isArtifactDeclared(final J2clArtifactCoords coords) {
-        return COORD_TO_DEPENDENCY.containsKey(coords);
-    }
-
-    private final static Map<J2clArtifactCoords, J2clDependency> COORD_TO_DEPENDENCY = Maps.sorted();
-
-    /**
-     * Switch that becomes true when gathering the JRE or any of its dependencies. When true dependencies are
-     * added to {@link #JRE_OR_JRE_DEPENDENCIES}
-     */
-    private static boolean GATHERING_JRE_DEPENDENCIES = false;
-
-    /**
-     * Holds the coords of any dependencies that are JRE dependencies.
-     */
-    private final static Set<J2clArtifactCoords> JRE_OR_JRE_DEPENDENCIES = Sets.sorted();
+    final static Map<J2clArtifactCoords, J2clDependency> COORD_TO_DEPENDENCY = Maps.sorted();
 
     // ctor.............................................................................................................
 
@@ -104,14 +93,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
             throw new IllegalArgumentException("Duplicate artifact " + CharSequences.quote(coords.toString()));
         }
 
-        final boolean jre = this.isJre();
-        if (jre) {
-            GATHERING_JRE_DEPENDENCIES = true;
-            JRE_OR_JRE_DEPENDENCIES.add(coords);
-        }
         this.gatherDeclaredDependencies();
         this.addAddedDependencies();
-        GATHERING_JRE_DEPENDENCIES = false;
     }
 
     private void gatherDeclaredDependencies() {
@@ -127,7 +110,12 @@ final class J2clDependency implements Comparable<J2clDependency> {
                 continue;
             }
 
-            this.dependencyCoords.add(this.getOrCreate(J2clArtifactCoords.with(artifact)).coords());
+            final J2clArtifactCoords coords = J2clArtifactCoords.with(artifact);
+            if(request.isExcluded(coords)) {
+                continue;
+            }
+
+            this.dependencyCoords.add(this.getOrCreate(coords).coords());
         }
     }
 
@@ -147,10 +135,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private J2clDependency getOrCreate(final J2clArtifactCoords coords) {
-        if (GATHERING_JRE_DEPENDENCIES) {
-            JRE_OR_JRE_DEPENDENCIES.add(coords);
-        }
-        final J2clDependency dependency = COORD_TO_DEPENDENCY.get(coords);
+        final J2clDependency dependency = COORD_TO_DEPENDENCY.get(this.request().replacement(coords).orElse(coords));
+
         return null != dependency ?
                 dependency :
                 this.loadDependency(coords);
@@ -163,35 +149,20 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
         return new J2clDependency(coords,
                 project,
-                request.mavenMiddleware().mavenFile(coords.toString()).orElseThrow(() -> new IllegalArgumentException("Archive file missing archive for " + CharSequences.quote(coords.toString())))/*.map(J2clPath.with())*/,
+                request.mavenMiddleware().mavenFile(coords.toString()).orElseThrow(() -> new IllegalArgumentException("Archive file missing for " + CharSequences.quote(coords.toString())))/*.map(J2clPath.with())*/,
                 request);
     }
 
     // dependencies.....................................................................................................
 
     private final Set<J2clArtifactCoords> dependencyCoords = Sets.sorted();
-
+    
     /**
-     * Returns the immediate dependencies without any transitives. If this is a non JRE dependency, and has no dependencies
-     * the JRE will be added as a dependency.
+     * Retrieves all dependencies including transients, and will include any required artifacts.
      */
     Set<J2clDependency> dependencies() {
         if (null == this.dependencies) {
-            final Set<J2clArtifactCoords> dependencyCoords = this.dependencyCoords;
-            final Set<J2clDependency> dependencies;
-
-            if (dependencyCoords.isEmpty()) {
-                dependencies = JRE_OR_JRE_DEPENDENCIES.contains(this.coords()) ?
-                        Sets.empty() :
-                        Sets.of(jre());
-            } else {
-                final J2clBuildRequest request = this.request();
-                dependencies = this.dependencyCoords
-                        .stream()
-                        .map(request::dependency)
-                        .collect(Collectors.toCollection(Sets::sorted));
-            }
-            this.dependencies = Sets.readOnly(dependencies);
+            this.computeTransitiveDependencies();
         }
 
         return this.dependencies;
@@ -199,24 +170,50 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     private Set<J2clDependency> dependencies;
 
-    /**
-     * Retrieves all dependencies including transients.
-     */
-    Set<J2clDependency> dependenciesIncludingTransitives() {
-        if (null == this.dependenciesIncludingTransitives) {
+    private void computeTransitiveDependencies() {
+        final J2clBuildRequest request = this.request();
 
-            final Set<J2clDependency> all = Sets.sorted();
-            for (final J2clDependency dependency : this.dependencies()) {
-                all.add(dependency);
-                all.addAll(dependency.dependencies());
-            }
-            this.dependenciesIncludingTransitives = Collections.unmodifiableSet(all);
+        final Map<J2clArtifactCoords, Set<J2clArtifactCoords>> flat = Maps.sorted();
+        for(final Entry<J2clArtifactCoords, J2clDependency> coordAndDependency : COORD_TO_DEPENDENCY.entrySet()) {
+            flat.put(coordAndDependency.getKey(), coordAndDependency.getValue().dependencyCoords);
         }
 
-        return this.dependenciesIncludingTransitives;
+        final J2clDependencyGraphCalculator calculator = J2clDependencyGraphCalculator.with(flat,
+                request.required()
+        .stream()
+        .filter(J2clDependency::requiredFilter)
+        .collect(Collectors.toCollection(Sets::sorted)));
+
+        final Map<J2clArtifactCoords, Set<J2clArtifactCoords>> tree = calculator.run();
+
+        for(final Entry<J2clArtifactCoords, J2clDependency> coordAndDependency : COORD_TO_DEPENDENCY.entrySet()) {
+            final J2clArtifactCoords coords = coordAndDependency.getKey();
+            final J2clDependency dependency = coordAndDependency.getValue();
+
+            dependency.dependencies = tree.get(coords)
+                    .stream()
+                    .map(J2clDependency::getOrFail)
+                    .collect(Collectors.toCollection(Sets::sorted));
+        }
     }
 
-    private Set<J2clDependency> dependenciesIncludingTransitives;
+    private static boolean requiredFilter(final J2clArtifactCoords coords) {
+        return getOrFail(coords).isProcessingRequired();
+    }
+
+    /**
+     * Returns the classpath and dependencies in order without any duplicates.
+     */
+    Set<J2clDependency> classpathAndDependencies() {
+        return Sets.readOnly(Stream.concat(this.request().classpathRequired().stream(), this.dependencies().stream())
+                .filter(this::isDifferent)
+                .filter(J2clDependency::isClasspathRequired)
+                .collect(Collectors.toCollection(Sets::ordered)));
+    }
+
+    private boolean isDifferent(final J2clDependency other) {
+        return 0 != this.compareTo(other);
+    }
 
     // isDependency.....................................................................................................
 
@@ -224,55 +221,20 @@ final class J2clDependency implements Comparable<J2clDependency> {
         return null != this.artifactFile;
     }
 
-
-    /**
-     * Returns the JAVAC BOOTSTRAP dependency
-     */
-    static J2clDependency javacBootstrap() {
-        if (null == javaBootstrap) {
-            javaBootstrap = findDependency(J2clDependency::isJavacBootstrap, "Java bootstrap");
-        }
-        return javaBootstrap;
-    }
-
-    private static J2clDependency javaBootstrap;
-
-    /**
-     * Returns the JRE dependency
-     */
-    static J2clDependency jre() {
-        if (null == jre) {
-            jre = findDependency(J2clDependency::isJreBinary, "JRE");
-        }
-        return jre;
-    }
-
-    private static J2clDependency jre;
-
-    private static J2clDependency findDependency(final Predicate<J2clDependency> filter,
-                                                 final String label) {
-        return COORD_TO_DEPENDENCY.values()
-                .stream()
-                .filter(filter)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Unable to find " + label + " dependency: " + COORD_TO_DEPENDENCY.values().stream().map(d -> CharSequences.quote(d.coords().toString())).collect(Collectors.joining(","))));
-    }
-
     // pretty...........................................................................................................
 
     /**
-     * Pretty prints all dependencies with after sorting by coords.
+     * Pretty prints all dependencies with indentation.
      */
     J2clDependency prettyPrintDependencies() {
+        this.dependencies();
+
         final Set<J2clDependency> sorted = Sets.sorted();
         sorted.addAll(COORD_TO_DEPENDENCY.values());
 
         final J2clLogger logger = this.request.logger();
 
         final J2clLinePrinter printer = J2clLinePrinter.with(logger.printer(logger::debug));
-        printer.printLine(this.coords.toString());
-        printer.indent();
-
         printer.printLine("Dependencies graph for all artifacts");
         printer.indent();
 
@@ -280,7 +242,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
             printer.printLine(artifact.toString());
             printer.indent();
             {
-                for (J2clDependency dependency : artifact.dependenciesIncludingTransitives()) {
+                for (J2clDependency dependency : artifact.dependencies()) {
                     printer.printLine(dependency.toString());
                 }
             }
@@ -303,41 +265,44 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     private final J2clArtifactCoords coords;
 
-    // bootstrap........................................................................................................
-
     /**
-     * Only returns true for artifacts that are actually the Bootstrap binaries in some form.
+     * Only returns true for artifacts that are actually the java Bootstrap in some form.
      */
-    boolean isJavacBootstrap() {
-        return this.request().isJavacBootstrap(this.coords);
-    }
-
-    // jre..............................................................................................................
-
-    boolean isJre() {
-        return this.request().isJre(this.coords);
+    boolean isClasspathRequired() {
+        final J2clBuildRequest request = this.request();
+        final J2clArtifactCoords coords = this.coords();
+        return request.isClasspathRequired(coords) || false == request.isJavascriptSourceRequired(coords);
     }
 
     /**
-     * Only returns true for artifacts that are actually the JRE binaries in some form, but not the jszip form.
+     * Only returns true for the JRE binary artifact
      */
-    boolean isJreBinary() {
-        return this.isJre() && false == JSZIP.equals(this.coords().classifier());
+    boolean isJavascriptSourceRequired() {
+        final J2clBuildRequest request = this.request();
+        final J2clArtifactCoords coords = this.coords();
+        return request.isJavascriptSourceRequired(coords) || false == request.isClasspathRequired(coords);
     }
 
-    private final static Optional<String> JSZIP = Optional.of("jszip");
+    /**
+     * Used to test if a dependency should be ignored and the archive files used as they are. Examples of this include
+     * the prepackaged JRE binaries and the jszip form, each used dependening whether class files or java source is
+     * required.
+     */
+    boolean isProcessingSkipped() {
+        return this.request().isProcessingSkipped(this.coords);
+    }
+
+    boolean isProcessingRequired() {
+        return false == this.isProcessingSkipped();
+    }
 
     // excluded..........................................................................................................
 
     /**
-     * Excluded dependencies will return true. These must be excluded during build classpaths etc.
+     * Excluded dependencies will return true, and will be ignored/removed during the dependency discovering phase.
      */
     boolean isExcluded() {
         return this.request().isExcluded(this.coords());
-    }
-
-    boolean isIncluded() {
-        return false == this.isExcluded();
     }
 
     // tasks............................................................................................................
@@ -400,7 +365,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     /**
-     * Returns the hash for this artifact or fails if the hash has not yet been computed.
+     * If the directory is present hashes the entire content or the content of the artifact file.
      */
     String hashOrFail() {
         return this.directory().filename();
@@ -460,10 +425,17 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private final Artifact artifact;
 
     /**
-     * Returns the archive file attached to this archive, and never any target/classes directory.
+     * Returns the archive file attached to this archive.
      */
     Optional<J2clPath> artifactFile() {
         return Optional.ofNullable(this.artifactFile);
+    }
+
+    /**
+     * Returns the archive file or fails if absent.
+     */
+    J2clPath artifactFileOrFail() {
+        return this.artifactFile().orElseThrow(() -> new IllegalArgumentException("Archive file missing for " + CharSequences.quote(this.coords().toString())));
     }
 
     private final J2clPath artifactFile;
@@ -473,11 +445,25 @@ final class J2clDependency implements Comparable<J2clDependency> {
     // toString.........................................................................................................
     @Override
     public String toString() {
-        return this.coords +
-                (Optional.ofNullable(this.artifact().getScope()).map(s -> " " + CharSequences.quoteAndEscape(s)).orElse("")) +
-                (this.isJre() ? " (JRE)" : "") +
-                (this.isJavacBootstrap() ? " (JAVAC BOOTSTRAP)" : "") +
-                (this.isExcluded() ? " (EXCLUDED)" : "");// +
+        final ToStringBuilder b = ToStringBuilder.empty();
+
+        b.value(this.coords());
+        b.value(this.artifact().getScope());
+
+        b.disable(ToStringBuilderOption.QUOTE);
+        b.valueSeparator(",");
+
+        if (this.isClasspathRequired()) {
+            b.value("CLASSPATH-REQUIRED");
+        }
+        if (this.isJavascriptSourceRequired()) {
+            b.value("JAVASCRIPT-SOURCE-REQUIRED");
+        }
+        if (this.isProcessingSkipped()) {
+            b.value("PROCESS-SKIPPED");
+        }
+
+        return b.build();
     }
 
     // Comparable.......................................................................................................

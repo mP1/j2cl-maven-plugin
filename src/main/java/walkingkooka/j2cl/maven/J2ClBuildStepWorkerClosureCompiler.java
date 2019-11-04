@@ -38,7 +38,7 @@ final class J2ClBuildStepWorkerClosureCompiler extends J2ClBuildStepWorker2 {
     }
 
     @Override
-    final J2clBuildStepResult execute0(final J2clDependency artifact,
+    final J2clBuildStepResult execute1(final J2clDependency artifact,
                                        final J2clStepDirectory directory,
                                        final J2clLinePrinter logger) throws Exception {
         final J2clBuildRequest request = artifact.request();
@@ -50,8 +50,8 @@ final class J2ClBuildStepWorkerClosureCompiler extends J2ClBuildStepWorker2 {
             sources = this.addSources(artifact, logger);
             logger.indent();
             {
-                for (final J2clDependency dependency : artifact.dependenciesIncludingTransitives()) {
-                    if(dependency.isExcluded()) {
+                for (final J2clDependency dependency : artifact.dependencies()) {
+                    if(false == dependency.isJavascriptSourceRequired()) {
                         continue;
                     }
                     sources.addAll(this.addSources(dependency, logger));
@@ -66,9 +66,8 @@ final class J2ClBuildStepWorkerClosureCompiler extends J2ClBuildStepWorker2 {
                 request.defines,
                 request.entryPoints,
                 request.externs,
-                directory.output().append(request.initialScriptFilename.toString()),
                 sources,
-                directory.output(),
+                directory.output().append(request.initialScriptFilename.toString()),
                 logger) ?
                 J2clBuildStepResult.SUCCESS :
                 J2clBuildStepResult.FAILED;
@@ -80,20 +79,23 @@ final class J2ClBuildStepWorkerClosureCompiler extends J2ClBuildStepWorker2 {
         logger.indent();
 
         final List<J2clPath> sources = Lists.array();
+        if(artifact.isProcessingRequired()) {
+            final J2clPath transpiled = artifact.step(J2clBuildStep.TRANSPILE).output();
+            if (transpiled.exists().isPresent()) {
+                sources.add(transpiled);
+            }
 
-        final J2clPath transpiled = artifact.step(J2clBuildStep.TRANSPILE).output();
-        if (transpiled.exists().isPresent()) {
-            sources.add(transpiled);
-        }
+            // add unpack anyway as it might contain js originally accompanying java source.
+            final J2clPath unpack = artifact.step(J2clBuildStep.UNPACK).output();
+            if (unpack.exists().isPresent()) {
+                sources.add(unpack);
+            }
 
-        // add unpack anyway as it might contain js originally accompanying java source.
-        final J2clPath unpack = artifact.step(J2clBuildStep.UNPACK).output();
-        if (unpack.exists().isPresent()) {
-            sources.add(unpack);
-        }
-
-        if (sources.isEmpty()) {
-            logger.printLine("No transpiled or unpacked output");
+            if (sources.isEmpty()) {
+                logger.printLine("No transpiled or unpacked output");
+            }
+        } else {
+            sources.add(artifact.artifactFileOrFail());
         }
 
         logger.outdent();

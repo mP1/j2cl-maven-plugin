@@ -20,7 +20,6 @@ package walkingkooka.j2cl.maven;
 import walkingkooka.collect.list.Lists;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Transpiles the stripped source into javascript equivalents.
@@ -39,53 +38,33 @@ final class J2clBuildStepWorkerJ2ClTranspiler extends J2ClBuildStepWorker2 {
     }
 
     @Override
-    final J2clBuildStepResult execute0(final J2clDependency artifact,
+    final J2clBuildStepResult execute1(final J2clDependency artifact,
                                        final J2clStepDirectory directory,
                                        final J2clLinePrinter logger) throws Exception {
         // in the end only the project is compiled, all other dependencies remain untouched.
-        final J2clPath sources = artifact.step(artifact.isJreBinary() ?
+        final J2clPath sourceRoot = artifact.step(artifact.isProcessingSkipped() ?
                 J2clBuildStep.UNPACK :
                 J2clBuildStep.GWT_INCOMPATIBLE_STRIP)
                 .output();
-        final List<J2clPath> sourceFiles = sources.findFiles(J2clPath.JAVA_FILES,
-                J2clPath.JAVASCRIPT_FILES,
-                J2clPath.NATIVE_JAVASCRIPT_FILES);
 
         logger.print("Preparing...");
-        logger.indent();
-        logger.printIndented("Sources", sources);
-        logger.printIndented("*.java, *.js, *.native.js files", sourceFiles);
-        logger.outdent();
+        logger.printIndented("Source path(s)", sourceRoot);
 
-        J2clBuildStepResult result;
-        if (sourceFiles.size() > 0) {
-            final List<J2clPath> classpath = Lists.array();
-            classpath.addAll(J2clDependency.javacBootstrap().artifactFile().map(Lists::of).orElse(Lists.empty()));
-            classpath.addAll(J2clDependency.jre().artifactFile().map(Lists::of).orElse(Lists.empty()));
+        final List<J2clPath> classpath = Lists.array();
 
-            classpath.addAll(artifact.dependenciesIncludingTransitives()
-                    .stream()
-                    .filter(J2clDependency::isIncluded) // remove excludeds
-                    .flatMap(d -> d.artifactFile().stream())
-                    .collect(Collectors.toList()));
-
-            result = J2clTranspiler.execute(classpath,
-                    sourceFiles,
-                    directory.output().emptyOrFail(),
-                    logger) ?
-                    J2clBuildStepResult.SUCCESS :
-                    J2clBuildStepResult.FAILED;
-        } else {
-            if (artifact.isDependency()) {
-                logger.printIndentedLine("No files found - transpiling aborted.");
-                directory.aborted().emptyOrFail();
-                result = J2clBuildStepResult.ABORTED;
+        for (final J2clDependency dependency : artifact.classpathAndDependencies()) {
+            if (dependency.isProcessingSkipped()) {
+                classpath.add(dependency.artifactFileOrFail());
             } else {
-                logger.printIndentedLine("No files found - transpiling skipped.");
-                directory.skipped().emptyOrFail();
-                result = J2clBuildStepResult.SKIPPED;
+                classpath.add(dependency.step(J2clBuildStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED).output());
             }
         }
-        return result;
+
+        return J2clTranspiler.execute(classpath,
+                sourceRoot,
+                directory.output().emptyOrFail(),
+                logger) ?
+                J2clBuildStepResult.SUCCESS :
+                J2clBuildStepResult.FAILED;
     }
 }
