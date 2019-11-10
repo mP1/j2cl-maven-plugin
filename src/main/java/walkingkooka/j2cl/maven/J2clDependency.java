@@ -412,7 +412,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private List<J2clPath> sourcesArchivePath() {
         return this.request.mavenMiddleware()
                 .mavenFile(this.coords.source().toString())
-                .map(f -> Lists.of(f))
+                .map(Lists::of)
                 .orElse(Lists.empty());
     }
 
