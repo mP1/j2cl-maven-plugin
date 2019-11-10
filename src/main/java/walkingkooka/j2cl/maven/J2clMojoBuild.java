@@ -99,6 +99,7 @@ public final class J2clMojoBuild extends J2clMojo {
             final String autoAdded =mapping.substring(equalsSign + 1);
 
             lookup.put(J2clArtifactCoords.parse(mapping.substring(0, equalsSign)), Arrays.stream(autoAdded.split(","))
+                    .map(String::trim)
                     .map(J2clArtifactCoords::parse)
                     .collect(Collectors.toList())
             );
@@ -139,7 +140,7 @@ public final class J2clMojoBuild extends J2clMojo {
     // compilationLevel.................................................................................................
 
     private CompilationLevel compilationLevel() {
-        final String parameter = this.compilationLevel;
+        final String parameter = this.compilationLevel.trim();
         final CompilationLevel level = CompilationLevel.fromString(parameter);
         if (null == level) {
             throw new IllegalStateException("Invalid compilation-level was " + CharSequences.quoteAndEscape(parameter));
@@ -166,7 +167,9 @@ public final class J2clMojoBuild extends J2clMojo {
     // entry-points.....................................................................................................
 
     private List<String> entryPoints() {
-        return this.entrypoints;
+        return this.entrypoints.stream()
+                .map(String::trim)
+                .collect(Collectors.toList());
     }
 
     @Parameter(alias = "entry-points", required = true)
@@ -180,6 +183,7 @@ public final class J2clMojoBuild extends J2clMojo {
      */
     private Predicate<J2clArtifactCoords> excludedDependencies() {
         final List<Predicate<J2clArtifactCoords>> filter = this.excludedDependencies.stream()
+                .map(String::trim)
                 .map(this::groupArtifactAndVersionPredicate)
                 .collect(Collectors.toList());
 
@@ -245,11 +249,12 @@ public final class J2clMojoBuild extends J2clMojo {
         final Map<J2clArtifactCoords, J2clArtifactCoords> lookup = Maps.sorted();
 
         for (final String mapping : this.replacedDependencies) {
-            final int equalsSign = mapping.indexOf('=');
+            final String mapping2 = mapping.trim();
+            final int equalsSign = mapping2.indexOf('=');
             if (-1 == equalsSign) {
-                throw new IllegalArgumentException("Replacement dependency missing '=' in " + CharSequences.quoteAndEscape(mapping));
+                throw new IllegalArgumentException("Replacement dependency missing '=' in " + CharSequences.quoteAndEscape(mapping2));
             }
-            lookup.put(J2clArtifactCoords.parse(mapping.substring(0, equalsSign)), J2clArtifactCoords.parse(mapping.substring(equalsSign + 1)));
+            lookup.put(J2clArtifactCoords.parse(mapping2.substring(0, equalsSign)), J2clArtifactCoords.parse(mapping2.substring(equalsSign + 1)));
         }
 
         return Maps.readOnly(lookup);
