@@ -200,7 +200,7 @@ public final class J2clMojoBuild extends J2clMojo {
 
             @Override
             public String toString() {
-                return J2clMojoBuild.this.excludedDependencies.stream().collect(Collectors.joining(","));
+                return String.join(",", J2clMojoBuild.this.excludedDependencies);
             }
         };
     }

@@ -124,8 +124,7 @@ public final class J2ClDependencyGraphCalculatorTest {
     }
 
     private String csv(final String... strings) {
-        return Arrays.stream(strings)
-                .collect(Collectors.joining(","));
+        return String.join(",", strings);
     }
 
     private void runAndCheck(final Map<String, String> flat,
