@@ -71,7 +71,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
                 .orElseThrow(() -> new IllegalArgumentException("Unknown coords " + CharSequences.quote(coords.toString())));
     }
 
-    final static Map<J2clArtifactCoords, J2clDependency> COORD_TO_DEPENDENCY = Maps.sorted();
+    private final static Map<J2clArtifactCoords, J2clDependency> COORD_TO_DEPENDENCY = Maps.sorted();
 
     // ctor.............................................................................................................
 
@@ -268,7 +268,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Only returns true for artifacts that are actually the java Bootstrap in some form.
      */
-    boolean isClasspathRequired() {
+    private boolean isClasspathRequired() {
         final J2clBuildRequest request = this.request();
         final J2clArtifactCoords coords = this.coords();
         return request.isClasspathRequired(coords) || false == request.isJavascriptSourceRequired(coords);

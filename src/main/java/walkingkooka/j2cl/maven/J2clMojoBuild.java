@@ -241,7 +241,7 @@ public final class J2clMojoBuild extends J2clMojo {
 
     // replacedDependencies.............................................................................................
 
-    Map<J2clArtifactCoords, J2clArtifactCoords> replacedDependencies() {
+    private Map<J2clArtifactCoords, J2clArtifactCoords> replacedDependencies() {
         final Map<J2clArtifactCoords, J2clArtifactCoords> lookup = Maps.sorted();
 
         for (final String mapping : this.replacedDependencies) {
