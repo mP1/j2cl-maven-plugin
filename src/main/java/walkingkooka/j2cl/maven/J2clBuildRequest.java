@@ -315,24 +315,19 @@ final class J2clBuildRequest {
      * Traverses the dependency graph creating job for each, for dependencies that are included.
      */
     private void prepareJobs(final J2clDependency artifact) {
-        //System.err.println("PREPARE JOBS " + artifact + " jobs " + (false == this.jobs.containsKey(artifact)));
-        if (/*artifact.isIncluded() && */artifact.isProcessingRequired() && false == this.jobs.containsKey(artifact)) {
+        if (artifact.isProcessingRequired() && false == this.jobs.containsKey(artifact)) {
             final Set<J2clDependency> dependencies = artifact.dependencies(); // dependencies()
-            //System.err.println("PREPARE JOBS " + artifact + " ABPUT! !!! " + dependencies);
 
             // keep transitive dependencies alphabetical sorted for better readability when trySubmitJob pretty prints queue processing.
             final Set<J2clDependency> required = Sets.sorted();
             this.jobs.put(artifact, required);
 
             dependencies.stream()
-                    //.peek(d -> System.err.println("maybe " + artifact + "\t\t" + d))
-                    //.filter(J2clDependency::isIncluded)
                     .filter(J2clDependency::isProcessingRequired)
                     .forEach(d -> {
                         required.add(d);
                         this.prepareJobs(d);
                     });
-            //System.err.println("PREPARE JOBS " + artifact + " REQUIRED " + required);
         }
     }
 
