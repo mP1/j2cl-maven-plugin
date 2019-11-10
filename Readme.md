@@ -29,7 +29,7 @@ and build and install with Maven.
 mvn clean install
 ```
 
-*STATUS* More integration tests need to be done to guarantee to establish that this is building correctly.
+
 
 # Goals
 
@@ -45,7 +45,6 @@ The plugin has two goals
 
 Some pieces of the vertispan/j2clmavenplugin are currently missing, because I dont have a large GWT project.
 
-- Auto substitution of Google j2cl artifacts with vertispan forks which are j2cl/gwt compatible.
 - j2cl tests.
 - DevMode: Should not be too hard to watch the source directory and re-build.
 
