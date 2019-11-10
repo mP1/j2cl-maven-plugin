@@ -69,7 +69,7 @@ final class J2ClBuildStepWorkerHash extends J2clBuildStepWorker {
 
     private void hashDependencies(final J2clDependency artifact,
                                   final HashBuilder hash,
-                                  final J2clLinePrinter logger) throws IOException {
+                                  final J2clLinePrinter logger) {
         final Set<J2clDependency> dependencies = artifact.dependencies(); // dependencies();
         logger.printLine(dependencies.size() + " Dependencies");
         logger.indent();
