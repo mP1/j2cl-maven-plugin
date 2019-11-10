@@ -51,7 +51,6 @@ final class JavacCompiler {
             {
                 logger.printIndented("Bootstrap", bootstrap);
                 logger.printIndented("Classpath(s)", classpath);
-                //noinspection ConstantConditions
                 logger.printIndented("New java file(s)", newSourceFiles); // printLine full paths here might be mixed sources...
                 logger.printIndented("Output", newClassFilesOutput);
             }
