@@ -135,7 +135,7 @@ public final class J2ClDependencyGraphCalculatorTest {
                 this.transform(tree));
     }
 
-    private final Map<J2clArtifactCoords, Set<J2clArtifactCoords>> transform(final Map<String, String> flat) {
+    private Map<J2clArtifactCoords, Set<J2clArtifactCoords>> transform(final Map<String, String> flat) {
         final Map<J2clArtifactCoords, Set<J2clArtifactCoords>> transformed = Maps.sorted();
 
         flat.forEach((k, v) -> transformed.put(J2clArtifactCoords.parse(k), this.transformCsv(v)));
