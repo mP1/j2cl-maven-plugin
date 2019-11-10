@@ -20,16 +20,8 @@ package walkingkooka.j2cl.maven;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.text.CharSequences;
 
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Unpacks the source from the sources artifact (jar with sources) and if no java files are present tries

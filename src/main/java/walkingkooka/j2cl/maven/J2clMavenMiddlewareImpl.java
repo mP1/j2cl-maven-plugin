@@ -32,7 +32,6 @@ import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import walkingkooka.text.CharSequences;
 
-import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
