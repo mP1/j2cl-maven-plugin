@@ -18,7 +18,6 @@
 package walkingkooka.j2cl.maven;
 
 import com.google.common.collect.Lists;
-import walkingkooka.collect.set.Sets;
 
 import java.io.IOException;
 import java.net.URI;
