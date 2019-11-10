@@ -17,12 +17,10 @@
 
 package walkingkooka.j2cl.maven;
 
-import com.google.common.collect.Streams;
 import com.google.javascript.jscomp.CompilationLevel;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
-import walkingkooka.text.CharSequences;
 
 import java.util.Collection;
 import java.util.List;
@@ -43,6 +41,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Context about a build request
@@ -222,7 +221,7 @@ final class J2clBuildRequest {
      * Returns the coords for all required artifacts, basically combining the {@link #classpathRequired} and {@link #javascriptSourceRequired}.
      */
     Set<J2clArtifactCoords> required() {
-        return Streams.concat(this.classpathRequired.stream(), this.javascriptSourceRequired.stream())
+        return Stream.concat(this.classpathRequired.stream(), this.javascriptSourceRequired.stream())
                 .collect(Collectors.toCollection(Sets::sorted));
     }
 
