@@ -17,10 +17,8 @@
 
 package walkingkooka.j2cl.maven;
 
-import com.google.common.collect.Iterables;
 import walkingkooka.collect.list.Lists;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
