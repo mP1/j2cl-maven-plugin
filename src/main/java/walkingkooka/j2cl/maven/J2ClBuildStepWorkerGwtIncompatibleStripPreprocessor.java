@@ -39,10 +39,10 @@ final class J2ClBuildStepWorkerGwtIncompatibleStripPreprocessor extends J2ClBuil
     }
 
     @Override
-    J2clBuildStepResult execute0(final J2clDependency artifact,
+    J2clBuildStepResult execute1(final J2clDependency artifact,
                                  final J2clStepDirectory directory,
                                  final J2clLinePrinter logger) throws Exception {
-        return GwtIncompatibleStripPreprocessor.execute(Lists.of(artifact.step(J2clBuildStep.UNPACK).output()),
+        return GwtIncompatibleStripPreprocessor.execute(artifact.step(J2clBuildStep.UNPACK).output(),
                 directory.output().emptyOrFail(),
                 logger);
     }

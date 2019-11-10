@@ -17,15 +17,18 @@
 
 package walkingkooka.j2cl.maven;
 
+import com.google.common.collect.Streams;
 import com.google.javascript.jscomp.CompilationLevel;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.text.CharSequences;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.Callable;
@@ -54,10 +57,11 @@ final class J2clBuildRequest {
                                  final List<String> entryPoints,
                                  final J2clPath initialScriptFilename,
                                  final J2clPath base,
-                                 final Predicate<J2clArtifactCoords> bootstrap,
-                                 final Predicate<J2clArtifactCoords> jre,
+                                 final List<J2clArtifactCoords> classpathRequired,
+                                 final List<J2clArtifactCoords> javascriptSourceRequired,
+                                 final List<J2clArtifactCoords> processingSkipped,
                                  final Predicate<J2clArtifactCoords> excluded,
-                                 final Map<J2clArtifactCoords, J2clArtifactCoords> replacedDependencies,
+                                 final Map<J2clArtifactCoords, J2clArtifactCoords> replaced,
                                  final J2clSourcesKind sourcesKind,
                                  final J2clPath buildTarget,
                                  final J2clMavenMiddleware middleware,
@@ -71,10 +75,11 @@ final class J2clBuildRequest {
                 entryPoints,
                 initialScriptFilename,
                 base,
-                bootstrap,
-                jre,
                 excluded,
-                replacedDependencies,
+                replaced,
+                classpathRequired,
+                javascriptSourceRequired,
+                processingSkipped,
                 sourcesKind,
                 buildTarget,
                 middleware,
@@ -90,10 +95,11 @@ final class J2clBuildRequest {
                              final List<String> entryPoints,
                              final J2clPath initialScriptFilename,
                              final J2clPath base,
-                             final Predicate<J2clArtifactCoords> javacBootstrap,
-                             final Predicate<J2clArtifactCoords> jre,
                              final Predicate<J2clArtifactCoords> excluded,
-                             final Map<J2clArtifactCoords, J2clArtifactCoords> replacedDependencies,
+                             final Map<J2clArtifactCoords, J2clArtifactCoords> replaced,
+                             final List<J2clArtifactCoords> classpathRequired,
+                             final List<J2clArtifactCoords> javascriptSourceRequired,
+                             final List<J2clArtifactCoords> processingSkipped,
                              final J2clSourcesKind sourcesKind,
                              final J2clPath buildTarget,
                              final J2clMavenMiddleware middleware,
@@ -113,10 +119,11 @@ final class J2clBuildRequest {
 
         this.base = base;
 
-        this.javacBootstrap = javacBootstrap;
-        this.jre = jre;
         this.excluded = excluded;
-        this.replacedDependencies = replacedDependencies;
+        this.classpathRequired = classpathRequired;
+        this.javascriptSourceRequired = javascriptSourceRequired;
+        this.processingSkipped = processingSkipped;
+        this.replaced = replaced;
 
         this.sourcesKind = sourcesKind;
 
@@ -139,15 +146,19 @@ final class J2clBuildRequest {
         });
         defines.forEach((k, v) -> hash.append(k).append(v));
         entryPoints.forEach(hash::append);
-        hash.append(excluded.toString());
         externs.forEach(hash::append);
-        hash.append(javacBootstrap.toString());
-        hash.append(jre.toString());
-        replacedDependencies.forEach((k, v)-> {
+
+        hash.append(excluded.toString());
+
+        replaced.forEach((k, v)-> {
             hash.append(k.toString());
             hash.append(v.toString());
         });
         hash.append(sourcesKind.name());
+        
+        hash.append(classpathRequired.toString());
+        hash.append(javascriptSourceRequired.toString());
+        hash.append(processingSkipped.toString());
 
         this.hash = hash
                 .toString();
@@ -184,46 +195,53 @@ final class J2clBuildRequest {
     final J2clPath buildTarget;
 
     boolean isExcluded(final J2clArtifactCoords coords) {
-        return this.excluded.test(coords) || this.replacedDependencies.containsKey(coords);
+        return this.excluded.test(coords) || this.replaced.containsKey(coords);
     }
 
     private final Predicate<J2clArtifactCoords> excluded;
 
-    boolean isJavacBootstrap(final J2clArtifactCoords coords) {
-        return this.javacBootstrap.test(coords);
+    List<J2clDependency> classpathRequired() {
+        return this.classpathRequired.stream()
+                .map(J2clDependency::getOrFail)
+                .collect(Collectors.toList());
     }
 
-    private final Predicate<J2clArtifactCoords> javacBootstrap;
-
-    boolean isJre(final J2clArtifactCoords coords) {
-        return this.jre.test(coords);
+    boolean isClasspathRequired(final J2clArtifactCoords coords) {
+        return this.classpathRequired.contains(coords);
     }
 
-    private final Predicate<J2clArtifactCoords> jre;
+    private final List<J2clArtifactCoords> classpathRequired;
 
-    // dependency........................................................................................................
+    boolean isJavascriptSourceRequired(final J2clArtifactCoords coords) {
+        return this.javascriptSourceRequired.contains(coords);
+    }
+
+    private final List<J2clArtifactCoords> javascriptSourceRequired;
 
     /**
-     * Accepts the given coords and returns the {@link J2clDependency} honouring any replacements.
+     * Returns the coords for all required artifacts, basically combining the {@link #classpathRequired} and {@link #javascriptSourceRequired}.
      */
-    J2clDependency dependency(final J2clArtifactCoords coords) {
-        J2clArtifactCoords lookup = this.replacedDependencies.get(coords);
-        if (null == lookup) {
-            lookup = coords;
-        }
-
-        try {
-            return J2clDependency.getOrFail(lookup);
-        } catch (final IllegalArgumentException cause) {
-            if (null == lookup) {
-                throw cause;
-            }
-
-            throw new IllegalArgumentException("Unknown coords " + CharSequences.quote(coords.toString()) + "->" + CharSequences.quote(lookup.toString()));
-        }
+    Set<J2clArtifactCoords> required() {
+        return Streams.concat(this.classpathRequired.stream(), this.javascriptSourceRequired.stream())
+                .collect(Collectors.toCollection(Sets::sorted));
     }
 
-    private final Map<J2clArtifactCoords, J2clArtifactCoords> replacedDependencies;
+    boolean isProcessingSkipped(final J2clArtifactCoords coords) {
+        return this.processingSkipped.contains(coords);
+    }
+
+    private final List<J2clArtifactCoords> processingSkipped;
+
+    // replacements........................................................................................................
+
+    /**
+     * Accepts the coords and returns the replacement if one is available.
+     */
+    Optional<J2clArtifactCoords> replacement(final J2clArtifactCoords coords) {
+        return Optional.ofNullable(this.replaced.get(coords));
+    }
+
+    private final Map<J2clArtifactCoords, J2clArtifactCoords> replaced;
 
     // MAVEN..............................................................................................................
 
@@ -268,9 +286,7 @@ final class J2clBuildRequest {
      */
     void execute(final J2clDependency project) throws Throwable {
         project.prettyPrintDependencies();
-        this.verifyBootstrapAndJreIdentified(project);
-        this.verifyReplacements();
-
+        this.verifyClasspathRequiredAndjavascriptSourceRequired();
         this.prepareJobs(project);
 
         if (0 == this.trySubmitJobs()) {
@@ -279,67 +295,44 @@ final class J2clBuildRequest {
         this.await();
     }
 
-    private void verifyBootstrapAndJreIdentified(final J2clDependency project) {
-        boolean javacBootstrap = false;
-        boolean jre = false;
-
-        for (J2clDependency potential : project.dependenciesIncludingTransitives()) {
-            javacBootstrap |= potential.isJavacBootstrap();
-            jre |= potential.isJreBinary();
-        }
-
-        if (false == javacBootstrap) {
-            throw new J2clException("Javac bootstrap dependency not found in dependencies");
-        }
-        if (false == jre) {
-            throw new J2clException("JRE dependency with classes not found in dependencies");
-        }
+    private void verifyClasspathRequiredAndjavascriptSourceRequired() {
+        this.verify(this.classpathRequired, "classpath-required");
+        this.verify(this.javascriptSourceRequired, "javascript-required");
+        this.verify(this.processingSkipped, "transpile-excluded");
     }
 
-    private void verifyReplacements() {
-        final Set<J2clArtifactCoords> unknown = Sets.sorted();
-
-        for (final Entry<J2clArtifactCoords, J2clArtifactCoords> originalToReplacement : this.replacedDependencies.entrySet()) {
-            {
-                final J2clArtifactCoords test = originalToReplacement.getKey();
-                if (false == J2clDependency.isArtifactDeclared(test)) {
-                    unknown.add(test);
-                }
-            }
-            {
-                final J2clArtifactCoords test = originalToReplacement.getValue();
-                if (false == J2clDependency.isArtifactDeclared(test)) {
-                    unknown.add(test);
-                }
-            }
+    private void verify(final Collection<J2clArtifactCoords> dependencies,
+                        final String label) {
+        final Collection<J2clArtifactCoords> unknown = dependencies.stream()
+                .filter(d -> false == J2clDependency.get(d).isPresent())
+                .collect(Collectors.toList());
+        if(false == unknown.isEmpty()) {
+            throw new IllegalArgumentException("Unknown " + label + " dependencies: " + unknown.stream().map(J2clArtifactCoords::toString).collect(Collectors.joining()));
         }
-
-        final int missing = unknown.size();
-        if (missing > 0) {
-            throw new J2clException(missing + " mapping(s) in <replaced-dependencies> contains unknown dependencies, " +
-                    unknown.stream()
-                            .map(J2clBuildRequest::format)
-                            .collect(Collectors.joining(", ")));
-        }
-    }
-
-    private static String format(final J2clArtifactCoords coords) {
-        return CharSequences.quoteAndEscape(coords.toString()).toString();
     }
 
     /**
      * Traverses the dependency graph creating job for each, for dependencies that are included.
      */
     private void prepareJobs(final J2clDependency artifact) {
-        if(artifact.isIncluded()) {
-            final Set<J2clDependency> dependencies = artifact.dependencies();
+        //System.err.println("PREPARE JOBS " + artifact + " jobs " + (false == this.jobs.containsKey(artifact)));
+        if (/*artifact.isIncluded() && */artifact.isProcessingRequired() && false == this.jobs.containsKey(artifact)) {
+            final Set<J2clDependency> dependencies = artifact.dependencies(); // dependencies()
+            //System.err.println("PREPARE JOBS " + artifact + " ABPUT! !!! " + dependencies);
 
             // keep transitive dependencies alphabetical sorted for better readability when trySubmitJob pretty prints queue processing.
-            this.jobs.put(artifact,
-                    dependencies.stream()
-                            .filter(J2clDependency::isIncluded)
-                            .peek(this::prepareJobs)
-                            .collect(Collectors.toCollection(Sets::sorted)));
+            final Set<J2clDependency> required = Sets.sorted();
+            this.jobs.put(artifact, required);
+
+            dependencies.stream()
+                    //.peek(d -> System.err.println("maybe " + artifact + "\t\t" + d))
+                    //.filter(J2clDependency::isIncluded)
+                    .filter(J2clDependency::isProcessingRequired)
+                    .forEach(d -> {
+                        required.add(d);
+                        this.prepareJobs(d);
+                    });
+            //System.err.println("PREPARE JOBS " + artifact + " REQUIRED " + required);
         }
     }
 
@@ -494,6 +487,10 @@ final class J2clBuildRequest {
                 this.externs + " " +
                 this.initialScriptFilename + " " +
                 this.base + " " +
-                this.javacBootstrap + " ";
+                this.excluded + " " + 
+                this.replaced + " " +
+                this.classpathRequired + " " +
+                this.javascriptSourceRequired + " " +
+                this.processingSkipped + " ";
     }
 }

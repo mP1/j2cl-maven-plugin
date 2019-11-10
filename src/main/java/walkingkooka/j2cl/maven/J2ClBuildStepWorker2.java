@@ -83,7 +83,19 @@ abstract class J2ClBuildStepWorker2 extends J2clBuildStepWorker {
         return result;
     }
 
-    abstract J2clBuildStepResult execute0(final J2clDependency artifact,
+    private J2clBuildStepResult execute0(final J2clDependency artifact,
+                                         final J2clStepDirectory directory,
+                                         final J2clLinePrinter logger) throws Exception {
+        // aborted steps for the project are transformed into skipped.
+        final J2clBuildStepResult result = this.execute1(artifact,
+                directory,
+                logger);
+        return J2clBuildStepResult.ABORTED == result && false == artifact.isDependency() ?
+                J2clBuildStepResult.SKIPPED :
+                result;
+    }
+
+    abstract J2clBuildStepResult execute1(final J2clDependency artifact,
                                           final J2clStepDirectory directory,
                                           final J2clLinePrinter logger) throws Exception;
 }

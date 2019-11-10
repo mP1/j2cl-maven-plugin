@@ -24,18 +24,13 @@ import com.google.javascript.jscomp.DependencyOptions;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
-import walkingkooka.text.CharSequences;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -48,17 +43,15 @@ class ClosureCompiler {
                            final Map<String, String> defines,
                            final List<String> entryPoints,
                            final Set<String> externs,
+                           final List<J2clPath> sourceRoots,
                            final J2clPath initialScriptFilename,
-                           final List<J2clPath> sources,
-                           final J2clPath output,
                            final J2clLinePrinter logger) throws Exception {
         return compile0(compilationLevel,
                 defines,
                 entryPoints,
                 sorted(externs),
+                sorted(sourceRoots),
                 initialScriptFilename,
-                sorted(sources),
-                output,
                 logger);
     }
 
@@ -72,16 +65,30 @@ class ClosureCompiler {
                                     final Map<String, String> defines,
                                     final List<String> entryPoints,
                                     final SortedSet<String> externs,
+                                    final SortedSet<J2clPath> sourceRoots,
                                     final J2clPath initialScriptFilename,
-                                    final SortedSet<J2clPath> sources,
-                                    final J2clPath output,
                                     final J2clLinePrinter logger) throws Exception {
         int fileCount = 0;
-        logger.printLine(sources.size() + " Source(s)");
+
+        final J2clPath unitedSourceRoot = initialScriptFilename.parent().append("sources");
+        logger.printLine(sourceRoots.size() + " Source(s)");
         logger.indent();
         {
-            for (final J2clPath source : sources) {
-                fileCount += printFiles(source.path(), logger);
+            for (final J2clPath sourceRoot : sourceRoots) {
+                logger.printLine(sourceRoot.toString());
+                logger.indent();
+                {
+                    final Collection<J2clPath> copied;
+                    if (sourceRoot.isFile()) {
+                        copied = sourceRoot.extractArchiveFiles(unitedSourceRoot, logger);
+                    } else {
+                        copied = unitedSourceRoot.copyFiles(sourceRoot,
+                                sourceRoot.gatherFiles(J2clPath.ALL_FILES),
+                                logger::printLine);
+                    }
+                    fileCount+=copied.size();
+                }
+                logger.outdent();
             }
             logger.printEndOfList();
         }
@@ -93,25 +100,13 @@ class ClosureCompiler {
 
             success = false;
         } else {
-            final Map<String, Collection<String>> arguments;
-
-            logger.printLine("Parameters");
-            logger.indent();
-            {
-                final Path initialScriptFilenamePath = initialScriptFilename.path();
-                final Path parentOf = initialScriptFilenamePath.getParent();
-                Files.createDirectories(parentOf);
-
-                arguments = prepareCommandLineArguments(compilationLevel,
-                        defines,
-                        entryPoints,
-                        externs,
-                        sources,
-                        initialScriptFilenamePath);
-
-                logCommandLineArguments(arguments, logger);
-            }
-            logger.outdent();
+            final Map<String, Collection<String>> arguments = prepareArguments(compilationLevel,
+                    defines,
+                    entryPoints,
+                    externs,
+                    unitedSourceRoot,
+                    initialScriptFilename,
+                    logger);
 
             logger.printLine("Closure compiler");
             logger.indent();
@@ -145,80 +140,56 @@ class ClosureCompiler {
         return success;
     }
 
-    /**
-     * Discovers all the js files under the given {@link Path}.
-     */
-    private static int printFiles(final Path root,
-                                  final J2clLinePrinter logger) throws IOException {
-        final Set<String> files = Sets.sorted();
+    private static Map<String, Collection<String>> prepareArguments(final CompilationLevel compilationLevel,
+                                                                    final Map<String, String> defines,
+                                                                    final List<String> entryPoints,
+                                                                    final SortedSet<String> externs,
+                                                                    final J2clPath sourceRoot,
+                                                                    final J2clPath initialScriptFilename,
+                                                                    final J2clLinePrinter logger) throws IOException {
+        final Map<String, Collection<String>> arguments;
 
-        Files.walkFileTree(root, new SimpleFileVisitor<>() {
-            @Override
-            public FileVisitResult visitFile(final Path file,
-                                             final BasicFileAttributes attrs) {
-                if (CharSequences.endsWith(file.getFileName().toString(), ".js")) {
-                    files.add(root.relativize(file).toString());
-                }
-                return FileVisitResult.CONTINUE;
-            }
-        });
-
-        logger.printLine(root.toString());
+        logger.printLine("Parameter(s)");
         logger.indent();
         {
-            files.forEach(logger::printLine);
+            final Path initialScriptFilenamePath = initialScriptFilename.path();
+            final Path parentOf = initialScriptFilenamePath.getParent();
+            Files.createDirectories(parentOf);
+
+            arguments = Maps.sorted();
+
+            arguments.put("--compilation_level", Sets.of(compilationLevel.name()));
+            {
+                final Set<String> definesSet = Sets.sorted();
+                if (compilationLevel == CompilationLevel.BUNDLE) {
+                    definesSet.add("goog.ENABLE_DEBUG_LOADER=false");
+                }
+                // TODO not sure about escaping....
+                for (final Map.Entry<String, String> define : defines.entrySet()) {
+                    definesSet.add(define.getKey() + "=" + define.getValue());
+                }
+                arguments.put("--define", definesSet);
+            }
+            arguments.put("--dependency_mode", Sets.of(DependencyOptions.DependencyMode.PRUNE.name()));
+            arguments.put("--entry_point", entryPoints);
+            arguments.put("--externs", externs);
+
+            arguments.put("--js", Sets.of(sourceRoot.path().toAbsolutePath() + "/**/*.js"));
+
+            arguments.put("--js_output_file", Sets.of(initialScriptFilenamePath.toString()));
+
+            arguments.put("--language_out", Sets.of("ECMASCRIPT5"));
+
+
+            logCommandLineArguments(arguments, logger);
         }
         logger.outdent();
-
-        return files.size();
-    }
-
-    /**
-     * Builds a multi-value {@link Map} holding all individual argument tokens.
-     */
-    private static Map<String, Collection<String>> prepareCommandLineArguments(final CompilationLevel compilationLevel,
-                                                                               final Map<String, String> defines,
-                                                                               final List<String> entryPoints,
-                                                                               final Set<String> externs,
-                                                                               final Set<J2clPath> sourceRoots,
-                                                                               final Path initialScriptFilenamePath) {
-        final Map<String, Collection<String>> arguments = Maps.sorted();
-
-        arguments.put("--compilation_level", Sets.of(compilationLevel.name()));
-
-        {
-            final Set<String> definesSet = Sets.sorted();
-            if (compilationLevel == CompilationLevel.BUNDLE) {
-                definesSet.add("goog.ENABLE_DEBUG_LOADER=false");
-            }
-            // TODO not sure about escaping....
-            for (final Map.Entry<String, String> define : defines.entrySet()) {
-                definesSet.add(define.getKey() + "=" + define.getValue());
-            }
-            arguments.put("--define", definesSet);
-        }
-        arguments.put("--dependency_mode", Sets.of(DependencyOptions.DependencyMode.PRUNE.name()));
-        arguments.put("--entry_point", entryPoints);
-        arguments.put("--externs", externs);
-
-        {
-            final Set<String> paths = Sets.sorted();
-            for (final J2clPath source : sourceRoots) {
-                paths.add(Paths.get(source.toString()) + "/**/*.js");
-            }
-            arguments.put("--js", paths);
-        }
-
-        arguments.put("--js_output_file", Sets.of(initialScriptFilenamePath.toString()));
-
-        arguments.put("--language_out", Sets.of("ECMASCRIPT5"));
-
         return arguments;
     }
 
     private static void logCommandLineArguments(final Map<String, Collection<String>> arguments,
                                                 final J2clLinePrinter logger) {
-        logger.printLine("Command line arguments");
+        logger.printLine("Command line argument(s)");
         logger.indent();
         {
             for (final Map.Entry<String, Collection<String>> keyAndValue : arguments.entrySet()) {

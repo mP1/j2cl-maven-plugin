@@ -19,10 +19,14 @@ package walkingkooka.j2cl.maven;
 
 import com.google.j2cl.common.FrontendUtils.FileInfo;
 import walkingkooka.collect.list.Lists;
+import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.text.CharSequences;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -31,11 +35,11 @@ import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -44,17 +48,22 @@ import java.util.stream.Collectors;
  */
 final class J2clPath implements Comparable<J2clPath> {
 
-    static final PathMatcher JAVA_FILES = FileSystems.getDefault().getPathMatcher("glob:**/*.java");
-    static final PathMatcher JAVASCRIPT_FILES = FileSystems.getDefault().getPathMatcher("glob:**/*.js");
-    static final PathMatcher NATIVE_JAVASCRIPT_FILES = FileSystems.getDefault().getPathMatcher("glob:**/*.native.js");
+    static final BiPredicate<Path, BasicFileAttributes> JAVA_FILES = (p, a) -> CharSequences.endsWith(p.toString(), ".java");
+    static final BiPredicate<Path, BasicFileAttributes> JAVASCRIPT_FILES = (p, a) -> CharSequences.endsWith(p.toString(), ".js");
+    static final BiPredicate<Path, BasicFileAttributes> NATIVE_JAVASCRIPT_FILES = (p, a) -> CharSequences.endsWith(p.toString(), ".native.js");
+    static final BiPredicate<Path, BasicFileAttributes> ALL_FILES = (p, a) -> true;
 
     static List<File> toFiles(final Collection<J2clPath> paths) {
         return paths.stream().map(J2clPath::file).collect(Collectors.toList());
     }
 
-    static List<FileInfo> toFileInfo(final List<J2clPath> files) {
+    static List<FileInfo> toFileInfo(final List<J2clPath> files,
+                                     final J2clPath base) {
         return files.stream()
-                .map(J2clPath::fileInfo)
+                .map(p -> {
+                    final Path path = p.path();
+                    return FileInfo.create(path.toString(), base.path().relativize(path).toString());
+                })
                 .collect(Collectors.toList());
     }
 
@@ -73,12 +82,12 @@ final class J2clPath implements Comparable<J2clPath> {
         this.path = path;
     }
 
-    boolean isJavaFile() {
-        return this.path().toString().endsWith(".java");
-    }
-
     boolean isFile() {
         return Files.isRegularFile(this.path());
+    }
+
+    J2clPath parent() {
+        return new J2clPath(this.path().getParent());
     }
 
     J2clPath createIfNecessary() throws IOException {
@@ -123,30 +132,21 @@ final class J2clPath implements Comparable<J2clPath> {
     }
 
     /**
-     * Used to collect all the files and then sort them alphabetically under the given root.
-     * This allows directories and archive to be processed in alphabetical order producing a consistent and readable output.
+     * Uses to collect all files that match the {@link BiPredicate} and returns a sorted {@link Set}.
      */
-    final Set<J2clPath> gatherFiles() throws IOException {
-        final Set<J2clPath> files = Sets.sorted();
-
-        Files.walkFileTree(this.path(), new SimpleFileVisitor<>() {
-            @Override
-            public FileVisitResult visitFile(final Path file,
-                                             final BasicFileAttributes attrs) {
-                files.add(J2clPath.with(file));
-                return FileVisitResult.CONTINUE;
-            }
-        });
-
-        return files;
+    Set<J2clPath> gatherFiles(final BiPredicate<Path, BasicFileAttributes> matcher) throws IOException {
+        return Files.find(this.path(), Integer.MAX_VALUE, matcher)
+                .map(J2clPath::with)
+                .sorted()
+                .collect(Collectors.toCollection(Sets::sorted));
     }
 
     /**
      * Copies the files from the given source to this directory.
      */
-    List<J2clPath> copyFiles(final J2clPath src,
-                             final Collection<J2clPath> files,
-                             final Consumer<String> logger) throws IOException {
+    Collection<J2clPath> copyFiles(final J2clPath src,
+                                   final Collection<J2clPath> files,
+                                   final Consumer<String> logger) throws IOException {
         final Path srcPath = src.path();
         final Path destPath = this.path();
 
@@ -166,39 +166,64 @@ final class J2clPath implements Comparable<J2clPath> {
 
             copied.add(J2clPath.with(copyTarget));
         }
-        logger.accept(files.size() + " file(s) copied");
 
         return copied;
     }
 
     /**
-     * Finds any files under the roots using the matches, returning {@link File files} with absolute paths.
+     * Extract ALL the files from this archive, returning number of files extracted
      */
-    static List<J2clPath> findFiles(final List<J2clPath> roots,
-                                    final PathMatcher... matchers) throws IOException {
-        final List<J2clPath> files = Lists.array();
-        for (final J2clPath root : roots) {
-            files.addAll(root.findFiles(matchers));
+    Set<J2clPath> extractArchiveFiles(final J2clPath target,
+                                      final J2clLinePrinter logger) throws IOException {
+        try (final FileSystem zip = FileSystems.newFileSystem(URI.create("jar:" + this.path().toAbsolutePath().toUri()), Maps.empty())) {
+            return this.extractArchiveFiles0(zip.getPath("/"),
+                    target,
+                    logger);
         }
-
-        return files;
     }
 
     /**
-     * Finds any files under the roots using the matches, returning {@link File files} with absolute paths.
-     * The files are also sorted alphabetically to aide readability when pretty printed by the logger.
+     * First gets an alphabetical listing of all files in the given source and then proceeds to copy them to the destination.
+     * This produces output that shows the files processed in alphabetical order.
      */
-    List<J2clPath> findFiles(final PathMatcher... matchers) throws IOException {
-        return this.exists().isPresent() ?
-                this.findFiles0(matchers) :
-                Lists.empty();
+    private Set<J2clPath> extractArchiveFiles0(final Path source,
+                                               final J2clPath target,
+                                               final J2clLinePrinter logger) throws IOException {
+        final Set<J2clPath> files = J2clPath.with(source).gatherFiles(J2clPath.ALL_FILES);
+        if (files.isEmpty()) {
+            logger.printIndentedLine("No files");
+        } else {
+            this.extractArchivesFiles1(source, target, files, logger);
+        }
+
+        return Sets.readOnly(files);
     }
 
-    private List<J2clPath> findFiles0(final PathMatcher... matchers) throws IOException {
-        return Files.find(this.path(), Integer.MAX_VALUE, ((path, basicFileAttributes) -> Arrays.stream(matchers).anyMatch(m -> m.matches(path))))
-                .map(J2clPath::with)
-                .sorted()
-                .collect(Collectors.toList());
+    /**
+     * Extracts the given files, note existing files will not be overwritten.
+     */
+    private void extractArchivesFiles1(final Path root,
+                                       final J2clPath target,
+                                       final Set<J2clPath> files,
+                                       final J2clLinePrinter logger) throws IOException {
+        logger.indent();
+        {
+
+            for (final J2clPath file : files) {
+                final Path filePath = file.path();
+                final Path pathInZip = root.relativize(filePath);
+                final Path copyTarget = Paths.get(target.toString()).resolve(pathInZip.toString());
+                if (Files.exists(copyTarget)) {
+                    continue;
+                }
+
+                Files.createDirectories(copyTarget.getParent());
+                Files.copy(filePath, copyTarget);
+
+                logger.printLine(file.toString());
+            }
+        }
+        logger.outdent();
     }
 
     String filename() {
@@ -211,11 +236,6 @@ final class J2clPath implements Comparable<J2clPath> {
 
     File file() {
         return this.path().toFile();
-    }
-
-    private FileInfo fileInfo() {
-        final String path = this.path().toString();
-        return FileInfo.create(path, path);
     }
 
     private final Path path;

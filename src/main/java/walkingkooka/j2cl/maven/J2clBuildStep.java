@@ -49,11 +49,6 @@ enum J2clBuildStep {
         }
 
         @Override
-        boolean skipIJavacBootstrapOrJre() {
-            return false;
-        }
-
-        @Override
         boolean skipIfDependency() {
             return false;
         }
@@ -76,11 +71,6 @@ enum J2clBuildStep {
         @Override
         J2clBuildStepWorker execute1() {
             return J2clBuildStepWorker.UNPACK;
-        }
-
-        @Override
-        boolean skipIJavacBootstrapOrJre() {
-            return true;
         }
 
         @Override
@@ -109,11 +99,6 @@ enum J2clBuildStep {
         }
 
         @Override
-        boolean skipIJavacBootstrapOrJre() {
-            return true; // dont try and compile JRE
-        }
-
-        @Override
         boolean skipIfDependency() {
             return false;
         }
@@ -139,11 +124,6 @@ enum J2clBuildStep {
         }
 
         @Override
-        boolean skipIJavacBootstrapOrJre() {
-            return true; // assumes JRE artifact has already been stripped
-        }
-
-        @Override
         boolean skipIfDependency() {
             return false;
         }
@@ -160,17 +140,12 @@ enum J2clBuildStep {
     COMPILE_GWT_INCOMPATIBLE_STRIPPED {
         @Override
         String directoryName() {
-            return "4-javac-compiled-gwt-incompatible-stripped-source";
+            return "4-javac-compiled-gwt-incompatible-stripped";
         }
 
         @Override
         J2clBuildStepWorker execute1() {
             return J2clBuildStepWorker.COMPILE_STRIP_GWT_INCOMPAT;
-        }
-
-        @Override
-        boolean skipIJavacBootstrapOrJre() {
-            return true; // no striped JRE to compile
         }
 
         @Override
@@ -199,11 +174,6 @@ enum J2clBuildStep {
         }
 
         @Override
-        boolean skipIJavacBootstrapOrJre() {
-            return true; // transpile JRE/UNPACK
-        }
-
-        @Override
         boolean skipIfDependency() {
             return false;
         }
@@ -228,11 +198,6 @@ enum J2clBuildStep {
         }
 
         @Override
-        boolean skipIJavacBootstrapOrJre() {
-            return true;
-        }
-
-        @Override
         boolean skipIfDependency() {
             return true;
         }
@@ -254,11 +219,6 @@ enum J2clBuildStep {
         @Override
         J2clBuildStepWorker execute1() {
             return J2clBuildStepWorker.OUTPUT_ASSEMBLER;
-        }
-
-        @Override
-        boolean skipIJavacBootstrapOrJre() {
-            return true;
         }
 
         @Override
@@ -301,27 +261,22 @@ enum J2clBuildStep {
                 }));
         try {
             final J2clBuildStepResult result;
-
-            if ((artifact.isJavacBootstrap() || artifact.isJreBinary()) && this.skipIJavacBootstrapOrJre()) {
+            if (artifact.isDependency() && this.skipIfDependency()) {
                 result = J2clBuildStepResult.SUCCESS;
             } else {
-                if (artifact.isDependency() && this.skipIfDependency()) {
-                    result = J2clBuildStepResult.SUCCESS;
-                } else {
-                    logger.printLine(prefix);
-                    logger.indent();
+                logger.printLine(prefix);
+                logger.indent();
 
-                    result = this.execute1()
-                            .execute(artifact,
-                                    this,
-                                    logger);
-                    final J2clStepDirectory directory = artifact.step(this);
-                    directory.writeLog(lines, logger);
+                result = this.execute1()
+                        .execute(artifact,
+                                this,
+                                logger);
+                final J2clStepDirectory directory = artifact.step(this);
+                directory.writeLog(lines, logger);
 
-                    result.path(directory).createIfNecessary();
+                result.path(directory).createIfNecessary();
 
-                    result.reportIfFailure(artifact, this);
-                }
+                result.reportIfFailure(artifact, this);
             }
             return result.next(this.next());
         } catch (final Exception cause) {
@@ -359,14 +314,6 @@ enum J2clBuildStep {
      * Returns the sub class of {@link J2clBuildStepWorker} and then calls {@link J2clBuildStepWorker#execute(J2clDependency, J2clBuildStep, J2clLinePrinter)
      */
     abstract J2clBuildStepWorker execute1();
-
-    // skipIfJre........................................................................................................
-
-    /**
-     * Some steps can be skipped if the artifact is the java bootstrap or JRE. These steps include {@link #COMPILE}, {@link #GWT_INCOMPATIBLE_STRIP}
-     * or {@link #COMPILE_GWT_INCOMPATIBLE_STRIPPED}.
-     */
-    abstract boolean skipIJavacBootstrapOrJre();
 
     // skipIfJre........................................................................................................
 

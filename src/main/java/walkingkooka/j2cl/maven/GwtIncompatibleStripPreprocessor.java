@@ -37,96 +37,78 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 /**
  * Accepts a directory and removes any files marked with @GwtIncompatible.
- * Support is included load an ignore file and skip copying those files only for that directory.
+ * Support is included to load an ignore file and skip copying those files only for that directory.
  */
 final class GwtIncompatibleStripPreprocessor {
 
-    static J2clBuildStepResult execute(final Collection<J2clPath> sourceRoots,
+    static J2clBuildStepResult execute(final J2clPath sourceRoot,
                                        final J2clPath output,
                                        final J2clLinePrinter logger) throws IOException {
         output.exists()
                 .orElseThrow(() -> new IllegalArgumentException("Output not a directory or does not exist: " + CharSequences.quote(output.toString())));
 
-        return execute0(new TreeSet<>(sourceRoots), output, logger);
-    }
-
-    private static J2clBuildStepResult execute0(final SortedSet<J2clPath> sourceRoots,
-                                                final J2clPath output,
-                                                final J2clLinePrinter logger) throws IOException {
         J2clBuildStepResult result;
 
-        if (sourceRoots.isEmpty()) {
-            result = J2clBuildStepResult.ABORTED;
+        final List<J2clPath> javaFiles = prepareJavaFiles(sourceRoot, output, logger);
+
+        final int javaFileCount = javaFiles.size();
+
+        if (javaFileCount > 0) {
+            result = processStripAnnotationsFiles(javaFiles, sourceRoot, output, logger);
+
+            copyJavascriptFiles(sourceRoot, output, logger);
+            logOutput(output, logger);
+
         } else {
-            final int filteredFileCount;
-            final List<J2clPath> filteredFiles = Lists.array();
+            logger.printIndentedLine("No files found");
 
-            logger.printLine("Copy *.java, *.js, *.native.js");
-            logger.indent();
-            {
-                logger.printLine("Output");
-                logger.printIndentedLine(output.toString());
-
-                logger.printLine(sourceRoots.size() + " Source(s)");
-                logger.indent();
-                {
-                    for (final J2clPath root : sourceRoots) {
-                        logger.printLine(root.toString());
-                        logger.indent();
-
-                        filteredFiles.addAll(walkTreeThenCopy(root, output, logger));
-
-                        logger.outdent();
-                    }
-                }
-                logger.outdent();
-
-
-                filteredFileCount = filteredFiles.size();
-                logger.printLine(filteredFileCount + " file(s) count");
-            }
-            logger.outdent();
-
-            if (filteredFileCount > 0) {
-                result = processFiles(filteredFiles, output, logger);
-            } else {
-                logger.printIndentedLine("No files found - stripping aborted");
-
-                output.removeAll(); // dont want to leave empty output directory when its empty.
-                result = J2clBuildStepResult.ABORTED;
-            }
+            output.removeAll(); // dont want to leave empty output directory when its empty.
+            result = J2clBuildStepResult.ABORTED;
         }
 
         return result;
     }
 
-    /**
-     * Gather files that match *.java, *.js, *.native.js for the given root(src) then copy them over to the destination,
-     * but never overwriting the file. This honours the classpath concept that preceding files take precedence over later
-     * files with the same relative to a root path.
-     */
-    private static List<J2clPath> walkTreeThenCopy(final J2clPath src,
-                                                   final J2clPath dest,
+    private static List<J2clPath> prepareJavaFiles(final J2clPath sourceRoot,
+                                                   final J2clPath output,
                                                    final J2clLinePrinter logger) throws IOException {
-        final SortedSet<J2clPath> files = gatherFiles(src);
-        return dest.copyFiles(src, files, logger::printLine);
+        final List<J2clPath> javaFiles = Lists.array();
+
+        logger.printLine("Preparing java files");
+        logger.indent();
+        {
+            logger.printLine(sourceRoot.toString());
+            logger.indent();
+
+            // find then copy from unpack to $output
+            final Collection<J2clPath> files = output.copyFiles(sourceRoot,
+                    gatherFiles(sourceRoot, J2clPath.JAVA_FILES),
+                    logger::printLine);
+            javaFiles.addAll(files);
+
+            logger.outdent();
+            logger.printLine(files.size() + " file(s) count");
+        }
+        logger.outdent();
+
+        return javaFiles;
     }
 
     /**
-     * Finds all files under the root that match *.java, *.js or *.native.js collecting their paths into a {@link java.util.SortedSet}.
-     * and honours any .j2cl-maven-plugin-ignore.txt files that it may find.
+     * Finds all files under the root that match the given {@link BiPredicate} collecting their paths into a {@link SortedSet}.
+     * and honours any .j2cl-maven-plugin-ignore.txt files if any found.
      */
-    private static SortedSet<J2clPath> gatherFiles(final J2clPath root) throws IOException {
+    private static SortedSet<J2clPath> gatherFiles(final J2clPath root,
+                                                   final BiPredicate<Path, BasicFileAttributes> include) throws IOException {
         final SortedSet<J2clPath> files = Sets.sorted();
 
         final Map<Path, List<PathMatcher>> pathToMatchers = Maps.hash();
         final List<PathMatcher> exclude = Lists.array();
-        final List<PathMatcher> include = Lists.of(J2clPath.JAVA_FILES, J2clPath.JAVASCRIPT_FILES, J2clPath.NATIVE_JAVASCRIPT_FILES);
 
         Files.walkFileTree(root.path(), new SimpleFileVisitor<>() {
 
@@ -159,10 +141,9 @@ final class GwtIncompatibleStripPreprocessor {
 
             @Override
             public FileVisitResult visitFile(final Path file,
-                                             final BasicFileAttributes basicFileAttributes) {
+                                             final BasicFileAttributes attributes) {
                 if (exclude.stream().noneMatch(m -> m.matches(file))) {
-                    if (include.stream()
-                            .anyMatch(m -> m.matches(file))) {
+                    if(include.test(file, attributes)) {
                         files.add(J2clPath.with(file));
                     }
                 }
@@ -174,19 +155,26 @@ final class GwtIncompatibleStripPreprocessor {
         return files;
     }
 
-    private static J2clBuildStepResult processFiles(final List<J2clPath> files,
-                                                    final J2clPath output,
-                                                    final J2clLinePrinter logger) {
+    /**
+     * Invokes the java preprocesor which use annotations to discover classes, methods and fields to remove from the actual source files.
+     * Because the source files are modified a previous step will have taken copied and place them in this output ready for modification if necessary.
+     * Errors will also be logged.
+     */
+    private static J2clBuildStepResult processStripAnnotationsFiles(final List<J2clPath> javaFilesInput,
+                                                                    final J2clPath source,
+                                                                    final J2clPath output,
+                                                                    final J2clLinePrinter logger) {
         J2clBuildStepResult result;
 
         logger.printLine("JavaPreprocessor");
         {
             logger.indent();
             {
+                logger.printIndented("Source(s)", javaFilesInput);
                 logger.printIndented("Output", output);
 
                 final Problems problems = new Problems();
-                JavaPreprocessor.preprocessFiles(J2clPath.toFileInfo(files),
+                JavaPreprocessor.preprocessFiles(J2clPath.toFileInfo(javaFilesInput, source),
                         output.path(),
                         problems);
                 final List<String> errors = problems.getErrors();
@@ -214,5 +202,28 @@ final class GwtIncompatibleStripPreprocessor {
         }
 
         return result;
+    }
+
+    private static void copyJavascriptFiles(final J2clPath sourceRoot,
+                                            final J2clPath output,
+                                            final J2clLinePrinter logger) throws IOException {
+        logger.printLine("Copy *.js");
+        logger.indent();
+        {
+            logger.printLine(sourceRoot.toString());
+            logger.indent();
+
+            final SortedSet<J2clPath> copy = gatherFiles(sourceRoot, J2clPath.JAVASCRIPT_FILES);
+            output.copyFiles(sourceRoot, copy, logger::printLine);
+
+            logger.outdent();
+            logger.outdent();
+        }
+        logger.outdent();
+    }
+
+    private static void logOutput(final J2clPath output,
+                                  final J2clLinePrinter logger) throws IOException {
+        logger.printIndented("Output file(s)", gatherFiles(output, J2clPath.ALL_FILES));
     }
 }
