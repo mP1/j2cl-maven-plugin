@@ -17,9 +17,6 @@
 
 package walkingkooka.j2cl.maven;
 
-import walkingkooka.collect.map.Maps;
-import walkingkooka.text.CharSequences;
-
 import java.util.List;
 import java.util.Optional;
 

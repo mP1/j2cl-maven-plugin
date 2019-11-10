@@ -17,8 +17,6 @@
 
 package walkingkooka.j2cl.maven;
 
-import walkingkooka.collect.list.Lists;
-
 /**
  * Compiles the java source to the target {@link J2clStepDirectory#output()}.
  */
