@@ -146,6 +146,9 @@
                         </goals>
                         <configuration>
                             <classpath-scope>runtime</classpath-scope>
+                            <!--
+                            BUNDLE, WHITESPACE_ONLY, SIMPLE, ADVANCED
+                            -->
                             <compilation-level>ADVANCED</compilation-level>
                             <defines>
                                 <jre.checkedMode>DISABLED</jre.checkedMode>
@@ -155,7 +158,14 @@
                             <entry-points>example.helloworld.app</entry-points>
                             <excluded-dependencies></excluded-dependencies>
                             <externs></externs>
-                            <formatting/>
+                            <formatting>
+                            <!--
+                            PRETTY_PRINT | PRINT_INPUT_DELIMITER | SINGLE_QUOTES
+                            -->
+                                <formatting>PRETTY_PRINT</formatting>
+                                <formatting>PRINT_INPUT_DELIMITER</formatting>
+                                <formatting>SINGLE_QUOTES</formatting>
+                            <formatting>
                             <!--
                                 ECMASCRIPT3,
                                 ECMASCRIPT5,
@@ -167,7 +177,7 @@
                                 ECMASCRIPT_2019,
                                 STABLE
                             -->
-                            <language-out>ECMASCRIPT6</language-out>
+                            <language-out>ECMASCRIPT_2016</language-out>
                             <thread-pool-size>0</thread-pool-size>
 
                             <added-dependencies>
