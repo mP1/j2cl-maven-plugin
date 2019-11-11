@@ -54,6 +54,7 @@ final class J2clBuildRequest {
                                  final Map<String, String> defines,
                                  final Set<String> externs,
                                  final List<String> entryPoints,
+                                 final Set<ClosureFormattingOption> formatting,
                                  final J2clPath initialScriptFilename,
                                  final J2clPath base,
                                  final List<J2clArtifactCoords> classpathRequired,
@@ -72,6 +73,7 @@ final class J2clBuildRequest {
                 defines,
                 externs,
                 entryPoints,
+                formatting,
                 initialScriptFilename,
                 base,
                 excluded,
@@ -92,6 +94,7 @@ final class J2clBuildRequest {
                              final Map<String, String> defines,
                              final Set<String> externs,
                              final List<String> entryPoints,
+                             final Set<ClosureFormattingOption> formatting,
                              final J2clPath initialScriptFilename,
                              final J2clPath base,
                              final Predicate<J2clArtifactCoords> excluded,
@@ -113,6 +116,7 @@ final class J2clBuildRequest {
         this.defines = defines;
         this.entryPoints = entryPoints;
         this.externs = externs;
+        this.formatting = formatting;
 
         this.initialScriptFilename = initialScriptFilename;
 
@@ -181,6 +185,7 @@ final class J2clBuildRequest {
     final Map<String, String> defines;
     final List<String> entryPoints;
     final Set<String> externs;
+    final Set<ClosureFormattingOption> formatting;
 
     final J2clPath initialScriptFilename;
 

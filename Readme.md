@@ -268,6 +268,22 @@ Key value pairs that define externs for the Closure compiler. For more info clic
 
 
 
+## formatting
+Zero or many formatting options that may be used to aide troubleshooting, or simply to produce pretty printed output.
+The sample below shows all available formatting options, some or all may be removed as necessary.
+
+For more info click [here](http://googleclosure.blogspot.com/2010/10/pretty-print-javascript-with-closure.html)
+
+```xml
+<formatting>
+    <param>PRETTY_PRINT</param>
+    <param>PRINT_INPUT_DELIMITER</param>
+    <param></param>SINGLE_QUOTES</param>
+</formatting>
+```
+
+
+
 ## initial-script-filename
 
 The path to the initial script filename.

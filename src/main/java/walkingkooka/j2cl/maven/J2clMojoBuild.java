@@ -38,9 +38,11 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -71,6 +73,7 @@ public final class J2clMojoBuild extends J2clMojo {
                 this.defines(),
                 this.externs(),
                 this.entryPoints(),
+                this.formatting(),
                 this.initialScriptFilename(),
                 this.cache(),
                 this.classpathRequired(),
@@ -279,6 +282,23 @@ public final class J2clMojoBuild extends J2clMojo {
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     @Parameter(required = true)
     private List<String> externs = new ArrayList<>();
+
+
+    // formatting..........................................................................................................
+
+    /**
+     * The formatting options if any are set.
+     */
+    private Set<ClosureFormattingOption> formatting() {
+        return this.formatting.stream()
+                .map(String::trim)
+                .map(ClosureFormattingOption::fromCommandLine)
+                .collect(Collectors.toCollection(() -> EnumSet.noneOf(ClosureFormattingOption.class)));
+    }
+
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+    @Parameter(required = true)
+    private List<String> formatting = new ArrayList<>();
 
     // initial-script-filename..........................................................................................
 
