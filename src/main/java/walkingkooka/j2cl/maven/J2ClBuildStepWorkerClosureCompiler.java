@@ -67,6 +67,7 @@ final class J2ClBuildStepWorkerClosureCompiler extends J2ClBuildStepWorker2 {
                 request.entryPoints,
                 request.externs,
                 request.formatting,
+                request.languageOut,
                 sources,
                 directory.output().append(request.initialScriptFilename.toString()),
                 logger) ?

@@ -168,6 +168,7 @@
                             <entry-points>com.vertispan.draw.connected.client.FlowChartEntryPoint</entry-points>
                             <externs></externs>
                             <formatting/>
+                            <language-out>ECMASCRIPT_2016</language-out>
                             <thread-pool-size>0</thread-pool-size>
 
                             <added-dependencies>

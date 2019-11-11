@@ -44,6 +44,10 @@ final class HashBuilder {
         }
     }
 
+    HashBuilder append(final Enum<?> e) {
+        return this.append(e.name());
+    }
+
     HashBuilder append(final String text) {
         return this.append(text.getBytes(Charset.defaultCharset()));
     }

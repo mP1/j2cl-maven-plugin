@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>walkingkooka</groupId>
-    <artifactId>example-formatting</artifactId>
+    <artifactId>example-es5</artifactId>
     <version>1.0</version>
     <packaging>war</packaging>
 
@@ -83,12 +83,10 @@
                                 <jre.checks.checkLevel>MINIMAL</jre.checks.checkLevel>
                                 <jsinterop.checks>DISABLED</jsinterop.checks>
                             </defines>
-                            <entry-points>example.formatting.app</entry-points>
+                            <entry-points>example.es5.app</entry-points>
                             <externs></externs>
-                            <formatting>
-                                <param>PRETTY_PRINT</param>
-                            </formatting>
-                            <language-out>ECMASCRIPT_2016</language-out>
+                            <formatting/>
+                            <language-out>ECMASCRIPT5</language-out>
                             <thread-pool-size>0</thread-pool-size>
 
                             <added-dependencies>
