@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import com.google.javascript.jscomp.CompilationLevel;
+import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
@@ -56,6 +57,7 @@ final class J2clBuildRequest {
                                  final List<String> entryPoints,
                                  final Set<ClosureFormattingOption> formatting,
                                  final J2clPath initialScriptFilename,
+                                 final LanguageMode languageOut,
                                  final J2clPath base,
                                  final List<J2clArtifactCoords> classpathRequired,
                                  final List<J2clArtifactCoords> javascriptSourceRequired,
@@ -75,6 +77,7 @@ final class J2clBuildRequest {
                 entryPoints,
                 formatting,
                 initialScriptFilename,
+                languageOut,
                 base,
                 excluded,
                 replaced,
@@ -96,6 +99,7 @@ final class J2clBuildRequest {
                              final List<String> entryPoints,
                              final Set<ClosureFormattingOption> formatting,
                              final J2clPath initialScriptFilename,
+                             final LanguageMode languageOut,
                              final J2clPath base,
                              final Predicate<J2clArtifactCoords> excluded,
                              final Map<J2clArtifactCoords, J2clArtifactCoords> replaced,
@@ -117,8 +121,8 @@ final class J2clBuildRequest {
         this.entryPoints = entryPoints;
         this.externs = externs;
         this.formatting = formatting;
-
         this.initialScriptFilename = initialScriptFilename;
+        this.languageOut = languageOut;
 
         this.base = base;
 
@@ -150,6 +154,8 @@ final class J2clBuildRequest {
         defines.forEach((k, v) -> hash.append(k).append(v));
         entryPoints.forEach(hash::append);
         externs.forEach(hash::append);
+        formatting.forEach(hash::append);
+        hash.append(this.languageOut);
 
         hash.append(excluded.toString());
 
@@ -186,8 +192,8 @@ final class J2clBuildRequest {
     final List<String> entryPoints;
     final Set<String> externs;
     final Set<ClosureFormattingOption> formatting;
-
     final J2clPath initialScriptFilename;
+    final LanguageMode languageOut;
 
     final J2clPath base;
 
@@ -484,7 +490,9 @@ final class J2clBuildRequest {
                 this.defines + " " +
                 this.entryPoints + " " +
                 this.externs + " " +
+                this.formatting + " " +
                 this.initialScriptFilename + " " +
+                this.languageOut + " " +
                 this.base + " " +
                 this.excluded + " " + 
                 this.replaced + " " +

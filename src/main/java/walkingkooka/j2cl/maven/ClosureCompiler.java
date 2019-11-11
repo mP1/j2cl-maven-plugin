@@ -20,6 +20,7 @@ package walkingkooka.j2cl.maven;
 import com.google.javascript.jscomp.CommandLineRunner;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
+import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import com.google.javascript.jscomp.DependencyOptions;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
@@ -45,6 +46,7 @@ class ClosureCompiler {
                            final List<String> entryPoints,
                            final Set<String> externs,
                            final Set<ClosureFormattingOption> formatting,
+                           final LanguageMode languageOut,
                            final List<J2clPath> sourceRoots,
                            final J2clPath initialScriptFilename,
                            final J2clLinePrinter logger) throws Exception {
@@ -53,6 +55,7 @@ class ClosureCompiler {
                 entryPoints,
                 sorted(externs),
                 formatting,
+                languageOut,
                 sorted(sourceRoots),
                 initialScriptFilename,
                 logger);
@@ -69,6 +72,7 @@ class ClosureCompiler {
                                     final List<String> entryPoints,
                                     final SortedSet<String> externs,
                                     final Set<ClosureFormattingOption> formatting,
+                                    final LanguageMode languageOut,
                                     final SortedSet<J2clPath> sourceRoots,
                                     final J2clPath initialScriptFilename,
                                     final J2clLinePrinter logger) throws Exception {
@@ -109,6 +113,7 @@ class ClosureCompiler {
                     entryPoints,
                     externs,
                     formatting.stream().map(ClosureFormattingOption::name).collect(Collectors.toCollection(Sets::sorted)),
+                    languageOut,
                     unitedSourceRoot,
                     initialScriptFilename,
                     logger);
@@ -150,6 +155,7 @@ class ClosureCompiler {
                                                                     final List<String> entryPoints,
                                                                     final SortedSet<String> externs,
                                                                     final Set<String> formatting,
+                                                                    final LanguageMode languageOut,
                                                                     final J2clPath sourceRoot,
                                                                     final J2clPath initialScriptFilename,
                                                                     final J2clLinePrinter logger) throws IOException {
@@ -185,7 +191,7 @@ class ClosureCompiler {
 
             arguments.put("--js_output_file", Sets.of(initialScriptFilenamePath.toString()));
 
-            arguments.put("--language_out", Sets.of("ECMASCRIPT5"));
+            arguments.put("--language_out", Sets.of(languageOut.name()));
 
 
             logCommandLineArguments(arguments, logger);

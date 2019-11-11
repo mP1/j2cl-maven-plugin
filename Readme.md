@@ -309,6 +309,26 @@ The snippet below is a good starting point and forcibly includes a few minimally
 
 
 
+## language-out
+The output language of the resulting javascript.
+
+For a detailed list of available language out options click [here](https://github.com/google/closure-compiler/wiki/Flags-and-Options).
+
+The xml snippet below includes all currently available options, only one may be set, more than one is an error.
+
+```xml
+<language-out>ECMASCRIPT3</language-out>
+<language-out>ECMASCRIPT5</language-out>
+<language-out>ECMASCRIPT5_STRICT</language-out>
+<language-out>ECMASCRIPT_2015</language-out>
+<language-out>ECMASCRIPT_2016</language-out>
+<language-out>ECMASCRIPT_2017</language-out>
+<language-out>ECMASCRIPT_2018</language-out>
+<language-out>ECMASCRIPT_2019</language-out>
+```
+
+
+
 ## output
 This path is the final location of the final javascript.
 

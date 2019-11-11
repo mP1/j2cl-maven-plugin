@@ -19,6 +19,7 @@ package walkingkooka.j2cl.maven;
 
 
 import com.google.javascript.jscomp.CompilationLevel;
+import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
@@ -75,6 +76,7 @@ public final class J2clMojoBuild extends J2clMojo {
                 this.entryPoints(),
                 this.formatting(),
                 this.initialScriptFilename(),
+                this.languageOut(),
                 this.cache(),
                 this.classpathRequired(),
                 this.javascriptSourceRequired(),
@@ -310,6 +312,16 @@ public final class J2clMojoBuild extends J2clMojo {
             defaultValue = "${project.groupId}-${project.artifactId}.js",
             required = true)
     private String initialScriptFilename;
+
+    // language-out.....................................................................................................
+
+    private LanguageMode languageOut() {
+        return this.languageOut;
+    }
+
+    @Parameter(alias = "language-out",
+            required = true)
+    private LanguageMode languageOut;
 
     // output...........................................................................................................
 

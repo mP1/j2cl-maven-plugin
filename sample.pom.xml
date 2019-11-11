@@ -156,6 +156,18 @@
                             <excluded-dependencies></excluded-dependencies>
                             <externs></externs>
                             <formatting/>
+                            <!--
+                                ECMASCRIPT3,
+                                ECMASCRIPT5,
+                                ECMASCRIPT5_STRICT,
+                                ECMASCRIPT_2015,
+                                ECMASCRIPT_2016,
+                                ECMASCRIPT_2017,
+                                ECMASCRIPT_2018,
+                                ECMASCRIPT_2019,
+                                STABLE
+                            -->
+                            <language-out>ECMASCRIPT6</language-out>
                             <thread-pool-size>0</thread-pool-size>
 
                             <added-dependencies>
