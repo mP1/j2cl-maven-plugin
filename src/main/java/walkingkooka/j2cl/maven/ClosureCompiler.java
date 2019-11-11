@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.stream.Collectors;
 
 class ClosureCompiler {
 
@@ -43,6 +44,7 @@ class ClosureCompiler {
                            final Map<String, String> defines,
                            final List<String> entryPoints,
                            final Set<String> externs,
+                           final Set<ClosureFormattingOption> formatting,
                            final List<J2clPath> sourceRoots,
                            final J2clPath initialScriptFilename,
                            final J2clLinePrinter logger) throws Exception {
@@ -50,6 +52,7 @@ class ClosureCompiler {
                 defines,
                 entryPoints,
                 sorted(externs),
+                formatting,
                 sorted(sourceRoots),
                 initialScriptFilename,
                 logger);
@@ -65,6 +68,7 @@ class ClosureCompiler {
                                     final Map<String, String> defines,
                                     final List<String> entryPoints,
                                     final SortedSet<String> externs,
+                                    final Set<ClosureFormattingOption> formatting,
                                     final SortedSet<J2clPath> sourceRoots,
                                     final J2clPath initialScriptFilename,
                                     final J2clLinePrinter logger) throws Exception {
@@ -104,6 +108,7 @@ class ClosureCompiler {
                     defines,
                     entryPoints,
                     externs,
+                    formatting.stream().map(ClosureFormattingOption::name).collect(Collectors.toCollection(Sets::sorted)),
                     unitedSourceRoot,
                     initialScriptFilename,
                     logger);
@@ -144,6 +149,7 @@ class ClosureCompiler {
                                                                     final Map<String, String> defines,
                                                                     final List<String> entryPoints,
                                                                     final SortedSet<String> externs,
+                                                                    final Set<String> formatting,
                                                                     final J2clPath sourceRoot,
                                                                     final J2clPath initialScriptFilename,
                                                                     final J2clLinePrinter logger) throws IOException {
@@ -173,6 +179,7 @@ class ClosureCompiler {
             arguments.put("--dependency_mode", Sets.of(DependencyOptions.DependencyMode.PRUNE.name()));
             arguments.put("--entry_point", entryPoints);
             arguments.put("--externs", externs);
+            arguments.put("--formatting", formatting);
 
             arguments.put("--js", Sets.of(sourceRoot.path().toAbsolutePath() + "/**/*.js"));
 

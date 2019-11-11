@@ -155,6 +155,7 @@
                             <entry-points>example.helloworld.app</entry-points>
                             <excluded-dependencies></excluded-dependencies>
                             <externs></externs>
+                            <formatting/>
                             <thread-pool-size>0</thread-pool-size>
 
                             <added-dependencies>

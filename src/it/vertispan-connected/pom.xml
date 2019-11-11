@@ -167,6 +167,7 @@
                             </defines>
                             <entry-points>com.vertispan.draw.connected.client.FlowChartEntryPoint</entry-points>
                             <externs></externs>
+                            <formatting/>
                             <thread-pool-size>0</thread-pool-size>
 
                             <added-dependencies>
