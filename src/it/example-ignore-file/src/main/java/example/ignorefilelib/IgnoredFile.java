@@ -1,4 +1,4 @@
-package example.helloworldlib;
+package example.ignorefilelib;
 
 import java.io.File;
 
