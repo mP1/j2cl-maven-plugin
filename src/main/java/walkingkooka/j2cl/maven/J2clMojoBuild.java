@@ -67,9 +67,20 @@ public final class J2clMojoBuild extends J2clMojo {
         }
     }
 
+    /**
+     * The {@link J2clBuildRequest} accompanying the build.
+     */
     private J2clBuildRequest request() {
-        return J2clBuildRequest.with(this.addedDependencies(),
+        return J2clBuildRequest.with(this.cache(),
+                this.output(),
                 this.classpathScope(),
+                this.addedDependencies(),
+                this.classpathRequired(),
+                this.excludedDependencies(),
+                this.javascriptSourceRequired(),
+                this.processingSkipped(),
+                this.replacedDependencies(),
+                J2clSourcesKind.SRC,
                 this.compilationLevel(),
                 this.defines(),
                 this.externs(),
@@ -77,48 +88,12 @@ public final class J2clMojoBuild extends J2clMojo {
                 this.formatting(),
                 this.initialScriptFilename(),
                 this.languageOut(),
-                this.cache(),
-                this.classpathRequired(),
-                this.javascriptSourceRequired(),
-                this.processingSkipped(),
-                this.excludedDependencies(),
-                this.replacedDependencies(),
-                J2clSourcesKind.SRC,
-                this.output(),
                 this.mavenMiddleware(),
                 this.executor(),
                 this.logger());
     }
 
-    // autoAddedDependencies.............................................................................................
-
-    private Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies() {
-        final Map<J2clArtifactCoords, List<J2clArtifactCoords>> lookup = Maps.sorted();
-
-        for (final String mapping : this.addedDependencies) {
-            final int equalsSign = mapping.indexOf('=');
-            if (-1 == equalsSign) {
-                throw new IllegalArgumentException("Replacement dependency missing '=' in " + CharSequences.quoteAndEscape(mapping));
-            }
-
-            final String autoAdded =mapping.substring(equalsSign + 1);
-
-            lookup.put(J2clArtifactCoords.parse(mapping.substring(0, equalsSign)), Arrays.stream(autoAdded.split(","))
-                    .map(String::trim)
-                    .map(J2clArtifactCoords::parse)
-                    .collect(Collectors.toList())
-            );
-        }
-
-        return Maps.readOnly(lookup);
-    }
-
-    /**
-     * A {@link List} of parent artifact to a comma separated list of dependencies to auto add, with the former separated
-     * from the later by an equals sign.
-     */
-    @Parameter(alias = "added-dependencies", required = true)
-    private List<String> addedDependencies = Lists.array();
+    // MAVEN............................................................................................................
 
     // classpathScope...................................................................................................
 
@@ -142,43 +117,82 @@ public final class J2clMojoBuild extends J2clMojo {
     @Parameter(alias = "classpath-scope", required = true)
     private String classpathScope;
 
-    // compilationLevel.................................................................................................
+    // output...........................................................................................................
 
-    private CompilationLevel compilationLevel() {
-        final String parameter = this.compilationLevel.trim();
-        final CompilationLevel level = CompilationLevel.fromString(parameter);
-        if (null == level) {
-            throw new IllegalStateException("Invalid compilation-level was " + CharSequences.quoteAndEscape(parameter));
-        }
-        return level;
+    /**
+     * The output directory where the final product of the build is copied to.
+     */
+    private J2clPath output() {
+        return J2clPath.with(this.output.toPath());
+    }
+
+    @Parameter(defaultValue = "${project.build.directory}/${project.build.finalName}",
+            required = true)
+    private File output;
+
+
+    // javascriptSourceRequired........................................................................................
+
+    private List<J2clArtifactCoords> javascriptSourceRequired() {
+        return parseList(this.javascriptSourceRequired);
     }
 
     /**
-     * <a href="https://developers.google.com/closure/compiler/docs/compilation_levels">Compilation levels</a>
+     * List of artifacts required when javascript sources are passed as arguments.
      */
-    @Parameter(alias = "compilation-level",
-            required = true)
-    private String compilationLevel;
+    @Parameter(alias = "javascript-source-required", required = true)
+    private List<String> javascriptSourceRequired;
 
-    // defines..........................................................................................................
+    // processingSkipped................................................................................................
 
-    private Map<String, String> defines() {
-        return this.defines;
+    private List<J2clArtifactCoords> processingSkipped() {
+        return parseList(this.processingSkipped);
     }
 
-    @Parameter(required = true)
-    private Map<String, String> defines = new HashMap<>();
+    /**
+     * List of artifacts that will not be processed at all. When required on the java classpath or source,
+     * the archive file will be added.
+     */
+    @Parameter(alias = "processing-skipped", required = true)
+    private List<String> processingSkipped;
 
-    // entry-points.....................................................................................................
-
-    private List<String> entryPoints() {
-        return this.entrypoints.stream()
-                .map(String::trim)
+    private List<J2clArtifactCoords> parseList(final List<String> coords) {
+        return coords.stream()
+                .map(J2clArtifactCoords::parse)
                 .collect(Collectors.toList());
     }
 
-    @Parameter(alias = "entry-points", required = true)
-    private List<String> entrypoints = new ArrayList<>();
+    // DEPENDENCIES.....................................................................................................
+
+    // autoAddedDependencies.............................................................................................
+
+    private Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies() {
+        final Map<J2clArtifactCoords, List<J2clArtifactCoords>> lookup = Maps.sorted();
+
+        for (final String mapping : this.addedDependencies) {
+            final int equalsSign = mapping.indexOf('=');
+            if (-1 == equalsSign) {
+                throw new IllegalArgumentException("Replacement dependency missing '=' in " + CharSequences.quoteAndEscape(mapping));
+            }
+
+            final String autoAdded = mapping.substring(equalsSign + 1);
+
+            lookup.put(J2clArtifactCoords.parse(mapping.substring(0, equalsSign)), Arrays.stream(autoAdded.split(","))
+                    .map(String::trim)
+                    .map(J2clArtifactCoords::parse)
+                    .collect(Collectors.toList())
+            );
+        }
+
+        return Maps.readOnly(lookup);
+    }
+
+    /**
+     * A {@link List} of parent artifact to a comma separated list of dependencies to auto add, with the former separated
+     * from the later by an equals sign.
+     */
+    @Parameter(alias = "added-dependencies", required = true)
+    private List<String> addedDependencies = Lists.array();
 
     // excludedDependencies..............................................................................................
 
@@ -272,6 +286,60 @@ public final class J2clMojoBuild extends J2clMojo {
     @Parameter(alias = "replaced-dependencies", required = true)
     private List<String> replacedDependencies = Lists.array();
 
+    // JAVA.............................................................................................................
+
+    // classpathRequired................................................................................................
+
+    private List<J2clArtifactCoords> classpathRequired() {
+        return parseList(this.classpathRequired);
+    }
+
+    /**
+     * List of artifacts required on java classpaths.
+     */
+    @Parameter(alias = "classpath-required", required = true)
+    private List<String> classpathRequired;
+
+    // CLOSURE..........................................................................................................
+
+    // compilationLevel.................................................................................................
+
+    private CompilationLevel compilationLevel() {
+        final String parameter = this.compilationLevel.trim();
+        final CompilationLevel level = CompilationLevel.fromString(parameter);
+        if (null == level) {
+            throw new IllegalStateException("Invalid compilation-level was " + CharSequences.quoteAndEscape(parameter));
+        }
+        return level;
+    }
+
+    /**
+     * <a href="https://developers.google.com/closure/compiler/docs/compilation_levels">Compilation levels</a>
+     */
+    @Parameter(alias = "compilation-level",
+            required = true)
+    private String compilationLevel;
+
+    // defines..........................................................................................................
+
+    private Map<String, String> defines() {
+        return this.defines;
+    }
+
+    @Parameter(required = true)
+    private Map<String, String> defines = new HashMap<>();
+
+    // entry-points.....................................................................................................
+
+    private List<String> entryPoints() {
+        return this.entrypoints.stream()
+                .map(String::trim)
+                .collect(Collectors.toList());
+    }
+
+    @Parameter(alias = "entry-points", required = true)
+    private List<String> entrypoints = new ArrayList<>();
+
     // externs..........................................................................................................
 
     /**
@@ -323,18 +391,6 @@ public final class J2clMojoBuild extends J2clMojo {
             required = true)
     private LanguageMode languageOut;
 
-    // output...........................................................................................................
-
-    /**
-     * The output directory where the final product of the build is copied to.
-     */
-    private J2clPath output() {
-        return J2clPath.with(this.output.toPath());
-    }
-
-    @Parameter(defaultValue = "${project.build.directory}/${project.build.finalName}",
-            required = true)
-    private File output;
 
     @Parameter(defaultValue = "${project}",
             readonly = true,
@@ -403,48 +459,4 @@ public final class J2clMojoBuild extends J2clMojo {
             readonly = true,
             required = true)
     private List<RemoteRepository> repositories;
-
-
-    // classpathRequired................................................................................................
-
-    private List<J2clArtifactCoords> classpathRequired() {
-        return parseList(this.classpathRequired);
-    }
-
-    /**
-     * List of artifacts required on java classpaths.
-     */
-    @Parameter(alias = "classpath-required", required = true)
-    private List<String> classpathRequired;
-
-    // javascriptSourceRequired........................................................................................
-
-    private List<J2clArtifactCoords> javascriptSourceRequired() {
-        return parseList(this.javascriptSourceRequired);
-    }
-
-    /**
-     * List of artifacts required when javascript sources are passed as arguments.
-     */
-    @Parameter(alias = "javascript-source-required", required = true)
-    private List<String> javascriptSourceRequired;
-
-    // processingSkipped................................................................................................
-
-    private List<J2clArtifactCoords> processingSkipped() {
-        return parseList(this.processingSkipped);
-    }
-
-    /**
-     * List of artifacts that will not be processed at all. When required on the java classpath or source,
-     * the archive file will be added.
-     */
-    @Parameter(alias = "processing-skipped", required = true)
-    private List<String> processingSkipped;
-
-    private List<J2clArtifactCoords> parseList(final List<String> coords) {
-        return coords.stream()
-                .map(J2clArtifactCoords::parse)
-                .collect(Collectors.toList());
-    }
 }
