@@ -171,6 +171,23 @@ final class J2clBuildRequest {
     }
 
     /**
+     * Classpath scope used to filter artifacts.
+     */
+    final J2clClasspathScope scope;
+
+    /**
+     * The base or cache directory.
+     */
+    final J2clPath base;
+
+    /**
+     * The target or base directory recieving all build files.
+     */
+    final J2clPath buildTarget;
+
+    // dependencies.....................................................................................................
+
+    /**
      * Get all dependencies added via the added-dependencies maven plugin parameter
      * or an empty list.
      */
@@ -183,23 +200,6 @@ final class J2clBuildRequest {
      */
     private final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies;
 
-    final J2clClasspathScope scope;
-    final CompilationLevel level;
-    final Map<String, String> defines;
-    final List<String> entryPoints;
-    final Set<String> externs;
-    final Set<ClosureFormattingOption> formatting;
-    final J2clPath initialScriptFilename;
-    final LanguageMode languageOut;
-
-    final J2clPath base;
-
-    final J2clSourcesKind sourcesKind;
-
-    /**
-     * The target or base directory recieving all build files.
-     */
-    final J2clPath buildTarget;
 
     boolean isExcluded(final J2clArtifactCoords coords) {
         return this.excluded.test(coords) || this.replaced.containsKey(coords);
@@ -250,6 +250,20 @@ final class J2clBuildRequest {
 
     private final Map<J2clArtifactCoords, J2clArtifactCoords> replaced;
 
+    // java.............................................................................................................
+
+    final J2clSourcesKind sourcesKind;
+
+    // closure.........................................................................................................
+
+    final CompilationLevel level;
+    final Map<String, String> defines;
+    final List<String> entryPoints;
+    final Set<String> externs;
+    final Set<ClosureFormattingOption> formatting;
+    final J2clPath initialScriptFilename;
+    final LanguageMode languageOut;
+
     // MAVEN..............................................................................................................
 
     J2clMavenMiddleware mavenMiddleware() {
@@ -293,7 +307,7 @@ final class J2clBuildRequest {
      */
     void execute(final J2clDependency project) throws Throwable {
         project.prettyPrintDependencies();
-        this.verifyClasspathRequiredAndjavascriptSourceRequired();
+        this.verifyClasspathRequiredAndJavascriptSourceRequired();
         this.prepareJobs(project);
 
         if (0 == this.trySubmitJobs()) {
@@ -302,10 +316,10 @@ final class J2clBuildRequest {
         this.await();
     }
 
-    private void verifyClasspathRequiredAndjavascriptSourceRequired() {
+    private void verifyClasspathRequiredAndJavascriptSourceRequired() {
         this.verify(this.classpathRequired, "classpath-required");
         this.verify(this.javascriptSourceRequired, "javascript-required");
-        this.verify(this.processingSkipped, "transpile-excluded");
+        this.verify(this.processingSkipped, "processing-skipped");
     }
 
     private void verify(final Collection<J2clArtifactCoords> dependencies,
@@ -313,7 +327,7 @@ final class J2clBuildRequest {
         final Collection<J2clArtifactCoords> unknown = dependencies.stream()
                 .filter(d -> false == J2clDependency.get(d).isPresent())
                 .collect(Collectors.toList());
-        if(false == unknown.isEmpty()) {
+        if (false == unknown.isEmpty()) {
             throw new IllegalArgumentException("Unknown " + label + " dependencies: " + unknown.stream().map(J2clArtifactCoords::toString).collect(Collectors.joining()));
         }
     }
@@ -442,8 +456,8 @@ final class J2clBuildRequest {
         while (false == this.executor.isTerminated()) {
             try {
                 final Future<?> task = this.completionService.poll(5, TimeUnit.SECONDS);
-                if(null != task) {
-                    if( 0 == this.running.decrementAndGet()) {
+                if (null != task) {
+                    if (0 == this.running.decrementAndGet()) {
                         this.executor.shutdown();
                     }
                 }
@@ -482,19 +496,19 @@ final class J2clBuildRequest {
 
     @Override
     public String toString() {
-        return this.scope + " " +
-                this.level + " " +
+        return this.base + " " +
+                this.classpathRequired + " " +
+                this.excluded + " " +
+                this.javascriptSourceRequired + " " +
+                this.processingSkipped + " " +
+                this.replaced + " " +
+                this.scope + " " +
                 this.defines + " " +
                 this.entryPoints + " " +
                 this.externs + " " +
                 this.formatting + " " +
                 this.initialScriptFilename + " " +
                 this.languageOut + " " +
-                this.base + " " +
-                this.excluded + " " + 
-                this.replaced + " " +
-                this.classpathRequired + " " +
-                this.javascriptSourceRequired + " " +
-                this.processingSkipped + " ";
+                this.level;
     }
 }
