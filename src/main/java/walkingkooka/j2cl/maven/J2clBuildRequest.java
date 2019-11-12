@@ -49,8 +49,16 @@ import java.util.stream.Stream;
  */
 final class J2clBuildRequest {
 
-    static J2clBuildRequest with(final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies,
+    static J2clBuildRequest with(final J2clPath base,
+                                 final J2clPath buildTarget,
                                  final J2clClasspathScope scope,
+                                 final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies,
+                                 final List<J2clArtifactCoords> classpathRequired,
+                                 final Predicate<J2clArtifactCoords> excluded,
+                                 final List<J2clArtifactCoords> javascriptSourceRequired,
+                                 final List<J2clArtifactCoords> processingSkipped,
+                                 final Map<J2clArtifactCoords, J2clArtifactCoords> replaced,
+                                 final J2clSourcesKind sourcesKind,
                                  final CompilationLevel level,
                                  final Map<String, String> defines,
                                  final Set<String> externs,
@@ -58,19 +66,19 @@ final class J2clBuildRequest {
                                  final Set<ClosureFormattingOption> formatting,
                                  final J2clPath initialScriptFilename,
                                  final LanguageMode languageOut,
-                                 final J2clPath base,
-                                 final List<J2clArtifactCoords> classpathRequired,
-                                 final List<J2clArtifactCoords> javascriptSourceRequired,
-                                 final List<J2clArtifactCoords> processingSkipped,
-                                 final Predicate<J2clArtifactCoords> excluded,
-                                 final Map<J2clArtifactCoords, J2clArtifactCoords> replaced,
-                                 final J2clSourcesKind sourcesKind,
-                                 final J2clPath buildTarget,
                                  final J2clMavenMiddleware middleware,
                                  final ExecutorService executor,
                                  final J2clLogger logger) {
-        return new J2clBuildRequest(addedDependencies,
+        return new J2clBuildRequest(base,
+                buildTarget,
                 scope,
+                addedDependencies,
+                classpathRequired,
+                excluded,
+                javascriptSourceRequired,
+                processingSkipped,
+                replaced,
+                sourcesKind,
                 level,
                 defines,
                 externs,
@@ -78,21 +86,21 @@ final class J2clBuildRequest {
                 formatting,
                 initialScriptFilename,
                 languageOut,
-                base,
-                excluded,
-                replaced,
-                classpathRequired,
-                javascriptSourceRequired,
-                processingSkipped,
-                sourcesKind,
-                buildTarget,
                 middleware,
                 executor,
                 logger);
     }
 
-    private J2clBuildRequest(final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies,
+    private J2clBuildRequest(final J2clPath base,
+                             final J2clPath buildTarget,
                              final J2clClasspathScope scope,
+                             final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies,
+                             final List<J2clArtifactCoords> classpathRequired,
+                             final Predicate<J2clArtifactCoords> excluded,
+                             final List<J2clArtifactCoords> javascriptSourceRequired,
+                             final List<J2clArtifactCoords> processingSkipped,
+                             final Map<J2clArtifactCoords, J2clArtifactCoords> replaced,
+                             final J2clSourcesKind sourcesKind,
                              final CompilationLevel level,
                              final Map<String, String> defines,
                              final Set<String> externs,
@@ -100,22 +108,24 @@ final class J2clBuildRequest {
                              final Set<ClosureFormattingOption> formatting,
                              final J2clPath initialScriptFilename,
                              final LanguageMode languageOut,
-                             final J2clPath base,
-                             final Predicate<J2clArtifactCoords> excluded,
-                             final Map<J2clArtifactCoords, J2clArtifactCoords> replaced,
-                             final List<J2clArtifactCoords> classpathRequired,
-                             final List<J2clArtifactCoords> javascriptSourceRequired,
-                             final List<J2clArtifactCoords> processingSkipped,
-                             final J2clSourcesKind sourcesKind,
-                             final J2clPath buildTarget,
                              final J2clMavenMiddleware middleware,
                              final ExecutorService executor,
                              final J2clLogger logger) {
         super();
 
-        this.addedDependencies = addedDependencies;
-
+        this.base = base;
+        this.buildTarget = buildTarget;
         this.scope = scope;
+
+        this.addedDependencies = addedDependencies;
+        this.classpathRequired = classpathRequired;
+        this.excluded = excluded;
+        this.javascriptSourceRequired = javascriptSourceRequired;
+        this.processingSkipped = processingSkipped;
+        this.replaced = replaced;
+
+        this.sourcesKind = sourcesKind;
+
         this.level = level;
         this.defines = defines;
         this.entryPoints = entryPoints;
@@ -124,53 +134,40 @@ final class J2clBuildRequest {
         this.initialScriptFilename = initialScriptFilename;
         this.languageOut = languageOut;
 
-        this.base = base;
-
-        this.excluded = excluded;
-        this.classpathRequired = classpathRequired;
-        this.javascriptSourceRequired = javascriptSourceRequired;
-        this.processingSkipped = processingSkipped;
-        this.replaced = replaced;
-
-        this.sourcesKind = sourcesKind;
-
-        this.buildTarget = buildTarget;
-
         this.middleware = middleware;
-
         this.executor = executor;
         this.completionService = new ExecutorCompletionService<>(executor);
-
         this.logger = logger;
 
-        final HashBuilder hash = HashBuilder.empty()
-                .append(scope.toString())
-                .append(level.toString());
-        addedDependencies.forEach((k, v) -> {
-            hash.append(k.toString());
+        this.hash = this.computeHash();
+    }
 
+    private String computeHash() {
+        final HashBuilder hash = HashBuilder.empty()
+                .append(this.scope.toString())
+                .append(this.level.toString());
+        hash.append(this.sourcesKind.name());
+
+        this.addedDependencies.forEach((k, v) -> {
+            hash.append(k.toString());
             v.forEach(a -> hash.append(a.toString()));
         });
-        defines.forEach((k, v) -> hash.append(k).append(v));
-        entryPoints.forEach(hash::append);
-        externs.forEach(hash::append);
-        formatting.forEach(hash::append);
-        hash.append(this.languageOut);
-
-        hash.append(excluded.toString());
-
-        replaced.forEach((k, v)-> {
+        hash.append(this.classpathRequired.toString());
+        hash.append(this.excluded.toString());
+        hash.append(this.javascriptSourceRequired.toString());
+        hash.append(this.processingSkipped.toString());
+        this.replaced.forEach((k, v) -> {
             hash.append(k.toString());
             hash.append(v.toString());
         });
-        hash.append(sourcesKind.name());
-        
-        hash.append(classpathRequired.toString());
-        hash.append(javascriptSourceRequired.toString());
-        hash.append(processingSkipped.toString());
 
-        this.hash = hash
-                .toString();
+        this.defines.forEach((k, v) -> hash.append(k).append(v));
+        this.entryPoints.forEach(hash::append);
+        this.externs.forEach(hash::append);
+        this.formatting.forEach(hash::append);
+        hash.append(this.languageOut);
+
+        return hash.toString();
     }
 
     /**
