@@ -49,7 +49,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Retrieves all {@link J2clDependency} in order of leaf to the project itself which should be last.
      */
     static J2clDependency gather(final MavenProject project,
-                                 final J2clBuildRequest request) {
+                                 final J2clRequest request) {
         return new J2clDependency(J2clArtifactCoords.with(project.getArtifact()),
                 project,
                 null,
@@ -81,7 +81,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private J2clDependency(final J2clArtifactCoords coords,
                            final MavenProject mavenProject,
                            final J2clPath artifactFile,
-                           final J2clBuildRequest request) {
+                           final J2clRequest request) {
         final Artifact artifact = mavenProject.getArtifact();
         this.coords = coords;
         this.artifact = artifact;
@@ -98,7 +98,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private void gatherDeclaredDependencies() {
-        final J2clBuildRequest request = this.request();
+        final J2clRequest request = this.request();
         final J2clClasspathScope scope = request.scope;
 
         for (final Artifact artifact : this.mavenProject.getArtifacts()) {
@@ -124,7 +124,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private void addAddedDependencies() {
-        final J2clBuildRequest request = this.request();
+        final J2clRequest request = this.request();
 
         for (final J2clArtifactCoords added : request.addedDependencies(this.coords())) {
             if (false == this.dependencyCoords.contains(added)) {
@@ -143,7 +143,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private J2clDependency loadDependency(final J2clArtifactCoords coords) {
-        final J2clBuildRequest request = this.request();
+        final J2clRequest request = this.request();
         final MavenProject project = request.mavenMiddleware()
                 .mavenProject(coords.mavenArtifact(request.scope, this.artifact.getArtifactHandler()));
 
@@ -171,7 +171,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private Set<J2clDependency> dependencies;
 
     private void computeTransitiveDependencies() {
-        final J2clBuildRequest request = this.request();
+        final J2clRequest request = this.request();
 
         final Map<J2clArtifactCoords, Set<J2clArtifactCoords>> flat = Maps.sorted();
         for(final Entry<J2clArtifactCoords, J2clDependency> coordAndDependency : COORD_TO_DEPENDENCY.entrySet()) {
@@ -269,7 +269,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Only returns true for artifacts that are actually the java Bootstrap in some form.
      */
     private boolean isClasspathRequired() {
-        final J2clBuildRequest request = this.request();
+        final J2clRequest request = this.request();
         final J2clArtifactCoords coords = this.coords();
         return request.isClasspathRequired(coords) || false == request.isJavascriptSourceRequired(coords);
     }
@@ -278,7 +278,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Only returns true for the JRE binary artifact
      */
     boolean isJavascriptSourceRequired() {
-        final J2clBuildRequest request = this.request();
+        final J2clRequest request = this.request();
         final J2clArtifactCoords coords = this.coords();
         return request.isJavascriptSourceRequired(coords) || false == request.isClasspathRequired(coords);
     }
@@ -307,11 +307,11 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     // tasks............................................................................................................
 
-    J2clBuildRequest request() {
+    J2clRequest request() {
         return this.request;
     }
 
-    private final J2clBuildRequest request;
+    private final J2clRequest request;
 
     // job..............................................................................................................
 
@@ -329,7 +329,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
         final J2clLogger logger = this.request().logger();
         logger.info(this.coords() + " begin");
 
-        this.executeStep(J2clBuildStep.FIRST);
+        this.executeStep(J2clStep.FIRST);
 
         logger.info(this.coords() + " end");
 
@@ -338,8 +338,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
         return this;
     }
 
-    private void executeStep(final J2clBuildStep step) throws Exception {
-        final Optional<J2clBuildStep> next = step.execute(this);
+    private void executeStep(final J2clStep step) throws Exception {
+        final Optional<J2clStep> next = step.execute(this);
         if (next.isPresent()) {
             this.executeStep(next.get());
         }
@@ -360,7 +360,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
         }
 
         create.createIfNecessary();
-        Files.createDirectories(Paths.get(create.toString(), J2clBuildStep.HASH.directoryName()));
+        Files.createDirectories(Paths.get(create.toString(), J2clStep.HASH.directoryName()));
         return this;
     }
 
@@ -387,7 +387,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Returns a compile step directory, creating it if necessary.
      */
-    J2clStepDirectory step(final J2clBuildStep step) {
+    J2clStepDirectory step(final J2clStep step) {
         return J2clStepDirectory.with(Paths.get(this.directory().toString(), step.directoryName()));
     }
 

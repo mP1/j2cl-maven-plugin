@@ -24,27 +24,27 @@ import java.util.List;
 /**
  * Transpiles the stripped source into javascript equivalents.
  */
-final class J2clBuildStepWorkerJ2ClTranspiler extends J2ClBuildStepWorker2 {
+final class J2clStepWorkerJ2ClTranspiler extends J2ClStepWorker2 {
 
     /**
      * Singleton
      */
-    static J2clBuildStepWorker instance() {
-        return new J2clBuildStepWorkerJ2ClTranspiler();
+    static J2clStepWorker instance() {
+        return new J2clStepWorkerJ2ClTranspiler();
     }
 
-    private J2clBuildStepWorkerJ2ClTranspiler() {
+    private J2clStepWorkerJ2ClTranspiler() {
         super();
     }
 
     @Override
-    final J2clBuildStepResult execute1(final J2clDependency artifact,
-                                       final J2clStepDirectory directory,
-                                       final J2clLinePrinter logger) throws Exception {
+    final J2clStepResult execute1(final J2clDependency artifact,
+                                  final J2clStepDirectory directory,
+                                  final J2clLinePrinter logger) throws Exception {
         // in the end only the project is compiled, all other dependencies remain untouched.
         final J2clPath sourceRoot = artifact.step(artifact.isProcessingSkipped() ?
-                J2clBuildStep.UNPACK :
-                J2clBuildStep.GWT_INCOMPATIBLE_STRIP)
+                J2clStep.UNPACK :
+                J2clStep.GWT_INCOMPATIBLE_STRIP)
                 .output();
 
         logger.print("Preparing...");
@@ -56,7 +56,7 @@ final class J2clBuildStepWorkerJ2ClTranspiler extends J2ClBuildStepWorker2 {
             if (dependency.isProcessingSkipped()) {
                 classpath.add(dependency.artifactFileOrFail());
             } else {
-                classpath.add(dependency.step(J2clBuildStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED).output());
+                classpath.add(dependency.step(J2clStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED).output());
             }
         }
 
@@ -64,7 +64,7 @@ final class J2clBuildStepWorkerJ2ClTranspiler extends J2ClBuildStepWorker2 {
                 sourceRoot,
                 directory.output().emptyOrFail(),
                 logger) ?
-                J2clBuildStepResult.SUCCESS :
-                J2clBuildStepResult.FAILED;
+                J2clStepResult.SUCCESS :
+                J2clStepResult.FAILED;
     }
 }

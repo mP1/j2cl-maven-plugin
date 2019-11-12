@@ -19,7 +19,7 @@ package walkingkooka.j2cl.maven;
 
 import java.util.Optional;
 
-enum J2clBuildStepResult {
+enum J2clStepResult {
     /**
      * Stops processing of remaining steps.
      */
@@ -30,7 +30,7 @@ enum J2clBuildStepResult {
         }
 
         @Override
-        Optional<J2clBuildStep> next(final Optional<J2clBuildStep> next) {
+        Optional<J2clStep> next(final Optional<J2clStep> next) {
             return Optional.empty();
         }
     },
@@ -44,7 +44,7 @@ enum J2clBuildStepResult {
         }
 
         @Override
-        Optional<J2clBuildStep> next(final Optional<J2clBuildStep> next) {
+        Optional<J2clStep> next(final Optional<J2clStep> next) {
             return Optional.empty();
         }
     },
@@ -58,7 +58,7 @@ enum J2clBuildStepResult {
         }
 
         @Override
-        Optional<J2clBuildStep> next(final Optional<J2clBuildStep> next) {
+        Optional<J2clStep> next(final Optional<J2clStep> next) {
             return next;
         }
     },
@@ -72,7 +72,7 @@ enum J2clBuildStepResult {
         }
 
         @Override
-        Optional<J2clBuildStep> next(final Optional<J2clBuildStep> next) {
+        Optional<J2clStep> next(final Optional<J2clStep> next) {
             return next;
         }
     };
@@ -80,14 +80,14 @@ enum J2clBuildStepResult {
     abstract J2clPath path(final J2clStepDirectory directory);
 
     /**
-     * Only the {@link J2clBuildStepResult#FAILED} will throw a {@link J2clException}
+     * Only the {@link J2clStepResult#FAILED} will throw a {@link J2clException}
      */
     final void reportIfFailure(final J2clDependency dependency,
-                               final J2clBuildStep step) throws J2clException {
+                               final J2clStep step) throws J2clException {
         if (FAILED == this) {
             throw new J2clException(step + " for " + dependency + " failed, refer to log file or console output for more details.");
         }
     }
 
-    abstract Optional<J2clBuildStep> next(final Optional<J2clBuildStep> next);
+    abstract Optional<J2clStep> next(final Optional<J2clStep> next);
 }

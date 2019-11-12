@@ -33,7 +33,7 @@ import java.util.concurrent.Callable;
 /**
  * The individual steps that are executed in series to complete the process or building.
  */
-enum J2clBuildStep {
+enum J2clStep {
     /**
      * Computes the hash for the given {@link J2clDependency} including its dependencies.
      */
@@ -44,8 +44,8 @@ enum J2clBuildStep {
         }
 
         @Override
-        J2clBuildStepWorker execute1() {
-            return J2clBuildStepWorker.HASH;
+        J2clStepWorker execute1() {
+            return J2clStepWorker.HASH;
         }
 
         @Override
@@ -54,7 +54,7 @@ enum J2clBuildStep {
         }
 
         @Override
-        Optional<J2clBuildStep> next() {
+        Optional<J2clStep> next() {
             return Optional.of(UNPACK);
         }
     },
@@ -69,8 +69,8 @@ enum J2clBuildStep {
         }
 
         @Override
-        J2clBuildStepWorker execute1() {
-            return J2clBuildStepWorker.UNPACK;
+        J2clStepWorker execute1() {
+            return J2clStepWorker.UNPACK;
         }
 
         @Override
@@ -79,7 +79,7 @@ enum J2clBuildStep {
         }
 
         @Override
-        Optional<J2clBuildStep> next() {
+        Optional<J2clStep> next() {
             return Optional.of(COMPILE);
         }
     },
@@ -94,8 +94,8 @@ enum J2clBuildStep {
         }
 
         @Override
-        J2clBuildStepWorker execute1() {
-            return J2clBuildStepWorker.COMPILE_SOURCE;
+        J2clStepWorker execute1() {
+            return J2clStepWorker.COMPILE_SOURCE;
         }
 
         @Override
@@ -104,7 +104,7 @@ enum J2clBuildStep {
         }
 
         @Override
-        Optional<J2clBuildStep> next() {
+        Optional<J2clStep> next() {
             return Optional.of(GWT_INCOMPATIBLE_STRIP);
         }
     },
@@ -119,8 +119,8 @@ enum J2clBuildStep {
         }
 
         @Override
-        J2clBuildStepWorker execute1() {
-            return J2clBuildStepWorker.STRIP_GWT_INCOMPAT;
+        J2clStepWorker execute1() {
+            return J2clStepWorker.STRIP_GWT_INCOMPAT;
         }
 
         @Override
@@ -129,7 +129,7 @@ enum J2clBuildStep {
         }
 
         @Override
-        Optional<J2clBuildStep> next() {
+        Optional<J2clStep> next() {
             return Optional.of(COMPILE_GWT_INCOMPATIBLE_STRIPPED);
         }
     },
@@ -144,8 +144,8 @@ enum J2clBuildStep {
         }
 
         @Override
-        J2clBuildStepWorker execute1() {
-            return J2clBuildStepWorker.COMPILE_STRIP_GWT_INCOMPAT;
+        J2clStepWorker execute1() {
+            return J2clStepWorker.COMPILE_STRIP_GWT_INCOMPAT;
         }
 
         @Override
@@ -154,7 +154,7 @@ enum J2clBuildStep {
         }
 
         @Override
-        Optional<J2clBuildStep> next() {
+        Optional<J2clStep> next() {
             return Optional.of(TRANSPILE);
         }
     },
@@ -169,8 +169,8 @@ enum J2clBuildStep {
         }
 
         @Override
-        J2clBuildStepWorker execute1() {
-            return J2clBuildStepWorker.TRANSPILER;
+        J2clStepWorker execute1() {
+            return J2clStepWorker.TRANSPILER;
         }
 
         @Override
@@ -179,7 +179,7 @@ enum J2clBuildStep {
         }
 
         @Override
-        Optional<J2clBuildStep> next() {
+        Optional<J2clStep> next() {
             return Optional.of(CLOSURE_COMPILER);
         }
     },
@@ -193,8 +193,8 @@ enum J2clBuildStep {
         }
 
         @Override
-        J2clBuildStepWorker execute1() {
-            return J2clBuildStepWorker.CLOSURE;
+        J2clStepWorker execute1() {
+            return J2clStepWorker.CLOSURE;
         }
 
         @Override
@@ -203,7 +203,7 @@ enum J2clBuildStep {
         }
 
         @Override
-        Optional<J2clBuildStep> next() {
+        Optional<J2clStep> next() {
             return Optional.of(OUTPUT_ASSEMBLER);
         }
     },
@@ -217,8 +217,8 @@ enum J2clBuildStep {
         }
 
         @Override
-        J2clBuildStepWorker execute1() {
-            return J2clBuildStepWorker.OUTPUT_ASSEMBLER;
+        J2clStepWorker execute1() {
+            return J2clStepWorker.OUTPUT_ASSEMBLER;
         }
 
         @Override
@@ -227,12 +227,12 @@ enum J2clBuildStep {
         }
 
         @Override
-        Optional<J2clBuildStep> next() {
+        Optional<J2clStep> next() {
             return Optional.empty();
         }
     };
 
-    public final static J2clBuildStep FIRST = HASH;
+    public final static J2clStep FIRST = HASH;
 
     // step directory naming............................................................................................
 
@@ -247,7 +247,7 @@ enum J2clBuildStep {
      * A {@link Callable} that creates a logger that is saved to a log file when the task is successful (completes without
      * throwing) or logs as errors to the output anything printed during execution.
      */
-    final Optional<J2clBuildStep> execute(final J2clDependency artifact) throws Exception {
+    final Optional<J2clStep> execute(final J2clDependency artifact) throws Exception {
         final J2clLogger j2clLogger = artifact.request()
                 .logger();
         final List<CharSequence> lines = Lists.array(); // these lines will be written to a log file.
@@ -260,9 +260,9 @@ enum J2clBuildStep {
                     lines.add(line);
                 }));
         try {
-            final J2clBuildStepResult result;
+            final J2clStepResult result;
             if (artifact.isDependency() && this.skipIfDependency()) {
-                result = J2clBuildStepResult.SUCCESS;
+                result = J2clStepResult.SUCCESS;
             } else {
                 logger.printLine(prefix);
                 logger.indent();
@@ -311,9 +311,9 @@ enum J2clBuildStep {
     }
 
     /**
-     * Returns the sub class of {@link J2clBuildStepWorker} and then calls {@link J2clBuildStepWorker#execute(J2clDependency, J2clBuildStep, J2clLinePrinter)
+     * Returns the sub class of {@link J2clStepWorker} and then calls {@link J2clStepWorker#execute(J2clDependency, J2clStep, J2clLinePrinter)
      */
-    abstract J2clBuildStepWorker execute1();
+    abstract J2clStepWorker execute1();
 
     // skipIfJre........................................................................................................
 
@@ -327,5 +327,5 @@ enum J2clBuildStep {
     /**
      * Returns the next step if one is present.
      */
-    abstract Optional<J2clBuildStep> next();
+    abstract Optional<J2clStep> next();
 }

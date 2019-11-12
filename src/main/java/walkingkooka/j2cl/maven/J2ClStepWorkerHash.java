@@ -36,34 +36,34 @@ import java.util.stream.Collectors;
 /**
  * Takes a {@link J2clDependency} and computes the hash for the files directly belonging to the artifact and then its dependencies.
  */
-final class J2ClBuildStepWorkerHash extends J2clBuildStepWorker {
+final class J2ClStepWorkerHash extends J2clStepWorker {
 
     /**
      * Singleton
      */
-    static J2clBuildStepWorker instance() {
-        return new J2ClBuildStepWorkerHash();
+    static J2clStepWorker instance() {
+        return new J2ClStepWorkerHash();
     }
 
     /**
      * Use singleton
      */
-    private J2ClBuildStepWorkerHash() {
+    private J2ClStepWorkerHash() {
         super();
     }
 
     @Override
-    J2clBuildStepResult execute(final J2clDependency artifact,
-                                final J2clBuildStep step,
-                                final J2clLinePrinter logger) throws Exception {
+    J2clStepResult execute(final J2clDependency artifact,
+                           final J2clStep step,
+                           final J2clLinePrinter logger) throws Exception {
         final HashBuilder hash = HashBuilder.empty();
 
         this.hashDependencies(artifact, hash, logger);
         this.hashArtifactSources(artifact, logger, hash);
 
         artifact.setHash(hash)
-                .step(J2clBuildStep.HASH);
-        return J2clBuildStepResult.SUCCESS;
+                .step(J2clStep.HASH);
+        return J2clStepResult.SUCCESS;
     }
 
     private void hashDependencies(final J2clDependency artifact,

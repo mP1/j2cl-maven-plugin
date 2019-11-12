@@ -25,27 +25,27 @@ import java.util.Optional;
  * the binary (jar) to {@link J2clStepDirectory#output()}. If no java source files are present processing of this
  * artifact is aborted and no attempt will be made to transpile java to javascript.
  */
-final class J2ClBuildStepWorkerUnpack extends J2ClBuildStepWorker2 {
+final class J2ClStepWorkerUnpack extends J2ClStepWorker2 {
 
     /**
      * Singleton
      */
-    static J2clBuildStepWorker instance() {
-        return new J2ClBuildStepWorkerUnpack();
+    static J2clStepWorker instance() {
+        return new J2ClStepWorkerUnpack();
     }
 
     /**
      * Use singleton
      */
-    private J2ClBuildStepWorkerUnpack() {
+    private J2ClStepWorkerUnpack() {
         super();
     }
 
     @Override
-    J2clBuildStepResult execute1(final J2clDependency artifact,
-                                 final J2clStepDirectory directory,
-                                 final J2clLinePrinter logger) throws Exception {
-        J2clBuildStepResult result;
+    J2clStepResult execute1(final J2clDependency artifact,
+                            final J2clStepDirectory directory,
+                            final J2clLinePrinter logger) throws Exception {
+        J2clStepResult result;
 
         final J2clPath dest = directory.output().emptyOrFail();
         logger.printIndented("Destination", dest);
@@ -68,10 +68,10 @@ final class J2ClBuildStepWorkerUnpack extends J2ClBuildStepWorker2 {
 
             if(javaFilesFound) {
                     logger.printLine("Java source found, transpiling will happen");
-                    result = J2clBuildStepResult.SUCCESS;
+                    result = J2clStepResult.SUCCESS;
             } else {
                 logger.printLine("No java source found, transpiling will not be attempted");
-                result = J2clBuildStepResult.SUCCESS;
+                result = J2clStepResult.SUCCESS;
             }
         }
 

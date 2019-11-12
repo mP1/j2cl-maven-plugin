@@ -47,29 +47,29 @@ import java.util.stream.Stream;
 /**
  * Context about a build request
  */
-final class J2clBuildRequest {
+final class J2clRequest {
 
-    static J2clBuildRequest with(final J2clPath base,
-                                 final J2clPath buildTarget,
-                                 final J2clClasspathScope scope,
-                                 final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies,
-                                 final List<J2clArtifactCoords> classpathRequired,
-                                 final Predicate<J2clArtifactCoords> excluded,
-                                 final List<J2clArtifactCoords> javascriptSourceRequired,
-                                 final List<J2clArtifactCoords> processingSkipped,
-                                 final Map<J2clArtifactCoords, J2clArtifactCoords> replaced,
-                                 final J2clSourcesKind sourcesKind,
-                                 final CompilationLevel level,
-                                 final Map<String, String> defines,
-                                 final Set<String> externs,
-                                 final List<String> entryPoints,
-                                 final Set<ClosureFormattingOption> formatting,
-                                 final J2clPath initialScriptFilename,
-                                 final LanguageMode languageOut,
-                                 final J2clMavenMiddleware middleware,
-                                 final ExecutorService executor,
-                                 final J2clLogger logger) {
-        return new J2clBuildRequest(base,
+    static J2clRequest with(final J2clPath base,
+                            final J2clPath buildTarget,
+                            final J2clClasspathScope scope,
+                            final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies,
+                            final List<J2clArtifactCoords> classpathRequired,
+                            final Predicate<J2clArtifactCoords> excluded,
+                            final List<J2clArtifactCoords> javascriptSourceRequired,
+                            final List<J2clArtifactCoords> processingSkipped,
+                            final Map<J2clArtifactCoords, J2clArtifactCoords> replaced,
+                            final J2clSourcesKind sourcesKind,
+                            final CompilationLevel level,
+                            final Map<String, String> defines,
+                            final Set<String> externs,
+                            final List<String> entryPoints,
+                            final Set<ClosureFormattingOption> formatting,
+                            final J2clPath initialScriptFilename,
+                            final LanguageMode languageOut,
+                            final J2clMavenMiddleware middleware,
+                            final ExecutorService executor,
+                            final J2clLogger logger) {
+        return new J2clRequest(base,
                 buildTarget,
                 scope,
                 addedDependencies,
@@ -91,26 +91,26 @@ final class J2clBuildRequest {
                 logger);
     }
 
-    private J2clBuildRequest(final J2clPath base,
-                             final J2clPath buildTarget,
-                             final J2clClasspathScope scope,
-                             final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies,
-                             final List<J2clArtifactCoords> classpathRequired,
-                             final Predicate<J2clArtifactCoords> excluded,
-                             final List<J2clArtifactCoords> javascriptSourceRequired,
-                             final List<J2clArtifactCoords> processingSkipped,
-                             final Map<J2clArtifactCoords, J2clArtifactCoords> replaced,
-                             final J2clSourcesKind sourcesKind,
-                             final CompilationLevel level,
-                             final Map<String, String> defines,
-                             final Set<String> externs,
-                             final List<String> entryPoints,
-                             final Set<ClosureFormattingOption> formatting,
-                             final J2clPath initialScriptFilename,
-                             final LanguageMode languageOut,
-                             final J2clMavenMiddleware middleware,
-                             final ExecutorService executor,
-                             final J2clLogger logger) {
+    private J2clRequest(final J2clPath base,
+                        final J2clPath buildTarget,
+                        final J2clClasspathScope scope,
+                        final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies,
+                        final List<J2clArtifactCoords> classpathRequired,
+                        final Predicate<J2clArtifactCoords> excluded,
+                        final List<J2clArtifactCoords> javascriptSourceRequired,
+                        final List<J2clArtifactCoords> processingSkipped,
+                        final Map<J2clArtifactCoords, J2clArtifactCoords> replaced,
+                        final J2clSourcesKind sourcesKind,
+                        final CompilationLevel level,
+                        final Map<String, String> defines,
+                        final Set<String> externs,
+                        final List<String> entryPoints,
+                        final Set<ClosureFormattingOption> formatting,
+                        final J2clPath initialScriptFilename,
+                        final LanguageMode languageOut,
+                        final J2clMavenMiddleware middleware,
+                        final ExecutorService executor,
+                        final J2clLogger logger) {
         super();
 
         this.base = base;
@@ -416,7 +416,7 @@ final class J2clBuildRequest {
     /**
      * Finds all jobs that have the given artifact as a dependency and remove that dependency from the waiting list.
      */
-    J2clBuildRequest taskCompleted(final J2clDependency completed) {
+    J2clRequest taskCompleted(final J2clDependency completed) {
         this.executeWithLock(() -> {
             this.jobs.remove(completed);
 

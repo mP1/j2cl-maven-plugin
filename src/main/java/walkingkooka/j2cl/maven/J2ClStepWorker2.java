@@ -22,23 +22,23 @@ import walkingkooka.text.CharSequences;
 /**
  * Any step that requires its working directory to be created before it can work.
  */
-abstract class J2ClBuildStepWorker2 extends J2clBuildStepWorker {
+abstract class J2ClStepWorker2 extends J2clStepWorker {
 
     /**
      * Package private to limit sub classing.
      */
-    J2ClBuildStepWorker2() {
+    J2ClStepWorker2() {
         super();
     }
 
     @Override
-    final J2clBuildStepResult execute(final J2clDependency artifact,
-                                      final J2clBuildStep step,
-                                      final J2clLinePrinter logger) throws Exception {
+    final J2clStepResult execute(final J2clDependency artifact,
+                                 final J2clStep step,
+                                 final J2clLinePrinter logger) throws Exception {
         if(artifact.isExcluded()) {
             throw new IllegalArgumentException("Excluded dependency should not have tasks scheduled: " + CharSequences.quote(artifact.coords().toString()));
         }
-        final J2clBuildStepResult result;
+        final J2clStepResult result;
 
         final J2clStepDirectory directory = artifact.step(step);
 
@@ -51,17 +51,17 @@ abstract class J2ClBuildStepWorker2 extends J2clBuildStepWorker {
                 if (directory.successful().exists().isPresent()) {
                     logger.printIndentedLine("Cache success result present and will be kept");
 
-                    result = J2clBuildStepResult.SUCCESS;
+                    result = J2clStepResult.SUCCESS;
                 } else {
                     if (directory.aborted().exists().isPresent()) {
                         logger.printIndentedLine("Cache abort result present and will be kept");
 
-                        result = J2clBuildStepResult.ABORTED;
+                        result = J2clStepResult.ABORTED;
                     } else {
                         if (directory.skipped().exists().isPresent()) {
                             logger.printIndentedLine("Cache skip result present and will be kept");
 
-                            result = J2clBuildStepResult.SKIPPED;
+                            result = J2clStepResult.SKIPPED;
                         } else {
                             final J2clPath path = directory.path();
                             if (path.exists().isPresent()) {
@@ -83,19 +83,19 @@ abstract class J2ClBuildStepWorker2 extends J2clBuildStepWorker {
         return result;
     }
 
-    private J2clBuildStepResult execute0(final J2clDependency artifact,
-                                         final J2clStepDirectory directory,
-                                         final J2clLinePrinter logger) throws Exception {
+    private J2clStepResult execute0(final J2clDependency artifact,
+                                    final J2clStepDirectory directory,
+                                    final J2clLinePrinter logger) throws Exception {
         // aborted steps for the project are transformed into skipped.
-        final J2clBuildStepResult result = this.execute1(artifact,
+        final J2clStepResult result = this.execute1(artifact,
                 directory,
                 logger);
-        return J2clBuildStepResult.ABORTED == result && false == artifact.isDependency() ?
-                J2clBuildStepResult.SKIPPED :
+        return J2clStepResult.ABORTED == result && false == artifact.isDependency() ?
+                J2clStepResult.SKIPPED :
                 result;
     }
 
-    abstract J2clBuildStepResult execute1(final J2clDependency artifact,
-                                          final J2clStepDirectory directory,
-                                          final J2clLinePrinter logger) throws Exception;
+    abstract J2clStepResult execute1(final J2clDependency artifact,
+                                     final J2clStepDirectory directory,
+                                     final J2clLinePrinter logger) throws Exception;
 }

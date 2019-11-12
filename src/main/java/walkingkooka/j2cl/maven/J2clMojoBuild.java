@@ -60,7 +60,7 @@ public final class J2clMojoBuild extends J2clMojo {
     @Override
     public void execute() throws MojoExecutionException {
         try {
-            final J2clBuildRequest request = this.request();
+            final J2clRequest request = this.request();
             request.execute(J2clDependency.gather(this.project, request));
         } catch (final Throwable e) {
             throw new MojoExecutionException("Failed to build project, check logs above", e);
@@ -70,8 +70,8 @@ public final class J2clMojoBuild extends J2clMojo {
     /**
      * The {@link J2clBuildRequest} accompanying the build.
      */
-    private J2clBuildRequest request() {
-        return J2clBuildRequest.with(this.cache(),
+    private J2clRequest request() {
+        return J2clRequest.with(this.cache(),
                 this.output(),
                 this.classpathScope(),
                 this.addedDependencies(),
