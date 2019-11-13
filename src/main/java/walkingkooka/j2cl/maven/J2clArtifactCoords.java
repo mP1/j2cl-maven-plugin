@@ -70,7 +70,7 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
     }
 
     /**
-     * Used to form source coordinates so {@link J2ClBuildStepWorkerUnpack} can fetch the accompany sources.jar for any dependency.
+     * Used to form source coordinates so {@link J2ClStepWorkerUnpack} can fetch the accompany sources.jar for any dependency.
      */
     J2clArtifactCoords source() {
         return new J2clArtifactCoords(this.groupId,

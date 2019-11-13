@@ -20,24 +20,24 @@ package walkingkooka.j2cl.maven;
 /**
  * Compiles the java source to the target {@link J2clStepDirectory#output()}.
  */
-final class J2ClBuildStepWorkerJavacCompilerUnpackedSource extends J2ClBuildStepWorkerJavacCompiler {
+final class J2ClStepWorkerJavacCompilerGwtIncompatibleStrippedSource extends J2ClStepWorkerJavacCompiler {
 
     /**
      * Singleton
      */
-    static J2clBuildStepWorker instance() {
-        return new J2ClBuildStepWorkerJavacCompilerUnpackedSource();
+    static J2clStepWorker instance() {
+        return new J2ClStepWorkerJavacCompilerGwtIncompatibleStrippedSource();
     }
 
     /**
      * Use singleton
      */
-    private J2ClBuildStepWorkerJavacCompilerUnpackedSource() {
+    private J2ClStepWorkerJavacCompilerGwtIncompatibleStrippedSource() {
         super();
     }
 
     @Override
-    J2clBuildStep sourcesStep() {
-        return J2clBuildStep.UNPACK;
+    J2clStep sourcesStep() {
+        return J2clStep.GWT_INCOMPATIBLE_STRIP;
     }
 }

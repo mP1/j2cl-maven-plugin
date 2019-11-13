@@ -20,28 +20,24 @@ package walkingkooka.j2cl.maven;
 /**
  * Compiles the java source to the target {@link J2clStepDirectory#output()}.
  */
-final class J2ClBuildStepWorkerGwtIncompatibleStripPreprocessor extends J2ClBuildStepWorker2 {
+final class J2ClStepWorkerJavacCompilerUnpackedSource extends J2ClStepWorkerJavacCompiler {
 
     /**
      * Singleton
      */
-    static J2clBuildStepWorker instance() {
-        return new J2ClBuildStepWorkerGwtIncompatibleStripPreprocessor();
+    static J2clStepWorker instance() {
+        return new J2ClStepWorkerJavacCompilerUnpackedSource();
     }
 
     /**
      * Use singleton
      */
-    private J2ClBuildStepWorkerGwtIncompatibleStripPreprocessor() {
+    private J2ClStepWorkerJavacCompilerUnpackedSource() {
         super();
     }
 
     @Override
-    J2clBuildStepResult execute1(final J2clDependency artifact,
-                                 final J2clStepDirectory directory,
-                                 final J2clLinePrinter logger) throws Exception {
-        return GwtIncompatibleStripPreprocessor.execute(artifact.step(J2clBuildStep.UNPACK).output(),
-                directory.output().emptyOrFail(),
-                logger);
+    J2clStep sourcesStep() {
+        return J2clStep.UNPACK;
     }
 }

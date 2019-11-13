@@ -22,29 +22,29 @@ import java.util.Collection;
 /**
  * Calls the closure compiler and assembles the final Javascript output.
  */
-final class J2ClBuildStepWorkerOutputAssembler extends J2ClBuildStepWorker2 {
+final class J2ClStepWorkerOutputAssembler extends J2ClStepWorker2 {
 
     /**
      * Singleton
      */
-    static J2clBuildStepWorker instance() {
-        return new J2ClBuildStepWorkerOutputAssembler();
+    static J2clStepWorker instance() {
+        return new J2ClStepWorkerOutputAssembler();
     }
 
-    private J2ClBuildStepWorkerOutputAssembler() {
+    private J2ClStepWorkerOutputAssembler() {
         super();
     }
 
     @Override
-    final J2clBuildStepResult execute1(final J2clDependency artifact,
-                                       final J2clStepDirectory directory,
-                                       final J2clLinePrinter logger) throws Exception {
+    final J2clStepResult execute1(final J2clDependency artifact,
+                                  final J2clStepDirectory directory,
+                                  final J2clLinePrinter logger) throws Exception {
         final J2clPath target = artifact.request().buildTarget;
 
         logger.printIndented("Destination", target);
         target.createIfNecessary();
 
-        final J2clPath source = artifact.step(J2clBuildStep.CLOSURE_COMPILER).output();
+        final J2clPath source = artifact.step(J2clStep.CLOSURE_COMPILER).output();
 
         final Collection<J2clPath> files = source.gatherFiles(J2clPath.ALL_FILES);
         logger.printIndented("Source", files);
@@ -56,6 +56,6 @@ final class J2ClBuildStepWorkerOutputAssembler extends J2ClBuildStepWorker2 {
         }
         logger.outdent();
 
-        return J2clBuildStepResult.SUCCESS;
+        return J2clStepResult.SUCCESS;
     }
 }

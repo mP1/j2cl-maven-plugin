@@ -46,13 +46,13 @@ import java.util.stream.Collectors;
  */
 final class GwtIncompatibleStripPreprocessor {
 
-    static J2clBuildStepResult execute(final J2clPath sourceRoot,
-                                       final J2clPath output,
-                                       final J2clLinePrinter logger) throws IOException {
+    static J2clStepResult execute(final J2clPath sourceRoot,
+                                  final J2clPath output,
+                                  final J2clLinePrinter logger) throws IOException {
         output.exists()
                 .orElseThrow(() -> new IllegalArgumentException("Output not a directory or does not exist: " + CharSequences.quote(output.toString())));
 
-        J2clBuildStepResult result;
+        J2clStepResult result;
 
         final List<J2clPath> javaFiles = prepareJavaFiles(sourceRoot, output, logger);
 
@@ -68,7 +68,7 @@ final class GwtIncompatibleStripPreprocessor {
             logger.printIndentedLine("No files found");
 
             output.removeAll(); // dont want to leave empty output directory when its empty.
-            result = J2clBuildStepResult.ABORTED;
+            result = J2clStepResult.ABORTED;
         }
 
         return result;
@@ -160,11 +160,11 @@ final class GwtIncompatibleStripPreprocessor {
      * Because the source files are modified a previous step will have taken copied and place them in this output ready for modification if necessary.
      * Errors will also be logged.
      */
-    private static J2clBuildStepResult processStripAnnotationsFiles(final List<J2clPath> javaFilesInput,
-                                                                    final J2clPath source,
-                                                                    final J2clPath output,
-                                                                    final J2clLinePrinter logger) {
-        J2clBuildStepResult result;
+    private static J2clStepResult processStripAnnotationsFiles(final List<J2clPath> javaFilesInput,
+                                                               final J2clPath source,
+                                                               final J2clPath output,
+                                                               final J2clLinePrinter logger) {
+        J2clStepResult result;
 
         logger.printLine("JavaPreprocessor");
         {
@@ -190,9 +190,9 @@ final class GwtIncompatibleStripPreprocessor {
                         logger.outdent();
 
                         logger.printEndOfList();
-                        result = J2clBuildStepResult.FAILED;
+                        result = J2clStepResult.FAILED;
                     } else {
-                        result = J2clBuildStepResult.SUCCESS;
+                        result = J2clStepResult.SUCCESS;
                     }
                     logger.printEndOfList();
                 }

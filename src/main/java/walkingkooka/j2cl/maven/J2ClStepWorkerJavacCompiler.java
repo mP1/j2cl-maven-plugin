@@ -24,21 +24,21 @@ import java.util.List;
 /**
  * Compiles the java source from sources and the given target.
  */
-abstract class J2ClBuildStepWorkerJavacCompiler extends J2ClBuildStepWorker2 {
+abstract class J2ClStepWorkerJavacCompiler extends J2ClStepWorker2 {
 
     /**
      * Package private to limit sub classing.
      */
-    J2ClBuildStepWorkerJavacCompiler() {
+    J2ClStepWorkerJavacCompiler() {
         super();
     }
 
     @Override
-    final J2clBuildStepResult execute1(final J2clDependency artifact,
-                                       final J2clStepDirectory directory,
-                                       final J2clLinePrinter logger) throws Exception {
-        J2clBuildStepResult result = null;
-        final J2clBuildStep step = this.sourcesStep();
+    final J2clStepResult execute1(final J2clDependency artifact,
+                                  final J2clStepDirectory directory,
+                                  final J2clLinePrinter logger) throws Exception {
+        J2clStepResult result = null;
+        final J2clStep step = this.sourcesStep();
 
         J2clPath source = artifact.step(step).output().exists().orElse(null);
         if (null != source) {
@@ -59,7 +59,7 @@ abstract class J2ClBuildStepWorkerJavacCompiler extends J2ClBuildStepWorker2 {
                     if (dependency.isProcessingSkipped()) {
                         classpath.add(dependency.artifactFileOrFail());
                     } else {
-                        classpath.add(dependency.step(J2clBuildStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED).output());
+                        classpath.add(dependency.step(J2clStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED).output());
                     }
                 }
 
@@ -68,14 +68,14 @@ abstract class J2ClBuildStepWorkerJavacCompiler extends J2ClBuildStepWorker2 {
                         javaSourceFiles,
                         directory.output().emptyOrFail(),
                         logger) ?
-                        J2clBuildStepResult.SUCCESS :
-                        J2clBuildStepResult.FAILED;
+                        J2clStepResult.SUCCESS :
+                        J2clStepResult.FAILED;
             }
         }
 
         if (null == source) {
             logger.printIndentedLine("No files found");
-            result = J2clBuildStepResult.ABORTED;
+            result = J2clStepResult.ABORTED;
         }
 
         return result;
@@ -84,5 +84,5 @@ abstract class J2ClBuildStepWorkerJavacCompiler extends J2ClBuildStepWorker2 {
     /**
      * A previous step that has source in its output ready for compiling
      */
-    abstract J2clBuildStep sourcesStep();
+    abstract J2clStep sourcesStep();
 }

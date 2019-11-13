@@ -24,24 +24,24 @@ import java.util.List;
 /**
  * Calls the closure compiler and assembles the final Javascript output.
  */
-final class J2ClBuildStepWorkerClosureCompiler extends J2ClBuildStepWorker2 {
+final class J2ClStepWorkerClosureCompiler extends J2ClStepWorker2 {
 
     /**
      * Singleton
      */
-    static J2clBuildStepWorker instance() {
-        return new J2ClBuildStepWorkerClosureCompiler();
+    static J2clStepWorker instance() {
+        return new J2ClStepWorkerClosureCompiler();
     }
 
-    private J2ClBuildStepWorkerClosureCompiler() {
+    private J2ClStepWorkerClosureCompiler() {
         super();
     }
 
     @Override
-    final J2clBuildStepResult execute1(final J2clDependency artifact,
-                                       final J2clStepDirectory directory,
-                                       final J2clLinePrinter logger) throws Exception {
-        final J2clBuildRequest request = artifact.request();
+    final J2clStepResult execute1(final J2clDependency artifact,
+                                  final J2clStepDirectory directory,
+                                  final J2clLinePrinter logger) throws Exception {
+        final J2clRequest request = artifact.request();
         final List<J2clPath> sources;
 
         logger.printLine("Discovering source roots");
@@ -71,8 +71,8 @@ final class J2ClBuildStepWorkerClosureCompiler extends J2ClBuildStepWorker2 {
                 sources,
                 directory.output().append(request.initialScriptFilename.toString()),
                 logger) ?
-                J2clBuildStepResult.SUCCESS :
-                J2clBuildStepResult.FAILED;
+                J2clStepResult.SUCCESS :
+                J2clStepResult.FAILED;
     }
 
     private List<J2clPath> addSources(final J2clDependency artifact,
@@ -82,13 +82,13 @@ final class J2ClBuildStepWorkerClosureCompiler extends J2ClBuildStepWorker2 {
 
         final List<J2clPath> sources = Lists.array();
         if(artifact.isProcessingRequired()) {
-            final J2clPath transpiled = artifact.step(J2clBuildStep.TRANSPILE).output();
+            final J2clPath transpiled = artifact.step(J2clStep.TRANSPILE).output();
             if (transpiled.exists().isPresent()) {
                 sources.add(transpiled);
             }
 
             // add unpack anyway as it might contain js originally accompanying java source.
-            final J2clPath unpack = artifact.step(J2clBuildStep.UNPACK).output();
+            final J2clPath unpack = artifact.step(J2clStep.UNPACK).output();
             if (unpack.exists().isPresent()) {
                 sources.add(unpack);
             }
