@@ -58,7 +58,8 @@ abstract class J2clMojoBuildTest extends J2clMojo {
     /**
      * The {@link J2clRequest} accompanying the build.
      */
-    final J2clRequest request(final J2clPath initialScriptFilename) {
+    final J2clRequest request(final List<String> entryPoints,
+                              final J2clPath initialScriptFilename) {
         return J2clRequest.with(this.cache(),
                 this.output(),
                 this.classpathScope(),
@@ -72,7 +73,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
                 this.compilationLevel(),
                 this.defines(),
                 this.externs(),
-                this.entryPoints(),
+                entryPoints,
                 this.formatting(),
                 initialScriptFilename,
                 this.languageOut(),
@@ -325,17 +326,6 @@ abstract class J2clMojoBuildTest extends J2clMojo {
 
     @Parameter(required = true)
     private Map<String, String> defines = new HashMap<>();
-
-    // entry-points.....................................................................................................
-
-    private List<String> entryPoints() {
-        return this.entrypoints.stream()
-                .map(String::trim)
-                .collect(Collectors.toList());
-    }
-
-    @Parameter(alias = "entry-points", required = true)
-    private List<String> entrypoints = new ArrayList<>();
 
     // externs..........................................................................................................
 
