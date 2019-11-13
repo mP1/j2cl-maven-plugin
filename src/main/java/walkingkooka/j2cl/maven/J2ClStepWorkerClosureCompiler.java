@@ -62,14 +62,14 @@ final class J2ClStepWorkerClosureCompiler extends J2ClStepWorker2 {
         }
         logger.outdent();
 
-        return ClosureCompiler.compile(request.level,
-                request.defines,
-                request.entryPoints,
-                request.externs,
-                request.formatting,
-                request.languageOut,
+        return ClosureCompiler.compile(request.level(),
+                request.defines(),
+                request.entryPoints(),
+                request.externs(),
+                request.formatting(),
+                request.languageOut(),
                 sources,
-                directory.output().append(request.initialScriptFilename.toString()),
+                directory.output().append(request.initialScriptFilename().toString()),
                 logger) ?
                 J2clStepResult.SUCCESS :
                 J2clStepResult.FAILED;

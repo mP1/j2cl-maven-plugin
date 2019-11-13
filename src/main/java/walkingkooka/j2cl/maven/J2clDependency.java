@@ -99,7 +99,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     private void gatherDeclaredDependencies() {
         final J2clRequest request = this.request();
-        final J2clClasspathScope scope = request.scope;
+        final J2clClasspathScope scope = request.scope();
 
         for (final Artifact artifact : this.mavenProject.getArtifacts()) {
             if (isSystemScope(artifact)) {
@@ -145,7 +145,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private J2clDependency loadDependency(final J2clArtifactCoords coords) {
         final J2clRequest request = this.request();
         final MavenProject project = request.mavenMiddleware()
-                .mavenProject(coords.mavenArtifact(request.scope, this.artifact.getArtifactHandler()));
+                .mavenProject(coords.mavenArtifact(request.scope(), this.artifact.getArtifactHandler()));
 
         return new J2clDependency(coords,
                 project,
@@ -353,7 +353,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     J2clDependency setHash(final HashBuilder hash) throws IOException {
         hash.append(this.request.hash());
 
-        final J2clPath create = J2clPath.with(Paths.get(this.request.base.toString(), this.coords.directorySafeName() + "-" + hash));
+        final J2clPath create = this.request.base().append(this.coords.directorySafeName() + "-" + hash);
         final J2clPath previous = this.directory.compareAndExchange(null, create);
         if (null != previous) {
             throw new IllegalStateException("HashBuilder already set for this artifact: " + CharSequences.quote(create.toString()));
@@ -377,7 +377,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     J2clPath directory() {
         final J2clPath directory = this.directory.get();
         if (null == directory) {
-            throw new IllegalStateException("Directory under " + this.request().base + " missing for " + CharSequences.quote(this.coords().toString()));
+            throw new IllegalStateException("Directory under " + this.request().base() + " missing for " + CharSequences.quote(this.coords().toString()));
         }
         return directory;
     }
