@@ -39,7 +39,7 @@ final class J2ClStepWorkerOutputAssembler extends J2ClStepWorker2 {
     final J2clStepResult execute1(final J2clDependency artifact,
                                   final J2clStepDirectory directory,
                                   final J2clLinePrinter logger) throws Exception {
-        final J2clPath target = artifact.request().buildTarget;
+        final J2clPath target = artifact.request().target();
 
         logger.printIndented("Destination", target);
         target.createIfNecessary();

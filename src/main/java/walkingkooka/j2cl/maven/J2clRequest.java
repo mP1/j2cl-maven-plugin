@@ -50,7 +50,7 @@ import java.util.stream.Stream;
 final class J2clRequest {
 
     static J2clRequest with(final J2clPath base,
-                            final J2clPath buildTarget,
+                            final J2clPath target,
                             final J2clClasspathScope scope,
                             final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies,
                             final List<J2clArtifactCoords> classpathRequired,
@@ -70,7 +70,7 @@ final class J2clRequest {
                             final ExecutorService executor,
                             final J2clLogger logger) {
         return new J2clRequest(base,
-                buildTarget,
+                target,
                 scope,
                 addedDependencies,
                 classpathRequired,
@@ -92,7 +92,7 @@ final class J2clRequest {
     }
 
     private J2clRequest(final J2clPath base,
-                        final J2clPath buildTarget,
+                        final J2clPath target,
                         final J2clClasspathScope scope,
                         final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies,
                         final List<J2clArtifactCoords> classpathRequired,
@@ -114,7 +114,7 @@ final class J2clRequest {
         super();
 
         this.base = base;
-        this.buildTarget = buildTarget;
+        this.target = target;
         this.scope = scope;
 
         this.addedDependencies = addedDependencies;
@@ -173,17 +173,35 @@ final class J2clRequest {
     /**
      * Classpath scope used to filter artifacts.
      */
-    final J2clClasspathScope scope;
+    J2clClasspathScope scope() {
+        return this.scope;
+    }
+
+    /**
+     * Classpath scope used to filter artifacts.
+     */
+    private J2clClasspathScope scope;
 
     /**
      * The base or cache directory.
      */
-    final J2clPath base;
+    J2clPath base() {
+        return this.base;
+    }
 
     /**
-     * The target or base directory recieving all build files.
+     * The base or cache directory.
      */
-    final J2clPath buildTarget;
+    private final J2clPath base;
+
+    J2clPath target() {
+        return this.target;
+    }
+
+    /**
+     * The target or base directory receiving all build files.
+     */
+    final J2clPath target;
 
     // dependencies.....................................................................................................
 
@@ -256,13 +274,47 @@ final class J2clRequest {
 
     // closure.........................................................................................................
 
-    final CompilationLevel level;
-    final Map<String, String> defines;
-    final List<String> entryPoints;
-    final Set<String> externs;
-    final Set<ClosureFormattingOption> formatting;
-    final J2clPath initialScriptFilename;
-    final LanguageMode languageOut;
+    final CompilationLevel level() {
+        return this.level;
+    }
+
+    private CompilationLevel level;
+
+    Map<String, String> defines() {
+        return this.defines;
+    }
+
+    private final Map<String, String> defines;
+
+    final List<String> entryPoints() {
+        return this.entryPoints;
+    }
+
+    private final List<String> entryPoints;
+
+    Set<String> externs() {
+        return this.externs;
+    }
+
+    private final Set<String> externs;
+
+    final Set<ClosureFormattingOption> formatting() {
+        return this.formatting;
+    }
+
+    private final Set<ClosureFormattingOption> formatting;
+
+    final J2clPath initialScriptFilename() {
+        return this.initialScriptFilename;
+    }
+
+    private final J2clPath initialScriptFilename;
+
+    LanguageMode languageOut() {
+        return this.languageOut;
+    }
+
+    private final LanguageMode languageOut;
 
     // MAVEN..............................................................................................................
 

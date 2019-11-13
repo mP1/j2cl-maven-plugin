@@ -297,7 +297,7 @@ enum J2clStep {
                 directory.writeLog(lines, logger);
             } else {
                 // HASH step probably failed so create a unique file and write it to the base directory.
-                final Path base = Paths.get(artifact.request().base.path().toString(), artifact.coords() + "-" + DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"));
+                final Path base = Paths.get(artifact.request().base().path().toString(), artifact.coords() + "-" + DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"));
 
                 j2clLogger.error("Log file");
                 j2clLogger.error(J2clLogger.INDENTATION + base.toString());
