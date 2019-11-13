@@ -24,6 +24,9 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -35,7 +38,8 @@ public final class J2clMojoBuild extends J2clMojoBuildTest {
     @Override
     public void execute() throws MojoExecutionException {
         try {
-            final J2clRequest request = this.request(this.initialScriptFilename());
+            final J2clRequest request = this.request(this.entryPoints(),
+                    this.initialScriptFilename());
             request.execute(this.gatherDependencies(request));
         } catch (final Throwable e) {
             throw new MojoExecutionException("Failed to build project, check logs above", e);
@@ -46,6 +50,18 @@ public final class J2clMojoBuild extends J2clMojoBuildTest {
     J2clSourcesKind sourcesKind() {
         return J2clSourcesKind.SRC;
     }
+
+    // entry-points.....................................................................................................
+
+    private List<String> entryPoints() {
+        return this.entrypoints.stream()
+                .map(String::trim)
+                .collect(Collectors.toList());
+    }
+
+    @Parameter(alias = "entry-points", required = true)
+    private List<String> entrypoints = new ArrayList<>();
+
     // initial-script-filename..........................................................................................
 
     private J2clPath initialScriptFilename() {
