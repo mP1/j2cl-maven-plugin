@@ -241,7 +241,7 @@ These key value pairs are arguments given only to the Closure compiler. The frag
 
 
 
-## entry-points
+## entry-points (build)
 A Closure compiler argument containing one or more entry point(s).
 
 ```xml
@@ -284,7 +284,7 @@ For more info click [here](http://googleclosure.blogspot.com/2010/10/pretty-prin
 
 
 
-## initial-script-filename
+## initial-script-filename (build)
 
 The path to the initial script filename.
 
@@ -329,7 +329,7 @@ The xml snippet below includes all currently available options, only one may be 
 
 
 
-## output
+## output (build)
 This path is the final location of the final javascript.
 
 
@@ -365,6 +365,28 @@ would be problematic and a customized substitute is available as a replacement.
 <replaced-dependencies>
     <param>com.google.gwt:gwt-user:2.8.2=walkingkooka:example-excluded-dependencies-gwt-entrypoint:1.0</param>
 </replaced-dependencies>
+```
+
+
+
+## skip-tests (test)
+
+This is only available when executing tests, and provides an easy switch to turn tests on.off.
+```xml
+<skip-tests>false</skip-tests>
+```
+
+
+
+## tests (test)
+
+A block of multiple `test` entries each defining a GLOB pattern to match test suites class names.
+
+```xml
+<tests>
+    <test>org.gwtproject.timer.client.TimerJc2lTest</test>
+    <test>org.gwtproject.timer.client2.**</test>
+</tests>
 ```
 
 

@@ -17,6 +17,7 @@
 
 package walkingkooka.j2cl.maven;
 
+import com.google.j2cl.common.FrontendUtils.FileInfo;
 import com.google.j2cl.common.Problems;
 import com.google.j2cl.tools.gwtincompatible.JavaPreprocessor;
 import walkingkooka.collect.list.Lists;
@@ -46,7 +47,7 @@ import java.util.stream.Collectors;
  */
 final class GwtIncompatibleStripPreprocessor {
 
-    static J2clStepResult execute(final J2clPath sourceRoot,
+    static J2clStepResult execute(final List<J2clPath> sourceRoots,
                                   final J2clPath output,
                                   final J2clLinePrinter logger) throws IOException {
         output.exists()
@@ -54,15 +55,16 @@ final class GwtIncompatibleStripPreprocessor {
 
         J2clStepResult result;
 
-        final List<J2clPath> javaFiles = prepareJavaFiles(sourceRoot, output, logger);
+        // FileInfo must have the source path otherwise stripper will write files to the wrong place.
+        final List<FileInfo> javaFiles = prepareJavaFiles(sourceRoots, output, logger);
 
         final int javaFileCount = javaFiles.size();
 
         if (javaFileCount > 0) {
-            result = processStripAnnotationsFiles(javaFiles, sourceRoot, output, logger);
+            result = processStripAnnotationsFiles(javaFiles, output, logger);
 
-            copyJavascriptFiles(sourceRoot, output, logger);
-            logOutput(output, logger);
+            copyJavascriptFiles(sourceRoots, output, logger);
+            logger.printIndented("Output file(s)", output.gatherFiles(J2clPath.ALL_FILES));
 
         } else {
             logger.printIndentedLine("No files found");
@@ -74,25 +76,32 @@ final class GwtIncompatibleStripPreprocessor {
         return result;
     }
 
-    private static List<J2clPath> prepareJavaFiles(final J2clPath sourceRoot,
+    private static List<FileInfo> prepareJavaFiles(final List<J2clPath> sourceRoots,
                                                    final J2clPath output,
                                                    final J2clLinePrinter logger) throws IOException {
-        final List<J2clPath> javaFiles = Lists.array();
+        final List<FileInfo> javaFiles = Lists.array();
 
         logger.printLine("Preparing java files");
         logger.indent();
         {
-            logger.printLine(sourceRoot.toString());
-            logger.indent();
+            for(final J2clPath sourceRoot : sourceRoots) {
+                logger.printLine(sourceRoot.toString());
 
-            // find then copy from unpack to $output
-            final Collection<J2clPath> files = output.copyFiles(sourceRoot,
-                    gatherFiles(sourceRoot, J2clPath.JAVA_FILES),
-                    logger::printLine);
-            javaFiles.addAll(files);
+                if(sourceRoot.exists().isPresent()) {
+                    logger.indent();
 
-            logger.outdent();
-            logger.printLine(files.size() + " file(s) count");
+                    // find then copy from unpack to $output
+                    final Collection<J2clPath> files = output.copyFiles(sourceRoot,
+                            gatherFiles(sourceRoot, J2clPath.JAVA_FILES),
+                            logger::printLine);
+
+                    // necessary to prepare FileInfo with correct sourceRoot otherwise stripped files will be written back to the wrong place.
+                    javaFiles.addAll(J2clPath.toFileInfo(files, output));
+
+                    logger.outdent();
+                }
+            }
+            logger.printLine(javaFiles.size() + " file(s) count");
         }
         logger.outdent();
 
@@ -160,8 +169,7 @@ final class GwtIncompatibleStripPreprocessor {
      * Because the source files are modified a previous step will have taken copied and place them in this output ready for modification if necessary.
      * Errors will also be logged.
      */
-    private static J2clStepResult processStripAnnotationsFiles(final List<J2clPath> javaFilesInput,
-                                                               final J2clPath source,
+    private static J2clStepResult processStripAnnotationsFiles(final List<FileInfo> javaFilesInput,
                                                                final J2clPath output,
                                                                final J2clLinePrinter logger) {
         J2clStepResult result;
@@ -170,11 +178,11 @@ final class GwtIncompatibleStripPreprocessor {
         {
             logger.indent();
             {
-                logger.printIndented("Source(s)", javaFilesInput);
+                logger.printIndented("Source(s)", javaFilesInput, FileInfo::targetPath);
                 logger.printIndented("Output", output);
 
                 final Problems problems = new Problems();
-                JavaPreprocessor.preprocessFiles(J2clPath.toFileInfo(javaFilesInput, source),
+                JavaPreprocessor.preprocessFiles(javaFilesInput,
                         output.path(),
                         problems);
                 final List<String> errors = problems.getErrors();
@@ -204,26 +212,22 @@ final class GwtIncompatibleStripPreprocessor {
         return result;
     }
 
-    private static void copyJavascriptFiles(final J2clPath sourceRoot,
+    private static void copyJavascriptFiles(final List<J2clPath> sourceRoots,
                                             final J2clPath output,
                                             final J2clLinePrinter logger) throws IOException {
-        logger.printLine("Copy *.js");
+        logger.printLine("Copy *.js from source root(s) to output");
         logger.indent();
         {
-            logger.printLine(sourceRoot.toString());
-            logger.indent();
-
-            final SortedSet<J2clPath> copy = gatherFiles(sourceRoot, J2clPath.JAVASCRIPT_FILES);
-            output.copyFiles(sourceRoot, copy, logger::printLine);
-
-            logger.outdent();
-            logger.outdent();
+            for(final J2clPath sourceRoot : sourceRoots) {
+                logger.printLine(sourceRoot.toString());
+                logger.indent();
+                {
+                    final SortedSet<J2clPath> copy = gatherFiles(sourceRoot, J2clPath.JAVASCRIPT_FILES);
+                    output.copyFiles(sourceRoot, copy, logger::printLine);
+                }
+                logger.outdent();
+            }
         }
         logger.outdent();
-    }
-
-    private static void logOutput(final J2clPath output,
-                                  final J2clLinePrinter logger) throws IOException {
-        logger.printIndented("Output file(s)", gatherFiles(output, J2clPath.ALL_FILES));
     }
 }

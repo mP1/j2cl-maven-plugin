@@ -64,9 +64,10 @@ abstract class J2ClStepWorkerJavacCompiler extends J2ClStepWorker2 {
                 }
 
                 result = JavacCompiler.execute(classpath.subList(0, 1),
-                        classpath.subList(1, classpath.size()),
+                        classpath.size() >= 1 ? classpath.subList(1, classpath.size()) : Lists.empty(),
                         javaSourceFiles,
                         directory.output().emptyOrFail(),
+                        this.shouldRunAnnotationProcessors(),
                         logger) ?
                         J2clStepResult.SUCCESS :
                         J2clStepResult.FAILED;
@@ -85,4 +86,9 @@ abstract class J2ClStepWorkerJavacCompiler extends J2ClStepWorker2 {
      * A previous step that has source in its output ready for compiling
      */
     abstract J2clStep sourcesStep();
+
+    /**
+     * Returns whether annotations processors should be run.
+     */
+    abstract boolean shouldRunAnnotationProcessors();
 }

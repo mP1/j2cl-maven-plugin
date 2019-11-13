@@ -84,19 +84,15 @@ class ClosureCompiler {
         {
             for (final J2clPath sourceRoot : sourceRoots) {
                 logger.printLine(sourceRoot.toString());
-                logger.indent();
-                {
-                    final Collection<J2clPath> copied;
-                    if (sourceRoot.isFile()) {
-                        copied = sourceRoot.extractArchiveFiles(unitedSourceRoot, logger);
-                    } else {
-                        copied = unitedSourceRoot.copyFiles(sourceRoot,
-                                sourceRoot.gatherFiles(J2clPath.ALL_FILES),
-                                logger::printLine);
-                    }
-                    fileCount+=copied.size();
+                final Collection<J2clPath> copied;
+                if (sourceRoot.isFile()) {
+                    copied = sourceRoot.extractArchiveFiles(unitedSourceRoot, logger);
+                } else {
+                    copied = unitedSourceRoot.copyFiles(sourceRoot,
+                            sourceRoot.gatherFiles(J2clPath.ALL_FILES),
+                            logger::printLine);
                 }
-                logger.outdent();
+                fileCount+=copied.size();
             }
             logger.printEndOfList();
         }

@@ -50,6 +50,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     static J2clDependency gather(final MavenProject project,
                                  final J2clRequest request) {
+        COORD_TO_DEPENDENCY.clear();
         return new J2clDependency(J2clArtifactCoords.with(project.getArtifact()),
                 project,
                 null,
@@ -68,7 +69,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     static J2clDependency getOrFail(final J2clArtifactCoords coords) {
         return get(coords)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown coords " + CharSequences.quote(coords.toString())));
+                .orElseThrow(() -> new IllegalArgumentException("Unknown coords " + CharSequences.quote(coords.toString()) + "\n" + COORD_TO_DEPENDENCY.keySet() + "\n" + COORD_TO_DEPENDENCY));
     }
 
     private final static Map<J2clArtifactCoords, J2clDependency> COORD_TO_DEPENDENCY = Maps.sorted();
@@ -348,27 +349,17 @@ final class J2clDependency implements Comparable<J2clDependency> {
     // directories......................................................................................................
 
     /**
-     * Sets the computed hash which will then be used to create or locate the home directory for this artifact.
+     * Sets the directory for this dependency, assumes the hash has been computed
      */
-    J2clDependency setHash(final HashBuilder hash) throws IOException {
-        hash.append(this.request.hash());
-
+    J2clDependency setDirectory(final String hash) throws IOException {
         final J2clPath create = this.request.base().append(this.coords.directorySafeName() + "-" + hash);
         final J2clPath previous = this.directory.compareAndExchange(null, create);
         if (null != previous) {
-            throw new IllegalStateException("HashBuilder already set for this artifact: " + CharSequences.quote(create.toString()));
+            throw new IllegalStateException("Hash already set for this artifact: " + CharSequences.quote(create.toString()));
         }
 
-        create.createIfNecessary();
-        Files.createDirectories(Paths.get(create.toString(), J2clStep.HASH.directoryName()));
+        create.append(J2clStep.HASH.directoryName()).createIfNecessary();
         return this;
-    }
-
-    /**
-     * If the directory is present hashes the entire content or the content of the artifact file.
-     */
-    String hashOrFail() {
-        return this.directory().filename();
     }
 
     /**

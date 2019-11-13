@@ -33,6 +33,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.List;
@@ -56,7 +57,7 @@ final class J2clPath implements Comparable<J2clPath> {
         return paths.stream().map(J2clPath::file).collect(Collectors.toList());
     }
 
-    static List<FileInfo> toFileInfo(final List<J2clPath> files,
+    static List<FileInfo> toFileInfo(final Collection<J2clPath> files,
                                      final J2clPath base) {
         return files.stream()
                 .map(p -> {
@@ -83,6 +84,11 @@ final class J2clPath implements Comparable<J2clPath> {
 
     boolean isFile() {
         return Files.isRegularFile(this.path());
+    }
+
+    boolean isTestAnnotation() {
+        final Path path = this.path();
+        return Files.isDirectory(path) && path.getFileName().toString().equals("test-annotations");
     }
 
     J2clPath parent() {
@@ -126,8 +132,16 @@ final class J2clPath implements Comparable<J2clPath> {
         return this;
     }
 
-    public J2clPath append(final String directory) {
+    J2clPath append(final String directory) {
         return J2clPath.with(Paths.get(this.path.toString(), directory));
+    }
+
+    /**
+     * Writes the content to this path.
+     */
+    J2clPath writeFile(final byte[] contents) throws IOException {
+        Files.write(this.path(), contents, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        return this;
     }
 
     /**

@@ -36,6 +36,8 @@ abstract class J2clStepWorker {
 
     final static J2clStepWorker OUTPUT_ASSEMBLER = J2ClStepWorkerOutputAssembler.instance();
 
+    final static J2clStepWorker JUNIT_WEBDRIVER_TESTS = J2ClStepWorkerWebDriverUnitTestRunner.instance();
+
     J2clStepWorker() {
         super();
     }

@@ -54,7 +54,7 @@ enum J2clStep {
         }
 
         @Override
-        Optional<J2clStep> next() {
+        Optional<J2clStep> next(final J2clRequest request) {
             return Optional.of(UNPACK);
         }
     },
@@ -79,7 +79,7 @@ enum J2clStep {
         }
 
         @Override
-        Optional<J2clStep> next() {
+        Optional<J2clStep> next(final J2clRequest request) {
             return Optional.of(COMPILE);
         }
     },
@@ -90,7 +90,7 @@ enum J2clStep {
     COMPILE {
         @Override
         String directoryName() {
-            return "2-javac-compiled-source";
+            return "2-javac-annotation-processors-compiled-source";
         }
 
         @Override
@@ -104,7 +104,7 @@ enum J2clStep {
         }
 
         @Override
-        Optional<J2clStep> next() {
+        Optional<J2clStep> next(final J2clRequest request) {
             return Optional.of(GWT_INCOMPATIBLE_STRIP);
         }
     },
@@ -129,7 +129,7 @@ enum J2clStep {
         }
 
         @Override
-        Optional<J2clStep> next() {
+        Optional<J2clStep> next(final J2clRequest request) {
             return Optional.of(COMPILE_GWT_INCOMPATIBLE_STRIPPED);
         }
     },
@@ -154,7 +154,7 @@ enum J2clStep {
         }
 
         @Override
-        Optional<J2clStep> next() {
+        Optional<J2clStep> next(final J2clRequest request) {
             return Optional.of(TRANSPILE);
         }
     },
@@ -179,7 +179,7 @@ enum J2clStep {
         }
 
         @Override
-        Optional<J2clStep> next() {
+        Optional<J2clStep> next(final J2clRequest request) {
             return Optional.of(CLOSURE_COMPILER);
         }
     },
@@ -203,8 +203,10 @@ enum J2clStep {
         }
 
         @Override
-        Optional<J2clStep> next() {
-            return Optional.of(OUTPUT_ASSEMBLER);
+        Optional<J2clStep> next(final J2clRequest request) {
+            return Optional.of(J2clClasspathScope.TEST == request.scope() ?
+                    JUNIT_WEBDRIVER_TESTS :
+                    OUTPUT_ASSEMBLER);
         }
     },
     /**
@@ -227,7 +229,31 @@ enum J2clStep {
         }
 
         @Override
-        Optional<J2clStep> next() {
+        Optional<J2clStep> next(final J2clRequest request) {
+            return Optional.empty();
+        }
+    },
+    /**
+     * Uses webdriver to execute a junit test.
+     */
+    JUNIT_WEBDRIVER_TESTS {
+        @Override
+        String directoryName() {
+            return "7-junit-webdriver-tests";
+        }
+
+        @Override
+        J2clStepWorker execute1() {
+            return J2clStepWorker.JUNIT_WEBDRIVER_TESTS;
+        }
+
+        @Override
+        boolean skipIfDependency() {
+            return true;
+        }
+
+        @Override
+        Optional<J2clStep> next(final J2clRequest request) {
             return Optional.empty();
         }
     };
@@ -248,8 +274,8 @@ enum J2clStep {
      * throwing) or logs as errors to the output anything printed during execution.
      */
     final Optional<J2clStep> execute(final J2clDependency artifact) throws Exception {
-        final J2clLogger j2clLogger = artifact.request()
-                .logger();
+        final J2clRequest request = artifact.request();
+        final J2clLogger j2clLogger = request.logger();
         final List<CharSequence> lines = Lists.array(); // these lines will be written to a log file.
         final String prefix = artifact.coords() + "-" + this;
 
@@ -278,7 +304,7 @@ enum J2clStep {
 
                 result.reportIfFailure(artifact, this);
             }
-            return result.next(this.next());
+            return result.next(this.next(request));
         } catch (final Exception cause) {
             logger.flush();
 
@@ -297,7 +323,7 @@ enum J2clStep {
                 directory.writeLog(lines, logger);
             } else {
                 // HASH step probably failed so create a unique file and write it to the base directory.
-                final Path base = Paths.get(artifact.request().base().path().toString(), artifact.coords() + "-" + DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"));
+                final Path base = Paths.get(request.base().path().toString(), artifact.coords() + "-" + DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"));
 
                 j2clLogger.error("Log file");
                 j2clLogger.error(J2clLogger.INDENTATION + base.toString());
@@ -327,5 +353,5 @@ enum J2clStep {
     /**
      * Returns the next step if one is present.
      */
-    abstract Optional<J2clStep> next();
+    abstract Optional<J2clStep> next(final J2clRequest request);
 }

@@ -55,40 +55,11 @@ abstract class J2clMojoBuildTest extends J2clMojo {
         super();
     }
 
-    /**
-     * The {@link J2clRequest} accompanying the build.
-     */
-    final J2clRequest request(final List<String> entryPoints,
-                              final J2clPath initialScriptFilename) {
-        return J2clRequest.with(this.cache(),
-                this.output(),
-                this.classpathScope(),
-                this.addedDependencies(),
-                this.classpathRequired(),
-                this.excludedDependencies(),
-                this.javascriptSourceRequired(),
-                this.processingSkipped(),
-                this.replacedDependencies(),
-                this.sourcesKind(),
-                this.compilationLevel(),
-                this.defines(),
-                this.externs(),
-                entryPoints,
-                this.formatting(),
-                initialScriptFilename,
-                this.languageOut(),
-                this.mavenMiddleware(),
-                this.executor(),
-                this.logger());
-    }
-
-    abstract J2clSourcesKind sourcesKind();
-
     // MAVEN............................................................................................................
 
     // classpathScope...................................................................................................
 
-    private J2clClasspathScope classpathScope() {
+    final J2clClasspathScope classpathScope() {
         return J2clClasspathScope.commandLineOption(this.classpathScope);
     }
 
@@ -113,7 +84,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
     /**
      * The output directory where the final product of the build is copied to.
      */
-    private J2clPath output() {
+    final J2clPath output() {
         return J2clPath.with(this.output.toPath());
     }
 
@@ -124,7 +95,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
 
     // javascriptSourceRequired........................................................................................
 
-    private List<J2clArtifactCoords> javascriptSourceRequired() {
+    final List<J2clArtifactCoords> javascriptSourceRequired() {
         return parseList(this.javascriptSourceRequired);
     }
 
@@ -136,7 +107,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
 
     // processingSkipped................................................................................................
 
-    private List<J2clArtifactCoords> processingSkipped() {
+    final List<J2clArtifactCoords> processingSkipped() {
         return parseList(this.processingSkipped);
     }
 
@@ -159,12 +130,12 @@ abstract class J2clMojoBuildTest extends J2clMojo {
      * Gathers the all the dependencies.
      */
     final J2clDependency gatherDependencies(final J2clRequest request) {
-        return J2clDependency.gather(this.project, request);
+        return J2clDependency.gather(this.project(), request);
     }
 
     // autoAddedDependencies.............................................................................................
 
-    private Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies() {
+    final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies() {
         final Map<J2clArtifactCoords, List<J2clArtifactCoords>> lookup = Maps.sorted();
 
         for (final String mapping : this.addedDependencies) {
@@ -198,7 +169,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
      * A {@link Predicate} that matches any transitive dependencies that should be removed from the dependency graph.
      * This should be applied during the dependency discover phase.
      */
-    private Predicate<J2clArtifactCoords> excludedDependencies() {
+    final Predicate<J2clArtifactCoords> excludedDependencies() {
         final List<Predicate<J2clArtifactCoords>> filter = this.excludedDependencies.stream()
                 .map(String::trim)
                 .map(this::groupArtifactAndVersionPredicate)
@@ -262,7 +233,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
 
     // replacedDependencies.............................................................................................
 
-    private Map<J2clArtifactCoords, J2clArtifactCoords> replacedDependencies() {
+    final Map<J2clArtifactCoords, J2clArtifactCoords> replacedDependencies() {
         final Map<J2clArtifactCoords, J2clArtifactCoords> lookup = Maps.sorted();
 
         for (final String mapping : this.replacedDependencies) {
@@ -288,7 +259,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
 
     // classpathRequired................................................................................................
 
-    private List<J2clArtifactCoords> classpathRequired() {
+    final List<J2clArtifactCoords> classpathRequired() {
         return parseList(this.classpathRequired);
     }
 
@@ -302,7 +273,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
 
     // compilationLevel.................................................................................................
 
-    private CompilationLevel compilationLevel() {
+    final CompilationLevel compilationLevel() {
         final String parameter = this.compilationLevel.trim();
         final CompilationLevel level = CompilationLevel.fromString(parameter);
         if (null == level) {
@@ -320,7 +291,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
 
     // defines..........................................................................................................
 
-    private Map<String, String> defines() {
+    final Map<String, String> defines() {
         return this.defines;
     }
 
@@ -332,7 +303,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
     /**
      * Externs sorted alphabetically, aides pretty printing.
      */
-    private SortedSet<String> externs() {
+    final SortedSet<String> externs() {
         return new java.util.TreeSet<>(this.externs);
     }
 
@@ -346,7 +317,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
     /**
      * The formatting options if any are set.
      */
-    private Set<ClosureFormattingOption> formatting() {
+    final Set<ClosureFormattingOption> formatting() {
         return this.formatting.stream()
                 .map(String::trim)
                 .map(ClosureFormattingOption::fromCommandLine)
@@ -359,7 +330,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
 
     // language-out.....................................................................................................
 
-    private LanguageMode languageOut() {
+    final LanguageMode languageOut() {
         return this.languageOut;
     }
 
@@ -367,6 +338,11 @@ abstract class J2clMojoBuildTest extends J2clMojo {
             required = true)
     private LanguageMode languageOut;
 
+    // project..........................................................................................................
+
+    final MavenProject project() {
+        return this.project;
+    }
 
     @Parameter(defaultValue = "${project}",
             readonly = true,
@@ -375,7 +351,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
 
     // threadPool.......................................................................................................
 
-    private ExecutorService executor() {
+    final ExecutorService executor() {
         final int threadPoolSize = this.threadPoolSize;
         if (threadPoolSize < 0) {
             throw new IllegalStateException("Invalid threadPoolSize expected 0 to select CPU cores *2, or a positive value but got " + threadPoolSize);
@@ -402,7 +378,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
     /**
      * Factory that creates a {@link J2clMavenMiddleware}
      */
-    private J2clMavenMiddleware mavenMiddleware() {
+    final J2clMavenMiddleware mavenMiddleware() {
         if (null == this.mavenMiddleware) {
             this.mavenMiddleware = J2clMavenMiddleware.of(this.mavenSession,
                     this.repositorySystem,

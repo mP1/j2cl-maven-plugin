@@ -18,7 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 /**
- * Compiles the java source to the target {@link J2clStepDirectory#output()}.
+ * Compiles the java source to the target {@link J2clStepDirectory#output()}, with annotation processors enabled.
  */
 final class J2ClStepWorkerJavacCompilerUnpackedSource extends J2ClStepWorkerJavacCompiler {
 
@@ -39,5 +39,10 @@ final class J2ClStepWorkerJavacCompilerUnpackedSource extends J2ClStepWorkerJava
     @Override
     J2clStep sourcesStep() {
         return J2clStep.UNPACK;
+    }
+
+    @Override
+    boolean shouldRunAnnotationProcessors() {
+        return true;
     }
 }
