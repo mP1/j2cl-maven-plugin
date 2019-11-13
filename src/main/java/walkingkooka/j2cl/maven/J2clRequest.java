@@ -270,7 +270,11 @@ final class J2clRequest {
 
     // java.............................................................................................................
 
-    final J2clSourcesKind sourcesKind;
+    J2clSourcesKind sourcesKind() {
+        return this.sourcesKind;
+    }
+
+    private final J2clSourcesKind sourcesKind;
 
     // closure.........................................................................................................
 
