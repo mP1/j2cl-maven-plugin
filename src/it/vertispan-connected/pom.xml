@@ -9,7 +9,9 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Connected</name>
-    <description>Simple Graphs and Flowcharts in GWT, source included is https://github.com/Vertispan/connected/commit/278671d6b8e5f103506bb0edbc7ef2af9d2ae0df</description>
+    <description>Simple Graphs and Flowcharts in GWT, source included is
+        https://github.com/Vertispan/connected/commit/278671d6b8e5f103506bb0edbc7ef2af9d2ae0df
+    </description>
     <organization>
         <name>Vertispan</name>
         <url>http://vertispan.com</url>
@@ -207,27 +209,13 @@
                                 <param>javax.annotation:jsr250-api:1.0</param>
                             </processing-skipped>
                             <replaced-dependencies>
-                                <param>com.google.jsinterop:base:1.0.0-RC1=com.vertispan.jsinterop:base:1.0.0-SNAPSHOT</param>
+                                <param>com.google.jsinterop:base:1.0.0-RC1=com.vertispan.jsinterop:base:1.0.0-SNAPSHOT
+                                </param>
                             </replaced-dependencies>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
-
     </build>
-
-    <distributionManagement>
-        <repository>
-            <id>vertispan-releases</id>
-            <name>Vertispan hosted artifacts-releases</name>
-            <url>https://repo.vertispan.com/j2cl</url>
-        </repository>
-        <snapshotRepository>
-            <id>vertispan-snapshots</id>
-            <name>Vertispan hosted artifacts-snapshots</name>
-            <url>https://repo.vertispan.com/j2cl</url>
-        </snapshotRepository>
-    </distributionManagement>
-
 </project>
