@@ -117,7 +117,7 @@
                                 <param>javax.annotation:jsr250-api:1.0</param>
                             </processing-skipped>
                             <replaced-dependencies></replaced-dependencies>
-                         </configuration>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
