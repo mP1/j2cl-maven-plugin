@@ -85,11 +85,13 @@ final class J2ClStepWorkerUnpack extends J2ClStepWorker2 {
 
         final List<J2clPath> sourceRoots = artifact.sourcesRoot();
         logger.printIndented("Source root(s)", sourceRoots);
+        logger.printLine("Unpacking...");
         logger.indent();
         {
+
             for (final J2clPath source : sourceRoots) {
-                logger.indent();
                 logger.printLine(source.toString());
+                logger.indent();
                 {
                     javaFilesFound |= source.isFile() ?
                             source.extractArchiveFiles(dest, logger).size() > 0 :
@@ -97,9 +99,9 @@ final class J2ClStepWorkerUnpack extends J2ClStepWorker2 {
                 }
                 logger.outdent();
             }
-            logger.printEndOfList();
         }
         logger.outdent();
+        logger.printEndOfList();
 
         return javaFilesFound;
     }
