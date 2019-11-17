@@ -47,7 +47,7 @@ final class J2clStepWorkerJ2ClTranspiler extends J2ClStepWorker2 {
                 J2clStep.GWT_INCOMPATIBLE_STRIP)
                 .output();
 
-        logger.print("Preparing...");
+        logger.printLine("Preparing...");
         logger.printIndented("Source path(s)", sourceRoot);
 
         final List<J2clPath> classpath = Lists.array();
