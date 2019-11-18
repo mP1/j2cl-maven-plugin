@@ -153,12 +153,13 @@ final class J2clPath implements Comparable<J2clPath> {
 
         for (final J2clPath file : files) {
             final Path filePath = file.path();
-            Path copyTarget = destPath.resolve(srcPath.relativize(filePath).toString());
+            final String relative = srcPath.relativize(filePath).toString();
+            final Path copyTarget = destPath.resolve(relative);
             if (Files.exists(copyTarget)) {
                 continue;
             }
 
-            logger.accept(srcPath.relativize(filePath).toString());
+            logger.accept(relative);
 
             Files.createDirectories(copyTarget.getParent());
             Files.copy(filePath, copyTarget);
