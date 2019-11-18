@@ -69,7 +69,7 @@ public final class J2clMojoBuild extends J2clMojoBuildTest {
     }
 
     @Parameter(alias = "initial-script-filename",
-            defaultValue = "${project.groupId}-${project.artifactId}.js",
+            defaultValue = "${project.build.directory}/${project.build.finalName}/${project.groupId}-${project.artifactId}.js",
             required = true)
     private String initialScriptFilename;
 }

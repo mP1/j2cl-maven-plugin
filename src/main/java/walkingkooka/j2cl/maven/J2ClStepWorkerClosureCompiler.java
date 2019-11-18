@@ -62,6 +62,9 @@ final class J2ClStepWorkerClosureCompiler extends J2ClStepWorker2 {
         }
         logger.outdent();
 
+        final J2clPath output = directory.output().createIfNecessary();
+        logger.printLine(output.toString());
+
         return ClosureCompiler.compile(request.level(),
                 request.defines(),
                 request.entryPoints(),
@@ -69,7 +72,7 @@ final class J2ClStepWorkerClosureCompiler extends J2ClStepWorker2 {
                 request.formatting(),
                 request.languageOut(),
                 sources,
-                directory.output().append(request.initialScriptFilename().toString()),
+                request.initialScriptFilename(),
                 logger) ?
                 J2clStepResult.SUCCESS :
                 J2clStepResult.FAILED;
