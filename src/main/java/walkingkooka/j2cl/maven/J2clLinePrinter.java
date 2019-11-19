@@ -21,6 +21,7 @@ import walkingkooka.text.printer.IndentingPrinter;
 import walkingkooka.text.printer.Printer;
 
 import java.util.Collection;
+import java.util.function.Function;
 
 final class J2clLinePrinter {
 
@@ -45,13 +46,19 @@ final class J2clLinePrinter {
     }
 
     void printIndented(final String label,
-                       final Collection<J2clPath> files) {
-        this.printLine(files.size() + " " + label);
+                       final Collection<?> values) {
+        this.printIndented(label, values, Object::toString);
+    }
+
+    <T> void printIndented(final String label,
+                           final Collection<T> values,
+                           final Function<T, String> formatter) {
+        this.printLine(values.size() + " " + label);
 
         //noinspection ConstantConditions
-        if (null != files) {
+        if (null != values) {
             this.indent();
-            files.forEach(f -> this.printLine(f.toString()));
+            values.forEach(f -> this.printLine(formatter.apply(f)));
             this.outdent();
         }
     }

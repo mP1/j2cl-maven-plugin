@@ -118,12 +118,7 @@ final class J2clTranspiler {
                     }
                     logger.outdent();
 
-                    logger.printLine("Output file(s) *.*");
-                    logger.indent();
-                    {
-                        logger.printIndented("Output file(s) after copy", output.gatherFiles(J2clPath.ALL_FILES));
-                    }
-                    logger.outdent();
+                    logger.printIndented("Output file(s) after copy", output.gatherFiles(J2clPath.ALL_FILES));
                 }
             }
         }

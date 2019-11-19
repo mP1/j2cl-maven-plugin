@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * <p>
  * Builds the given project and all of its dependencies in the correct order producing a single JS file.
  */
 @Mojo(name = "build", requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
@@ -38,17 +37,41 @@ public final class J2clMojoBuild extends J2clMojoBuildTest {
     @Override
     public void execute() throws MojoExecutionException {
         try {
-            final J2clRequest request = this.request(this.entryPoints(),
-                    this.initialScriptFilename());
-            request.execute(this.gatherDependencies(request));
+            final J2clRequest request = this.request(this.entryPoints(), this.initialScriptFilename());
+            final J2clDependency project = this.gatherDependencies(request);
+            project.prettyPrintDependencies();
+            request.verifyClasspathRequiredAndJavascriptSourceRequired();
+
+            request.execute(project);
         } catch (final Throwable e) {
             throw new MojoExecutionException("Failed to build project, check logs above", e);
         }
     }
 
-    @Override
-    J2clSourcesKind sourcesKind() {
-        return J2clSourcesKind.SRC;
+    /**
+     * The {@link J2clRequest} accompanying the build.
+     */
+    final J2clRequest request(final List<String> entryPoints,
+                              final J2clPath initialScriptFilename) {
+        return J2clMojoBuildRequest.with(this.cache(),
+                this.output(),
+                this.classpathScope(),
+                this.addedDependencies(),
+                this.classpathRequired(),
+                this.excludedDependencies(),
+                this.javascriptSourceRequired(),
+                this.processingSkipped(),
+                this.replacedDependencies(),
+                this.compilationLevel(),
+                this.defines(),
+                this.externs(),
+                entryPoints,
+                this.formatting(),
+                initialScriptFilename,
+                this.languageOut(),
+                this.mavenMiddleware(),
+                this.executor(),
+                this.logger());
     }
 
     // entry-points.....................................................................................................

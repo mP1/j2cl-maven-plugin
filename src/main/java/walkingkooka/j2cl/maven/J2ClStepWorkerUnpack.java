@@ -60,7 +60,6 @@ final class J2ClStepWorkerUnpack extends J2ClStepWorker2 {
                     final J2clPath path = archive.get();
                     logger.printIndented("Archive", path);
                     logger.indent();
-                    //javaFilesFound = this.extractArchiveFiles(archive.get().path(), dest, logger);
                     javaFilesFound = archive.get().extractArchiveFiles(dest, logger).size() > 0;
                     logger.outdent();
                 }
@@ -93,6 +92,12 @@ final class J2ClStepWorkerUnpack extends J2ClStepWorker2 {
                 logger.printLine(source.toString());
                 logger.indent();
                 {
+                    if (source.isTestAnnotation()) {
+                        logger.printLine("// test annotations source skipped");
+                        continue;
+                    }
+
+                    // dont want to copy test-annotations will contain the generated class by any annotation processor.
                     javaFilesFound |= source.isFile() ?
                             source.extractArchiveFiles(dest, logger).size() > 0 :
                             dest.copyFiles(source, source.gatherFiles(J2clPath.ALL_FILES), logger::printLine).size() > 0;

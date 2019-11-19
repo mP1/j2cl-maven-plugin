@@ -17,6 +17,8 @@
 
 package walkingkooka.j2cl.maven;
 
+import walkingkooka.collect.list.Lists;
+
 /**
  * Compiles the java source to the target {@link J2clStepDirectory#output()}.
  */
@@ -40,7 +42,7 @@ final class J2ClStepWorkerGwtIncompatibleStripPreprocessor extends J2ClStepWorke
     J2clStepResult execute1(final J2clDependency artifact,
                             final J2clStepDirectory directory,
                             final J2clLinePrinter logger) throws Exception {
-        return GwtIncompatibleStripPreprocessor.execute(artifact.step(J2clStep.UNPACK).output(),
+        return GwtIncompatibleStripPreprocessor.execute(Lists.of(artifact.step(J2clStep.COMPILE).output(), artifact.step(J2clStep.UNPACK).output()),
                 directory.output().emptyOrFail(),
                 logger);
     }

@@ -45,53 +45,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Context about a build request
+ * Context about a build/test request. It contains common properties shared by different phases of the build/test process,
+ * including classpaths, closure compiler parameters and maven scoping which is used to select dependencies/artifacts.
  */
-final class J2clRequest {
+abstract class J2clRequest {
 
-    static J2clRequest with(final J2clPath base,
-                            final J2clPath target,
-                            final J2clClasspathScope scope,
-                            final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies,
-                            final List<J2clArtifactCoords> classpathRequired,
-                            final Predicate<J2clArtifactCoords> excluded,
-                            final List<J2clArtifactCoords> javascriptSourceRequired,
-                            final List<J2clArtifactCoords> processingSkipped,
-                            final Map<J2clArtifactCoords, J2clArtifactCoords> replaced,
-                            final J2clSourcesKind sourcesKind,
-                            final CompilationLevel level,
-                            final Map<String, String> defines,
-                            final Set<String> externs,
-                            final List<String> entryPoints,
-                            final Set<ClosureFormattingOption> formatting,
-                            final J2clPath initialScriptFilename,
-                            final LanguageMode languageOut,
-                            final J2clMavenMiddleware middleware,
-                            final ExecutorService executor,
-                            final J2clLogger logger) {
-        return new J2clRequest(base,
-                target,
-                scope,
-                addedDependencies,
-                classpathRequired,
-                excluded,
-                javascriptSourceRequired,
-                processingSkipped,
-                replaced,
-                sourcesKind,
-                level,
-                defines,
-                externs,
-                entryPoints,
-                formatting,
-                initialScriptFilename,
-                languageOut,
-                middleware,
-                executor,
-                logger);
-    }
-
-    private J2clRequest(final J2clPath base,
+    J2clRequest(final J2clPath base,
                         final J2clPath target,
                         final J2clClasspathScope scope,
                         final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies,
@@ -100,13 +59,10 @@ final class J2clRequest {
                         final List<J2clArtifactCoords> javascriptSourceRequired,
                         final List<J2clArtifactCoords> processingSkipped,
                         final Map<J2clArtifactCoords, J2clArtifactCoords> replaced,
-                        final J2clSourcesKind sourcesKind,
                         final CompilationLevel level,
                         final Map<String, String> defines,
                         final Set<String> externs,
-                        final List<String> entryPoints,
                         final Set<ClosureFormattingOption> formatting,
-                        final J2clPath initialScriptFilename,
                         final LanguageMode languageOut,
                         final J2clMavenMiddleware middleware,
                         final ExecutorService executor,
@@ -124,29 +80,179 @@ final class J2clRequest {
         this.processingSkipped = processingSkipped;
         this.replaced = replaced;
 
-        this.sourcesKind = sourcesKind;
-
         this.level = level;
         this.defines = defines;
-        this.entryPoints = entryPoints;
         this.externs = externs;
         this.formatting = formatting;
-        this.initialScriptFilename = initialScriptFilename;
         this.languageOut = languageOut;
 
         this.middleware = middleware;
         this.executor = executor;
         this.completionService = new ExecutorCompletionService<>(executor);
         this.logger = logger;
-
-        this.hash = this.computeHash();
     }
 
-    private String computeHash() {
+    /**
+     * Classpath scope used to filter artifacts.
+     */
+    final J2clClasspathScope scope() {
+        return this.scope;
+    }
+
+    /**
+     * Classpath scope used to filter artifacts.
+     */
+    private J2clClasspathScope scope;
+
+    /**
+     * The base or cache directory.
+     */
+    final J2clPath base() {
+        return this.base;
+    }
+
+    /**
+     * The base or cache directory.
+     */
+    private final J2clPath base;
+
+    final J2clPath target() {
+        return this.target;
+    }
+
+    /**
+     * The target or base directory receiving all build files.
+     */
+    final J2clPath target;
+
+    // dependencies.....................................................................................................
+
+    /**
+     * Get all dependencies added via the added-dependencies maven plugin parameter
+     * or an empty list.
+     */
+    final List<J2clArtifactCoords> addedDependencies(final J2clArtifactCoords coords) {
+        return this.addedDependencies.getOrDefault(coords, Lists.empty());
+    }
+
+    /**
+     * Added to each discovered dependency as they are discovered.
+     */
+    private final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies;
+
+    final boolean isExcluded(final J2clArtifactCoords coords) {
+        return this.excluded.test(coords) || this.replaced.containsKey(coords);
+    }
+
+    private final Predicate<J2clArtifactCoords> excluded;
+
+    final List<J2clDependency> classpathRequired() {
+        return this.classpathRequired.stream()
+                .map(J2clDependency::getOrFail)
+                .collect(Collectors.toList());
+    }
+
+    final boolean isClasspathRequired(final J2clArtifactCoords coords) {
+        return this.classpathRequired.contains(coords);
+    }
+
+    private final List<J2clArtifactCoords> classpathRequired;
+
+    final boolean isJavascriptSourceRequired(final J2clArtifactCoords coords) {
+        return this.javascriptSourceRequired.contains(coords);
+    }
+
+    private final List<J2clArtifactCoords> javascriptSourceRequired;
+
+    /**
+     * Returns the coords for all required artifacts, basically combining the {@link #classpathRequired} and {@link #javascriptSourceRequired}.
+     */
+    final Set<J2clArtifactCoords> required() {
+        return Stream.concat(this.classpathRequired.stream(), this.javascriptSourceRequired.stream())
+                .collect(Collectors.toCollection(Sets::sorted));
+    }
+
+    final boolean isProcessingSkipped(final J2clArtifactCoords coords) {
+        return this.processingSkipped.contains(coords);
+    }
+
+    private final List<J2clArtifactCoords> processingSkipped;
+
+    // replacements........................................................................................................
+
+    /**
+     * Accepts the coords and returns the replacement if one is available.
+     */
+    final Optional<J2clArtifactCoords> replacement(final J2clArtifactCoords coords) {
+        return Optional.ofNullable(this.replaced.get(coords));
+    }
+
+    private final Map<J2clArtifactCoords, J2clArtifactCoords> replaced;
+
+    // java.............................................................................................................
+
+    abstract J2clSourcesKind sourcesKind();
+
+    // closure.........................................................................................................
+
+    final CompilationLevel level() {
+        return this.level;
+    }
+
+    private CompilationLevel level;
+
+    final Map<String, String> defines() {
+        return this.defines;
+    }
+
+    private final Map<String, String> defines;
+
+    abstract List<String> entryPoints();
+
+    final Set<String> externs() {
+        return this.externs;
+    }
+
+    private final Set<String> externs;
+
+    final Set<ClosureFormattingOption> formatting() {
+        return this.formatting;
+    }
+
+    private final Set<ClosureFormattingOption> formatting;
+
+    abstract J2clPath initialScriptFilename();
+
+    final LanguageMode languageOut() {
+        return this.languageOut;
+    }
+
+    private final LanguageMode languageOut;
+
+    // MAVEN..............................................................................................................
+
+    final J2clMavenMiddleware mavenMiddleware() {
+        return this.middleware;
+    }
+
+    private final J2clMavenMiddleware middleware;
+
+    // hash..............................................................................................................
+
+    /**
+     * Returns a sha1 hash in hex digits that uniquely identifies this request using components.
+     * Requests should cache the hash for performance reasons.
+     */
+    abstract String hash();
+
+    /**
+     * Creates a {@link HashBuilder} and hashes most of the properties of a request.
+     */
+    final HashBuilder computeHash() {
         final HashBuilder hash = HashBuilder.empty()
                 .append(this.scope.toString())
                 .append(this.level.toString());
-        hash.append(this.sourcesKind.name());
+        hash.append(this.sourcesKind().name());
 
         this.addedDependencies.forEach((k, v) -> {
             hash.append(k.toString());
@@ -162,189 +268,19 @@ final class J2clRequest {
         });
 
         this.defines.forEach((k, v) -> hash.append(k).append(v));
-        this.entryPoints.forEach(hash::append);
         this.externs.forEach(hash::append);
         this.formatting.forEach(hash::append);
         hash.append(this.languageOut);
 
-        return hash.toString();
+        return hash;
     }
-
-    /**
-     * Classpath scope used to filter artifacts.
-     */
-    J2clClasspathScope scope() {
-        return this.scope;
-    }
-
-    /**
-     * Classpath scope used to filter artifacts.
-     */
-    private J2clClasspathScope scope;
-
-    /**
-     * The base or cache directory.
-     */
-    J2clPath base() {
-        return this.base;
-    }
-
-    /**
-     * The base or cache directory.
-     */
-    private final J2clPath base;
-
-    J2clPath target() {
-        return this.target;
-    }
-
-    /**
-     * The target or base directory receiving all build files.
-     */
-    final J2clPath target;
-
-    // dependencies.....................................................................................................
-
-    /**
-     * Get all dependencies added via the added-dependencies maven plugin parameter
-     * or an empty list.
-     */
-    List<J2clArtifactCoords> addedDependencies(final J2clArtifactCoords coords) {
-        return this.addedDependencies.getOrDefault(coords, Lists.empty());
-    }
-
-    /**
-     * Added to each discovered dependency as they are discovered.
-     */
-    private final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies;
-
-
-    boolean isExcluded(final J2clArtifactCoords coords) {
-        return this.excluded.test(coords) || this.replaced.containsKey(coords);
-    }
-
-    private final Predicate<J2clArtifactCoords> excluded;
-
-    List<J2clDependency> classpathRequired() {
-        return this.classpathRequired.stream()
-                .map(J2clDependency::getOrFail)
-                .collect(Collectors.toList());
-    }
-
-    boolean isClasspathRequired(final J2clArtifactCoords coords) {
-        return this.classpathRequired.contains(coords);
-    }
-
-    private final List<J2clArtifactCoords> classpathRequired;
-
-    boolean isJavascriptSourceRequired(final J2clArtifactCoords coords) {
-        return this.javascriptSourceRequired.contains(coords);
-    }
-
-    private final List<J2clArtifactCoords> javascriptSourceRequired;
-
-    /**
-     * Returns the coords for all required artifacts, basically combining the {@link #classpathRequired} and {@link #javascriptSourceRequired}.
-     */
-    Set<J2clArtifactCoords> required() {
-        return Stream.concat(this.classpathRequired.stream(), this.javascriptSourceRequired.stream())
-                .collect(Collectors.toCollection(Sets::sorted));
-    }
-
-    boolean isProcessingSkipped(final J2clArtifactCoords coords) {
-        return this.processingSkipped.contains(coords);
-    }
-
-    private final List<J2clArtifactCoords> processingSkipped;
-
-    // replacements........................................................................................................
-
-    /**
-     * Accepts the coords and returns the replacement if one is available.
-     */
-    Optional<J2clArtifactCoords> replacement(final J2clArtifactCoords coords) {
-        return Optional.ofNullable(this.replaced.get(coords));
-    }
-
-    private final Map<J2clArtifactCoords, J2clArtifactCoords> replaced;
-
-    // java.............................................................................................................
-
-    J2clSourcesKind sourcesKind() {
-        return this.sourcesKind;
-    }
-
-    private final J2clSourcesKind sourcesKind;
-
-    // closure.........................................................................................................
-
-    final CompilationLevel level() {
-        return this.level;
-    }
-
-    private CompilationLevel level;
-
-    Map<String, String> defines() {
-        return this.defines;
-    }
-
-    private final Map<String, String> defines;
-
-    final List<String> entryPoints() {
-        return this.entryPoints;
-    }
-
-    private final List<String> entryPoints;
-
-    Set<String> externs() {
-        return this.externs;
-    }
-
-    private final Set<String> externs;
-
-    final Set<ClosureFormattingOption> formatting() {
-        return this.formatting;
-    }
-
-    private final Set<ClosureFormattingOption> formatting;
-
-    final J2clPath initialScriptFilename() {
-        return this.initialScriptFilename;
-    }
-
-    private final J2clPath initialScriptFilename;
-
-    LanguageMode languageOut() {
-        return this.languageOut;
-    }
-
-    private final LanguageMode languageOut;
-
-    // MAVEN..............................................................................................................
-
-    J2clMavenMiddleware mavenMiddleware() {
-        return this.middleware;
-    }
-
-    private final J2clMavenMiddleware middleware;
-
-    // hash..............................................................................................................
-
-    /**
-     * Returns a sha1 hash in hex digits that uniquely identifies this compile task without hasshing dependencies
-     */
-    String hash() {
-        return this.hash;
-    }
-
-    private final String hash;
 
     // logger...........................................................................................................
 
     /**
      * Returns a {@link J2clLogger}
      */
-    J2clLogger logger() {
+    final J2clLogger logger() {
         return this.logger;
     }
 
@@ -361,9 +297,7 @@ final class J2clRequest {
     /**
      * Executes the given project.
      */
-    void execute(final J2clDependency project) throws Throwable {
-        project.prettyPrintDependencies();
-        this.verifyClasspathRequiredAndJavascriptSourceRequired();
+    final void execute(final J2clDependency project) throws Throwable {
         this.prepareJobs(project);
 
         if (0 == this.trySubmitJobs()) {
@@ -372,7 +306,7 @@ final class J2clRequest {
         this.await();
     }
 
-    private void verifyClasspathRequiredAndJavascriptSourceRequired() {
+    final void verifyClasspathRequiredAndJavascriptSourceRequired() {
         this.verify(this.classpathRequired, "classpath-required");
         this.verify(this.javascriptSourceRequired, "javascript-required");
         this.verify(this.processingSkipped, "processing-skipped");
@@ -472,7 +406,7 @@ final class J2clRequest {
     /**
      * Finds all jobs that have the given artifact as a dependency and remove that dependency from the waiting list.
      */
-    J2clRequest taskCompleted(final J2clDependency completed) {
+    final J2clRequest taskCompleted(final J2clDependency completed) {
         this.executeWithLock(() -> {
             this.jobs.remove(completed);
 
@@ -534,7 +468,7 @@ final class J2clRequest {
      * Used to cancel any outstanding tasks typically done because one step has failed and any future work is pointless
      * and should be immediately aborted.
      */
-    void cancel(final Throwable cause) {
+    final void cancel(final Throwable cause) {
         final J2clLogger logger = this.logger();
         logger.warn("Killing all running tasks");
 
@@ -560,10 +494,10 @@ final class J2clRequest {
                 this.replaced + " " +
                 this.scope + " " +
                 this.defines + " " +
-                this.entryPoints + " " +
+                this.entryPoints() + " " +
                 this.externs + " " +
                 this.formatting + " " +
-                this.initialScriptFilename + " " +
+                this.initialScriptFilename() + " " +
                 this.languageOut + " " +
                 this.level;
     }

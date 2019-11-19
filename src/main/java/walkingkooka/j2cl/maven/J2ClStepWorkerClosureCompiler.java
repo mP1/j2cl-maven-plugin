@@ -63,7 +63,7 @@ final class J2ClStepWorkerClosureCompiler extends J2ClStepWorker2 {
         logger.outdent();
 
         final J2clPath output = directory.output().createIfNecessary();
-        logger.printLine(output.toString());
+        logger.printIndented("Output", output);
 
         return ClosureCompiler.compile(request.level(),
                 request.defines(),

@@ -17,6 +17,7 @@
 
 package walkingkooka.j2cl.maven;
 
+import walkingkooka.collect.list.Lists;
 import walkingkooka.util.systemproperty.SystemProperty;
 
 import javax.tools.JavaCompiler;
@@ -29,6 +30,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -39,10 +41,18 @@ final class JavacCompiler {
     static boolean execute(final List<J2clPath> bootstrap,
                            final Collection<J2clPath> classpath,
                            final List<J2clPath> newSourceFiles, // files being compiled
-                           //final List<J2clPath> sourcePaths,
                            final J2clPath newClassFilesOutput,
+                           final boolean runAnnotationProcessors,
                            final J2clLinePrinter logger) throws IOException {
-        final List<String> javacOptions = Arrays.asList("-implicit:none", "-bootclasspath", toClasspathStringList(bootstrap));
+        // try and add options in alpha order...
+        final List<String> options = Lists.array();
+        options.add("-bootclasspath");
+        options.add(toClasspathStringList(bootstrap));
+        options.add("-implicit:none");
+
+        if(false == runAnnotationProcessors) {
+            options.add("-proc:none");
+        }
 
         final boolean success;
         {
@@ -53,6 +63,7 @@ final class JavacCompiler {
                 logger.printIndented("Classpath(s)", classpath);
                 logger.printIndented("New java file(s)", newSourceFiles); // printLine full paths here might be mixed sources...
                 logger.printIndented("Output", newClassFilesOutput);
+                logger.printIndented("Option(s)", options, Function.identity());
             }
             logger.outdent();
 
@@ -69,7 +80,7 @@ final class JavacCompiler {
                 success = compiler.getTask(output(logger),
                         fileManager,
                         null,
-                        javacOptions,
+                        options,
                         null,
                         fileManager.getJavaFileObjects(J2clPath.toPaths(newSourceFiles)))
                         .call();

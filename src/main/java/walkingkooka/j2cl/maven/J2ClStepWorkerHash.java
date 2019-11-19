@@ -56,12 +56,12 @@ final class J2ClStepWorkerHash extends J2clStepWorker {
     J2clStepResult execute(final J2clDependency artifact,
                            final J2clStep step,
                            final J2clLinePrinter logger) throws Exception {
-        final HashBuilder hash = HashBuilder.empty();
+        final HashBuilder hash = artifact.request().computeHash();
 
         this.hashDependencies(artifact, hash, logger);
         this.hashArtifactSources(artifact, logger, hash);
 
-        artifact.setHash(hash)
+        artifact.setDirectory(hash.toString())
                 .step(J2clStep.HASH);
         return J2clStepResult.SUCCESS;
     }
