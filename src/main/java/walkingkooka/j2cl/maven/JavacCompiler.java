@@ -63,7 +63,7 @@ final class JavacCompiler {
                 logger.printIndented("Classpath(s)", classpath);
                 logger.printIndented("New java file(s)", newSourceFiles); // printLine full paths here might be mixed sources...
                 logger.printIndented("Output", newClassFilesOutput);
-                logger.printIndented("Option(s)", options, Function.identity());
+                logger.printIndentedString("Option(s)", options);
             }
             logger.outdent();
 
