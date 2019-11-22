@@ -335,14 +335,14 @@
 
         <dependency>
             <groupId>com.github.mP1</groupId>
-            <artifactId>walkingkooka-text-printer</artifactId>
+            <artifactId>walkingkooka-text-pretty</artifactId>
             <version>master-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>io.github.bonigarcia</groupId>
-            <artifactId>webdrivermanager</artifactId>
-            <version>3.7.1</version>
+            <groupId>com.github.mP1</groupId>
+            <artifactId>walkingkooka-text-printer</artifactId>
+            <version>master-SNAPSHOT</version>
         </dependency>
 
         <dependency>

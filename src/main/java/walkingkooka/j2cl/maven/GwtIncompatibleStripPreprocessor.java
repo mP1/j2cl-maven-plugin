@@ -178,7 +178,7 @@ final class GwtIncompatibleStripPreprocessor {
         {
             logger.indent();
             {
-                logger.printIndented("Source(s)", javaFilesInput, FileInfo::targetPath);
+                logger.printIndentedFileInfo("Source(s)", javaFilesInput);
                 logger.printIndented("Output", output);
 
                 final Problems problems = new Problems();
