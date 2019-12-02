@@ -98,23 +98,42 @@ final class J2clDependencyGraphCalculator {
         }
     }
 
+    /**
+     * Keep repeating the processing of all entries in {@link #tree} each time another level of descendants should be added,
+     * if none then it is complete and exit.
+     */
     private void addTransitives() {
-        this.tree.forEach((k, v) -> {
-            final Set<J2clArtifactCoords> descendants = Sets.sorted();
-            descendants.addAll(v);
-            this.addTransitives0(this.tree.getOrDefault(k, Sets.empty()), descendants);
-            this.tree.put(k, descendants);
-        });
+        boolean changes;
+
+        do {
+            changes = false;
+            for (final Entry<J2clArtifactCoords, Set<J2clArtifactCoords>> parentToDependencies : this.tree.entrySet()) {
+                final Set<J2clArtifactCoords> children = parentToDependencies.getValue();
+
+                final Set<J2clArtifactCoords> descendants = Sets.sorted();
+                descendants.addAll(children);
+
+                for (J2clArtifactCoords child : children) {
+                    changes |= this.addTransitives0(child, descendants);
+                }
+
+                parentToDependencies.setValue(descendants);
+            }
+        } while (changes);
     }
 
-    private void addTransitives0(final Set<J2clArtifactCoords> children,
-                                 final Set<J2clArtifactCoords> descendants) {
-        for(final J2clArtifactCoords child : children) {
-            //if(descendants.add(child)) {
-            descendants.add(child);
-                this.addTransitives0(this.tree.getOrDefault(child, Sets.empty()), descendants);
-            //}
+    private boolean addTransitives0(final J2clArtifactCoords parent, final Set<J2clArtifactCoords> descendants) {
+        boolean changes = false;
+
+        for (final J2clArtifactCoords child : this.tree.getOrDefault(parent, Sets.empty())) {
+            // if a new child also try and add its transitives...
+            if (descendants.add(child)) {
+                changes = true;
+                this.addTransitives0(child, descendants);
+            }
         }
+        
+        return changes;
     }
 
     /**
