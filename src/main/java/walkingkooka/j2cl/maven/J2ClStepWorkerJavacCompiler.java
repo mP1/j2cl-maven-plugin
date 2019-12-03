@@ -63,7 +63,7 @@ abstract class J2ClStepWorkerJavacCompiler extends J2ClStepWorker2 {
                     }
                 }
 
-                result = JavacCompiler.execute(classpath.subList(0, 1),
+                result = JavacCompiler.execute(classpath.size() > 1 ? classpath.subList(0, 1) : Lists.empty(),
                         classpath.size() >= 1 ? classpath.subList(1, classpath.size()) : Lists.empty(),
                         javaSourceFiles,
                         directory.output().emptyOrFail(),
