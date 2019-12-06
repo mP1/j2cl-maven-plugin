@@ -11,6 +11,24 @@
 
     <name>J2CL Maven Plugin</name>
 
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:https://github.com/mP1/j2cl-maven-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:mP1/j2cl-maven-plugin.git</developerConnection>
+        <url>https://github.com/mP1/j2cl-maven-plugin</url>
+        <tag>HEAD</tag>
+    </scm>
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/mP1/j2cl-maven-plugin/issues</url>
+    </issueManagement>
+
     <properties>
         <junit.version>4.12</junit.version>
         <!-- Plugin dependencies versions-->
