@@ -11,24 +11,6 @@
 
     <name>J2CL Maven Plugin</name>
 
-    <licenses>
-        <license>
-            <name>Apache License, Version 2.0</name>
-            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-    <scm>
-        <connection>scm:git:https://github.com/mP1/j2cl-maven-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:mP1/j2cl-maven-plugin.git</developerConnection>
-        <url>https://github.com/mP1/j2cl-maven-plugin</url>
-        <tag>HEAD</tag>
-    </scm>
-    <issueManagement>
-        <system>GitHub</system>
-        <url>https://github.com/mP1/j2cl-maven-plugin/issues</url>
-    </issueManagement>
-
     <properties>
         <junit.version>4.12</junit.version>
         <!-- Plugin dependencies versions-->
@@ -47,8 +29,6 @@
         <project.build.outputEncoding>UTF-8</project.build.outputEncoding>
         <takari.lifecycle.plugin.version>1.13.9</takari.lifecycle.plugin.version>
         <!-- Builder dependencies versions -->
-        <transpiler.version>0.3-SNAPSHOT</transpiler.version>
-        <gwt.incompatible.stripper.version>0.3-SNAPSHOT</gwt.incompatible.stripper.version>
         <closure.compiler.unshaded.version>0.1.2-SNAPSHOT</closure.compiler.unshaded.version>
         <!-- Test -->
         <takari.plugin.testing.version>2.9.2</takari.plugin.testing.version>
@@ -58,12 +38,29 @@
         <maven>${maven.required.version}</maven>
     </prerequisites>
 
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:https://github.com/mP1/j2cl-maven-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:mP1/j2cl-maven-plugin.git</developerConnection>
+        <url>https://github.com/mP1/j2cl-maven-plugin</url>
+        <tag>HEAD</tag>
+    </scm>
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/mP1/j2cl-maven-plugin/issues</url>
+    </issueManagement>
+
     <repositories>
         <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
+            <id>github-mp1-appengine-repo</id>
+            <url>https://maven-repo-254709.appspot.com</url>
         </repository>
-
         <repository>
             <id>vertispan-releases</id>
             <name>Vertispan hosted artifacts-releases</name>
@@ -75,18 +72,27 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-
         <repository>
-            <id>sonatype-snapshots-repo</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <id>vertispan-gwt-snapshots</id>
+            <url>https://repo.vertispan.com/gwt-snapshot/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
             <snapshots>
                 <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>google-sonatype-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/google-snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
             </snapshots>
         </repository>
     </repositories>
-
 
     <!-- These are forced dependency versions are necessary because many of dependencies specify different versions for their deps -->
     <dependencyManagement>
@@ -324,11 +330,15 @@
         <dependency>
             <groupId>com.vertispan.j2cl</groupId>
             <artifactId>transpiler</artifactId>
-            <version>${transpiler.version}</version>
+            <version>0.4-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.javascript</groupId>
                     <artifactId>closure-compiler-unshaded</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.jsinterop</groupId>
+                    <artifactId>jsinterop-annotations</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -336,7 +346,13 @@
         <dependency>
             <groupId>com.vertispan.j2cl</groupId>
             <artifactId>gwt-incompatible-stripper</artifactId>
-            <version>${gwt.incompatible.stripper.version}</version>
+            <version>0.4-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.jsinterop</groupId>
+                    <artifactId>jsinterop-annotations</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -349,18 +365,6 @@
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
             <version>3.7.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.mP1</groupId>
-            <artifactId>walkingkooka-text-pretty</artifactId>
-            <version>master-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.mP1</groupId>
-            <artifactId>walkingkooka-text-printer</artifactId>
-            <version>master-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -459,6 +463,17 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>walkingkooka</groupId>
+            <artifactId>walkingkooka-text-pretty</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>walkingkooka</groupId>
+            <artifactId>walkingkooka-text-printer</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
