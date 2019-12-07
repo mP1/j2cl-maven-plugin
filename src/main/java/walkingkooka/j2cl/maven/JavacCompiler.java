@@ -24,13 +24,10 @@ import javax.tools.JavaCompiler;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
-import java.io.IOException;
 import java.io.Writer;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -43,7 +40,7 @@ final class JavacCompiler {
                            final List<J2clPath> newSourceFiles, // files being compiled
                            final J2clPath newClassFilesOutput,
                            final boolean runAnnotationProcessors,
-                           final J2clLinePrinter logger) throws IOException {
+                           final J2clLinePrinter logger) throws Exception {
         // try and add options in alpha order...
         final List<String> options = Lists.array();
         options.add("-bootclasspath");
@@ -71,7 +68,7 @@ final class JavacCompiler {
             logger.emptyLine();
             logger.indent();
             {
-                final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+                final JavaCompiler compiler = javaCompiler();
                 final StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
                 fileManager.setLocation(StandardLocation.SOURCE_PATH, Collections.emptyList()); // Location to search for existing source files.
                 fileManager.setLocation(StandardLocation.CLASS_PATH, J2clPath.toFiles(classpath)); /// Location to search for user class files.
@@ -90,6 +87,17 @@ final class JavacCompiler {
         }
 
         return success;
+    }
+
+    /**
+     * Hack way to get the {@link JavaCompiler}
+     */
+    private static JavaCompiler javaCompiler() throws Exception {
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        if (null == compiler) {
+            compiler = (JavaCompiler) Class.forName("com.sun.tools.javac.api.JavacTool").newInstance();
+        }
+        return compiler;
     }
 
     private static String toClasspathStringList(final List<J2clPath> entries) {
