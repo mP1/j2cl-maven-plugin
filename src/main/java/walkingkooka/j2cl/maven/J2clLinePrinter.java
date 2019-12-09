@@ -89,7 +89,7 @@ final class J2clLinePrinter {
 
             @Override
             public void branchBegin(final List<StringName> names, final IndentingPrinter printer) {
-                final String path = this.path(names);
+                final String path = this.toPath(names);
                 if (false == path.isEmpty()) {
                     J2clLinePrinter.this.printLine(path);
                     printer.indent();
@@ -98,17 +98,14 @@ final class J2clLinePrinter {
 
             @Override
             public void branchEnd(final List<StringName> names, final IndentingPrinter printer) {
-                final String path = this.path(names);
+                final String path = this.toPath(names);
                 if (false == path.isEmpty()) {
                     printer.outdent();
                 }
             }
 
-            private String path(final List<StringName> names) {
-                return names.stream()
-                        .filter(n -> false == n.value().isEmpty())
-                        .map(StringName::toString)
-                        .collect(Collectors.joining("/"));
+            private String toPath(final List<StringName> names) {
+                return toPath(names, StringPath.SEPARATOR);
             }
 
             @Override
