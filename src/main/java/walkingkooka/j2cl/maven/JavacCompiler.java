@@ -25,6 +25,7 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -80,7 +81,7 @@ final class JavacCompiler {
                             null,
                             options,
                             null,
-                            fileManager.getJavaFileObjects(J2clPath.toPaths(newSourceFiles)))
+                            fileManager.getJavaFileObjectsFromFiles(J2clPath.toFiles(newSourceFiles)))
                             .call();
                     logger.printEndOfList();
                 }
@@ -97,7 +98,7 @@ final class JavacCompiler {
     private static JavaCompiler javaCompiler() throws Exception {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         if (null == compiler) {
-            compiler = Class.forName("com.sun.tools.javac.api.JavacTool").asSubclass(JavaCompiler.class).newInstance();
+            throw new J2clException("JavaCompiler missing, require JDK not JRE.");
         }
         return compiler;
     }
