@@ -18,7 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import walkingkooka.collect.list.Lists;
-import walkingkooka.util.systemproperty.SystemProperty;
+import walkingkooka.util.SystemProperty;
 
 import javax.tools.JavaCompiler;
 import javax.tools.StandardJavaFileManager;
