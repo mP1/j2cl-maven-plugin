@@ -74,14 +74,16 @@ final class JavacCompiler {
                 fileManager.setLocation(StandardLocation.CLASS_PATH, J2clPath.toFiles(classpath)); /// Location to search for user class files.
                 fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Collections.singleton(newClassFilesOutput.file())); /// Location of new class files
 
-                success = compiler.getTask(output(logger),
-                        fileManager,
-                        null,
-                        options,
-                        null,
-                        fileManager.getJavaFileObjects(J2clPath.toPaths(newSourceFiles)))
-                        .call();
-                logger.printEndOfList();
+                try(final Writer output = output(logger)) {
+                    success = compiler.getTask(output,
+                            fileManager,
+                            null,
+                            options,
+                            null,
+                            fileManager.getJavaFileObjects(J2clPath.toPaths(newSourceFiles)))
+                            .call();
+                    logger.printEndOfList();
+                }
             }
             logger.outdent();
         }
@@ -90,12 +92,12 @@ final class JavacCompiler {
     }
 
     /**
-     * Hack way to get the {@link JavaCompiler}
+     * Returns the {@link JavaCompiler} and includes a hacked attempt to locate the javacompiler for OSX or fails.
      */
     private static JavaCompiler javaCompiler() throws Exception {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         if (null == compiler) {
-            compiler = (JavaCompiler) Class.forName("com.sun.tools.javac.api.JavacTool").newInstance();
+            compiler = Class.forName("com.sun.tools.javac.api.JavacTool").asSubclass(JavaCompiler.class).newInstance();
         }
         return compiler;
     }
@@ -126,7 +128,7 @@ final class JavacCompiler {
 
             @Override
             public void close() {
-                // ignore close
+                this.flush();
             }
 
             @Override
