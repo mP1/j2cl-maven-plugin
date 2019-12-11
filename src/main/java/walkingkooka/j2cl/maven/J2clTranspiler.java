@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import com.google.j2cl.common.Problems;
+import com.google.j2cl.frontend.Frontend;
 import com.google.j2cl.transpiler.J2clTranspilerOptions;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.text.CharSequences;
@@ -84,6 +85,7 @@ final class J2clTranspiler {
                         .setDeclareLegacyNamespace(false)//TODO parameterize these? copied straight from vertispan/j2clmavenplugin
                         .setEmitReadableLibraryInfo(false)
                         .setEmitReadableSourceMap(false)
+                        .setFrontend(Frontend.JDT)
                         .setGenerateKytheIndexingMetadata(false)
                         .setSources(J2clPath.toFileInfo(javaInput, sourcePath))
                         .setNativeSources(J2clPath.toFileInfo(nativeJsInput, sourcePath))

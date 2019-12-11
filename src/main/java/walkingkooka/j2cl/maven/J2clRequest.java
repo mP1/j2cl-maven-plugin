@@ -447,6 +447,7 @@ abstract class J2clRequest {
             try {
                 final Future<?> task = this.completionService.poll(5, TimeUnit.SECONDS);
                 if (null != task) {
+                    task.get();
                     if (0 == this.running.decrementAndGet()) {
                         this.executor.shutdown();
                     }
@@ -469,13 +470,14 @@ abstract class J2clRequest {
      * and should be immediately aborted.
      */
     final void cancel(final Throwable cause) {
+        this.cause.compareAndSet(null, cause);
+
         final J2clLogger logger = this.logger();
         logger.warn("Killing all running tasks");
 
         // TODO might be able to give Callable#toString and hope that is used by Runnable returned.
         this.executor.shutdownNow()
                 .forEach(task -> logger.warn("" + J2clLogger.INDENTATION + task));
-        this.cause.compareAndSet(null, cause);
     }
 
     private final ExecutorService executor;
