@@ -21,15 +21,20 @@ import com.google.j2cl.common.FrontendUtils.FileInfo;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.naming.StringName;
 import walkingkooka.naming.StringPath;
+import walkingkooka.text.LineEnding;
+import walkingkooka.text.pretty.Table;
+import walkingkooka.text.pretty.TextPretty;
 import walkingkooka.text.pretty.TreePrinting;
 import walkingkooka.text.printer.IndentingPrinter;
 import walkingkooka.text.printer.Printer;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 final class J2clLinePrinter {
@@ -111,17 +116,39 @@ final class J2clLinePrinter {
 
             @Override
             public void children(final Set<StringPath> paths, final IndentingPrinter printer) {
+                Table table = TextPretty.table();
+
+                int i = 0;
                 for (final StringPath path : paths) {
-                    J2clLinePrinter.this.printLine(path.name().value());
+                    final int column = i % COLUMN_COUNT;
+                    final int row = i / COLUMN_COUNT;
+                    table = table.setCell(column,
+                            row,
+                            path.name().toString());
+
+                    i++;
+                }
+
+                table = TABLE_TRANSFORMER.apply(table);
+
+                for (int r = 0; r < table.maxRow(); r++) {
+                    J2clLinePrinter.this.printLine(TextPretty.rowColumnsToLine((column -> 1), LineEnding.SYSTEM)
+                            .apply(table.row(r)));
                 }
             }
         }.biConsumer()
                 .accept(paths.stream().map(toStringPath).collect(Collectors.toCollection(Sets::sorted)),
-                this.printer);
+                        this.printer);
         this.outdent();
         this.printLine(paths.size() + " file(s)");
         this.outdent();
     }
+
+    private final static int COLUMN_COUNT = 4;
+
+    private final static UnaryOperator<Table> TABLE_TRANSFORMER = TextPretty.tableTransformer(Collections.nCopies(COLUMN_COUNT, TextPretty.columnConfig()
+            .minWidth(20)
+            .leftAlign()));
 
     void printIndentedString(final String label,
                              final Collection<String> values) {
