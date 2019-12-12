@@ -107,7 +107,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
                 continue;
             }
 
-            if (false == scope.scopeFilter().test(artifact)) {
+            if (false == artifact.getScope().equals("provided") && false == scope.scopeFilter().test(artifact)) {
                 continue;
             }
 

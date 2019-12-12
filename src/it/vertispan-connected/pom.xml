@@ -87,18 +87,21 @@
             <version>0.4-SNAPSHOT</version>
             <type>zip</type>
             <classifier>jszip</classifier>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.vertispan.j2cl</groupId>
             <artifactId>javac-bootstrap-classpath</artifactId>
             <version>0.4-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.vertispan.j2cl</groupId>
             <artifactId>jre</artifactId>
             <version>0.4-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -107,6 +110,7 @@
             <version>0.4-SNAPSHOT</version>
             <type>zip</type>
             <classifier>jszip</classifier>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
