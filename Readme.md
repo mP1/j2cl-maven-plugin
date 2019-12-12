@@ -112,10 +112,41 @@ detail below.
                     </defines>
                     <entry-points>example.helloworld.app</entry-points>
                     <externs></externs>
-                    <javac-bootstrap>com.vertispan.j2cl:javac-bootstrap-classpath</javac-bootstrap>
-                    <jre-jar-file>com.vertispan.j2cl:jre</jre-jar-file>
+                    <formatting/>
+                    <language-out>ECMASCRIPT_2016</language-out>
                     <thread-pool-size>0</thread-pool-size>
-                 </configuration>
+    
+                    <added-dependencies>
+                        <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:0.5-SNAPSHOT</param>
+                    </added-dependencies>
+                    <classpath-required>
+                        <param>com.vertispan.j2cl:javac-bootstrap-classpath:0.5-SNAPSHOT</param>
+                        <param>com.vertispan.j2cl:jre:0.5-SNAPSHOT</param>
+                        <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT</param>
+                        <param>com.vertispan.j2cl:gwt-internal-annotations:jar:0.5-SNAPSHOT</param>
+                        <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
+                        <param>javax.annotation:jsr250-api:1.0</param>
+                    </classpath-required>
+                    <excluded-dependencies></excluded-dependencies>
+                    <javascript-source-required>
+                        <param>com.vertispan.j2cl:bootstrap:zip:jszip:0.5-SNAPSHOT</param>
+                        <param>com.vertispan.j2cl:jre:zip:jszip:0.5-SNAPSHOT</param>
+                    </javascript-source-required>
+                    <processing-skipped>
+                        <!-- jre & bootstrap transpiled versions also included as dependencies, skip transpiling-->
+                        <param>com.vertispan.j2cl:javac-bootstrap-classpath:0.5-SNAPSHOT</param>
+                        <param>com.vertispan.j2cl:jre:0.5-SNAPSHOT</param>
+                        <param>com.vertispan.j2cl:bootstrap:zip:jszip:0.5-SNAPSHOT</param>
+                        <param>com.vertispan.j2cl:jre:zip:jszip:0.5-SNAPSHOT</param>
+                        <!-- dependencies below only contain annotations -->
+                        <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
+                        <param>com.vertispan.j2cl:gwt-internal-annotations:jar:0.5-SNAPSHOT</param>
+                        <param>javax.annotation:jsr250-api:1.0</param>
+                    </processing-skipped>
+                    <replaced-dependencies>
+                        <param>com.vertispan.j2cl:gwt-internal-annotations:0.4-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:0.5-SNAPSHOT</param>
+                    </replaced-dependencies>
+                </configuration>
             </execution>
         </executions>
     </plugin>
@@ -131,29 +162,33 @@ The fragment below was taken directly from the integration tests present in this
     <dependency>
         <groupId>com.vertispan.j2cl</groupId>
         <artifactId>bootstrap</artifactId>
-        <version>0.4-SNAPSHOT</version>
+        <version>0.5-SNAPSHOT</version>
         <type>zip</type>
         <classifier>jszip</classifier>
+        <scope>provided</scope>
     </dependency>
 
     <dependency>
         <groupId>com.vertispan.j2cl</groupId>
         <artifactId>javac-bootstrap-classpath</artifactId>
-        <version>0.4-SNAPSHOT</version>
+        <version>0.5-SNAPSHOT</version>
+        <scope>provided</scope>
     </dependency>
 
     <dependency>
         <groupId>com.vertispan.j2cl</groupId>
         <artifactId>jre</artifactId>
-        <version>0.4-SNAPSHOT</version>
+        <version>0.5-SNAPSHOT</version>
+        <scope>provided</scope>
     </dependency>
 
     <dependency>
         <groupId>com.vertispan.j2cl</groupId>
         <artifactId>jre</artifactId>
-        <version>0.4-SNAPSHOT</version>
+        <version>0.5-SNAPSHOT</version>
         <type>zip</type>
         <classifier>jszip</classifier>
+        <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -166,6 +201,12 @@ The fragment below was taken directly from the integration tests present in this
         <groupId>javax.annotation</groupId>
         <artifactId>jsr250-api</artifactId>
         <version>1.0</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.google.jsinterop</groupId>
+        <artifactId>jsinterop-annotations</artifactId>
+        <version>2.0.0</version>
     </dependency>
 </dependencies>
 ```
@@ -200,9 +241,12 @@ The snippet below is a good starting point and forcibly includes a few minimally
 
 ```xml
 <classpath-required>
-    <param>com.vertispan.j2cl:javac-bootstrap-classpath:0.4-SNAPSHOT</param>
-    <param>com.vertispan.j2cl:jre:0.4-SNAPSHOT</param>
+    <param>com.vertispan.j2cl:javac-bootstrap-classpath:0.5-SNAPSHOT</param>
+    <param>com.vertispan.j2cl:jre:0.5-SNAPSHOT</param>
     <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT</param>
+    <param>com.vertispan.j2cl:gwt-internal-annotations:jar:0.5-SNAPSHOT</param>
+    <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
+    <param>javax.annotation:jsr250-api:1.0</param>
 </classpath-required>
 ```
 
@@ -301,9 +345,8 @@ The snippet below is a good starting point and forcibly includes a few minimally
 
 ```xml
 <javascript-source-required>
-    <param>com.vertispan.j2cl:bootstrap:zip:jszip:0.4-SNAPSHOT</param>
-    <param>com.vertispan.j2cl:jre:zip:jszip:0.4-SNAPSHOT</param>
-    <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT</param>
+    <param>com.vertispan.j2cl:bootstrap:zip:jszip:0.5-SNAPSHOT</param>
+    <param>com.vertispan.j2cl:jre:zip:jszip:0.5-SNAPSHOT</param>
 </javascript-source-required>
 ```
 
@@ -342,13 +385,14 @@ for compiling (javac).
 ```xml
 <processing-skipped>
     <!-- jre & bootstrap transpiled versions also included as dependencies, skip transpiling-->
-    <param>com.vertispan.j2cl:javac-bootstrap-classpath:0.4-SNAPSHOT</param>
-    <param>com.vertispan.j2cl:jre:0.4-SNAPSHOT</param>
-    <param>com.vertispan.j2cl:bootstrap:zip:jszip:0.4-SNAPSHOT</param>
-    <param>com.vertispan.j2cl:jre:zip:jszip:0.4-SNAPSHOT</param>
-    <!-- 2x dependencies below only contain annotations -->
+    <param>com.vertispan.j2cl:javac-bootstrap-classpath:0.5-SNAPSHOT</param>
+    <param>com.vertispan.j2cl:jre:0.5-SNAPSHOT</param>
+    <param>com.vertispan.j2cl:bootstrap:zip:jszip:0.5-SNAPSHOT</param>
+    <param>com.vertispan.j2cl:jre:zip:jszip:0.5-SNAPSHOT</param>
+    <!-- dependencies below only contain annotations -->
     <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
-    <param>com.vertispan.j2cl:gwt-internal-annotations:jar:0.4-SNAPSHOT</param>
+    <param>com.vertispan.j2cl:gwt-internal-annotations:jar:0.5-SNAPSHOT</param>
+    <param>javax.annotation:jsr250-api:1.0</param>
 </processing-skipped>
 ```
 
@@ -518,42 +562,67 @@ and tree views for a file listing such as a classpath.
 ```text
 walkingkooka:example-hello-world-single:war:1.0-TRANSPILE
   Directory
-    /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-a73d49fe3a86d585659f6a7a23a96c19d6cd580b/5-transpiled-java-to-javascriptPreparing...
-        Sources
-          /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-a73d49fe3a86d585659f6a7a23a96c19d6cd580b/3-gwt-incompatible-stripped-source/output
-        3 *.java, *.js, *.native.js files
-          /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-a73d49fe3a86d585659f6a7a23a96c19d6cd580b/3-gwt-incompatible-stripped-source/output/example/helloworld/app.js
-          /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-a73d49fe3a86d585659f6a7a23a96c19d6cd580b/3-gwt-incompatible-stripped-source/output/example/helloworldlib/HelloWorld.java
-          /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-a73d49fe3a86d585659f6a7a23a96c19d6cd580b/3-gwt-incompatible-stripped-source/output/example/helloworldlib/hello.js
+    /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-3b822904f436686e983f48cd4b9ae84e51bb5c7f/5-transpiled-java-to-javascript
+      Preparing...
+      Source path(s)
+        /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-3b822904f436686e983f48cd4b9ae84e51bb5c7f/3-gwt-incompatible-stripped-source/output
       J2clTranspiler
         Parameters
-          10 Classpath(s)
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/j2cl/javac-bootstrap-classpath/0.4-SNAPSHOT/javac-bootstrap-classpath-0.4-SNAPSHOT.jar
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/j2cl/jre/0.4-SNAPSHOT/jre-0.4-SNAPSHOT.jar
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/google/jsinterop/jsinterop-annotations/2.0.0/jsinterop-annotations-2.0.0.jar
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/j2cl/bootstrap/0.4-SNAPSHOT/bootstrap-0.4-SNAPSHOT-jszip.zip
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/j2cl/gwt-internal-annotations/0.4-SNAPSHOT/gwt-internal-annotations-0.4-SNAPSHOT.jar
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/j2cl/javac-bootstrap-classpath/0.4-SNAPSHOT/javac-bootstrap-classpath-0.4-SNAPSHOT.jar
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/j2cl/jre/0.4-SNAPSHOT/jre-0.4-SNAPSHOT.jar
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/j2cl/jre/0.4-SNAPSHOT/jre-0.4-SNAPSHOT-jszip.zip
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/com/vertispan/jsinterop/base/1.0.0-SNAPSHOT/base-1.0.0-SNAPSHOT.jar
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo/javax/annotation/jsr250-api/1.0/jsr250-api-1.0.jar
-          1 Source(s)
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-a73d49fe3a86d585659f6a7a23a96c19d6cd580b/3-gwt-incompatible-stripped-source/output/example/helloworldlib/HelloWorld.java
-          0 Native source(s)
-          2 Other (ignored) file(s)
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-a73d49fe3a86d585659f6a7a23a96c19d6cd580b/3-gwt-incompatible-stripped-source/output/example/helloworld/app.js
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-a73d49fe3a86d585659f6a7a23a96c19d6cd580b/3-gwt-incompatible-stripped-source/output/example/helloworldlib/hello.js
+          Classpath(s)
+              Users/miroslav/repos-github/j2cl-maven-plugin/target
+                it-repo
+                  com
+                    google/jsinterop/jsinterop-annotations/2.0.0
+                      jsinterop-annotations-2.0.0.jar
+                    vertispan/j2cl
+                      gwt-internal-annotations/0.5-SNAPSHOT
+                        gwt-internal-annotations-0.5-SNAPSHOT.jar
+                      javac-bootstrap-classpath/0.5-SNAPSHOT
+                        javac-bootstrap-classpath-0.5-SNAPSHOT.jar
+                      jre/0.5-SNAPSHOT
+                        jre-0.5-SNAPSHOT.jar
+                  javax/annotation/jsr250-api/1.0
+                    jsr250-api-1.0.jar
+                it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/com.vertispan.jsinterop-base-jar-1.0.0-SNAPSHOT-3c567690544f3976786d34887a1766d3e0cdcaf5/4-javac-compiled-gwt-incompatible-stripped
+                  output
+            6 file(s)
+          *.java Source(s)
+              Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-3b822904f436686e983f48cd4b9ae84e51bb5c7f/3-gwt-incompatible-stripped-source/output/example/helloworldlib
+                HelloWorld.java
+            1 file(s)
+          *.native.js source(s)
+            0 file(s)
+          *.js source(s)
+              Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-3b822904f436686e983f48cd4b9ae84e51bb5c7f/3-gwt-incompatible-stripped-source/output/example
+                helloworld
+                  app.js
+                helloworldlib
+                  hello.js
+            2 file(s)
           Output
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-a73d49fe3a86d585659f6a7a23a96c19d6cd580b/5-transpiled-java-to-javascript/output
+            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-3b822904f436686e983f48cd4b9ae84e51bb5c7f/5-transpiled-java-to-javascript/output
         J2clTranspiler
           0 problem(s)
             *** END ***
+          Copy js to output
+            Copying
+                Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-3b822904f436686e983f48cd4b9ae84e51bb5c7f/5-transpiled-java-to-javascript/output/example
+                  helloworld
+                    app.js
+                  helloworldlib
+                    hello.js
+              2 file(s)
+          Output file(s) after copy
+              Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-3b822904f436686e983f48cd4b9ae84e51bb5c7f/5-transpiled-java-to-javascript/output/example
+                helloworld
+                  app.js
+                helloworldlib
+                  HelloWorld.impl.java.js HelloWorld.java      HelloWorld.java.js   HelloWorld.js.map
+                  hello.js
+            10 file(s)
     
     Log file
-      /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-a73d49fe3a86d585659f6a7a23a96c19d6cd580b/5-transpiled-java-to-javascript/log.txt
-    
-    
+      /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-3b822904f436686e983f48cd4b9ae84e51bb5c7f/5-transpiled-java-to-javascript/log.txt
 ```
 
 The image below contains two panel views, the left shows a directory tree showing the output directory showing all artifacts
