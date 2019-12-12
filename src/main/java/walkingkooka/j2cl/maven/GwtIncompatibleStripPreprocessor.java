@@ -85,20 +85,16 @@ final class GwtIncompatibleStripPreprocessor {
         logger.indent();
         {
             for(final J2clPath sourceRoot : sourceRoots) {
-                logger.printLine(sourceRoot.toString());
-
                 if(sourceRoot.exists().isPresent()) {
                     logger.indent();
 
                     // find then copy from unpack to $output
                     final Collection<J2clPath> files = output.copyFiles(sourceRoot,
                             gatherFiles(sourceRoot, J2clPath.JAVA_FILES),
-                            logger::printLine);
+                            logger);
 
                     // necessary to prepare FileInfo with correct sourceRoot otherwise stripped files will be written back to the wrong place.
                     javaFiles.addAll(J2clPath.toFileInfo(files, output));
-
-                    logger.outdent();
                 }
             }
             logger.printLine(javaFiles.size() + " file(s) count");
@@ -218,14 +214,9 @@ final class GwtIncompatibleStripPreprocessor {
         logger.printLine("Copy *.js from source root(s) to output");
         logger.indent();
         {
-            for(final J2clPath sourceRoot : sourceRoots) {
-                logger.printLine(sourceRoot.toString());
-                logger.indent();
-                {
-                    final SortedSet<J2clPath> copy = gatherFiles(sourceRoot, J2clPath.JAVASCRIPT_FILES);
-                    output.copyFiles(sourceRoot, copy, logger::printLine);
-                }
-                logger.outdent();
+            for (final J2clPath sourceRoot : sourceRoots) {
+                final SortedSet<J2clPath> copy = gatherFiles(sourceRoot, J2clPath.JAVASCRIPT_FILES);
+                output.copyFiles(sourceRoot, copy, logger);
             }
         }
         logger.outdent();

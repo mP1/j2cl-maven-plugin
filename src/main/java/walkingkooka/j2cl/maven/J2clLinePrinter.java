@@ -82,7 +82,8 @@ final class J2clLinePrinter {
                                              final Collection<T> paths,
                                              final Function<T, StringPath> toStringPath) {
         this.printer.lineStart();
-        this.printLine(paths.size() + " " + label);
+        this.printLine(label);
+        this.indent();
         this.indent();
 
         new TreePrinting<StringPath, StringName>() {
@@ -117,6 +118,8 @@ final class J2clLinePrinter {
         }.biConsumer()
                 .accept(paths.stream().map(toStringPath).collect(Collectors.toCollection(Sets::sorted)),
                 this.printer);
+        this.outdent();
+        this.printLine(paths.size() + " file(s)");
         this.outdent();
     }
 

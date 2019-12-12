@@ -116,7 +116,7 @@ final class J2clTranspiler {
                     {
                         output.copyFiles(sourcePath,
                                 jsInput,
-                                logger::printLine);
+                                logger);
                     }
                     logger.outdent();
 

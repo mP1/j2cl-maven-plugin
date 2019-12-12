@@ -47,12 +47,11 @@ final class J2ClStepWorkerOutputAssembler extends J2ClStepWorker2 {
         final J2clPath source = artifact.step(J2clStep.CLOSURE_COMPILER).output();
 
         final Collection<J2clPath> files = source.gatherFiles(J2clPath.ALL_FILES);
-        logger.printIndented("Source", files);
 
         logger.printLine("Copying");
         logger.indent();
         {
-            target.copyFiles(source, files, logger::printLine);
+            target.copyFiles(source, files, logger);
         }
         logger.outdent();
 
