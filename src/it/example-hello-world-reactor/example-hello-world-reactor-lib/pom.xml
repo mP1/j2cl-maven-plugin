@@ -10,7 +10,7 @@
         <dependency>
             <groupId>com.vertispan.j2cl</groupId>
             <artifactId>bootstrap</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.5-SNAPSHOT</version>
             <type>zip</type>
             <classifier>jszip</classifier>
         </dependency>
@@ -18,19 +18,19 @@
         <dependency>
             <groupId>com.vertispan.j2cl</groupId>
             <artifactId>javac-bootstrap-classpath</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.5-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.vertispan.j2cl</groupId>
             <artifactId>jre</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.5-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.vertispan.j2cl</groupId>
             <artifactId>jre</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.5-SNAPSHOT</version>
             <type>zip</type>
             <classifier>jszip</classifier>
         </dependency>
