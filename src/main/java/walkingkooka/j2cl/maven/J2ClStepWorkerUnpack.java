@@ -17,8 +17,12 @@
 
 package walkingkooka.j2cl.maven;
 
+import walkingkooka.collect.set.Sets;
+import walkingkooka.naming.StringPath;
+
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Unpacks the source from the sources artifact (jar with sources) and if no java files are present tries
@@ -100,7 +104,7 @@ final class J2ClStepWorkerUnpack extends J2ClStepWorker2 {
                     // dont want to copy test-annotations will contain the generated class by any annotation processor.
                     javaFilesFound |= source.isFile() ?
                             source.extractArchiveFiles(dest, logger).size() > 0 :
-                            dest.copyFiles(source, source.gatherFiles(J2clPath.ALL_FILES), logger::printLine).size() > 0;
+                            dest.copyFiles(source, source.gatherFiles(J2clPath.ALL_FILES), logger).size() > 0;
                 }
                 logger.outdent();
             }

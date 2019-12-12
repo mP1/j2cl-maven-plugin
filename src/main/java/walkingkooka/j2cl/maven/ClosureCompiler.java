@@ -90,7 +90,7 @@ class ClosureCompiler {
                 } else {
                     copied = unitedSourceRoot.copyFiles(sourceRoot,
                             sourceRoot.gatherFiles(J2clPath.ALL_FILES),
-                            logger::printLine);
+                            logger);
                 }
                 fileCount+=copied.size();
             }

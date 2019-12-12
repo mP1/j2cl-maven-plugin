@@ -21,6 +21,7 @@ import com.google.j2cl.common.FrontendUtils.FileInfo;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.naming.StringPath;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;
@@ -153,7 +154,7 @@ final class J2clPath implements Comparable<J2clPath> {
      */
     Collection<J2clPath> copyFiles(final J2clPath src,
                                    final Collection<J2clPath> files,
-                                   final Consumer<String> logger) throws IOException {
+                                   final J2clLinePrinter logger) throws IOException {
         final Path srcPath = src.path();
         final Path destPath = this.path();
 
@@ -167,13 +168,13 @@ final class J2clPath implements Comparable<J2clPath> {
                 continue;
             }
 
-            logger.accept(relative);
-
             Files.createDirectories(copyTarget.getParent());
             Files.copy(filePath, copyTarget);
 
             copied.add(J2clPath.with(copyTarget));
         }
+
+        logger.printIndented("Copying", copied);
 
         return copied;
     }
@@ -216,7 +217,6 @@ final class J2clPath implements Comparable<J2clPath> {
                                        final J2clLinePrinter logger) throws IOException {
         logger.indent();
         {
-
             for (final J2clPath file : files) {
                 final Path filePath = file.path();
                 final Path pathInZip = root.relativize(filePath);
@@ -227,9 +227,9 @@ final class J2clPath implements Comparable<J2clPath> {
 
                 Files.createDirectories(copyTarget.getParent());
                 Files.copy(filePath, copyTarget);
-
-                logger.printLine(file.toString());
             }
+
+            logger.printIndented("Extracting", files);
         }
         logger.outdent();
     }
