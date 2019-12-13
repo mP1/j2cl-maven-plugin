@@ -144,10 +144,12 @@ final class J2clLinePrinter {
         this.outdent();
     }
 
-    private final static int COLUMN_COUNT = 4;
+    private final static int COLUMN_COUNT = 3;
 
     private final static UnaryOperator<Table> TABLE_TRANSFORMER = TextPretty.tableTransformer(Collections.nCopies(COLUMN_COUNT, TextPretty.columnConfig()
-            .minWidth(20)
+            .minWidth(40)
+            .maxWidth(40)
+            .overflowMaxWidthBreak()
             .leftAlign()));
 
     void printIndentedString(final String label,
