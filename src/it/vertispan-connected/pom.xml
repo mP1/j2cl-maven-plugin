@@ -76,15 +76,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.jsinterop</groupId>
-            <artifactId>jsinterop-annotations</artifactId>
-            <version>2.0.0</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.vertispan.j2cl</groupId>
             <artifactId>bootstrap</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.5-SNAPSHOT</version>
             <type>zip</type>
             <classifier>jszip</classifier>
             <scope>provided</scope>
@@ -93,21 +87,21 @@
         <dependency>
             <groupId>com.vertispan.j2cl</groupId>
             <artifactId>javac-bootstrap-classpath</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.5-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.vertispan.j2cl</groupId>
             <artifactId>jre</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.5-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.vertispan.j2cl</groupId>
             <artifactId>jre</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.5-SNAPSHOT</version>
             <type>zip</type>
             <classifier>jszip</classifier>
             <scope>provided</scope>
@@ -125,6 +119,11 @@
             <version>1.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.jsinterop</groupId>
+            <artifactId>jsinterop-annotations</artifactId>
+            <version>2.0.0</version>
+        </dependency>
     </dependencies>
 
     <pluginRepositories>
@@ -151,7 +150,6 @@
                     <target>${java.version}</target>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>walkingkooka</groupId>
                 <artifactId>j2cl-maven-plugin</artifactId>
@@ -165,7 +163,7 @@
                         </goals>
                         <configuration>
                             <classpath-scope>runtime</classpath-scope>
-                            <compilation-level>BUNDLE</compilation-level>
+                            <compilation-level>ADVANCED</compilation-level>
                             <defines>
                                 <jre.checkedMode>DISABLED</jre.checkedMode>
                                 <jre.checks.checkLevel>MINIMAL</jre.checks.checkLevel>
@@ -178,43 +176,36 @@
                             <thread-pool-size>0</thread-pool-size>
 
                             <added-dependencies>
-                                <param>com.vertispan.jsinterop:base:1.0.0-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:0.4-SNAPSHOT</param>
+                                <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:0.5-SNAPSHOT</param>
                             </added-dependencies>
-
                             <classpath-required>
-                                <param>com.vertispan.j2cl:javac-bootstrap-classpath:0.4-SNAPSHOT</param>
-                                <param>com.vertispan.j2cl:jre:0.4-SNAPSHOT</param>
+                                <param>com.vertispan.j2cl:javac-bootstrap-classpath:0.5-SNAPSHOT</param>
+                                <param>com.vertispan.j2cl:jre:0.5-SNAPSHOT</param>
+                                <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT</param>
+                                <param>com.vertispan.j2cl:gwt-internal-annotations:jar:0.5-SNAPSHOT</param>
                                 <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
-                                <param>com.vertispan.jsinterop:base:1.0.0-SNAPSHOT</param>
-                                <param>com.vertispan.j2cl:gwt-internal-annotations:jar:0.4-SNAPSHOT</param>
                                 <param>javax.annotation:jsr250-api:1.0</param>
                             </classpath-required>
-                            <excluded-dependencies>
-                                <param>com.google.gwt:gwt-user:2.8.2</param>
-                                <param>com.google.jsinterop:jsinterop-annotations:1.0.2</param>
-                                <param>javax.servlet:javax.servlet-api:3.1.0</param>
-                                <param>javax.validation:validation-api:1.0.0.GA</param>
-                                <param>org.w3c.css:sac:1.3</param>
-                            </excluded-dependencies>
+                            <excluded-dependencies></excluded-dependencies>
                             <javascript-source-required>
-                                <param>com.vertispan.j2cl:bootstrap:zip:jszip:0.4-SNAPSHOT</param>
-                                <param>com.vertispan.j2cl:jre:zip:jszip:0.4-SNAPSHOT</param>
+                                <param>com.vertispan.j2cl:bootstrap:zip:jszip:0.5-SNAPSHOT</param>
+                                <param>com.vertispan.j2cl:jre:zip:jszip:0.5-SNAPSHOT</param>
                                 <param>com.vertispan.jsinterop:base:1.0.0-SNAPSHOT</param>
                             </javascript-source-required>
                             <processing-skipped>
                                 <!-- jre & bootstrap transpiled versions also included as dependencies, skip transpiling-->
-                                <param>com.vertispan.j2cl:javac-bootstrap-classpath:0.4-SNAPSHOT</param>
-                                <param>com.vertispan.j2cl:jre:0.4-SNAPSHOT</param>
-                                <param>com.vertispan.j2cl:bootstrap:zip:jszip:0.4-SNAPSHOT</param>
-                                <param>com.vertispan.j2cl:jre:zip:jszip:0.4-SNAPSHOT</param>
+                                <param>com.vertispan.j2cl:javac-bootstrap-classpath:0.5-SNAPSHOT</param>
+                                <param>com.vertispan.j2cl:jre:0.5-SNAPSHOT</param>
+                                <param>com.vertispan.j2cl:bootstrap:zip:jszip:0.5-SNAPSHOT</param>
+                                <param>com.vertispan.j2cl:jre:zip:jszip:0.5-SNAPSHOT</param>
                                 <!-- dependencies below only contain annotations -->
                                 <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
-                                <param>com.vertispan.j2cl:gwt-internal-annotations:jar:0.4-SNAPSHOT</param>
+                                <param>com.vertispan.j2cl:gwt-internal-annotations:jar:0.5-SNAPSHOT</param>
                                 <param>javax.annotation:jsr250-api:1.0</param>
                             </processing-skipped>
                             <replaced-dependencies>
-                                <param>com.google.jsinterop:base:1.0.0-RC1=com.vertispan.jsinterop:base:1.0.0-SNAPSHOT
-                                </param>
+                                <param>com.google.jsinterop:base:1.0.0-RC1=com.vertispan.jsinterop:base:1.0.0-SNAPSHOT</param>
+                                <param>com.vertispan.j2cl:gwt-internal-annotations:0.4-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:0.5-SNAPSHOT</param>
                             </replaced-dependencies>
                         </configuration>
                     </execution>
