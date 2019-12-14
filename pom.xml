@@ -396,6 +396,13 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model</artifactId>
+            <version>${maven.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- dependencies to annotations -->
         <dependency>
             <groupId>org.apache.maven.plugin-tools</groupId>

@@ -21,7 +21,6 @@ import com.google.j2cl.common.FrontendUtils.FileInfo;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
-import walkingkooka.naming.StringPath;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;
@@ -41,7 +40,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -84,6 +82,13 @@ final class J2clPath implements Comparable<J2clPath> {
     boolean isTestAnnotation() {
         final Path path = this.path();
         return Files.isDirectory(path) && path.getFileName().toString().equals("test-annotations");
+    }
+
+    /**
+     * Returns true if the given {@link Path} belongs to the super under this path.
+     */
+    boolean isSuperSource(final Path path) {
+        return this.path.relativize(path).toString().startsWith("super");
     }
 
     J2clPath parent() {
