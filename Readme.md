@@ -33,17 +33,17 @@ mvn clean install
 
 # Goals
 
-The plugin has two goals
+The plugin supports three out of the four following goals
 
 1. `build`: executes a single compilation, typically to produce a JS application or library.
 
 2. `clean`: cleans up all the cache directory.
 
-3. `test`: TODO
+3. `test`: executes junit 3 tests.
 
 4. 'watch': aka DEVMODE TODO
 
-Some pieces of the vertispan/j2clmavenplugin are currently missing, because I dont have a large GWT project.
+Some pieces of the `vertispan/j2clmavenplugin` are currently missing:
 
 - DevMode: Should not be too hard to watch the source directory and re-build.
 
@@ -77,13 +77,58 @@ Sample required plugin repositories
 ```xml
 <pluginRepositories>
     <pluginRepository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
+        <id>github-mp1-appengine-repo</id>
+        <url>https://maven-repo-254709.appspot.com</url>
     </pluginRepository>
 
     <pluginRepository>
-        <id>github.com/mP1 maven repo</id>
-        <url>https://maven-repo-254709.appspot.com</url>
+        <id>google-snapshots</id>
+        <name>google-snapshots</name>
+        <url>https://oss.sonatype.org/content/repositories/google-snapshots/</url>
+        <releases>
+            <enabled>true</enabled>
+        </releases>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+    </pluginRepository>
+
+    <pluginRepository>
+        <id>vertispan-releases</id>
+        <name>Vertispan hosted artifacts-releases</name>
+        <url>https://repo.vertispan.com/j2cl</url>
+        <releases>
+            <enabled>true</enabled>
+        </releases>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+    </pluginRepository>
+
+    <pluginRepository>
+        <id>vertispan-snapshots</id>
+        <name>Vertispan Snapshots</name>
+        <url>https://repo.vertispan.com/gwt-snapshot/</url>
+        <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>daily</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+        </snapshots>
+    </pluginRepository>
+
+    <pluginRepository>
+        <id>sonatype-snapshots-repo</id>
+        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>daily</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+        </snapshots>
+    </pluginRepository>
+
+    <pluginRepository>
+        <id>sonatype-repo</id>
+        <url>https://oss.sonatype.org/content/repositories/repositories</url>
         <snapshots>
             <enabled>true</enabled>
             <updatePolicy>daily</updatePolicy>

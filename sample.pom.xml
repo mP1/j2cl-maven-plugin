@@ -8,7 +8,10 @@
     <packaging>jar</packaging>
 
     <repositories>
-
+        <repository>
+            <id>github-mp1-appengine-repo</id>
+            <url>https://maven-repo-254709.appspot.com</url>
+        </repository>
         <!-- mixture of j2cl and google tooling -->
         <repository>
             <id>google-snapshots</id>
