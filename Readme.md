@@ -45,8 +45,17 @@ The plugin has two goals
 
 Some pieces of the vertispan/j2clmavenplugin are currently missing, because I dont have a large GWT project.
 
-- j2cl tests.
 - DevMode: Should not be too hard to watch the source directory and re-build.
+
+
+
+# Super sourcing
+
+When necessary to emulate missing JRE classes or replace with a browser substitute, super source java files should be
+placed place in a projects `resources/super`. Any java files under `/super` will be excluded from any of java compiling (javac). 
+
+Java 9 and later will fail to compile any source under package java, thus they must be excluded using the `/super`
+directory.
 
 
 

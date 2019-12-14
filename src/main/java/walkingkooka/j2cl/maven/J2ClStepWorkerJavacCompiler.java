@@ -43,9 +43,11 @@ abstract class J2ClStepWorkerJavacCompiler extends J2ClStepWorker2 {
         J2clPath source = artifact.step(step).output().exists().orElse(null);
         if (null != source) {
             final List<J2clPath> javaSourceFiles = Lists.array();
-            javaSourceFiles.addAll(artifact.step(step)
-                    .output()
-                    .gatherFiles(J2clPath.JAVA_FILES));
+
+            final J2clPath output = artifact.step(step).output();
+
+            // skip placing super-source java files on the compile source path.
+            javaSourceFiles.addAll(output.gatherFiles((path, attributes) -> false == output.isSuperSource(path) && J2clPath.JAVA_FILES.test(path, attributes)));
             if (javaSourceFiles.isEmpty()) {
                 source = null;
             } else {

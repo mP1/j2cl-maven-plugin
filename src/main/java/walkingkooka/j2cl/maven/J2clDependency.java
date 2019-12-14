@@ -27,9 +27,7 @@ import walkingkooka.collect.set.Sets;
 import walkingkooka.text.CharSequences;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -385,18 +383,16 @@ final class J2clDependency implements Comparable<J2clDependency> {
     // maven ...........................................................................................................
 
     /**
-     * Returns all source roots which can be directories or archives.
+     * Returns all source roots including resources which can be directories or archives.
      */
     List<J2clPath> sourcesRoot() {
-        final List<String> sources = this.compileSourceRoots();
-        return null != sources && sources.size() > 0 ?
-                Collections.unmodifiableList(sources.stream()
-                        .map(s -> J2clPath.with(Paths.get(s)))
-                        .collect(Collectors.toList())) :
+        final List<J2clPath> sources = this.compileSourceRoots();
+        return sources.size() > 0 ?
+                sources :
                 this.sourcesArchivePath();
     }
 
-    private List<String> compileSourceRoots() {
+    private List<J2clPath> compileSourceRoots() {
         return this.request()
                 .sourcesKind()
                 .compileSourceRoots(this.mavenProject);
