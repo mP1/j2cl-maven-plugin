@@ -421,7 +421,7 @@ abstract class J2clRequest {
 
     private void executeWithLock(final Runnable execute) {
         try {
-            if (false == this.jobsLock.tryLock(10, TimeUnit.SECONDS)) {
+            if (false == this.jobsLock.tryLock(3, TimeUnit.SECONDS)) {
                 throw new J2clException("Failed to get job lock");
             }
             execute.run();
@@ -445,7 +445,7 @@ abstract class J2clRequest {
     private void await() throws Throwable {
         while (false == this.executor.isTerminated()) {
             try {
-                final Future<?> task = this.completionService.poll(5, TimeUnit.SECONDS);
+                final Future<?> task = this.completionService.poll(1, TimeUnit.SECONDS);
                 if (null != task) {
                     task.get();
                     if (0 == this.running.decrementAndGet()) {
