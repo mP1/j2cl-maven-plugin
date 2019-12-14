@@ -119,7 +119,7 @@ final class J2ClStepWorkerWebDriverUnitTestRunner extends J2ClStepWorker2 {
                 if (!isSuccess(driver)) {
                     logger.printLine("One or more test(s) failed!");
                 } else {
-                    logger.printLine("!!!All test(s) successful!");
+                    logger.printLine("All test(s) successful!");
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
