@@ -42,8 +42,8 @@
     <repositories>
 
         <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
+            <id>github-mp1-appengine-repo</id>
+            <url>https://maven-repo-254709.appspot.com</url>
         </repository>
         <repository>
             <id>vertispan-releases</id>
