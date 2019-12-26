@@ -48,13 +48,20 @@ final class J2clStepWorkerOutputAssembler extends J2clStepWorker2 {
 
         final Collection<J2clPath> files = source.gatherFiles(J2clPath.ALL_FILES);
 
+        final J2clStepResult result;
+
         logger.printLine("Copying");
         logger.indent();
         {
-            target.copyFiles(source, files, logger);
+            if (target.copyFiles(source, files, logger).isEmpty()) {
+                logger.printLine("No files copied, transpile step likely failed with warnings that are actually errors.");
+                result = J2clStepResult.FAILED;
+            } else {
+                result = J2clStepResult.SUCCESS;
+            }
         }
         logger.outdent();
 
-        return J2clStepResult.SUCCESS;
+        return result;
     }
 }
