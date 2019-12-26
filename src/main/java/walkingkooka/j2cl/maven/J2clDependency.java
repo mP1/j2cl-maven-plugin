@@ -434,25 +434,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     // toString.........................................................................................................
     @Override
     public String toString() {
-        final ToStringBuilder b = ToStringBuilder.empty();
-
-        b.value(this.coords());
-        b.value(this.artifact().getScope());
-
-        b.disable(ToStringBuilderOption.QUOTE);
-        b.valueSeparator(",");
-
-        if (this.isClasspathRequired()) {
-            b.value("CLASSPATH-REQUIRED");
-        }
-        if (this.isJavascriptSourceRequired()) {
-            b.value("JAVASCRIPT-SOURCE-REQUIRED");
-        }
-        if (this.isProcessingSkipped()) {
-            b.value("PROCESS-SKIPPED");
-        }
-
-        return b.build();
+        return this.coords().toString();
     }
 
     // Comparable.......................................................................................................
