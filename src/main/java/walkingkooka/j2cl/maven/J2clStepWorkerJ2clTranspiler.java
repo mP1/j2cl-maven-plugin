@@ -24,16 +24,16 @@ import java.util.List;
 /**
  * Transpiles the stripped source into javascript equivalents.
  */
-final class J2clStepWorkerJ2ClTranspiler extends J2ClStepWorker2 {
+final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
 
     /**
      * Singleton
      */
     static J2clStepWorker instance() {
-        return new J2clStepWorkerJ2ClTranspiler();
+        return new J2clStepWorkerJ2clTranspiler();
     }
 
-    private J2clStepWorkerJ2ClTranspiler() {
+    private J2clStepWorkerJ2clTranspiler() {
         super();
     }
 

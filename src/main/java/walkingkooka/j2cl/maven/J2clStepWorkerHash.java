@@ -36,19 +36,19 @@ import java.util.stream.Collectors;
 /**
  * Takes a {@link J2clDependency} and computes the hash for the files directly belonging to the artifact and then its dependencies.
  */
-final class J2ClStepWorkerHash extends J2clStepWorker {
+final class J2clStepWorkerHash extends J2clStepWorker {
 
     /**
      * Singleton
      */
     static J2clStepWorker instance() {
-        return new J2ClStepWorkerHash();
+        return new J2clStepWorkerHash();
     }
 
     /**
      * Use singleton
      */
-    private J2ClStepWorkerHash() {
+    private J2clStepWorkerHash() {
         super();
     }
 

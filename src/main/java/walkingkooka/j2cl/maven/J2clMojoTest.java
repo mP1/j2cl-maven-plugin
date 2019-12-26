@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 
 /**
  * Runs all tests that are matched by `<tests>` as defined in the POM. The junit annotation processor will
- * create several files and {@link J2ClStepWorkerWebDriverUnitTestRunner} will prepare a HTML which will run all tests
+ * create several files and {@link J2clStepWorkerWebDriverUnitTestRunner} will prepare a HTML which will run all tests
  * and will be executed by webdriver.
  */
 @Mojo(name = "test", requiresDependencyResolution = ResolutionScope.TEST)

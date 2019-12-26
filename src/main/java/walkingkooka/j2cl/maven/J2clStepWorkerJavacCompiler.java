@@ -24,12 +24,12 @@ import java.util.List;
 /**
  * Compiles the java source from sources and the given target.
  */
-abstract class J2ClStepWorkerJavacCompiler extends J2ClStepWorker2 {
+abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
 
     /**
      * Package private to limit sub classing.
      */
-    J2ClStepWorkerJavacCompiler() {
+    J2clStepWorkerJavacCompiler() {
         super();
     }
 

@@ -18,31 +18,31 @@
 package walkingkooka.j2cl.maven;
 
 /**
- * Compiles the java source to the target {@link J2clStepDirectory#output()}, with annotation processors enabled.
+ * Compiles the java source to the target {@link J2clStepDirectory#output()}.
  */
-final class J2ClStepWorkerJavacCompilerUnpackedSource extends J2ClStepWorkerJavacCompiler {
+final class J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource extends J2clStepWorkerJavacCompiler {
 
     /**
      * Singleton
      */
     static J2clStepWorker instance() {
-        return new J2ClStepWorkerJavacCompilerUnpackedSource();
+        return new J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource();
     }
 
     /**
      * Use singleton
      */
-    private J2ClStepWorkerJavacCompilerUnpackedSource() {
+    private J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource() {
         super();
     }
 
     @Override
     J2clStep sourcesStep() {
-        return J2clStep.UNPACK;
+        return J2clStep.GWT_INCOMPATIBLE_STRIP;
     }
 
     @Override
     boolean shouldRunAnnotationProcessors() {
-        return true;
+        return false; // dont need to generate annotation processor classes again.
     }
 }
