@@ -17,33 +17,32 @@
 
 package walkingkooka.j2cl.maven;
 
-import walkingkooka.collect.list.Lists;
-
 /**
- * Compiles the java source to the target {@link J2clStepDirectory#output()}.
+ * Compiles the java source to the target {@link J2clStepDirectory#output()}, with annotation processors enabled.
  */
-final class J2ClStepWorkerGwtIncompatibleStripPreprocessor extends J2ClStepWorker2 {
+final class J2clStepWorkerJavacCompilerUnpackedSource extends J2clStepWorkerJavacCompiler {
 
     /**
      * Singleton
      */
     static J2clStepWorker instance() {
-        return new J2ClStepWorkerGwtIncompatibleStripPreprocessor();
+        return new J2clStepWorkerJavacCompilerUnpackedSource();
     }
 
     /**
      * Use singleton
      */
-    private J2ClStepWorkerGwtIncompatibleStripPreprocessor() {
+    private J2clStepWorkerJavacCompilerUnpackedSource() {
         super();
     }
 
     @Override
-    J2clStepResult execute1(final J2clDependency artifact,
-                            final J2clStepDirectory directory,
-                            final J2clLinePrinter logger) throws Exception {
-        return GwtIncompatibleStripPreprocessor.execute(Lists.of(artifact.step(J2clStep.COMPILE).output(), artifact.step(J2clStep.UNPACK).output()),
-                directory.output().emptyOrFail(),
-                logger);
+    J2clStep sourcesStep() {
+        return J2clStep.UNPACK;
+    }
+
+    @Override
+    boolean shouldRunAnnotationProcessors() {
+        return true;
     }
 }

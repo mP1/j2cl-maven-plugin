@@ -22,12 +22,12 @@ import walkingkooka.text.CharSequences;
 /**
  * Any step that requires its working directory to be created before it can work.
  */
-abstract class J2ClStepWorker2 extends J2clStepWorker {
+abstract class J2clStepWorker2 extends J2clStepWorker {
 
     /**
      * Package private to limit sub classing.
      */
-    J2ClStepWorker2() {
+    J2clStepWorker2() {
         super();
     }
 

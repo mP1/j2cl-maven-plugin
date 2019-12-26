@@ -35,16 +35,16 @@ import java.time.Duration;
  * Assumes that the closure compiler has completed successfully and then invokes web driver to execute the prepared
  * js file containing the tests.
  */
-final class J2ClStepWorkerWebDriverUnitTestRunner extends J2ClStepWorker2 {
+final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
 
     /**
      * Singleton
      */
     static J2clStepWorker instance() {
-        return new J2ClStepWorkerWebDriverUnitTestRunner();
+        return new J2clStepWorkerWebDriverUnitTestRunner();
     }
 
-    private J2ClStepWorkerWebDriverUnitTestRunner() {
+    private J2clStepWorkerWebDriverUnitTestRunner() {
         super();
     }
 

@@ -22,16 +22,16 @@ import java.util.Collection;
 /**
  * Calls the closure compiler and assembles the final Javascript output.
  */
-final class J2ClStepWorkerOutputAssembler extends J2ClStepWorker2 {
+final class J2clStepWorkerOutputAssembler extends J2clStepWorker2 {
 
     /**
      * Singleton
      */
     static J2clStepWorker instance() {
-        return new J2ClStepWorkerOutputAssembler();
+        return new J2clStepWorkerOutputAssembler();
     }
 
-    private J2ClStepWorkerOutputAssembler() {
+    private J2clStepWorkerOutputAssembler() {
         super();
     }
 

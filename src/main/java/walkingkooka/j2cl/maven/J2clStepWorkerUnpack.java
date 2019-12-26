@@ -17,31 +17,27 @@
 
 package walkingkooka.j2cl.maven;
 
-import walkingkooka.collect.set.Sets;
-import walkingkooka.naming.StringPath;
-
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Unpacks the source from the sources artifact (jar with sources) and if no java files are present tries
  * the binary (jar) to {@link J2clStepDirectory#output()}. If no java source files are present processing of this
  * artifact is aborted and no attempt will be made to transpile java to javascript.
  */
-final class J2ClStepWorkerUnpack extends J2ClStepWorker2 {
+final class J2clStepWorkerUnpack extends J2clStepWorker2 {
 
     /**
      * Singleton
      */
     static J2clStepWorker instance() {
-        return new J2ClStepWorkerUnpack();
+        return new J2clStepWorkerUnpack();
     }
 
     /**
      * Use singleton
      */
-    private J2ClStepWorkerUnpack() {
+    private J2clStepWorkerUnpack() {
         super();
     }
 

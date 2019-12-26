@@ -20,23 +20,23 @@ package walkingkooka.j2cl.maven;
 @SuppressWarnings("StaticInitializerReferencesSubClass")
 abstract class J2clStepWorker {
 
-    final static J2clStepWorker HASH = J2ClStepWorkerHash.instance();
+    final static J2clStepWorker HASH = J2clStepWorkerHash.instance();
 
-    final static J2clStepWorker UNPACK = J2ClStepWorkerUnpack.instance();
+    final static J2clStepWorker UNPACK = J2clStepWorkerUnpack.instance();
 
-    final static J2clStepWorker COMPILE_SOURCE = J2ClStepWorkerJavacCompilerUnpackedSource.instance();
+    final static J2clStepWorker COMPILE_SOURCE = J2clStepWorkerJavacCompilerUnpackedSource.instance();
 
-    final static J2clStepWorker STRIP_GWT_INCOMPAT = J2ClStepWorkerGwtIncompatibleStripPreprocessor.instance();
+    final static J2clStepWorker STRIP_GWT_INCOMPAT = J2clStepWorkerGwtIncompatibleStripPreprocessor.instance();
 
-    final static J2clStepWorker COMPILE_STRIP_GWT_INCOMPAT = J2ClStepWorkerJavacCompilerGwtIncompatibleStrippedSource.instance();
+    final static J2clStepWorker COMPILE_STRIP_GWT_INCOMPAT = J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource.instance();
 
-    final static J2clStepWorker TRANSPILER = J2clStepWorkerJ2ClTranspiler.instance();
+    final static J2clStepWorker TRANSPILER = J2clStepWorkerJ2clTranspiler.instance();
 
-    final static J2clStepWorker CLOSURE = J2ClStepWorkerClosureCompiler.instance();
+    final static J2clStepWorker CLOSURE = J2clStepWorkerClosureCompiler.instance();
 
-    final static J2clStepWorker OUTPUT_ASSEMBLER = J2ClStepWorkerOutputAssembler.instance();
+    final static J2clStepWorker OUTPUT_ASSEMBLER = J2clStepWorkerOutputAssembler.instance();
 
-    final static J2clStepWorker JUNIT_WEBDRIVER_TESTS = J2ClStepWorkerWebDriverUnitTestRunner.instance();
+    final static J2clStepWorker JUNIT_WEBDRIVER_TESTS = J2clStepWorkerWebDriverUnitTestRunner.instance();
 
     J2clStepWorker() {
         super();
