@@ -21,6 +21,7 @@ import com.google.j2cl.common.FrontendUtils.FileInfo;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.text.CharSequences;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +39,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
@@ -52,6 +54,11 @@ final class J2clPath implements Comparable<J2clPath> {
      * The name of the ignore file which is used during the unpack phase to filter files.
      */
     static final String IGNORE_FILE = FILE_PREFIX + "-ignore.txt";
+
+    /**
+     * The name of the repackage file used during {@link J2clStep#POSSIBLE_REPACKAGE} and the package prefix to be removed.
+     */
+    static final String PACKAGE_PREFIX_FILE = FILE_PREFIX + "-package-prefix.txt";
 
     static final BiPredicate<Path, BasicFileAttributes> JAVA_FILES = fileEndsWith(".java");
     static final BiPredicate<Path, BasicFileAttributes> JAVASCRIPT_FILES = fileEndsWith(".js");
@@ -68,6 +75,13 @@ final class J2clPath implements Comparable<J2clPath> {
      * Matches all files but not directories.
      */
     static final BiPredicate<Path, BasicFileAttributes> ALL_FILES = (p, a) -> Files.isRegularFile(p);
+
+    /**
+     * Matches all files except for java source.
+     */
+    static final BiPredicate<Path, BasicFileAttributes> ALL_FILES_EXCEPT_JAVA = (p, a) -> {
+        return Files.isRegularFile(p) && false == p.getFileName().toString().endsWith(".java");
+    };
 
     static List<File> toFiles(final Collection<J2clPath> paths) {
         return paths.stream().map(J2clPath::file).collect(Collectors.toList());
@@ -94,6 +108,23 @@ final class J2clPath implements Comparable<J2clPath> {
 
     boolean isFile() {
         return Files.isRegularFile(this.path());
+    }
+
+    /**
+     * Returns true if this file is a java file.
+     */
+    boolean isJava() {
+        return this.filename().endsWith(".java");
+    }
+
+    final static String OUTPUT = "output";
+
+    /**
+     * Only returns true if this path is the output directory of an UNPACK.
+     */
+    boolean isUnpackOutput() {
+        return this.filename().equals(OUTPUT) &&
+                this.path().getParent().getFileName().toString().equals(J2clStep.UNPACK.directoryName());
     }
 
     boolean isTestAnnotation() {
@@ -177,6 +208,26 @@ final class J2clPath implements Comparable<J2clPath> {
     Collection<J2clPath> copyFiles(final J2clPath src,
                                    final Collection<J2clPath> files,
                                    final J2clLinePrinter logger) throws IOException {
+        return this.copyFiles(src,
+                files,
+                J2clPath::identityBiFunction,
+                logger);
+    }
+
+    /**
+     * Returns the content unmodified. This is the default behaviour of all copy operations except for {@link J2clStep#POSSIBLE_REPACKAGE}
+     */
+    private static byte[] identityBiFunction(final byte[] content, final J2clPath path) {
+        return content;
+    }
+
+    /**
+     * Copies the files from the given source to this directory.
+     */
+    Collection<J2clPath> copyFiles(final J2clPath src,
+                                   final Collection<J2clPath> files,
+                                   final BiFunction<byte[], J2clPath, byte[]> contentTransformer,
+                                   final J2clLinePrinter logger) throws IOException {
         final Path srcPath = src.path();
         final Path destPath = this.path();
 
@@ -191,9 +242,12 @@ final class J2clPath implements Comparable<J2clPath> {
             }
 
             Files.createDirectories(copyTarget.getParent());
-            Files.copy(filePath, copyTarget);
 
-            copied.add(J2clPath.with(copyTarget));
+            final J2clPath copyTargetPath = J2clPath.with(copyTarget);
+            Files.write(copyTarget,
+                        contentTransformer.apply(Files.readAllBytes(filePath), copyTargetPath));
+
+            copied.add(copyTargetPath);
         }
 
         logger.printIndented("Copying", copied);
@@ -250,6 +304,25 @@ final class J2clPath implements Comparable<J2clPath> {
         }
 
         logger.printIndented("Extracting", files);
+    }
+
+    /**
+     * Reads the contents of this file and returns the package prefix.
+     */
+    String readPackagePrefix() throws IOException {
+        final Path path = this.path();
+        final List<String> lines = Files.readAllLines(path);
+        final int count = lines.size();
+        if (1 != count) {
+            throw new J2clException("Package prefix file " + path + " must contain only 1 line not " + count);
+        }
+
+        final String packagePrefix = lines.get(0);
+        final int last = packagePrefix.lastIndexOf('.');
+        if (-1 == last) {
+            throw new J2clException("Package prefix " + CharSequences.quote(packagePrefix) + " must not be a top level package");
+        }
+        return packagePrefix;
     }
 
     String filename() {

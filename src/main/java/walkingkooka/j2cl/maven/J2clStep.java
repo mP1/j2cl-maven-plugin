@@ -155,17 +155,43 @@ enum J2clStep {
 
         @Override
         Optional<J2clStep> next(final J2clRequest request) {
+            return Optional.of(POSSIBLE_REPACKAGE);
+        }
+    },
+
+    /**
+     * Attempts to find files called "j2cl-maven-plugin-repackage" and drops the current directory/java package from
+     * files under it.
+     */
+    POSSIBLE_REPACKAGE {
+        @Override
+        String directoryName() {
+            return "5-possible-repackage";
+        }
+
+        @Override
+        J2clStepWorker execute1() {
+            return J2clStepWorker.POSSIBLE_REPACKAGE;
+        }
+
+        @Override
+        boolean skipIfDependency() {
+            return false;
+        }
+
+        @Override
+        Optional<J2clStep> next(final J2clRequest request) {
             return Optional.of(TRANSPILE);
         }
     },
 
     /**
-     * Calls the transpiler on /gwt-incompatible-strip and dependencies as native source/javascript into /transpile
+     * Calls the transpiler on the output of previous steps.
      */
     TRANSPILE {
         @Override
         String directoryName() {
-            return "5-transpiled-java-to-javascript";
+            return "6-transpiled-java-to-javascript";
         }
 
         @Override
@@ -189,7 +215,7 @@ enum J2clStep {
     CLOSURE_COMPILER {
         @Override
         String directoryName() {
-            return "6-closure-compiler-output";
+            return "7-closure-compiler-output";
         }
 
         @Override
@@ -215,7 +241,7 @@ enum J2clStep {
     OUTPUT_ASSEMBLER {
         @Override
         String directoryName() {
-            return "7-output-assembler";
+            return "8-output-assembler";
         }
 
         @Override
@@ -239,7 +265,7 @@ enum J2clStep {
     JUNIT_WEBDRIVER_TESTS {
         @Override
         String directoryName() {
-            return "7-junit-webdriver-tests";
+            return "8-junit-webdriver-tests";
         }
 
         @Override
