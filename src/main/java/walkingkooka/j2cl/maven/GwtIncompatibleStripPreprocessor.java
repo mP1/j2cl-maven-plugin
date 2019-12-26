@@ -106,7 +106,7 @@ final class GwtIncompatibleStripPreprocessor {
 
     /**
      * Finds all files under the root that match the given {@link BiPredicate} collecting their paths into a {@link SortedSet}.
-     * and honours any .j2cl-maven-plugin-ignore.txt files if any found.
+     * and honours any ignore files if any found.
      */
     private static SortedSet<J2clPath> gatherFiles(final J2clPath root,
                                                    final BiPredicate<Path, BasicFileAttributes> include) throws IOException {
@@ -120,7 +120,7 @@ final class GwtIncompatibleStripPreprocessor {
             @Override
             public FileVisitResult preVisitDirectory(final Path dir,
                                                      final BasicFileAttributes attrs) throws IOException {
-                final J2clPath ignoreFile = J2clPath.with(dir).append(".j2cl-maven-plugin-ignore.txt");
+                final J2clPath ignoreFile = J2clPath.with(dir).append(J2clPath.IGNORE_FILE);
                 if (ignoreFile.exists().isPresent()) {
                     final List<PathMatcher> matchers = Files.readAllLines(ignoreFile.path())
                             .stream()
