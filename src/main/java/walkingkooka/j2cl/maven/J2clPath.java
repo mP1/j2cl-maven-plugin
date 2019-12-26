@@ -47,6 +47,13 @@ import java.util.stream.Collectors;
  */
 final class J2clPath implements Comparable<J2clPath> {
 
+    private static final String FILE_PREFIX = ".walkingkooka-j2cl-maven-plugin";
+
+    /**
+     * The name of the ignore file which is used during the unpack phase to filter files.
+     */
+    static final String IGNORE_FILE = FILE_PREFIX + "-ignore.txt";
+
     static final BiPredicate<Path, BasicFileAttributes> JAVA_FILES = (p, a) -> CharSequences.endsWith(p.toString(), ".java");
     static final BiPredicate<Path, BasicFileAttributes> JAVASCRIPT_FILES = (p, a) -> CharSequences.endsWith(p.toString(), ".js");
     static final BiPredicate<Path, BasicFileAttributes> NATIVE_JAVASCRIPT_FILES = (p, a) -> CharSequences.endsWith(p.toString(), ".native.js");
