@@ -26,8 +26,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.outputEncoding>UTF-8</project.build.outputEncoding>
         <takari.lifecycle.plugin.version>1.13.9</takari.lifecycle.plugin.version>
-        <!-- Builder dependencies versions -->
-        <closure.compiler.unshaded.version>0.1.2-SNAPSHOT</closure.compiler.unshaded.version>
         <!-- Test -->
         <takari.plugin.testing.version>2.9.2</takari.plugin.testing.version>
     </properties>
@@ -445,9 +443,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.treblereel.gwt.javascript</groupId>
+            <groupId>com.vertispan.javascript</groupId>
             <artifactId>closure-compiler-unshaded</artifactId>
-            <version>${closure.compiler.unshaded.version}</version>
+            <version>0.1-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.jsinterop</groupId>
@@ -460,6 +458,18 @@
                 <exclusion>
                     <groupId>com.google.protobuf</groupId>
                     <artifactId>protobuf-java</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>args4j</groupId>
+                    <artifactId>args4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.jsinterop</groupId>
+                    <artifactId>base</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.elemental2</groupId>
+                    <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
