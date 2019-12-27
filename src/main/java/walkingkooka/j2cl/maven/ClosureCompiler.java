@@ -84,15 +84,19 @@ class ClosureCompiler {
         {
             for (final J2clPath sourceRoot : sourceRoots) {
                 logger.printLine(sourceRoot.toString());
-                final Collection<J2clPath> copied;
-                if (sourceRoot.isFile()) {
-                    copied = sourceRoot.extractArchiveFiles(unitedSourceRoot, logger);
-                } else {
-                    copied = unitedSourceRoot.copyFiles(sourceRoot,
-                            sourceRoot.gatherFiles(J2clPath.ALL_FILES),
-                            logger);
+                logger.indent();
+                {
+                    final Collection<J2clPath> copied;
+                    if (sourceRoot.isFile()) {
+                        copied = sourceRoot.extractArchiveFiles(unitedSourceRoot, logger);
+                    } else {
+                        copied = unitedSourceRoot.copyFiles(sourceRoot,
+                                sourceRoot.gatherFiles(J2clPath.ALL_FILES),
+                                logger);
+                    }
+                    fileCount += copied.size();
                 }
-                fileCount+=copied.size();
+                logger.outdent();
             }
             logger.printEndOfList();
         }
@@ -136,8 +140,8 @@ class ClosureCompiler {
                 logger.print(new String(compilerOutputBytes.toByteArray(), charset)); // the captured output will already have line endings.
                 logger.outdent();
 
-                // anything but zero means errors and is a FAIL.
-                success = 0 == exitCode;
+                // anything but zero means errors and initial file must also exist and is a FAIL.
+                success = 0 == exitCode && initialScriptFilename.exists().isPresent();
             }
             logger.outdent();
             logger.flush();
