@@ -227,23 +227,19 @@ final class J2clPath implements Comparable<J2clPath> {
                                        final J2clPath target,
                                        final Set<J2clPath> files,
                                        final J2clLinePrinter logger) throws IOException {
-        logger.indent();
-        {
-            for (final J2clPath file : files) {
-                final Path filePath = file.path();
-                final Path pathInZip = root.relativize(filePath);
-                final Path copyTarget = Paths.get(target.toString()).resolve(pathInZip.toString());
-                if (Files.exists(copyTarget)) {
-                    continue;
-                }
-
-                Files.createDirectories(copyTarget.getParent());
-                Files.copy(filePath, copyTarget);
+        for (final J2clPath file : files) {
+            final Path filePath = file.path();
+            final Path pathInZip = root.relativize(filePath);
+            final Path copyTarget = Paths.get(target.toString()).resolve(pathInZip.toString());
+            if (Files.exists(copyTarget)) {
+                continue;
             }
 
-            logger.printIndented("Extracting", files);
+            Files.createDirectories(copyTarget.getParent());
+            Files.copy(filePath, copyTarget);
         }
-        logger.outdent();
+
+        logger.printIndented("Extracting", files);
     }
 
     String filename() {
