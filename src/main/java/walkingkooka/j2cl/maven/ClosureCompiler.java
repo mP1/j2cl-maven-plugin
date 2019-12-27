@@ -48,7 +48,8 @@ class ClosureCompiler {
                            final Set<ClosureFormattingOption> formatting,
                            final LanguageMode languageOut,
                            final List<J2clPath> sourceRoots,
-                           final J2clPath initialScriptFilename,
+                           final J2clPath output,
+                           final String initialScriptFilename,
                            final J2clLinePrinter logger) throws Exception {
         return compile0(compilationLevel,
                 defines,
@@ -57,6 +58,7 @@ class ClosureCompiler {
                 formatting,
                 languageOut,
                 sorted(sourceRoots),
+                output,
                 initialScriptFilename,
                 logger);
     }
@@ -74,11 +76,12 @@ class ClosureCompiler {
                                     final Set<ClosureFormattingOption> formatting,
                                     final LanguageMode languageOut,
                                     final SortedSet<J2clPath> sourceRoots,
-                                    final J2clPath initialScriptFilename,
+                                    final J2clPath output,
+                                    final String initialScriptFilename,
                                     final J2clLinePrinter logger) throws Exception {
         int fileCount = 0;
 
-        final J2clPath unitedSourceRoot = initialScriptFilename.parent().append("sources");
+        final J2clPath unitedSourceRoot = output.append("sources");
         logger.printLine(sourceRoots.size() + " Source(s)");
         logger.indent();
         {
@@ -108,6 +111,8 @@ class ClosureCompiler {
 
             success = false;
         } else {
+            final J2clPath initialScriptFilenamePath = output.append(initialScriptFilename);
+
             final Map<String, Collection<String>> arguments = prepareArguments(compilationLevel,
                     defines,
                     entryPoints,
@@ -115,7 +120,7 @@ class ClosureCompiler {
                     formatting.stream().map(ClosureFormattingOption::name).collect(Collectors.toCollection(Sets::sorted)),
                     languageOut,
                     unitedSourceRoot,
-                    initialScriptFilename,
+                    initialScriptFilenamePath,
                     logger);
 
             logger.printLine("Closure compiler");
@@ -151,7 +156,7 @@ class ClosureCompiler {
                     logger.outdent();
 
                     // anything but zero means errors and initial file must also exist and is a FAIL.
-                    success = 0 == exitCode && initialScriptFilename.exists().isPresent();
+                    success = 0 == exitCode && initialScriptFilenamePath.exists().isPresent();
                 }
             }
             logger.outdent();
