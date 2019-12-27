@@ -72,7 +72,8 @@ final class J2clStepWorkerClosureCompiler extends J2clStepWorker2 {
                 request.formatting(),
                 request.languageOut(),
                 sources,
-                request.initialScriptFilename(),
+                output,
+                request.initialScriptFilename().filename(),
                 logger) ?
                 J2clStepResult.SUCCESS :
                 J2clStepResult.FAILED;
