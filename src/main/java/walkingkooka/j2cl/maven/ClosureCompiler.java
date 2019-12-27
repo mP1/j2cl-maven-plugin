@@ -121,27 +121,38 @@ class ClosureCompiler {
             logger.printLine("Closure compiler");
             logger.indent();
             {
-                final ByteArrayOutputStream compilerOutputBytes = new ByteArrayOutputStream();
                 final String charset = Charset.defaultCharset().name();
-                final Compiler compiler = new Compiler(new PrintStream(compilerOutputBytes,
-                        true,
-                        charset));
-                final ClosureCompilerCommandLineRunner runner = new ClosureCompilerCommandLineRunner(compiler, argumentsToArray(arguments));
-                runner.run();
 
-                final int exitCode = runner.exitCode;
+                try(final ByteArrayOutputStream outputBytes = new ByteArrayOutputStream()) {
+                    final PrintStream outputPrintStream = new PrintStream(outputBytes,
+                            true,
+                            charset);
 
-                logger.printLine("Exit code");
-                logger.printIndentedLine("" + exitCode);
+                    final Compiler compiler = new Compiler(outputPrintStream);
 
-                logger.printLine("Messages");
-                logger.indent();
-                logger.emptyLine();
-                logger.print(new String(compilerOutputBytes.toByteArray(), charset)); // the captured output will already have line endings.
-                logger.outdent();
+                    final ClosureCompilerCommandLineRunner runner = new ClosureCompilerCommandLineRunner(compiler,
+                            argumentsToArray(arguments),
+                            outputPrintStream,
+                            outputPrintStream);
+                    if (!runner.shouldRunCompiler()) {
+                        throw new IllegalStateException("Closure Compiler setup has error(s), check recently logged messages");
+                    }
+                    runner.run();
 
-                // anything but zero means errors and initial file must also exist and is a FAIL.
-                success = 0 == exitCode && initialScriptFilename.exists().isPresent();
+                    final int exitCode = runner.exitCode;
+
+                    logger.printLine("Exit code");
+                    logger.printIndentedLine("" + exitCode);
+
+                    logger.printLine("Messages");
+                    logger.indent();
+                    logger.emptyLine();
+                    logger.print(new String(outputBytes.toByteArray(), charset)); // the captured output will already have line endings.
+                    logger.outdent();
+
+                    // anything but zero means errors and initial file must also exist and is a FAIL.
+                    success = 0 == exitCode && initialScriptFilename.exists().isPresent();
+                }
             }
             logger.outdent();
             logger.flush();
@@ -250,8 +261,10 @@ class ClosureCompiler {
         private int exitCode;
 
         ClosureCompilerCommandLineRunner(final Compiler compiler,
-                                         final String[] args) {
-            super(args);
+                                         final String[] args,
+                                         final PrintStream out,
+                                         final PrintStream err) {
+            super(args, out, err);
             this.compiler = compiler;
             setExitCodeReceiver(exitCode -> {
                 //noinspection ConstantConditions
