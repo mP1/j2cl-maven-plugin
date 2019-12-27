@@ -112,9 +112,9 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>walkingkooka</groupId>
-                <artifactId>j2cl-maven-plugin</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <groupId>@project.groupId@</groupId>
+                <artifactId>@project.artifactId@</artifactId>
+                <version>@project.version@</version>
                 <executions>
                     <execution>
                         <id>build-js</id>
