@@ -68,7 +68,7 @@ final class J2clStepWorkerHash extends J2clStepWorker {
 
     private void hashDependencies(final J2clDependency artifact,
                                   final HashBuilder hash,
-                                  final J2clLinePrinter logger) {
+                                  final J2clLinePrinter logger) throws IOException {
         final Set<J2clDependency> dependencies = artifact.dependencies(); // dependencies();
         logger.printLine(dependencies.size() + " Dependencies");
         logger.indent();
@@ -79,11 +79,7 @@ final class J2clStepWorkerHash extends J2clStepWorker {
             logger.printLine(dependency.toString());
             logger.indent();
             {
-                if(dependency.isProcessingRequired()) {
-                    hash.append(dependency.directory().toString());
-                } else {
-                    hash.append(dependency.toString());
-                }
+                hash.append(dependency.artifactFileOrFail().path());
             }
             logger.outdent();
         }
@@ -149,7 +145,7 @@ final class J2clStepWorkerHash extends J2clStepWorker {
             @Override
             public FileVisitResult visitFile(final Path path,
                                              final BasicFileAttributes basicFileAttributes) throws IOException {
-                hash.append(Files.readAllBytes(path));
+                hash.append(path);
                 return FileVisitResult.CONTINUE;
             }
 
