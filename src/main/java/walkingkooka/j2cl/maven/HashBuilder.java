@@ -19,7 +19,10 @@ package walkingkooka.j2cl.maven;
 
 import org.apache.commons.codec.binary.Hex;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -49,6 +52,10 @@ final class HashBuilder {
 
     HashBuilder append(final String text) {
         return this.append(text.getBytes(Charset.defaultCharset()));
+    }
+
+    HashBuilder append(final Path file) throws IOException {
+        return this.append(Files.readAllBytes(file));
     }
 
     HashBuilder append(final byte[] content) {
