@@ -173,7 +173,7 @@
                                 <formatting>PRETTY_PRINT</formatting>
                                 <formatting>PRINT_INPUT_DELIMITER</formatting>
                                 <formatting>SINGLE_QUOTES</formatting>
-                            <formatting>
+                            </formatting>
                             <!--
                                 ECMASCRIPT3,
                                 ECMASCRIPT5,
