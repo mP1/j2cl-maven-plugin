@@ -24,8 +24,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Builds a SHA1 composed of several inputs, including string parameters used during transpiling and file contents.
- * Note this class is mutable and each append operation updates the hash.
+ * Builds a SHA1 composed of several inputs, such as dependencies & maven parameters.
  */
 final class HashBuilder {
 
@@ -53,8 +52,12 @@ final class HashBuilder {
     }
 
     HashBuilder append(final byte[] content) {
-        digest.update(content);
-        this.hash = null; // result is now out of sync and needs to be recomputed.
+        final String hash = this.hash;
+        if (null != hash) {
+            throw new IllegalStateException("Hash already computed: " + hash);
+        }
+
+        this.digest.update(content);
         return this;
     }
 
@@ -63,9 +66,9 @@ final class HashBuilder {
      */
     @Override
     public String toString() {
-        if (null == hash) {
-            hash = Hex.encodeHexString(digest.digest());
+        if (null == this.hash) {
+            this.hash = Hex.encodeHexString(digest.digest());
         }
-        return hash;
+        return this.hash;
     }
 }
