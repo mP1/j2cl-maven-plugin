@@ -41,11 +41,19 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
     final J2clStepResult execute1(final J2clDependency artifact,
                                   final J2clStepDirectory directory,
                                   final J2clLinePrinter logger) throws Exception {
-        // in the end only the project is compiled, all other dependencies remain untouched.
-        final J2clPath sourceRoot = artifact.step(artifact.isProcessingSkipped() ?
-                J2clStep.UNPACK :
-                J2clStep.GWT_INCOMPATIBLE_STRIP)
-                .output();
+        final J2clPath sourceRoot;
+
+        if (artifact.isProcessingSkipped()) {
+            sourceRoot = artifact.step(J2clStep.UNPACK).output();
+        } else {
+            // source may have been repackaged, have to check if a repackage output directory exists.
+            final J2clPath possibleRepackage = artifact.step(J2clStep.POSSIBLE_REPACKAGE).output();
+            if (possibleRepackage.exists().isPresent()) {
+                sourceRoot = possibleRepackage;
+            } else {
+                sourceRoot = artifact.step(J2clStep.GWT_INCOMPATIBLE_STRIP).output();
+            }
+        }
 
         logger.printLine("Preparing...");
         logger.printIndented("Source path(s)", sourceRoot);

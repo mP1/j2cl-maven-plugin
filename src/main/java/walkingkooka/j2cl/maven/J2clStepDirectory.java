@@ -59,7 +59,7 @@ final class J2clStepDirectory {
      * The output directory for the javac compiler, transpiler etc.
      */
     J2clPath output() {
-        return this.path.append("output");
+        return this.path.append(J2clPath.OUTPUT);
     }
 
     J2clPath skipped() {
