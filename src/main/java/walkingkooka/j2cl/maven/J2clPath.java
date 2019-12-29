@@ -21,7 +21,6 @@ import com.google.j2cl.common.FrontendUtils.FileInfo;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
-import walkingkooka.text.CharSequences;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,10 +53,21 @@ final class J2clPath implements Comparable<J2clPath> {
      */
     static final String IGNORE_FILE = FILE_PREFIX + "-ignore.txt";
 
-    static final BiPredicate<Path, BasicFileAttributes> JAVA_FILES = (p, a) -> CharSequences.endsWith(p.toString(), ".java");
-    static final BiPredicate<Path, BasicFileAttributes> JAVASCRIPT_FILES = (p, a) -> CharSequences.endsWith(p.toString(), ".js");
-    static final BiPredicate<Path, BasicFileAttributes> NATIVE_JAVASCRIPT_FILES = (p, a) -> CharSequences.endsWith(p.toString(), ".native.js");
-    static final BiPredicate<Path, BasicFileAttributes> ALL_FILES = (p, a) -> true;
+    static final BiPredicate<Path, BasicFileAttributes> JAVA_FILES = fileEndsWith(".java");
+    static final BiPredicate<Path, BasicFileAttributes> JAVASCRIPT_FILES = fileEndsWith(".js");
+    static final BiPredicate<Path, BasicFileAttributes> NATIVE_JAVASCRIPT_FILES = fileEndsWith(".native.js");
+
+    /**
+     * Matches all files that end with the given extension, assumes the extension includes a leading dot.
+     */
+    private static BiPredicate<Path, BasicFileAttributes> fileEndsWith(final String extension) {
+        return (p, a) -> Files.isRegularFile(p) && p.getFileName().toString().endsWith(extension);
+    };
+
+    /**
+     * Matches all files but not directories.
+     */
+    static final BiPredicate<Path, BasicFileAttributes> ALL_FILES = (p, a) -> Files.isRegularFile(p);
 
     static List<File> toFiles(final Collection<J2clPath> paths) {
         return paths.stream().map(J2clPath::file).collect(Collectors.toList());
