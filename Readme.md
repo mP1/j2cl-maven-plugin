@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.com/mP1/j2cl-maven-plugin.svg?branch=master)](https://travis-ci.com/mP1/j2cl-maven-plugin.svg.svg?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/mP1/j2cl-maven-plugin/badge.svg?branch=master)](https://coveralls.io/github/mP1/j2cl-maven-plugin?branch=master)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 J2CL Maven plugin
