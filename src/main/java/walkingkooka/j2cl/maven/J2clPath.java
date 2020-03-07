@@ -24,7 +24,9 @@ import walkingkooka.collect.set.Sets;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -37,7 +39,9 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -120,18 +124,6 @@ final class J2clPath implements Comparable<J2clPath> {
     private static final String IGNORE_FILE = FILE_PREFIX + "-ignore.txt";
 
     /**
-     * Builds a new path holding the package prefix file.
-     */
-    J2clPath packagePrefixFile() {
-        return this.append(PACKAGE_PREFIX_FILE);
-    }
-
-    /**
-     * The name of the repackage file used during {@link J2clStep#POSSIBLE_REPACKAGE} and the package prefix to be removed.
-     */
-    private static final String PACKAGE_PREFIX_FILE = FILE_PREFIX + "-package-prefix.txt";
-
-    /**
      * Builds a new path holding the output directory within this directory.
      */
     J2clPath output() {
@@ -147,6 +139,18 @@ final class J2clPath implements Comparable<J2clPath> {
     }
 
     private final static String OUTPUT = "output";
+
+    /**
+     * Builds a new path holding the repackage mapping file.
+     */
+    J2clPath repackageFile() {
+        return this.append(REPACKAGE_FILE);
+    }
+
+    /**
+     * The name of the repackage file used during {@link J2clStep#POSSIBLE_REPACKAGE} and the package prefix to be removed.
+     */
+    private static final String REPACKAGE_FILE = FILE_PREFIX + "-repackage.txt";
 
     boolean isTestAnnotation() {
         final Path path = this.path();
@@ -344,6 +348,20 @@ final class J2clPath implements Comparable<J2clPath> {
             throw new J2clException("Package prefix " + CharSequences.quote(packagePrefix) + " must not be a top level package");
         }
         return packagePrefix;
+    }
+
+    /**
+     * Used to read the {@link #REPACKAGE_FILE} properties file.
+     */
+    Map<String, String> readRepackageFile() throws IOException {
+        try (final InputStream file = new FileInputStream(this.file())) {
+            final Properties properties = new Properties();
+            properties.load(file);
+
+            final Map<String, String> map = Maps.sorted();
+            properties.forEach((k, v) -> map.put((String) k, (String) v));
+            return map;
+        }
     }
 
     String filename() {

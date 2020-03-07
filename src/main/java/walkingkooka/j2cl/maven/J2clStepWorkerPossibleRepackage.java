@@ -22,8 +22,9 @@ import walkingkooka.text.CharSequences;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Scans the output of the previous step for any repackage super source and if any are found writes the result to an output directory.
@@ -48,26 +49,35 @@ final class J2clStepWorkerPossibleRepackage extends J2clStepWorker2 {
     J2clStepResult execute1(final J2clDependency artifact,
                             final J2clStepDirectory directory,
                             final J2clLinePrinter logger) throws Exception {
-        final J2clStepResult result;
+        J2clStepResult result = null;
 
         if (artifact.isProcessingSkipped()) {
             result = J2clStepResult.SKIPPED;
         } else {
 
             // the package prefix file will be present in UNPACK
-            final J2clPath packagePrefix = artifact.step(J2clStep.UNPACK)
+            final J2clPath repackage = artifact.step(J2clStep.UNPACK)
                     .output()
-                    .packagePrefixFile();
-            logger.printLine(packagePrefix.toString());
+                    .repackageFile();
+            logger.printLine(repackage.toString());
             logger.indent();
             {
-                if (packagePrefix.isFile()) {
-                    this.copyAndRepackage(artifact.step(J2clStep.GWT_INCOMPATIBLE_STRIP).output(),
-                            packagePrefix.readPackagePrefix(),
-                            directory.output(),
-                            logger);
-                    result = J2clStepResult.SUCCESS;
-                } else {
+                boolean repackaging = false;
+
+                if (repackage.isFile()) {
+                    final Map<String, String> repackageMappings = repackage.readRepackageFile();
+
+                    if (!repackageMappings.isEmpty()) {
+                        this.copyAndRepackage(artifact.step(J2clStep.GWT_INCOMPATIBLE_STRIP).output(),
+                                repackageMappings,
+                                directory.output(),
+                                logger);
+                        repackaging = true;
+                        result = J2clStepResult.SUCCESS;
+                    }
+                }
+
+                if (!repackaging) {
                     logger.printLine("Not found");
                     result = J2clStepResult.SKIPPED;
                 }
@@ -83,54 +93,62 @@ final class J2clStepWorkerPossibleRepackage extends J2clStepWorker2 {
      * copy the files to the destination.
      */
     private void copyAndRepackage(final J2clPath sourceRoot,
-                                  final String packagePrefix,
+                                  final Map<String, String> repackaging,
                                   final J2clPath output,
                                   final J2clLinePrinter logger) throws Exception {
         final Set<J2clPath> files = sourceRoot.gatherFiles(J2clPath.JAVA_FILES);
-        final J2clPath refactorSourceRoot;
-        final Set<J2clPath> refactorFiles;
+        final Set<J2clPath> nonRefactoredFiles = Sets.sorted();
+        nonRefactoredFiles.addAll(files);
 
         logger.indent();
         {
-            final String find = packagePrefix;
-            final int lastPackage = packagePrefix.lastIndexOf('.');
-            final String replace = packagePrefix.substring(lastPackage + 1);
+            for(final Entry<String, String> mapping : repackaging.entrySet()) {
+                final String find = mapping.getKey();
+                final String replace = mapping.getValue();
 
-            logger.printLine("Finding package prefix " + CharSequences.quote(find) + " replacing with " + CharSequences.quote(replace) + " in java source");
-            logger.indent();
-            {
-                refactorSourceRoot = sourceRoot.append(find.substring(0, lastPackage)
-                .replace('.', File.separatorChar));
+                final J2clPath repackageDirectory = replace.isEmpty() ?
+                        output :
+                        output.append(replace.replace('.', File.separatorChar));
 
-                // filter only files belonging to refactor source root
-                refactorFiles = files.stream()
-                        .filter(f -> f.path().startsWith(refactorSourceRoot.path()))
-                        .collect(Collectors.toCollection(Sets::sorted));
+                logger.printLine("Finding package " + CharSequences.quote(find) + " replacing with " + CharSequences.quote(replace) + " in java source");
+                logger.indent();
+                {
+                    final Set<J2clPath> refactorFiles = Sets.sorted();
+                    final J2clPath refactorSourceRoot = sourceRoot.append(find.replace('.', File.separatorChar));
 
-                // copy and refactor java source and copy other files to output.
-                output.copyFiles(refactorSourceRoot,
-                        refactorFiles,
-                        (content, path) -> {
-                            return path.isJava() ?
-                                    refactor(content, find, replace) :
-                                    content;
-                        },
-                        logger);
+                    // filter only files belonging to refactor source root
+                    files.stream()
+                            .filter(f -> f.path().startsWith(refactorSourceRoot.path()))
+                            .forEach(refactorFiles::add);
+
+                    nonRefactoredFiles.removeAll(refactorFiles);
+
+                    logger.printLine("FILES: " + files.size() + "\t" + files.toString());
+                    logger.printLine("OUTPUT: " + output);
+                    logger.printLine("REF: " + repackageDirectory);
+                    logger.printLine("REFACTOR SOURCE ROOT: " + refactorSourceRoot);
+
+                    // copy and refactor java source and copy other files to output.
+                    repackageDirectory.copyFiles(refactorSourceRoot,
+                            refactorFiles,
+                            (content, path) -> {
+                                logger.printLine("FIND " + find + " REPLACE " + replace);
+                                return path.isJava() ?
+                                        refactor(content, find, replace) :
+                                        content;
+                            },
+                            logger);
+                }
+                logger.outdent();
             }
-            logger.outdent();
 
             logger.printLine("Copying other files");
             logger.indent();
             {
 
-                // remove the refactored files and copy those...
-                final Set<J2clPath> otherFiles = Sets.sorted();
-                otherFiles.addAll(files);
-                otherFiles.removeAll(refactorFiles);
-
                 // copy all other files verbatim.
                 output.copyFiles(sourceRoot,
-                        otherFiles,
+                        nonRefactoredFiles,
                         logger);
 
             }
