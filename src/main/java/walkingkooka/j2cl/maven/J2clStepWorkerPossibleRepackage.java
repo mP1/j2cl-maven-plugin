@@ -102,7 +102,7 @@ final class J2clStepWorkerPossibleRepackage extends J2clStepWorker2 {
 
         logger.indent();
         {
-            for(final Entry<String, String> mapping : repackaging.entrySet()) {
+            for (final Entry<String, String> mapping : repackaging.entrySet()) {
                 final String find = mapping.getKey();
                 final String replace = mapping.getValue();
 
@@ -123,16 +123,10 @@ final class J2clStepWorkerPossibleRepackage extends J2clStepWorker2 {
 
                     nonRefactoredFiles.removeAll(refactorFiles);
 
-                    logger.printLine("FILES: " + files.size() + "\t" + files.toString());
-                    logger.printLine("OUTPUT: " + output);
-                    logger.printLine("REF: " + repackageDirectory);
-                    logger.printLine("REFACTOR SOURCE ROOT: " + refactorSourceRoot);
-
                     // copy and refactor java source and copy other files to output.
                     repackageDirectory.copyFiles(refactorSourceRoot,
                             refactorFiles,
                             (content, path) -> {
-                                logger.printLine("FIND " + find + " REPLACE " + replace);
                                 return path.isJava() ?
                                         refactor(content, find, replace) :
                                         content;
