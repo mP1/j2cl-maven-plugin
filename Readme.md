@@ -21,13 +21,13 @@ defaulted and must be present in the POM.
 
 The preferred way to use the plugin is to checkout the source
 
-```
+```bash
 git clone git://github.com/mP1/j2cl-maven-plugin.git
 ```
 
 and build and install with Maven.
 
-```
+```bash
 mvn clean install
 ```
 
@@ -73,9 +73,12 @@ A sample POM with the minimal dependencies and this plugin declaration is presen
 As a guide the following dependencies below may be considered a minimal requirement, and these were the implied or default
 dependencies that were defaulted.
 
+
+
 ## Plugin Repositories
 
 Sample required plugin repositories
+
 ```xml
 <pluginRepositories>
     <pluginRepository>
@@ -139,6 +142,8 @@ Sample required plugin repositories
     </pluginRepository>
 </pluginRepositories>
 ```
+
+
 
 ## Plugin
 
@@ -208,6 +213,8 @@ detail below.
     </plugin>
 </plugins>
 ```
+
+
 
 ## Dependencies
 
@@ -624,7 +631,7 @@ class Locale {
 The actual java source that is compiled into javascript.
 
 ```java
-package java.util
+package java.util;
 
 class Locale {
    Locale forLanguageTag(String tag);
