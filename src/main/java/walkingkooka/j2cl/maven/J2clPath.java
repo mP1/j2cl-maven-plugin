@@ -50,11 +50,6 @@ final class J2clPath implements Comparable<J2clPath> {
 
     private static final String FILE_PREFIX = ".walkingkooka-j2cl-maven-plugin";
 
-    /**
-     * The name of the repackage file used during {@link J2clStep#POSSIBLE_REPACKAGE} and the package prefix to be removed.
-     */
-    static final String PACKAGE_PREFIX_FILE = FILE_PREFIX + "-package-prefix.txt";
-
     static final BiPredicate<Path, BasicFileAttributes> JAVA_FILES = fileEndsWith(".java");
     static final BiPredicate<Path, BasicFileAttributes> JAVASCRIPT_FILES = fileEndsWith(".js");
     static final BiPredicate<Path, BasicFileAttributes> NATIVE_JAVASCRIPT_FILES = fileEndsWith(".native.js");
@@ -124,6 +119,17 @@ final class J2clPath implements Comparable<J2clPath> {
      */
     private static final String IGNORE_FILE = FILE_PREFIX + "-ignore.txt";
 
+    /**
+     * Builds a new path holding the package prefix file.
+     */
+    J2clPath packagePrefixFile() {
+        return this.append(PACKAGE_PREFIX_FILE);
+    }
+
+    /**
+     * The name of the repackage file used during {@link J2clStep#POSSIBLE_REPACKAGE} and the package prefix to be removed.
+     */
+    private static final String PACKAGE_PREFIX_FILE = FILE_PREFIX + "-package-prefix.txt";
 
     final static String OUTPUT = "output";
 
