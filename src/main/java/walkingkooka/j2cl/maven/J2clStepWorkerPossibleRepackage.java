@@ -56,7 +56,8 @@ final class J2clStepWorkerPossibleRepackage extends J2clStepWorker2 {
 
             // the package prefix file will be present in UNPACK
             final J2clPath packagePrefix = artifact.step(J2clStep.UNPACK)
-                    .output().append(J2clPath.PACKAGE_PREFIX_FILE);
+                    .output()
+                    .packagePrefixFile();
             logger.printLine(packagePrefix.toString());
             logger.indent();
             {
