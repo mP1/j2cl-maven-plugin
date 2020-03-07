@@ -51,11 +51,6 @@ final class J2clPath implements Comparable<J2clPath> {
     private static final String FILE_PREFIX = ".walkingkooka-j2cl-maven-plugin";
 
     /**
-     * The name of the ignore file which is used during the unpack phase to filter files.
-     */
-    static final String IGNORE_FILE = FILE_PREFIX + "-ignore.txt";
-
-    /**
      * The name of the repackage file used during {@link J2clStep#POSSIBLE_REPACKAGE} and the package prefix to be removed.
      */
     static final String PACKAGE_PREFIX_FILE = FILE_PREFIX + "-package-prefix.txt";
@@ -116,6 +111,19 @@ final class J2clPath implements Comparable<J2clPath> {
     boolean isJava() {
         return this.filename().endsWith(".java");
     }
+
+    /**
+     * Builds a new path holding the ignore file.
+     */
+    J2clPath ignoreFile() {
+        return this.append(IGNORE_FILE);
+    }
+
+    /**
+     * The name of the ignore file which is used during the unpack phase to filter files.
+     */
+    private static final String IGNORE_FILE = FILE_PREFIX + "-ignore.txt";
+
 
     final static String OUTPUT = "output";
 
