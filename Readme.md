@@ -611,31 +611,33 @@ of methods under test.
 
 
  
-### .walkingkooka-j2cl-maven-plugin-package-prefix.txt
-``txt
-example.java
-``
+### .walkingkooka-j2cl-maven-plugin-repackage.txt
 
-The simplified & emulated `Locale` that will exist within compiled javascript before repackaging.
+This performs a similar action as GWT super source [GWT](http://www.gwtproject.org/doc/latest/DevGuideOrganizingProjects.html),
+but allows entire packages to be changed. It may also be used to repackage the threeten package into java.time.
 
-``
+```txt
+example.java.util=java.util
+```
+
+```java
 package example.java.util
 
 class Locale {
   static Locale forLanguageTag(String tag);
     // perhaps have a big switch statement with a few locales we wish to support in js.
 }
-``
+```
 
 The actual java source that is compiled into javascript.
 
-``
+```java
 package java.util
 
 class Locale {
    Locale forLanguageTag(String tag);
 }
-``
+```
 
 
 
