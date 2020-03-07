@@ -594,21 +594,13 @@ This step invokes javac on the output produced by step 4.
 
 ## Step 6 Possible repackage 
 
-This step will attempt to locate a `.walkingkooka-j2cl-maven-plugin-package-prefix.txt` file, expecting a single line
-holding a java package. All file under this package will be refactored so their package name is transformed with the
-prefix less the last component removed. A package of `example.java` will actually result in `example` being removed and
-all packages under and including `java` be selected for repackaging. This allows other `example` packages to remain
-unselected and unmodified.
+This step will attempt to locate a `.walkingkooka-j2cl-maven-plugin-repackage.txt` properties file which can hold mappings
+of packages that should exist to new packages. This can be useful when one wishes to write an emulation of another package,
+and have both co-exist and used to author unit tests. A simple example might be to author a replacement of a as yet
+unsupported JDK class(es).
 
-This is particularly useful when one wishes to have the real and emulated class co-exist within a JRE environment and
-have tests compare the behaviour and results from both, and eventually transform the later when producing javascript.
-This of course does not solve all problems that require native javascript. 
- 
-The files below show a rather simplistic example of providing a simplified `java.util.Locale` that still compiles,
-and co exists within a JRE allowing tests to be written that compares the behaviour and output of both for the subset
-of methods under test.
-
-
+This is very similar to the concept of GWT super source but with extra functionality to change the packaging and will be useful
+when converting threeten to java.time.
 
  
 ### .walkingkooka-j2cl-maven-plugin-repackage.txt
