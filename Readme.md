@@ -612,12 +612,13 @@ when converting threeten to java.time.
  
 ### .walkingkooka-j2cl-maven-plugin-repackage.txt
 
-This performs a similar action as GWT super source [GWT](http://www.gwtproject.org/doc/latest/DevGuideOrganizingProjects.html),
-but allows entire packages to be changed. It may also be used to repackage the threeten package into java.time.
+The properties file content. This example will eventually change `example.java.util` to `java.util`.
 
 ```txt
 example.java.util=java.util
 ```
+
+The original source prior to step 6 altering packaging and type references.
 
 ```java
 package example.java.util;
@@ -628,7 +629,8 @@ class Locale {
 }
 ```
 
-The actual java source that is compiled into javascript.
+The actual java source after step 6 processing, that is compiled into javascript. This will also the be actual source
+that appears under the sources directory that is mapped by source maps.
 
 ```java
 package java.util;
