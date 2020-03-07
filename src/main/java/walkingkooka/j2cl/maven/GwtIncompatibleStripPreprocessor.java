@@ -120,7 +120,7 @@ final class GwtIncompatibleStripPreprocessor {
             @Override
             public FileVisitResult preVisitDirectory(final Path dir,
                                                      final BasicFileAttributes attrs) throws IOException {
-                final J2clPath ignoreFile = J2clPath.with(dir).append(J2clPath.IGNORE_FILE);
+                final J2clPath ignoreFile = J2clPath.with(dir).ignoreFile();
                 if (ignoreFile.exists().isPresent()) {
                     final List<PathMatcher> matchers = Files.readAllLines(ignoreFile.path())
                             .stream()
