@@ -621,7 +621,7 @@ example.java.util=java.util
 ```
 
 ```java
-package example.java.util
+package example.java.util;
 
 class Locale {
   static Locale forLanguageTag(String tag);
@@ -664,7 +664,7 @@ It might be useful to change the `thread-pool-size` parameter to 1 to simplify c
 To aide readability and faster location of a parameter or file, everything is sorted alphabetically, along with nesting
 and tree views for a file listing such as a classpath.
 
-```text
+```txt
 walkingkooka:example-hello-world-single:war:1.0-TRANSPILE
   Directory
     /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-3b822904f436686e983f48cd4b9ae84e51bb5c7f/5-transpiled-java-to-javascript
