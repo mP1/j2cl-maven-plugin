@@ -131,7 +131,12 @@ final class J2clPath implements Comparable<J2clPath> {
      */
     private static final String PACKAGE_PREFIX_FILE = FILE_PREFIX + "-package-prefix.txt";
 
-    final static String OUTPUT = "output";
+    /**
+     * Builds a new path holding the output directory within this directory.
+     */
+    J2clPath output() {
+        return this.append(OUTPUT);
+    }
 
     /**
      * Only returns true if this path is the output directory of an UNPACK.
@@ -140,6 +145,8 @@ final class J2clPath implements Comparable<J2clPath> {
         return this.filename().equals(OUTPUT) &&
                 this.path().getParent().getFileName().toString().equals(J2clStep.UNPACK.directoryName());
     }
+
+    private final static String OUTPUT = "output";
 
     boolean isTestAnnotation() {
         final Path path = this.path();
