@@ -28,7 +28,7 @@ const HelloWorld = goog.require('example.formattinglib.HelloWorld');
  * @return {void}
  */
 function sayHello() {
-    document.write(HelloWorld.getHelloWorld() + ' and JS!');
+    document.write(HelloWorld.getHelloWorld() + ' and JS!'); // lgtm[js/eval-like-call]
 }
 
 // Export our method so it could be used outside of the module.
