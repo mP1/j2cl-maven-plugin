@@ -181,6 +181,7 @@ detail below.
                         <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:0.5-SNAPSHOT</param>
                     </added-dependencies>
                     <classpath-required>
+                        <!-- bootstrap must be the first entry -->
                         <param>com.vertispan.j2cl:javac-bootstrap-classpath:0.5-SNAPSHOT</param>
                         <param>com.vertispan.j2cl:jre:0.5-SNAPSHOT</param>
                         <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT</param>
