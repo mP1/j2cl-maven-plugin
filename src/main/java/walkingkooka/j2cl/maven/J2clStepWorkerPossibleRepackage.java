@@ -55,7 +55,6 @@ final class J2clStepWorkerPossibleRepackage extends J2clStepWorker2 {
             result = J2clStepResult.SKIPPED;
         } else {
 
-            // the package prefix file will be present in UNPACK
             final J2clPath repackage = artifact.step(J2clStep.UNPACK)
                     .output()
                     .repackageFile();
