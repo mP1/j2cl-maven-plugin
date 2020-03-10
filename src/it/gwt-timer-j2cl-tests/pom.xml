@@ -154,7 +154,6 @@
             <version>1.0</version>
         </dependency>
 
-        <!-- test dependencies -->
         <dependency>
             <groupId>com.vertispan.j2cl</groupId>
             <artifactId>gwttestcase-emul</artifactId>
