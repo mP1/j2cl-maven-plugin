@@ -28,7 +28,7 @@ const HelloWorld = goog.require('example.repackagelib.HelloWorld');
  * @return {void}
  */
 function sayHello() {
-    document.write("" + HelloWorld.getHelloWorld());
+    document.write("" + HelloWorld.getHelloWorld()); // lgtm[js/eval-like-call]
 }
 
 // Export our method so it could be used outside of the module.
