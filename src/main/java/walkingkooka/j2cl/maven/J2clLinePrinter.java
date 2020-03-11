@@ -144,11 +144,12 @@ final class J2clLinePrinter {
         this.outdent();
     }
 
-    private final static int COLUMN_COUNT = 3;
+    private final static int COLUMN_COUNT = 2;
+    private final static int COLUMN_WIDTH = 60;
 
     private final static UnaryOperator<Table> TABLE_TRANSFORMER = TextPretty.tableTransformer(Collections.nCopies(COLUMN_COUNT, TextPretty.columnConfig()
-            .minWidth(40)
-            .maxWidth(40)
+            .minWidth(COLUMN_WIDTH)
+            .maxWidth(COLUMN_WIDTH)
             .overflowMaxWidthBreak()
             .leftAlign()));
 
