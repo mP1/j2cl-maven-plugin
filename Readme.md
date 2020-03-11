@@ -503,6 +503,16 @@ A block of multiple `test` entries each defining a GLOB pattern to match test su
 
 
 
+## test-timeout (test)
+
+The timeout for each test not the entire suite in seconds.
+
+```xml
+<test-timeout>60</test-timeout>
+```
+
+
+
 ## thread-pool-size
 This parameter controls size of the thread pool used to execute parallel dependency processing. A value of 0, uses the
 CPU core * 2, a value of 1 is useful to limit a single task at a time which makes for uninterrupted console messages at the

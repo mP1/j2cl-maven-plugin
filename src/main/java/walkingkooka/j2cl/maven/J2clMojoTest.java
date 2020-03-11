@@ -66,11 +66,6 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
      * Finds all test classes, strips, compiles, transpiles and closure compiles for each and every test.
      */
     private void executeTests(final J2clLinePrinter logger) throws Exception {
-        final J2clMojoTestRequest request = this.request();
-        final J2clDependency project = this.gatherDependencies(request);
-        project.prettyPrintDependencies();
-        request.verifyClasspathRequiredAndJavascriptSourceRequired();
-
         final List<String> tests = this.findTestClassNames(logger);
 
         logger.printLine("Tests");
@@ -80,9 +75,13 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
                 logger.printLine(test);
                 logger.indent();
                 {
-                    // re=use
+                    final J2clMojoTestRequest request = this.request(test);
+                    final J2clDependency project = this.gatherDependencies(request);
+                    project.prettyPrintDependencies();
+                    request.verifyClasspathRequiredAndJavascriptSourceRequired();
+
                     try {
-                        request.setTest(project, test);
+                        request.setProject(project);
                         request.execute(project);
                     } catch (final Throwable cause) {
                         throw new MojoExecutionException("Failed to build project, check logs above", cause);
@@ -97,7 +96,7 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
     /**
      * The {@link J2clRequest} accompanying the build.
      */
-    final J2clMojoTestRequest request() {
+    private J2clMojoTestRequest request(final String testClassName) {
         return J2clMojoTestRequest.with(this.cache(),
                 this.output(),
                 this.classpathScope(),
@@ -112,6 +111,8 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
                 this.externs(),
                 this.formatting(),
                 this.languageOut(),
+                testClassName,
+                this.testTimeout(),
                 this.mavenMiddleware(),
                 this.executor(),
                 this.logger());
@@ -167,6 +168,21 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
     private boolean skipTests() {
         return this.skipTests;
     }
+
+    // testTimeout.......................................................................................................
+
+    @Parameter(alias = "test-timeout", required = true)
+    private int testTimeout;
+
+    private int testTimeout() {
+        final int timeout = this.testTimeout;
+        if (timeout < TEST_TIMEOUT_MINIMUM) {
+            throw new IllegalStateException("Invalid test timeout " + timeout + " < " + TEST_TIMEOUT_MINIMUM + " seconds");
+        }
+        return timeout;
+    }
+
+    private final static int TEST_TIMEOUT_MINIMUM = 30;
 
     // tests............................................................................................................
 

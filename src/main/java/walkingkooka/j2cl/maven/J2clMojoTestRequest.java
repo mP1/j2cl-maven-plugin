@@ -47,6 +47,8 @@ final class J2clMojoTestRequest extends J2clRequest {
                                     final Set<String> externs,
                                     final Set<ClosureFormattingOption> formatting,
                                     final LanguageMode languageOut,
+                                    final String testClassName,
+                                    final int testTimeout,
                                     final J2clMavenMiddleware middleware,
                                     final ExecutorService executor,
                                     final J2clLogger logger) {
@@ -64,6 +66,8 @@ final class J2clMojoTestRequest extends J2clRequest {
                 externs,
                 formatting,
                 languageOut,
+                testClassName,
+                testTimeout,
                 middleware,
                 executor,
                 logger);
@@ -83,6 +87,8 @@ final class J2clMojoTestRequest extends J2clRequest {
                                 final Set<String> externs,
                                 final Set<ClosureFormattingOption> formatting,
                                 final LanguageMode languageOut,
+                                final String testClassName,
+                                final int testTimeout,
                                 final J2clMavenMiddleware middleware,
                                 final ExecutorService executor,
                                 final J2clLogger logger) {
@@ -103,6 +109,8 @@ final class J2clMojoTestRequest extends J2clRequest {
                 middleware,
                 executor,
                 logger);
+        this.testClassName = testClassName;
+        this.testTimeout = testTimeout;
     }
 
     @Override
@@ -113,38 +121,46 @@ final class J2clMojoTestRequest extends J2clRequest {
     @Override
     List<String> entryPoints() {
         // this is the mangled name of a javascript file produced by the junit annotation-processor.
-        return Lists.of("javatests." + this.test + "_AdapterSuite");
+        return Lists.of("javatests." + this.testClassName + "_AdapterSuite");
     }
 
     @Override
     J2clPath initialScriptFilename() {
-        return this.project.directory().append(this.test + ".js");
+        return this.project.directory()
+                .append(J2clStep.CLOSURE_COMPILER.directoryName())
+                .output()
+                .append(this.testClassName + ".js");
     }
 
     @Override
     String hash() {
         if (null == this.hash) {
             final HashBuilder hash = this.computeHash();
-            hash.append(this.test);
+            hash.append(this.testClassName);
             this.hash = hash.toString();
         }
         return this.hash;
     }
 
     /**
-     * Lazily computed and cached hash. A new hash needs to be computed when the test is changed.
+     * Lazily computed and cached hash.
      */
     private String hash;
 
-    J2clMojoTestRequest setTest(final J2clDependency project,
-                                final String test) {
+    J2clMojoTestRequest setProject(final J2clDependency project) {
         this.project = project;
-        this.test = test;
-        this.hash = null; // force recompute.
 
         return this;
     }
 
     private J2clDependency project;
-    private String test;
+
+    private final String testClassName;
+
+    @Override
+    int testTimeout() {
+        return this.testTimeout;
+    }
+
+    int testTimeout;
 }

@@ -145,4 +145,9 @@ final class J2clMojoBuildRequest extends J2clRequest {
      * Lazily computed and cached hash.
      */
     private String hash;
+
+    @Override
+    int testTimeout() {
+        throw new UnsupportedOperationException();
+    }
 }

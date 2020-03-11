@@ -229,6 +229,10 @@ abstract class J2clRequest {
 
     private final LanguageMode languageOut;
 
+    // testTimeout......................................................................................................
+
+    abstract int testTimeout();
+
     // MAVEN..............................................................................................................
 
     final J2clMavenMiddleware mavenMiddleware() {

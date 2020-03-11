@@ -309,6 +309,8 @@
                             <tests>
                                 <test>org.gwtproject.timer.client.TimerJc2lTest</test>
                             </tests>
+                            <!-- test timeout in seconds -->
+                            <test-timeout>60</test-timeout>
                         </configuration>
                     </execution>
                 </executions>
