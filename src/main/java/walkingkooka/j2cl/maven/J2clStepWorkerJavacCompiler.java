@@ -38,20 +38,20 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
                                   final J2clStepDirectory directory,
                                   final J2clLinePrinter logger) throws Exception {
         J2clStepResult result = null;
-        final J2clStep step = this.sourcesStep();
+        final J2clStep sourceStep = this.sourcesStep();
 
-        J2clPath source = artifact.step(step).output().exists().orElse(null);
+        J2clPath source = artifact.step(sourceStep).output().exists().orElse(null);
         if (null != source) {
             final List<J2clPath> javaSourceFiles = Lists.array();
 
-            final J2clPath output = artifact.step(step).output();
-
-            // skip placing super-source java files on the compile source path.
+            final J2clPath output = artifact.step(sourceStep).output();
+            
             javaSourceFiles.addAll(output.gatherFiles((path, attributes) -> false == output.isSuperSource(path) && J2clPath.JAVA_FILES.test(path, attributes)));
             if (javaSourceFiles.isEmpty()) {
                 source = null;
             } else {
                 final List<J2clPath> classpath = Lists.array();
+                final J2clStep compiledStep = this.compiledStep();
 
                 for (final J2clDependency dependency : artifact.classpathAndDependencies()) {
                     if(dependency.dependencies().contains(artifact)) {
@@ -61,7 +61,7 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
                     if (dependency.isProcessingSkipped()) {
                         classpath.add(dependency.artifactFileOrFail());
                     } else {
-                        classpath.add(dependency.step(J2clStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED).output());
+                        classpath.add(dependency.step(compiledStep).output());
                     }
                 }
 
@@ -88,6 +88,11 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
      * A previous step that has source in its output ready for compiling
      */
     abstract J2clStep sourcesStep();
+
+    /**
+     * This step this is used to build the classpath for the java compiler.
+     */
+    abstract J2clStep compiledStep();
 
     /**
      * Returns whether annotations processors should be run.

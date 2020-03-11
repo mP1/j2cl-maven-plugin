@@ -42,6 +42,11 @@ final class J2clStepWorkerJavacCompilerUnpackedSource extends J2clStepWorkerJava
     }
 
     @Override
+    J2clStep compiledStep() {
+        return J2clStep.COMPILE;
+    }
+
+    @Override
     boolean shouldRunAnnotationProcessors() {
         return true;
     }

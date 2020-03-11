@@ -42,6 +42,11 @@ final class J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource extends J2c
     }
 
     @Override
+    J2clStep compiledStep() {
+        return J2clStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED;
+    }
+
+    @Override
     boolean shouldRunAnnotationProcessors() {
         return false; // dont need to generate annotation processor classes again.
     }
