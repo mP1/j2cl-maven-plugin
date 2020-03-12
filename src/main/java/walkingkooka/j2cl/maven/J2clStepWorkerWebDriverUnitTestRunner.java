@@ -55,7 +55,9 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
         logger.printLine("Junit Tests");
         logger.indent();
         {
-            this.executeTestSuite(this.prepareJunitHostFileScriptPath(artifact.request(), logger),
+            final J2clRequest request = artifact.request();
+            this.executeTestSuite(this.prepareJunitHostFileScriptPath(request, logger),
+                    request.testTimeout(),
                     logger);
         }
         logger.outdent();
@@ -95,6 +97,7 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
      * Starts up webdriver and loads the javascript host file which will run all the tests.
      */
     private void executeTestSuite(final J2clPath startupHostFile,
+                                  final int timeout,
                                   final J2clLinePrinter logger) {
 
         logger.printLine("Test " + startupHostFile);
@@ -108,7 +111,7 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
 
                 // loop and poll if tests are done
                 new FluentWait<>(driver)
-                        .withTimeout(Duration.ofMinutes(1))
+                        .withTimeout(Duration.ofSeconds(timeout))
                         .withMessage("Tests failed to finish in timeout")
                         .pollingEvery(Duration.ofMillis(100))
                         .until(d -> isFinished(d));
