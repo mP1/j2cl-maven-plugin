@@ -363,14 +363,15 @@ A Closure compiler argument containing one or more entry point(s).
 
 
 ## excluded-dependencies
-A list of artifacts (group-id colon artifact-id) that may appear as transitive dependencies that must be excluded from
-the build process. The sample below is useful when requiring gwt-user, which contains a combination of client/translatable
-and server/untranslatable packages/classes.
+A list of artifacts (group-id colon artifact-id colon version) or (group-id colon artifact-id colon classifier colon version)
+that may appear as transitive dependencies that must be excluded from the build process. The sample below is useful when
+requiring gwt-user, which contains a combination of client/translatable and server/untranslatable packages/classes.
 
 ```xml
 <excluded-dependencies>
-    <param>javax.servlet:javax.servlet-api</param>
-    <param>javax.validation:validation-api</param>
+    <param>javax.servlet:javax.servlet-api:1.0</param>
+    <param>javax.validation:validation-api:1.0</param>
+    <param>group1:artifact2:classifier3:version4</param>
 </excluded-dependencies>
 ```
 

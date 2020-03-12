@@ -39,6 +39,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.ExecutorService;
@@ -172,7 +173,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
     final Predicate<J2clArtifactCoords> excludedDependencies() {
         final List<Predicate<J2clArtifactCoords>> filter = this.excludedDependencies.stream()
                 .map(String::trim)
-                .map(this::groupArtifactAndVersionPredicate)
+                .map(this::groupArtifactOptionalClassifierAndVersionPredicate)
                 .collect(Collectors.toList());
 
         return new Predicate<>() {
@@ -200,25 +201,46 @@ abstract class J2clMojoBuildTest extends J2clMojo {
     /**
      * Only matches using the group-id and artifact-id the base or original version not the resolved version is ignored.
      */
-    private Predicate<J2clArtifactCoords> groupArtifactAndVersionPredicate(final String coords) {
-        final String[] components = coords.split(":");
-        if (3 != components.length) {
-            throw new IllegalArgumentException("Invalid coords, expected 3 components (groupId, artifactId, version): " + CharSequences.quoteAndEscape(coords));
-        }
+    private Predicate<J2clArtifactCoords> groupArtifactOptionalClassifierAndVersionPredicate(final String coords) {
+        final String groupId;
+        final String artifactId;
+        final String classifier;
+        final String version;
 
-        final String groupId = components[0];
-        final String artifactId = components[1];
-        final String version = components[2];
+        final String[] components = coords.split(":");
+        switch (components.length) {
+            case 3:
+                groupId = components[0];
+                artifactId = components[1];
+                classifier = null;
+                version = components[2];
+                break;
+            case 4:
+                groupId = components[0];
+                artifactId = components[1];
+                classifier = components[2];
+                version = components[3];
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid coords, expected 3 components (groupId, artifactId, version) or 4 components (groupId, artifactId, version): " + CharSequences.quoteAndEscape(coords));
+
+        }
 
         CharSequences.failIfNullOrEmpty(groupId, "group-id");
         CharSequences.failIfNullOrEmpty(artifactId, "artifact-id");
+        if ("".equals(classifier)) {
+            throw new IllegalArgumentException("Classifier must not be empty: " + CharSequences.quote(coords));
+        }
         CharSequences.failIfNullOrEmpty(version, "version");
 
         return new Predicate<>() {
 
             @Override
             public boolean test(final J2clArtifactCoords test) {
-                return groupId.equals(test.groupId()) && artifactId.equals(test.artifactId()) && version.equals(test.version());
+                return groupId.equals(test.groupId()) &&
+                        artifactId.equals(test.artifactId()) &&
+                        version.equals(test.version()) &&
+                        (null == classifier || Objects.equals(classifier, test.classifier().orElse(null)));
             }
 
             @Override
