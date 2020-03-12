@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -285,10 +286,13 @@ final class J2clPath implements Comparable<J2clPath> {
      */
     Set<J2clPath> extractArchiveFiles(final J2clPath target,
                                       final J2clLinePrinter logger) throws IOException {
-        try (final FileSystem zip = FileSystems.newFileSystem(URI.create("jar:" + this.path().toAbsolutePath().toUri()), Maps.empty())) {
+        final URI uri = URI.create("jar:" + this.path().toAbsolutePath().toUri());
+        try (final FileSystem zip = FileSystems.newFileSystem(uri, Maps.empty())) {
             return this.extractArchiveFiles0(zip.getPath("/"),
                     target,
                     logger);
+        } catch (final FileSystemAlreadyExistsException cause) {
+            throw new IOException("File " + uri + " exists", cause);
         }
     }
 
