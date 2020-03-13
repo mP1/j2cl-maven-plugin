@@ -1,2 +1,0 @@
-example.repackage.java.io=java.io
-example.repackage.javaio=java.io

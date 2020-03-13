@@ -155,23 +155,23 @@ enum J2clStep {
 
         @Override
         Optional<J2clStep> next(final J2clRequest request) {
-            return Optional.of(POSSIBLE_REPACKAGE);
+            return Optional.of(POSSIBLE_SHADE);
         }
     },
 
     /**
-     * Attempts to find files called "j2cl-maven-plugin-repackage" and drops the current directory/java package from
+     * Attempts to find files called "j2cl-maven-plugin-shade" and drops the current directory/java package from
      * files under it.
      */
-    POSSIBLE_REPACKAGE {
+    POSSIBLE_SHADE {
         @Override
         String directoryName() {
-            return "5-possible-repackage";
+            return "5-possible-shade";
         }
 
         @Override
         J2clStepWorker execute1() {
-            return J2clStepWorker.POSSIBLE_REPACKAGE;
+            return J2clStepWorker.POSSIBLE_SHADE;
         }
 
         @Override

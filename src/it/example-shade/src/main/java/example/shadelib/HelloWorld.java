@@ -13,26 +13,24 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package example.repackage.java.io;
+package example.shadelib;
 
 import jsinterop.annotations.JsType;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
- * This file eventually gets translated into java.io.File
- *
- * <p>Note that it is marked as @JsType as we would like to call have whole class available to use
- * from JavaScript.
+ * Calls a class that is unsupported JDK (java.io.File) that is replaced by a example.java.io.File at
+ * transpile time.
  */
 @JsType
-public class File {
+public class HelloWorld {
 
-    public File(final String path) {
-        this.path = path;
+    public static String getHelloWorld() throws Exception {
+        return "Should say \"java.io.FileInputStream java.io.File\" path=hello.txt -> " + new FileInputStream(new File("hello.txt")).toString();
     }
-    
-    @Override
-    public String toString() {
-        return this.getClass().getName() + " path=" + path;
-    }
-
-    private final String path;
 }

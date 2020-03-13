@@ -284,7 +284,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     /**
      * Used to test if a dependency should be ignored and the archive files used as they are. Examples of this include
-     * the prepackaged JRE binaries and the jszip form, each used dependening whether class files or java source is
+     * the pshaded JRE binaries and the jszip form, each used dependening whether class files or java source is
      * required.
      */
     boolean isProcessingSkipped() {

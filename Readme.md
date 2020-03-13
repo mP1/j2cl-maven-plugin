@@ -615,9 +615,9 @@ This step invokes javac on the output produced by step 4.
 
 
 
-## Step 6 Possible repackage 
+## Step 6 Possible shade 
 
-This step will attempt to locate a `.walkingkooka-j2cl-maven-plugin-repackage.txt` properties file which can hold mappings
+This step will attempt to locate a `.walkingkooka-j2cl-maven-plugin-shade.txt` properties file which can hold mappings
 of packages that should exist to new packages. This can be useful when one wishes to write an emulation of another package,
 and have both co-exist and used to author unit tests. A simple example might be to author a replacement of a as yet
 unsupported JDK class(es).
@@ -626,7 +626,7 @@ This is very similar to the concept of GWT super source but with extra functiona
 when converting threeten to java.time.
 
  
-### .walkingkooka-j2cl-maven-plugin-repackage.txt
+### .walkingkooka-j2cl-maven-plugin-shade.txt
 
 The properties file content. This example will eventually change `example.java.util` to `java.util`.
 

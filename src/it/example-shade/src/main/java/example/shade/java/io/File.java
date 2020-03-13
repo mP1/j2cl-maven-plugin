@@ -13,28 +13,26 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package example.repackage.javaio;
+package example.shade.java.io;
 
 import jsinterop.annotations.JsType;
-import java.io.File;
-
 /**
- * This file eventually gets translated into java.io.FileInputStream
+ * This file eventually gets translated into java.io.File
  *
  * <p>Note that it is marked as @JsType as we would like to call have whole class available to use
  * from JavaScript.
  */
 @JsType
-public class FileInputStream {
+public class File {
 
-    public FileInputStream(final File file) {
-        this.file = file;
+    public File(final String path) {
+        this.path = path;
     }
     
     @Override
     public String toString() {
-        return this.getClass().getName() + " " + file.getClass().getName();
+        return this.getClass().getName() + " path=" + path;
     }
 
-    private final File file;
+    private final String path;
 }
