@@ -149,7 +149,7 @@ final class J2clPath implements Comparable<J2clPath> {
     }
 
     /**
-     * The name of the shade file used during {@link J2clStep#POSSIBLE_SHADE} and the package prefix to be removed.
+     * The name of the shade file used during {@link J2clStep#JAVA_SOURCE_SHADE} and the package prefix to be removed.
      */
     private static final String SHADE_FILE = FILE_PREFIX + "-shade.txt";
 
@@ -241,7 +241,7 @@ final class J2clPath implements Comparable<J2clPath> {
     }
 
     /**
-     * Returns the content unmodified. This is the default behaviour of all copy operations except for {@link J2clStep#POSSIBLE_SHADE}
+     * Returns the content unmodified. This is the default behaviour of all copy operations except for {@link J2clStep#JAVA_SOURCE_SHADE}
      */
     private static byte[] identityBiFunction(final byte[] content, final J2clPath path) {
         return content;

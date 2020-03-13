@@ -27,21 +27,21 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * Scans the output of the previous step for any shade super source and if any are found writes the result to an output directory.
+ * Scans the output of the previous step for any shade java source and if any are found writes the result to an output directory.
  */
-final class J2clStepWorkerPossibleShade extends J2clStepWorker2 {
+final class J2clStepWorkerJavaSourceShade extends J2clStepWorker2 {
 
     /**
      * Singleton
      */
     static J2clStepWorker instance() {
-        return new J2clStepWorkerPossibleShade();
+        return new J2clStepWorkerJavaSourceShade();
     }
 
     /**
      * Use singleton
      */
-    private J2clStepWorkerPossibleShade() {
+    private J2clStepWorkerJavaSourceShade() {
         super();
     }
 
