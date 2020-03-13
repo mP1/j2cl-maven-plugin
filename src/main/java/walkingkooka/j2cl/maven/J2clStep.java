@@ -155,18 +155,17 @@ enum J2clStep {
 
         @Override
         Optional<J2clStep> next(final J2clRequest request) {
-            return Optional.of(POSSIBLE_SHADE);
+            return Optional.of(JAVA_SOURCE_SHADE);
         }
     },
 
     /**
-     * Attempts to find files called "j2cl-maven-plugin-shade" and drops the current directory/java package from
-     * files under it.
+     * Attempts to find files called "j2cl-maven-plugin-shade.txt" and uses that to shade matching source files.
      */
-    POSSIBLE_SHADE {
+    JAVA_SOURCE_SHADE {
         @Override
         String directoryName() {
-            return "5-possible-shade";
+            return "5-java-source-shade";
         }
 
         @Override
