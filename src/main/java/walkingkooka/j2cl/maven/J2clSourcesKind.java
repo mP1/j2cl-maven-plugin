@@ -23,10 +23,10 @@ import org.apache.maven.project.MavenProject;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Used to select either SRC or TEST sources including resources
@@ -34,45 +34,57 @@ import java.util.stream.Stream;
 enum J2clSourcesKind {
 
     /**
-     * Use the project and dependencies src directory.
+     * Use the project and dependencies src and resource directories.
      */
     SRC {
         @Override
         List<J2clPath> compileSourceRoots(final MavenProject project) {
-            return this.compileSourceRoots0(project.getCompileSourceRoots(), project.getResources());
+            return concat(
+                    sources(project.getCompileSourceRoots()),
+                    resources(project.getResources())
+            );
         }
     },
 
     /**
-     * When TEST use the project TEST directory.
+     * When TEST use the project SRC and TEST source and resource directories.
      */
     TEST {
         @Override
         List<J2clPath> compileSourceRoots(final MavenProject project) {
-            return this.compileSourceRoots0(project.getTestCompileSourceRoots(), project.getTestResources());
+            return concat(
+                    sources(project.getCompileSourceRoots(), project.getTestCompileSourceRoots()),
+                    resources(project.getResources(), project.getTestResources())
+            );
         }
     };
 
     abstract List<J2clPath> compileSourceRoots(final MavenProject project);
 
-    final List<J2clPath> compileSourceRoots0(final List<String> sources,
-                                             final List<Resource> resources) {
-        return Stream.concat(
-                paths(sources, Function.identity()),
-                paths(resources, Resource::getDirectory))
+    static List<J2clPath> sources(final List<String>... sources) {
+        return concat(Function.identity(), sources);
+    }
+
+    static List<J2clPath> resources(final List<Resource>... sources) {
+        return concat(Resource::getDirectory, sources);
+    }
+
+    private static <T> List<J2clPath> concat(final Function<T, String> mapper,
+                                             final List<T>... sources) {
+        return Arrays.stream(sources)
+                .filter(i -> null != i)
+                .flatMap(s -> s.stream())
+                .map(mapper)
                 .map(Paths::get)
                 .filter(Files::exists)
                 .map(J2clPath::with)
+                .distinct()
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Handles a source root and resources which may be null when missing into a {@link Stream} of {@link J2clPath paths}.
-     */
-    private static <S> Stream<String> paths(final List<S> sources,
-                                            final Function<S, String> path) {
-        return null != sources ?
-                sources.stream().map(path) :
-                Stream.empty();
+    static List<J2clPath> concat(final List<J2clPath>... sources) {
+        return Arrays.stream(sources)
+                .flatMap(s -> s.stream())
+                .collect(Collectors.toList());
     }
 }
