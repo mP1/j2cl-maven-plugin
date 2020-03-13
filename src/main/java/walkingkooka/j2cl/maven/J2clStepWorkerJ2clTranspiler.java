@@ -46,10 +46,10 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
         if (artifact.isProcessingSkipped()) {
             sourceRoot = artifact.step(J2clStep.UNPACK).output();
         } else {
-            // source may have been repackaged, have to check if a repackage output directory exists.
-            final J2clPath possibleRepackage = artifact.step(J2clStep.POSSIBLE_REPACKAGE).output();
-            if (possibleRepackage.exists().isPresent()) {
-                sourceRoot = possibleRepackage;
+            // source may have been shaded, have to check if a shade output directory exists.
+            final J2clPath possibleShade = artifact.step(J2clStep.POSSIBLE_SHADE).output();
+            if (possibleShade.exists().isPresent()) {
+                sourceRoot = possibleShade;
             } else {
                 sourceRoot = artifact.step(J2clStep.GWT_INCOMPATIBLE_STRIP).output();
             }

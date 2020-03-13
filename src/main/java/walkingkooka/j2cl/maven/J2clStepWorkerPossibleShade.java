@@ -27,21 +27,21 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * Scans the output of the previous step for any repackage super source and if any are found writes the result to an output directory.
+ * Scans the output of the previous step for any shade super source and if any are found writes the result to an output directory.
  */
-final class J2clStepWorkerPossibleRepackage extends J2clStepWorker2 {
+final class J2clStepWorkerPossibleShade extends J2clStepWorker2 {
 
     /**
      * Singleton
      */
     static J2clStepWorker instance() {
-        return new J2clStepWorkerPossibleRepackage();
+        return new J2clStepWorkerPossibleShade();
     }
 
     /**
      * Use singleton
      */
-    private J2clStepWorkerPossibleRepackage() {
+    private J2clStepWorkerPossibleShade() {
         super();
     }
 
@@ -55,20 +55,20 @@ final class J2clStepWorkerPossibleRepackage extends J2clStepWorker2 {
             result = J2clStepResult.SKIPPED;
         } else {
 
-            final J2clPath repackage = artifact.step(J2clStep.UNPACK)
+            final J2clPath shade = artifact.step(J2clStep.UNPACK)
                     .output()
-                    .repackageFile();
-            logger.printLine(repackage.toString());
+                    .shadeFile();
+            logger.printLine(shade.toString());
             logger.indent();
             {
                 boolean repackaging = false;
 
-                if (repackage.isFile()) {
-                    final Map<String, String> repackageMappings = repackage.readRepackageFile();
+                if (shade.isFile()) {
+                    final Map<String, String> shadeMappings = shade.readShadeFile();
 
-                    if (!repackageMappings.isEmpty()) {
-                        this.copyAndRepackage(artifact.step(J2clStep.GWT_INCOMPATIBLE_STRIP).output(),
-                                repackageMappings,
+                    if (!shadeMappings.isEmpty()) {
+                        this.copyAndShade(artifact.step(J2clStep.GWT_INCOMPATIBLE_STRIP).output(),
+                                shadeMappings,
                                 directory.output(),
                                 logger);
                         repackaging = true;
@@ -91,7 +91,7 @@ final class J2clStepWorkerPossibleRepackage extends J2clStepWorker2 {
      * Performs two copy passes, the first will refactor any java source during the copy process, the second will simply
      * copy the files to the destination.
      */
-    private void copyAndRepackage(final J2clPath sourceRoot,
+    private void copyAndShade(final J2clPath sourceRoot,
                                   final Map<String, String> repackaging,
                                   final J2clPath output,
                                   final J2clLinePrinter logger) throws Exception {
@@ -105,7 +105,7 @@ final class J2clStepWorkerPossibleRepackage extends J2clStepWorker2 {
                 final String find = mapping.getKey();
                 final String replace = mapping.getValue();
 
-                final J2clPath repackageDirectory = replace.isEmpty() ?
+                final J2clPath shadeDirectory = replace.isEmpty() ?
                         output :
                         output.append(replace.replace('.', File.separatorChar));
 
@@ -123,7 +123,7 @@ final class J2clStepWorkerPossibleRepackage extends J2clStepWorker2 {
                     nonRefactoredFiles.removeAll(refactorFiles);
 
                     // copy and refactor java source and copy other files to output.
-                    repackageDirectory.copyFiles(refactorSourceRoot,
+                    shadeDirectory.copyFiles(refactorSourceRoot,
                             refactorFiles,
                             (content, path) -> {
                                 return path.isJava() ?

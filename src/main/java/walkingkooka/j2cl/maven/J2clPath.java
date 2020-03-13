@@ -142,16 +142,16 @@ final class J2clPath implements Comparable<J2clPath> {
     private final static String OUTPUT = "output";
 
     /**
-     * Builds a new path holding the repackage mapping file.
+     * Builds a new path holding the shade mapping file.
      */
-    J2clPath repackageFile() {
-        return this.append(REPACKAGE_FILE);
+    J2clPath shadeFile() {
+        return this.append(SHADE_FILE);
     }
 
     /**
-     * The name of the repackage file used during {@link J2clStep#POSSIBLE_REPACKAGE} and the package prefix to be removed.
+     * The name of the shade file used during {@link J2clStep#POSSIBLE_SHADE} and the package prefix to be removed.
      */
-    private static final String REPACKAGE_FILE = FILE_PREFIX + "-repackage.txt";
+    private static final String SHADE_FILE = FILE_PREFIX + "-shade.txt";
 
     boolean isTestAnnotation() {
         final Path path = this.path();
@@ -241,7 +241,7 @@ final class J2clPath implements Comparable<J2clPath> {
     }
 
     /**
-     * Returns the content unmodified. This is the default behaviour of all copy operations except for {@link J2clStep#POSSIBLE_REPACKAGE}
+     * Returns the content unmodified. This is the default behaviour of all copy operations except for {@link J2clStep#POSSIBLE_SHADE}
      */
     private static byte[] identityBiFunction(final byte[] content, final J2clPath path) {
         return content;
@@ -355,9 +355,9 @@ final class J2clPath implements Comparable<J2clPath> {
     }
 
     /**
-     * Used to read the {@link #REPACKAGE_FILE} properties file.
+     * Used to read the {@link #SHADE_FILE} properties file.
      */
-    Map<String, String> readRepackageFile() throws IOException {
+    Map<String, String> readShadeFile() throws IOException {
         try (final InputStream file = new FileInputStream(this.file())) {
             final Properties properties = new Properties();
             properties.load(file);
