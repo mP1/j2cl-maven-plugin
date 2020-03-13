@@ -38,10 +38,7 @@
 
         <maven.compiler.source>1.9</maven.compiler.source>
         <maven.compiler.target>1.9</maven.compiler.target>
-
         <maven.compiler.plugin>3.7.0</maven.compiler.plugin>
-        <maven.findbugs.plugin>3.0.5</maven.findbugs.plugin>
-        <maven.j2cl.plugin>0.10-SNAPSHOT</maven.j2cl.plugin>
 
         <elemental2.version>1.0.0-RC1</elemental2.version>
         <j2cl.version>0.3-SNAPSHOT</j2cl.version>
