@@ -32,6 +32,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -155,6 +156,7 @@ final class J2clLinePrinter {
 
     void printIndentedString(final String label,
                              final Collection<String> values) {
+        Objects.requireNonNull(values, "values");
         this.printLine(values.size() + " " + label);
 
         //noinspection ConstantConditions

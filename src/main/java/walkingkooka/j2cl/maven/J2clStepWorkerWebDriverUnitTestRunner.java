@@ -81,10 +81,12 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
             logger.printIndented("Compiled tests file", file);
             logger.printIndented("JUnit startup file", junitStartup);
 
-            final String junitHtml = CharStreams.toString(new InputStreamReader(this.getClass().getResourceAsStream("junit.html"), DEFAULT_CHARSET))
-                    .replace("<TEST_SCRIPT>", file.toString());
+            try (final InputStreamReader reader = new InputStreamReader(this.getClass().getResourceAsStream("junit.html"), DEFAULT_CHARSET)) {
+                final String junitHtml = CharStreams.toString(reader)
+                        .replace("<TEST_SCRIPT>", file.toString());
 
-            junitStartup.writeFile(junitHtml.getBytes(DEFAULT_CHARSET));
+                junitStartup.writeFile(junitHtml.getBytes(DEFAULT_CHARSET));
+            }
         }
         logger.outdent();
         return junitStartup;
