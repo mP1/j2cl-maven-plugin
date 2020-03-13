@@ -336,25 +336,6 @@ final class J2clPath implements Comparable<J2clPath> {
     }
 
     /**
-     * Reads the contents of this file and returns the package prefix.
-     */
-    String readPackagePrefix() throws IOException {
-        final Path path = this.path();
-        final List<String> lines = Files.readAllLines(path);
-        final int count = lines.size();
-        if (1 != count) {
-            throw new J2clException("Package prefix file " + path + " must contain only 1 line not " + count);
-        }
-
-        final String packagePrefix = lines.get(0);
-        final int last = packagePrefix.lastIndexOf('.');
-        if (-1 == last) {
-            throw new J2clException("Package prefix " + CharSequences.quote(packagePrefix) + " must not be a top level package");
-        }
-        return packagePrefix;
-    }
-
-    /**
      * Used to read the {@link #SHADE_FILE} properties file.
      */
     Map<String, String> readShadeFile() throws IOException {
