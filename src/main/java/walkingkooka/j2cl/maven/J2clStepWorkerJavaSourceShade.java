@@ -61,7 +61,7 @@ final class J2clStepWorkerJavaSourceShade extends J2clStepWorker2 {
             logger.printLine(shade.toString());
             logger.indent();
             {
-                boolean repackaging = false;
+                boolean shaded = false;
 
                 if (shade.isFile()) {
                     final Map<String, String> shadeMappings = shade.readShadeFile();
@@ -71,12 +71,12 @@ final class J2clStepWorkerJavaSourceShade extends J2clStepWorker2 {
                                 shadeMappings,
                                 directory.output(),
                                 logger);
-                        repackaging = true;
+                        shaded = true;
                         result = J2clStepResult.SUCCESS;
                     }
                 }
 
-                if (!repackaging) {
+                if (!shaded) {
                     logger.printLine("Not found");
                     result = J2clStepResult.SKIPPED;
                 }
