@@ -88,11 +88,11 @@ final class J2clStepWorkerJavaSourceShade extends J2clStepWorker2 {
     }
 
     /**
-     * Performs two copy passes, the first will refactor any java source during the copy process, the second will simply
+     * Performs two copy passes, the first will shade any java source during the copy process, the second will simply
      * copy the files to the destination.
      */
     private void copyAndShade(final J2clPath sourceRoot,
-                                  final Map<String, String> repackaging,
+                                  final Map<String, String> shade,
                                   final J2clPath output,
                                   final J2clLinePrinter logger) throws Exception {
         final Set<J2clPath> files = sourceRoot.gatherFiles(J2clPath.JAVA_FILES);
@@ -101,7 +101,7 @@ final class J2clStepWorkerJavaSourceShade extends J2clStepWorker2 {
 
         logger.indent();
         {
-            for (final Entry<String, String> mapping : repackaging.entrySet()) {
+            for (final Entry<String, String> mapping : shade.entrySet()) {
                 final String find = mapping.getKey();
                 final String replace = mapping.getValue();
 
@@ -109,7 +109,7 @@ final class J2clStepWorkerJavaSourceShade extends J2clStepWorker2 {
                         output :
                         output.append(replace.replace('.', File.separatorChar));
 
-                logger.printLine("Finding package " + CharSequences.quote(find) + " replacing with " + CharSequences.quote(replace) + " in java source");
+                logger.printLine("Shading package from " + CharSequences.quote(find) + " to " + CharSequences.quote(replace));
                 logger.indent();
                 {
                     final Set<J2clPath> refactorFiles = Sets.sorted();
