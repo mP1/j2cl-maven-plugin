@@ -21,7 +21,6 @@ import com.google.j2cl.common.FrontendUtils.FileInfo;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
-import walkingkooka.text.CharSequences;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -55,6 +54,7 @@ final class J2clPath implements Comparable<J2clPath> {
 
     private static final String FILE_PREFIX = ".walkingkooka-j2cl-maven-plugin";
 
+    static final BiPredicate<Path, BasicFileAttributes> CLASS_FILES = fileEndsWith(".class");
     static final BiPredicate<Path, BasicFileAttributes> JAVA_FILES = fileEndsWith(".java");
     static final BiPredicate<Path, BasicFileAttributes> JAVASCRIPT_FILES = fileEndsWith(".js");
     static final BiPredicate<Path, BasicFileAttributes> NATIVE_JAVASCRIPT_FILES = fileEndsWith(".native.js");
@@ -149,7 +149,7 @@ final class J2clPath implements Comparable<J2clPath> {
     }
 
     /**
-     * The name of the shade file used during {@link J2clStep#JAVA_SOURCE_SHADE} and the package prefix to be removed.
+     * The name of the shade file used during {@link J2clStep#SHADE_JAVA_SOURCE} and the package prefix to be removed.
      */
     private static final String SHADE_FILE = FILE_PREFIX + "-shade.txt";
 
@@ -241,7 +241,7 @@ final class J2clPath implements Comparable<J2clPath> {
     }
 
     /**
-     * Returns the content unmodified. This is the default behaviour of all copy operations except for {@link J2clStep#JAVA_SOURCE_SHADE}
+     * Returns the content unmodified. This is the default behaviour of all copy operations except for {@link J2clStep#SHADE_JAVA_SOURCE}
      */
     private static byte[] identityBiFunction(final byte[] content, final J2clPath path) {
         return content;

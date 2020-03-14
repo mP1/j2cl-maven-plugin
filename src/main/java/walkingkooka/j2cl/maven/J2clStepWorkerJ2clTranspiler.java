@@ -47,7 +47,7 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
             sourceRoot = artifact.step(J2clStep.UNPACK).output();
         } else {
             // source may have been shaded, have to check if a shade output directory exists.
-            final J2clPath possibleShade = artifact.step(J2clStep.JAVA_SOURCE_SHADE).output();
+            final J2clPath possibleShade = artifact.step(J2clStep.SHADE_JAVA_SOURCE).output();
             if (possibleShade.exists().isPresent()) {
                 sourceRoot = possibleShade;
             } else {

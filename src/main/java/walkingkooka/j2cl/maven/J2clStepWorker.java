@@ -30,7 +30,9 @@ abstract class J2clStepWorker {
 
     final static J2clStepWorker COMPILE_STRIP_GWT_INCOMPAT = J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource.instance();
 
-    final static J2clStepWorker SHADE_SOURCE = J2clStepWorkerJavaSourceShade.instance();
+    final static J2clStepWorker SHADE_JAVA_SOURCE = J2clStepWorkerShadeJavaSource.instance();
+
+    final static J2clStepWorker SHADE_CLASS_FILE = J2clStepWorkerShadeClassFile.instance();
 
     final static J2clStepWorker TRANSPILER = J2clStepWorkerJ2clTranspiler.instance();
 
