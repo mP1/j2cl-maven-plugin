@@ -54,33 +54,22 @@ final class J2clStepWorkerJavaSourceShade extends J2clStepWorker2 {
         if (artifact.isProcessingSkipped()) {
             result = J2clStepResult.SKIPPED;
         } else {
-
-            final J2clPath shade = artifact.step(J2clStep.UNPACK)
-                    .output()
-                    .shadeFile();
-            logger.printLine(shade.toString());
             logger.indent();
             {
-                boolean shaded = false;
+                final Map<String, String> shadeMappings = artifact.shadeMappings();
 
-                if (shade.isFile()) {
-                    final Map<String, String> shadeMappings = shade.readShadeFile();
-
-                    if (!shadeMappings.isEmpty()) {
-                        this.copyAndShade(artifact.step(J2clStep.GWT_INCOMPATIBLE_STRIP).output(),
-                                shadeMappings,
-                                directory.output(),
-                                logger);
-                        shaded = true;
-                        result = J2clStepResult.SUCCESS;
-                    }
-                }
-
-                if (!shaded) {
+                if (!shadeMappings.isEmpty()) {
+                    this.copyAndShade(artifact.step(J2clStep.GWT_INCOMPATIBLE_STRIP).output(),
+                            shadeMappings,
+                            directory.output(),
+                            logger);
+                    result = J2clStepResult.SUCCESS;
+                } else {
                     logger.printLine("Not found");
                     result = J2clStepResult.SKIPPED;
                 }
             }
+
             logger.outdent();
         }
 

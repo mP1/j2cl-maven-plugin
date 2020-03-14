@@ -19,8 +19,6 @@ package walkingkooka.j2cl.maven;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
-import walkingkooka.ToStringBuilder;
-import walkingkooka.ToStringBuilderOption;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
@@ -302,6 +300,30 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     boolean isExcluded() {
         return this.request().isExcluded(this.coords());
+    }
+
+
+    // shade............................................................................................................
+
+    Map<String, String> shadeMappings() throws IOException {
+        if (null == this.shadeMappings) {
+            this.shadeMappings = this.loadShadeFile();
+        }
+        return this.shadeMappings;
+    }
+
+    /**
+     * The cached shade mappings file as a {@link Map}.
+     */
+    private Map<String, String> shadeMappings;
+
+    private Map<String, String> loadShadeFile() throws IOException {
+        final J2clPath file = this.step(J2clStep.UNPACK)
+                .output()
+                .shadeFile();
+        return file.exists().isPresent() ?
+                file.readShadeFile() :
+                Maps.empty();
     }
 
     // tasks............................................................................................................
