@@ -85,8 +85,8 @@ final class J2clStepWorkerJavaSourceShade extends J2clStepWorker2 {
                                   final J2clPath output,
                                   final J2clLinePrinter logger) throws Exception {
         final Set<J2clPath> files = sourceRoot.gatherFiles(J2clPath.JAVA_FILES);
-        final Set<J2clPath> nonRefactoredFiles = Sets.sorted();
-        nonRefactoredFiles.addAll(files);
+        final Set<J2clPath> nonShadedFiles = Sets.sorted();
+        nonShadedFiles.addAll(files);
 
         logger.indent();
         {
@@ -101,22 +101,22 @@ final class J2clStepWorkerJavaSourceShade extends J2clStepWorker2 {
                 logger.printLine("Shading package from " + CharSequences.quote(find) + " to " + CharSequences.quote(replace));
                 logger.indent();
                 {
-                    final Set<J2clPath> refactorFiles = Sets.sorted();
-                    final J2clPath refactorSourceRoot = sourceRoot.append(find.replace('.', File.separatorChar));
+                    final Set<J2clPath> shadedFiles = Sets.sorted();
+                    final J2clPath shadedSourceRoot = sourceRoot.append(find.replace('.', File.separatorChar));
 
-                    // filter only files belonging to refactor source root
+                    // filter only files belonging to shade source root
                     files.stream()
-                            .filter(f -> f.path().startsWith(refactorSourceRoot.path()))
-                            .forEach(refactorFiles::add);
+                            .filter(f -> f.path().startsWith(shadedSourceRoot.path()))
+                            .forEach(shadedFiles::add);
 
-                    nonRefactoredFiles.removeAll(refactorFiles);
+                    nonShadedFiles.removeAll(shadedFiles);
 
-                    // copy and refactor java source and copy other files to output.
-                    shadeDirectory.copyFiles(refactorSourceRoot,
-                            refactorFiles,
+                    // copy and shade java source and copy other files to output.
+                    shadeDirectory.copyFiles(shadedSourceRoot,
+                            shadedFiles,
                             (content, path) -> {
                                 return path.isJava() ?
-                                        refactor(content, find, replace) :
+                                        shade(content, find, replace) :
                                         content;
                             },
                             logger);
@@ -130,7 +130,7 @@ final class J2clStepWorkerJavaSourceShade extends J2clStepWorker2 {
 
                 // copy all other files verbatim.
                 output.copyFiles(sourceRoot,
-                        nonRefactoredFiles,
+                        nonShadedFiles,
                         logger);
 
             }
@@ -143,9 +143,9 @@ final class J2clStepWorkerJavaSourceShade extends J2clStepWorker2 {
      * Reads the text file assuming its java source and removes the package prefix. Should have the intended effect
      * of fixing package declarations, import statements and other fully qualified class names.
      */
-    private static byte[] refactor(final byte[] content,
-                                   final String find,
-                                   final String replace) {
+    private static byte[] shade(final byte[] content,
+                                final String find,
+                                final String replace) {
         final Charset charset = Charset.defaultCharset();
         String text = new String(content, charset);
 
