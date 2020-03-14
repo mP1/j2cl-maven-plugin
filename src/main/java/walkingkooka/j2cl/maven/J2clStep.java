@@ -170,7 +170,7 @@ enum J2clStep {
 
         @Override
         J2clStepWorker execute1() {
-            return J2clStepWorker.POSSIBLE_SHADE;
+            return J2clStepWorker.SHADE_SOURCE;
         }
 
         @Override
