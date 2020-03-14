@@ -116,7 +116,7 @@ final class J2clStepWorkerJavaSourceShade extends J2clStepWorker2 {
                             shadedFiles,
                             (content, path) -> {
                                 return path.isJava() ?
-                                        shade(content, find, replace) :
+                                        shade(content, shade) :
                                         content;
                             },
                             logger);
@@ -144,13 +144,14 @@ final class J2clStepWorkerJavaSourceShade extends J2clStepWorker2 {
      * of fixing package declarations, import statements and other fully qualified class names.
      */
     private static byte[] shade(final byte[] content,
-                                final String find,
-                                final String replace) {
+                                final Map<String, String> shadings) {
         final Charset charset = Charset.defaultCharset();
         String text = new String(content, charset);
 
         // TODO nasty simply remove the package prefix, replace with javaparser that transforms java source imports, fqcns etc.
-        text = text.replace(find, replace);
+        for (final Entry<String, String> mapping : shadings.entrySet()) {
+            text = text.replace(mapping.getKey(), mapping.getValue());
+        }
 
         return text.getBytes(charset);
     }
