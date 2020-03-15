@@ -324,8 +324,8 @@
                             </replaced-dependencies>
                             <skip-tests>false</skip-tests>
                             <tests>
-                                <test>org.gwtproject.timer.client.TimerJc2lTest</test>
-                                <test>org.gwtproject.timer.client.TimerJc2lTest2</test>
+                                <test>org.gwtproject.timer.client.TimerJ2clTest</test>
+                                <test>org.gwtproject.timer.client.TimerJ2clTest2</test>
                             </tests>
                             <test-timeout>90</test-timeout>
                         </configuration>
