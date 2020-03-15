@@ -19,8 +19,8 @@ import com.google.j2cl.junit.apt.J2clTestInput;
 import elemental2.promise.Promise;
 import org.junit.Test;
 
-@J2clTestInput(TimerJc2lTest.class)
-public class TimerJc2lTest {
+@J2clTestInput(TimerJ2clTest.class)
+public class TimerJ2clTest {
 
   @Test(timeout = 500)
   public Promise<Void> testTimerSchedule() {
