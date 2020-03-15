@@ -559,6 +559,42 @@ sub2/IgnoredFile2.*
 ``` 
 
 
+# Shade file(s)
+
+The shade file is useful for shading classes belonging to package and all sub packages. This useful feature helps when
+developing missing or incoplete JRE classes such as `java.util.Base64`. This feature supports the ability to create
+a replacement under a different package allowing regular JRE unit tests to be written that compare results when invoking
+the real `java.util.Base64` and a class with similar methods but under a different package.
+
+
+ 
+## Sample .walkingkooka-j2cl-maven-plugin-shade.txt
+
+The properties file content. This example will eventually change `example.java.util` to `java.util`.
+
+```txt
+example.java.util=java.util
+```
+
+The sample below shows an example of the source before step 5, after that completes, the package and type references
+will have the example removed.
+
+```java
+package example.java.util;
+
+class Base64 {
+  class Decoder {
+    
+  }
+
+  class Encoder {
+  
+  }
+}
+```
+
+
+
 # Building steps or phases.
 
 The build process involves transforming the parent project and dependencies including transitives from java into javascript,
@@ -577,14 +613,16 @@ will be useful if anything goes wrong.
 Every single step for every single artifact will have its own log file under its own step directory under the directory
 for that artifact named according to the scheme mentioned above.
 
-## Step 1 Hashing
+
+
+## Step 0 Hashing
 
 The first step whenever a dependency processing begins is to compute the hash which is then combined with the maven
 coordinates and used to create a directory if one did not previously exist.
 
 
 
-## Step 2 Unpack
+## Step 1 Unpack
 
 An attempt will be made to locate the sources jar and unpack if found. If no java source files (`*.java`) are found the
 original artifact itself will be unpacked over the first unpack. If no java source files are found in either the remaining
@@ -593,13 +631,13 @@ javascript.
 
 
 
-## Step 3 Javac Compile
+## Step 2 Javac Compile
 
 The source extracted in step 2 will then be compiled by javac.
 
 
 
-## Step 4 Gwt incompatible stripped source
+## Step 3 Gwt incompatible stripped source
 
 The goal of this step is to remove classes and class members such as methods or fields that have been marked with the
 `@Gwt-incompatible` annotation with the "output" directory of this step containing the final result AFTER these classes and
@@ -609,52 +647,24 @@ This step also removes entire classes that have been matched by the ignore files
 
 
 
-## Step 5 Javac Compile Gwt incompatible stripped source
+## Step 4 Javac Compile Gwt incompatible stripped source
 
 This step invokes javac on the output produced by step 4.
 
 
 
-## Step 6 Possible shade 
+## Step 5 shade java source.
 
-This step will attempt to locate a `.walkingkooka-j2cl-maven-plugin-shade.txt` properties file which can hold mappings
-of packages that should exist to new packages. This can be useful when one wishes to write an emulation of another package,
-and have both co-exist and used to author unit tests. A simple example might be to author a replacement of a as yet
-unsupported JDK class(es).
+This step will execute if a `.walkingkooka-j2cl-maven-plugin-shade.txt` file is present. All the mapped java source files
+will be shaded so they appear in the new package. 
 
-This is very similar to the concept of GWT super source but with extra functionality to change the packaging and will be useful
-when converting threeten to java.time.
 
- 
-### .walkingkooka-j2cl-maven-plugin-shade.txt
 
-The properties file content. This example will eventually change `example.java.util` to `java.util`.
+## Step 6 shade classfiles.
 
-```txt
-example.java.util=java.util
-```
-
-The original source prior to step 6 altering packaging and type references.
-
-```java
-package example.java.util;
-
-class Locale {
-  static Locale forLanguageTag(String tag);
-    // perhaps have a big switch statement with a few locales we wish to support in js.
-}
-```
-
-The actual java source after step 6 processing, that is compiled into javascript. This will also the be actual source
-that appears under the sources directory that is mapped by source maps.
-
-```java
-package java.util;
-
-class Locale {
-   Locale forLanguageTag(String tag);
-}
-```
+This step will execute if a `.walkingkooka-j2cl-maven-plugin-shade.txt` file is present. All the mapped class files
+will be shaded so they appear in the new package. The files modified here will be the class files of the java source
+modified in step 5.
 
 
 
