@@ -25,9 +25,6 @@
         <maven.version>3.6.0</maven.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.outputEncoding>UTF-8</project.build.outputEncoding>
-        <takari.lifecycle.plugin.version>1.13.9</takari.lifecycle.plugin.version>
-        <!-- Test -->
-        <takari.plugin.testing.version>2.9.2</takari.plugin.testing.version>
     </properties>
 
     <prerequisites>
