@@ -692,69 +692,88 @@ To aide readability and faster location of a parameter or file, everything is so
 and tree views for a file listing such as a classpath.
 
 ```txt
-walkingkooka:example-hello-world-single:war:1.0-TRANSPILE
-  Directory
-    /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-3b822904f436686e983f48cd4b9ae84e51bb5c7f/5-transpiled-java-to-javascript
-      Preparing...
-      Source path(s)
-        /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-3b822904f436686e983f48cd4b9ae84e51bb5c7f/3-gwt-incompatible-stripped-source/output
-      J2clTranspiler
-        Parameters
-          Classpath(s)
-              Users/miroslav/repos-github/j2cl-maven-plugin/target
-                it-repo
-                  com
-                    google/jsinterop/jsinterop-annotations/2.0.0
-                      jsinterop-annotations-2.0.0.jar
-                    vertispan/j2cl
-                      gwt-internal-annotations/0.5-SNAPSHOT
-                        gwt-internal-annotations-0.5-SNAPSHOT.jar
-                      javac-bootstrap-classpath/0.5-SNAPSHOT
-                        javac-bootstrap-classpath-0.5-SNAPSHOT.jar
-                      jre/0.5-SNAPSHOT
-                        jre-0.5-SNAPSHOT.jar
-                  javax/annotation/jsr250-api/1.0
-                    jsr250-api-1.0.jar
-                it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/com.vertispan.jsinterop-base-jar-1.0.0-SNAPSHOT-3c567690544f3976786d34887a1766d3e0cdcaf5/4-javac-compiled-gwt-incompatible-stripped
-                  output
-            6 file(s)
-          *.java Source(s)
-              Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-3b822904f436686e983f48cd4b9ae84e51bb5c7f/3-gwt-incompatible-stripped-source/output/example/helloworldlib
-                HelloWorld.java
-            1 file(s)
-          *.native.js source(s)
-            0 file(s)
-          *.js source(s)
-              Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-3b822904f436686e983f48cd4b9ae84e51bb5c7f/3-gwt-incompatible-stripped-source/output/example
-                helloworld
-                  app.js
-                helloworldlib
-                  hello.js
-            2 file(s)
-          Output
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-3b822904f436686e983f48cd4b9ae84e51bb5c7f/5-transpiled-java-to-javascript/output
-        J2clTranspiler
-          0 problem(s)
-            *** END ***
-          Copy js to output
-            Copying
-                Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-3b822904f436686e983f48cd4b9ae84e51bb5c7f/5-transpiled-java-to-javascript/output/example
-                  helloworld
-                    app.js
-                  helloworldlib
-                    hello.js
-              2 file(s)
-          Output file(s) after copy
-              Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-3b822904f436686e983f48cd4b9ae84e51bb5c7f/5-transpiled-java-to-javascript/output/example
-                helloworld
-                  app.js
-                helloworldlib
-                  HelloWorld.impl.java.js HelloWorld.java      HelloWorld.java.js   HelloWorld.js.map
-                  hello.js
-            10 file(s)
-    
-    Log file
-      /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-3b822904f436686e983f48cd4b9ae84e51bb5c7f/5-transpiled-java-to-javascript/log.txt
+[DEBUG] com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT-TRANSPILE
+[DEBUG]   Directory
+[DEBUG]     /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/com.vertispan.jsinterop-base-jar-1.0.0-SNAPSHOT-13545c8faf5ab4dccf4cb4a188c738df245edc9f/7-transpiled-java-to-javascript
+[DEBUG]       Preparing...
+[DEBUG]       Source path(s)
+[DEBUG]         /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/com.vertispan.jsinterop-base-jar-1.0.0-SNAPSHOT-13545c8faf5ab4dccf4cb4a188c738df245edc9f/3-gwt-incompatible-stripped-source/output
+[DEBUG]       J2clTranspiler
+[DEBUG]         Parameters
+[DEBUG]           Classpath(s)
+[DEBUG]               Users/miroslav/repos-github/j2cl-maven-plugin/target/it-repo
+[DEBUG]                 com
+[DEBUG]                   google/jsinterop/jsinterop-annotations/2.0.0
+[DEBUG]                     jsinterop-annotations-2.0.0.jar
+[DEBUG]                   vertispan/j2cl
+[DEBUG]                     gwt-internal-annotations/0.5-SNAPSHOT
+[DEBUG]                       gwt-internal-annotations-0.5-SNAPSHOT.jar
+[DEBUG]                     javac-bootstrap-classpath/0.5-SNAPSHOT
+[DEBUG]                       javac-bootstrap-classpath-0.5-SNAPSHOT.jar
+[DEBUG]                     jre/0.5-SNAPSHOT
+[DEBUG]                       jre-0.5-SNAPSHOT.jar
+[DEBUG]                 javax/annotation/jsr250-api/1.0
+[DEBUG]                   jsr250-api-1.0.jar
+[DEBUG]             5 file(s)
+[DEBUG]           *.java Source(s)
+[DEBUG]               Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/com.vertispan.jsinterop-base-jar-1.0.0-SNAPSHOT-13545c8faf5ab4dccf4cb4a188c738df245edc9f/3-gwt-incompatible-stripped-source/output/jsinterop/base
+[DEBUG]                 super/com/google/gwt/core/client
+[DEBUG]                   UnsafeNativeLong.java
+[DEBUG]                 Any.java                                                     InternalJsUtil.java
+[DEBUG]                 InternalPreconditions.java                                   Js.java
+[DEBUG]                 JsArrayLike.java                                             JsConstructorFn.java
+[DEBUG]                 JsForEachCallbackFn.java                                     JsPropertyMap.java
+[DEBUG]             9 file(s)
+[DEBUG]           *.native.js source(s)
+[DEBUG]               Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/com.vertispan.jsinterop-base-jar-1.0.0-SNAPSHOT-13545c8faf5ab4dccf4cb4a188c738df245edc9f/3-gwt-incompatible-stripped-source/output/jsinterop/base
+[DEBUG]                 InternalJsUtil.native.js                                     InternalPreconditions.native.js
+[DEBUG]                 Js.native.js
+[DEBUG]             3 file(s)
+[DEBUG]           *.js source(s)
+[DEBUG]               Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/com.vertispan.jsinterop-base-jar-1.0.0-SNAPSHOT-13545c8faf5ab4dccf4cb4a188c738df245edc9f/3-gwt-incompatible-stripped-source/output/jsinterop/base
+[DEBUG]                 jsinterop.js
+[DEBUG]             1 file(s)
+[DEBUG]           Output
+[DEBUG]             /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/com.vertispan.jsinterop-base-jar-1.0.0-SNAPSHOT-13545c8faf5ab4dccf4cb4a188c738df245edc9f/7-transpiled-java-to-javascript/output
+[DEBUG]         J2clTranspiler
+[DEBUG]           0 problem(s)
+[DEBUG]             *** END ***
+[DEBUG]           Copy js to output
+[DEBUG]             Copying
+[DEBUG]                 Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/com.vertispan.jsinterop-base-jar-1.0.0-SNAPSHOT-13545c8faf5ab4dccf4cb4a188c738df245edc9f/7-transpiled-java-to-javascript/output/jsinterop/base
+[DEBUG]                   jsinterop.js
+[DEBUG]               1 file(s)
+[DEBUG]           Output file(s) after copy
+[DEBUG]               Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/com.vertispan.jsinterop-base-jar-1.0.0-SNAPSHOT-13545c8faf5ab4dccf4cb4a188c738df245edc9f/7-transpiled-java-to-javascript/output
+[DEBUG]                 com/google/gwt/core/client
+[DEBUG]                   UnsafeNativeLong$$LambdaAdaptor.impl.java.js                 UnsafeNativeLong$$LambdaAdaptor.java.js
+[DEBUG]                   UnsafeNativeLong$$LambdaAdaptor.js.map                       UnsafeNativeLong.impl.java.js
+[DEBUG]                   UnsafeNativeLong.java                                        UnsafeNativeLong.java.js
+[DEBUG]                   UnsafeNativeLong.js.map
+[DEBUG]                 jsinterop/base
+[DEBUG]                   Any$$Overlay.impl.java.js                                    Any$$Overlay.java.js
+[DEBUG]                   Any$$Overlay.js.map                                          Any.java
+[DEBUG]                   InternalJsUtil.impl.java.js                                  InternalJsUtil.java
+[DEBUG]                   InternalJsUtil.java.js                                       InternalJsUtil.js.map
+[DEBUG]                   InternalJsUtil.native_js                                     InternalPreconditions.impl.java.js
+[DEBUG]                   InternalPreconditions.java                                   InternalPreconditions.java.js
+[DEBUG]                   InternalPreconditions.js.map                                 InternalPreconditions.native_js
+[DEBUG]                   Js.impl.java.js                                              Js.java
+[DEBUG]                   Js.java.js                                                   Js.js.map
+[DEBUG]                   Js.native_js                                                 JsArrayLike$$Overlay.impl.java.js
+[DEBUG]                   JsArrayLike$$Overlay.java.js                                 JsArrayLike$$Overlay.js.map
+[DEBUG]                   JsArrayLike.java                                             JsConstructorFn$$Overlay.impl.java.js
+[DEBUG]                   JsConstructorFn$$Overlay.java.js                             JsConstructorFn$$Overlay.js.map
+[DEBUG]                   JsConstructorFn.java                                         JsForEachCallbackFn.java
+[DEBUG]                   JsPropertyMap$$Overlay.impl.java.js                          JsPropertyMap$$Overlay.java.js
+[DEBUG]                   JsPropertyMap$$Overlay.js.map                                JsPropertyMap.java
+[DEBUG]                   jsinterop.js
+[DEBUG]             40 file(s)
+[DEBUG]     
+[DEBUG]     Log file
+[DEBUG]       /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/j2cl-maven-plugin-cache/com.vertispan.jsinterop-base-jar-1.0.0-SNAPSHOT-13545c8faf5ab4dccf4cb4a188c738df245edc9f/7-transpiled-java-to-javascript/log.txt
+[DEBUG]     
+[DEBUG]
 ```
 
 The image below contains two panel views, the left shows a directory tree showing the output directory showing all artifacts
