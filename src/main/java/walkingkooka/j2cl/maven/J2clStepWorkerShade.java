@@ -21,32 +21,28 @@ import walkingkooka.collect.set.Sets;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;
-import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.BiPredicate;
 
 /**
- * Scans the output of the previous step for any shade java source and if any are found writes the result to an output directory.
+ * If the dependency source has a shade file, create an output directory with selected shaded class files combined
+ * with the other class files changed.
  */
-final class J2clStepWorkerJavaSourceShade extends J2clStepWorker2 {
+abstract class J2clStepWorkerShade extends J2clStepWorker2 {
 
     /**
-     * Singleton
+     * Package private to limit sub classing.
      */
-    static J2clStepWorker instance() {
-        return new J2clStepWorkerJavaSourceShade();
-    }
-
-    /**
-     * Use singleton
-     */
-    private J2clStepWorkerJavaSourceShade() {
+    J2clStepWorkerShade() {
         super();
     }
 
     @Override
-    J2clStepResult execute1(final J2clDependency artifact,
+    final J2clStepResult execute1(final J2clDependency artifact,
                             final J2clStepDirectory directory,
                             final J2clLinePrinter logger) throws Exception {
         J2clStepResult result = null;
@@ -59,7 +55,7 @@ final class J2clStepWorkerJavaSourceShade extends J2clStepWorker2 {
                 final Map<String, String> shadeMappings = artifact.shadeMappings();
 
                 if (!shadeMappings.isEmpty()) {
-                    this.copyAndShade(artifact.step(J2clStep.GWT_INCOMPATIBLE_STRIP).output(),
+                    this.copyAndShade(artifact.step(this.step()).output(),
                             shadeMappings,
                             directory.output(),
                             logger);
@@ -76,15 +72,17 @@ final class J2clStepWorkerJavaSourceShade extends J2clStepWorker2 {
         return result;
     }
 
+    abstract J2clStep step();
+
     /**
-     * Performs two copy passes, the first will shade any java source during the copy process, the second will simply
+     * Performs two copy passes, the first will shade any files during the copy process, the second will simply
      * copy the files to the destination.
      */
-    private void copyAndShade(final J2clPath sourceRoot,
+    private void copyAndShade(final J2clPath root,
                                   final Map<String, String> shade,
                                   final J2clPath output,
                                   final J2clLinePrinter logger) throws Exception {
-        final Set<J2clPath> files = sourceRoot.gatherFiles(J2clPath.JAVA_FILES);
+        final Set<J2clPath> files = root.gatherFiles(this.fileFilter());
         final Set<J2clPath> nonShadedFiles = Sets.sorted();
         nonShadedFiles.addAll(files);
 
@@ -102,17 +100,17 @@ final class J2clStepWorkerJavaSourceShade extends J2clStepWorker2 {
                 logger.indent();
                 {
                     final Set<J2clPath> shadedFiles = Sets.sorted();
-                    final J2clPath shadedSourceRoot = sourceRoot.append(find.replace('.', File.separatorChar));
+                    final J2clPath shadedRoot = root.append(find.replace('.', File.separatorChar));
 
                     // filter only files belonging to shade source root
                     files.stream()
-                            .filter(f -> f.path().startsWith(shadedSourceRoot.path()))
+                            .filter(f -> f.path().startsWith(shadedRoot.path()))
                             .forEach(shadedFiles::add);
 
                     nonShadedFiles.removeAll(shadedFiles);
 
                     // copy and shade java source and copy other files to output.
-                    shadeDirectory.copyFiles(shadedSourceRoot,
+                    shadeDirectory.copyFiles(shadedRoot,
                             shadedFiles,
                             (content, path) -> {
                                 return path.isJava() ?
@@ -129,7 +127,7 @@ final class J2clStepWorkerJavaSourceShade extends J2clStepWorker2 {
             {
 
                 // copy all other files verbatim.
-                output.copyFiles(sourceRoot,
+                output.copyFiles(root,
                         nonShadedFiles,
                         logger);
 
@@ -139,20 +137,11 @@ final class J2clStepWorkerJavaSourceShade extends J2clStepWorker2 {
         logger.outdent();
     }
 
+    abstract BiPredicate<Path, BasicFileAttributes> fileFilter();
+
     /**
-     * Reads the text file assuming its java source and removes the package prefix. Should have the intended effect
-     * of fixing package declarations, import statements and other fully qualified class names.
+     * Reads the file and shades the source text or class file type references.
      */
-    private static byte[] shade(final byte[] content,
-                                final Map<String, String> shadings) {
-        final Charset charset = Charset.defaultCharset();
-        String text = new String(content, charset);
-
-        // TODO nasty simply remove the package prefix, replace with javaparser that transforms java source imports, fqcns etc.
-        for (final Entry<String, String> mapping : shadings.entrySet()) {
-            text = text.replace(mapping.getKey(), mapping.getValue());
-        }
-
-        return text.getBytes(charset);
-    }
+    abstract byte[] shade(final byte[] content,
+                          final Map<String, String> mappings);
 }

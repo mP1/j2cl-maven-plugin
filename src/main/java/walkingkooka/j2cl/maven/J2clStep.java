@@ -155,22 +155,49 @@ enum J2clStep {
 
         @Override
         Optional<J2clStep> next(final J2clRequest request) {
-            return Optional.of(JAVA_SOURCE_SHADE);
+            return Optional.of(SHADE_JAVA_SOURCE);
         }
     },
 
     /**
-     * Attempts to find files called "j2cl-maven-plugin-shade.txt" and uses that to shade matching source files.
+     * Attempts to find files called "j2cl-maven-plugin-shade.txt" in the root of the dependency files and uses that to
+     * shade java source files.
      */
-    JAVA_SOURCE_SHADE {
+    SHADE_JAVA_SOURCE {
         @Override
         String directoryName() {
-            return "5-java-source-shade";
+            return "5-shade-java-source";
         }
 
         @Override
         J2clStepWorker execute1() {
-            return J2clStepWorker.SHADE_SOURCE;
+            return J2clStepWorker.SHADE_JAVA_SOURCE;
+        }
+
+        @Override
+        boolean skipIfDependency() {
+            return false;
+        }
+
+        @Override
+        Optional<J2clStep> next(final J2clRequest request) {
+            return Optional.of(SHADE_CLASS_FILES);
+        }
+    },
+
+    /**
+     * Attempts to find files called "j2cl-maven-plugin-shade.txt" in the root of the dependency files and uses that to
+     * shade class files.
+     */
+    SHADE_CLASS_FILES {
+        @Override
+        String directoryName() {
+            return "6-shade-class-files";
+        }
+
+        @Override
+        J2clStepWorker execute1() {
+            return J2clStepWorker.SHADE_CLASS_FILE;
         }
 
         @Override
@@ -190,7 +217,7 @@ enum J2clStep {
     TRANSPILE {
         @Override
         String directoryName() {
-            return "6-transpiled-java-to-javascript";
+            return "7-transpiled-java-to-javascript";
         }
 
         @Override
@@ -214,7 +241,7 @@ enum J2clStep {
     CLOSURE_COMPILER {
         @Override
         String directoryName() {
-            return "7-closure-compiler-output";
+            return "8-closure-compiler-output";
         }
 
         @Override
@@ -240,7 +267,7 @@ enum J2clStep {
     OUTPUT_ASSEMBLER {
         @Override
         String directoryName() {
-            return "8-output-assembler";
+            return "9-output-assembler";
         }
 
         @Override
@@ -264,7 +291,7 @@ enum J2clStep {
     JUNIT_WEBDRIVER_TESTS {
         @Override
         String directoryName() {
-            return "8-junit-webdriver-tests";
+            return "9-junit-webdriver-tests";
         }
 
         @Override

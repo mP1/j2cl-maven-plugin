@@ -751,7 +751,7 @@ The image below contains two panel views, the left shows a directory tree showin
 and some log files expanded, and the right shows a sample log file. The log shows a successful Closure compile build, with
 numerous warning level messages. All the parameters and paths to files are above the area of the log shown.
 
-![Sample output](output-directory.png)
+![Sample output](draw-vertispan-connected-closure-compiler-output-directory.png)
 
  
 
