@@ -100,7 +100,7 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
      */
     private void executeTestSuite(final J2clPath startupHostFile,
                                   final int timeout,
-                                  final J2clLinePrinter logger) {
+                                  final J2clLinePrinter logger) throws Exception {
 
         logger.printLine("Test " + startupHostFile);
         logger.indent();
@@ -126,9 +126,10 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
                 } else {
                     logger.printLine("All test(s) successful!");
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            } catch (final Exception cause) {
+                cause.printStackTrace();
                 logger.printLine("Test(s) failed!");
+                throw cause;
             } finally {
                 if (driver != null) {
                     driver.quit();
