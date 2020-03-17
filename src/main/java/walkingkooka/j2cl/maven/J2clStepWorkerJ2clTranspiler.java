@@ -17,9 +17,8 @@
 
 package walkingkooka.j2cl.maven;
 
-import walkingkooka.collect.list.Lists;
-
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Transpiles the stripped source into javascript equivalents.
@@ -58,15 +57,13 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
         logger.printLine("Preparing...");
         logger.printIndented("Source path(s)", sourceRoot);
 
-        final List<J2clPath> classpath = Lists.array();
-
-        for (final J2clDependency dependency : artifact.classpathAndDependencies()) {
-            if (dependency.isProcessingSkipped()) {
-                classpath.add(dependency.artifactFileOrFail());
-            } else {
-                classpath.add(dependency.step(J2clStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED).output());
-            }
-        }
+        final List<J2clPath> classpath = artifact.classpathAndDependencies()
+                .stream()
+                .map(d -> d.isProcessingSkipped() ?
+                        d.artifactFileOrFail() :
+                        d.step(J2clStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED).output())
+                .flatMap(d -> d.exists().stream())
+                .collect(Collectors.toList());
 
         return J2clTranspiler.execute(classpath,
                 sourceRoot,
