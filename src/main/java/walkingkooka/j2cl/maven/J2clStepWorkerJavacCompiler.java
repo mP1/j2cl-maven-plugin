@@ -68,14 +68,18 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
                             .ifPresent(classpath::add);
                 }
 
-                result = JavacCompiler.execute(classpath.size() > 1 ? classpath.subList(0, 1) : Lists.empty(),
-                        classpath.size() >= 1 ? classpath.subList(1, classpath.size()) : Lists.empty(),
-                        javaSourceFiles,
-                        directory.output().emptyOrFail(),
-                        this.shouldRunAnnotationProcessors(),
-                        logger) ?
-                        J2clStepResult.SUCCESS :
-                        J2clStepResult.FAILED;
+                if(classpath.isEmpty()) {
+                    result = J2clStepResult.SKIPPED; // project could have no source files.
+                } else {
+                    result = JavacCompiler.execute(classpath.size() > 1 ? classpath.subList(0, 1) : Lists.empty(),
+                            classpath.size() >= 1 ? classpath.subList(1, classpath.size()) : Lists.empty(),
+                            javaSourceFiles,
+                            directory.output().emptyOrFail(),
+                            this.shouldRunAnnotationProcessors(),
+                            logger) ?
+                            J2clStepResult.SUCCESS :
+                            J2clStepResult.FAILED;
+                }
             }
         }
 
