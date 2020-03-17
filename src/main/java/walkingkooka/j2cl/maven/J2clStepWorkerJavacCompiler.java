@@ -60,9 +60,12 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
 
                     if (dependency.isProcessingSkipped()) {
                         classpath.add(dependency.artifactFileOrFail());
-                    } else {
-                        classpath.add(dependency.step(compiledStep).output());
+                        continue;
                     }
+                    dependency.step(compiledStep)
+                            .output()
+                            .exists()
+                            .ifPresent(classpath::add);
                 }
 
                 result = JavacCompiler.execute(classpath.size() > 1 ? classpath.subList(0, 1) : Lists.empty(),
