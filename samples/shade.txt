@@ -1,0 +1,6 @@
+#
+# A text or properties file mapping packages that will be shaded. The file must be named:
+#   .walkingkooka-j2cl-maven-plugin-shade.txt
+#
+example.shade.java.io=java.io
+example.shade.javaio=java.io

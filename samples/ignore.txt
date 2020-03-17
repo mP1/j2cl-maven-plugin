@@ -1,0 +1,9 @@
+#
+# can be placed in any directory holding *.java files or resources and must be named:
+#   .walkingkooka-j2cl-maven-plugin-ignore.txt
+#
+# Patterns in this file should match files in this package and its sub package.
+
+IgnoredFile.*
+**/IgnoredFile2.*
+
