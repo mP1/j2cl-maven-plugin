@@ -784,6 +784,13 @@ numerous warning level messages. All the parameters and paths to files are above
 
  
 
+
+# Samples
+
+Samples of all the various files mentioned above are available under [samples](samples/)
+
+
+
 # Contributions
 
 Suggestions via the issue tracker, and pull requests are most welcomed.
