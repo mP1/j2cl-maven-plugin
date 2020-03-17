@@ -151,7 +151,7 @@ final class J2clPath implements Comparable<J2clPath> {
     /**
      * The name of the shade file used during {@link J2clStep#SHADE_JAVA_SOURCE} and the package prefix to be removed.
      */
-    private static final String SHADE_FILE = FILE_PREFIX + "-shade.txt";
+    static final String SHADE_FILE = FILE_PREFIX + "-shade.txt";
 
     boolean isTestAnnotation() {
         final Path path = this.path();

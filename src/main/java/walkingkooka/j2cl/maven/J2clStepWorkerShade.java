@@ -43,8 +43,8 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
 
     @Override
     final J2clStepResult execute1(final J2clDependency artifact,
-                            final J2clStepDirectory directory,
-                            final J2clLinePrinter logger) throws Exception {
+                                  final J2clStepDirectory directory,
+                                  final J2clLinePrinter logger) throws Exception {
         J2clStepResult result = null;
 
         if (artifact.isProcessingSkipped()) {
@@ -52,18 +52,24 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
         } else {
             logger.indent();
             {
-                final Map<String, String> shadeMappings = artifact.shadeMappings();
+                logger.printLine(J2clPath.SHADE_FILE);
+                logger.indent();
+                {
+                    final Map<String, String> shadeMappings = artifact.shadeMappings();
 
-                if (!shadeMappings.isEmpty()) {
-                    this.copyAndShade(artifact.step(this.step()).output(),
-                            shadeMappings,
-                            directory.output(),
-                            logger);
-                    result = J2clStepResult.SUCCESS;
-                } else {
-                    logger.printLine("Not found");
-                    result = J2clStepResult.SKIPPED;
+                    if (!shadeMappings.isEmpty()) {
+                        this.copyAndShade(artifact.step(this.step()).output(),
+                                shadeMappings,
+                                directory.output(),
+                                logger);
+                        result = J2clStepResult.SUCCESS;
+                    } else {
+                        logger.printLine("Not found");
+                        result = J2clStepResult.SKIPPED;
+                    }
+
                 }
+                logger.outdent();
             }
 
             logger.outdent();
