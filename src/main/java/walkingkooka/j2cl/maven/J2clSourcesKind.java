@@ -38,10 +38,11 @@ enum J2clSourcesKind {
      */
     SRC {
         @Override
-        List<J2clPath> compileSourceRoots(final MavenProject project) {
+        List<J2clPath> compileSourceRoots(final MavenProject project,
+                                          final J2clPath base) {
             return concat(
-                    sources(project.getCompileSourceRoots()),
-                    resources(project.getResources())
+                    sources(base, project.getCompileSourceRoots()),
+                    resources(base, project.getResources())
             );
         }
     },
@@ -51,36 +52,46 @@ enum J2clSourcesKind {
      */
     TEST {
         @Override
-        List<J2clPath> compileSourceRoots(final MavenProject project) {
+        List<J2clPath> compileSourceRoots(final MavenProject project,
+                                          final J2clPath base) {
             return concat(
-                    sources(project.getCompileSourceRoots(), project.getTestCompileSourceRoots()),
-                    resources(project.getResources(), project.getTestResources())
+                    sources(base, project.getCompileSourceRoots(), project.getTestCompileSourceRoots()),
+                    resources(base, project.getResources(), project.getTestResources())
             );
         }
     };
 
-    abstract List<J2clPath> compileSourceRoots(final MavenProject project);
+    abstract List<J2clPath> compileSourceRoots(final MavenProject project,
+                                               final J2clPath base);
 
-    static List<J2clPath> sources(final List<String>... sources) {
-        return concat(Function.identity(), sources);
+    static List<J2clPath> sources(final J2clPath base, final List<String>... sources) {
+        return concat(Function.identity(), base, sources);
     }
 
-    static List<J2clPath> resources(final List<Resource>... sources) {
-        return concat(Resource::getDirectory, sources);
+    static List<J2clPath> resources(final J2clPath base, final List<Resource>... sources) {
+        return concat(Resource::getDirectory, base, sources);
     }
 
     private static <T> List<J2clPath> concat(final Function<T, String> mapper,
+                                             final J2clPath base,
                                              final List<T>... sources) {
         return Arrays.stream(sources)
                 .filter(i -> null != i)
                 .flatMap(s -> s.stream())
                 .map(mapper)
+                .map(p -> {
+                    return p.startsWith(SEPARATOR) ?
+                            p :
+                            base + SEPARATOR + p;
+                })
                 .map(Paths::get)
                 .filter(Files::exists)
                 .map(J2clPath::with)
                 .distinct()
                 .collect(Collectors.toList());
     }
+
+    private final static String SEPARATOR = "/";
 
     static List<J2clPath> concat(final List<J2clPath>... sources) {
         return Arrays.stream(sources)

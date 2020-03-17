@@ -415,9 +415,10 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private List<J2clPath> compileSourceRoots() {
-        return this.request()
+        final J2clRequest request = this.request();
+        return request
                 .sourcesKind()
-                .compileSourceRoots(this.mavenProject);
+                .compileSourceRoots(this.mavenProject, request.base());
     }
 
     private List<J2clPath> sourcesArchivePath() {
