@@ -94,6 +94,8 @@
     </dependencies>
 
     <build>
+        <!-- relative path used to test J2clSourcesKind relative path resolving to absolute path -->
+        <sourceDirectory>src/main/java</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>@project.groupId@</groupId>
