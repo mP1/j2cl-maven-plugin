@@ -50,4 +50,11 @@ final class J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource extends J2c
     boolean shouldRunAnnotationProcessors() {
         return false; // dont need to generate annotation processor classes again.
     }
+
+    @Override
+    void postCompile(final J2clDependency artifact,
+                     final J2clStepDirectory directory,
+                     final J2clLinePrinter logger) {
+        // nop
+    }
 }

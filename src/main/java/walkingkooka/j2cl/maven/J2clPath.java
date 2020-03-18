@@ -165,6 +165,26 @@ final class J2clPath implements Comparable<J2clPath> {
         return this.path.relativize(path).toString().startsWith("super");
     }
 
+    /**
+     * Builds the name of the testsuite javascript file from the class name. It should appear in the output directory.
+     */
+    J2clPath testAdapterSuiteGeneratedFilename(final String testClassName) {
+        //  'org.gwtproject.timer.client.TimerJ2clTest');
+        return this.append(testClassName.replace('.', File.separatorChar) + TESTSUITE_FILEEXTENSION);
+    }
+
+    /**
+     * Using the output directory and the testClassName and computes the testSuite js path.
+     */
+    J2clPath testAdapterSuiteCorrectFilename(final String testClassName) {
+        // goog.module('javatests.org.gwtproject.timer.client.TimerJ2clTest_AdapterSuite');
+        return this.append(("/javatests/" + testClassName + "_AdapterSuite")
+                .replace('.', File.separatorChar)
+                + ".js");
+    }
+
+    private final static String TESTSUITE_FILEEXTENSION = ".testsuite";
+
     J2clPath parent() {
         return new J2clPath(this.path().getParent());
     }
@@ -364,6 +384,20 @@ final class J2clPath implements Comparable<J2clPath> {
     private final Path path;
 
     // Object...........................................................................................................
+
+    @Override
+    public int hashCode() {
+        return this.path.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+        return this == other || other instanceof J2clPath && this.equals0((J2clPath) other);
+    }
+
+    private boolean equals0(final J2clPath other) {
+        return this.path.equals(other.path);
+    }
 
     @Override
     public String toString() {

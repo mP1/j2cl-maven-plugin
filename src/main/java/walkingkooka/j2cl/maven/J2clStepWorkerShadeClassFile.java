@@ -21,7 +21,6 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.commons.Remapper;
-import walkingkooka.util.SystemProperty;
 
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -96,5 +95,12 @@ final class J2clStepWorkerShadeClassFile extends J2clStepWorkerShade {
 
     private static String binaryTypeName(final String typeName) {
         return typeName.replace('.', '/');
+    }
+
+    @Override
+    void postCopyAndShade(final J2clDependency artifact,
+                          final J2clPath output,
+                          final J2clLinePrinter logger) {
+        // do nothing
     }
 }

@@ -17,12 +17,14 @@
 
 package walkingkooka.j2cl.maven;
 
+import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -58,7 +60,8 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
                     final Map<String, String> shadeMappings = artifact.shadeMappings();
 
                     if (!shadeMappings.isEmpty()) {
-                        this.copyAndShade(artifact.step(this.step()).output(),
+                        this.copyAndShade(artifact,
+                                artifact.step(this.step()).output(),
                                 shadeMappings,
                                 directory.output(),
                                 logger);
@@ -84,10 +87,11 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
      * Performs two copy passes, the first will shade any files during the copy process, the second will simply
      * copy the files to the destination.
      */
-    private void copyAndShade(final J2clPath root,
-                                  final Map<String, String> shade,
-                                  final J2clPath output,
-                                  final J2clLinePrinter logger) throws Exception {
+    private void copyAndShade(final J2clDependency artifact,
+                              final J2clPath root,
+                              final Map<String, String> shade,
+                              final J2clPath output,
+                              final J2clLinePrinter logger) throws Exception {
         final Set<J2clPath> files = root.gatherFiles(this.fileFilter());
         final Set<J2clPath> nonShadedFiles = Sets.sorted();
         nonShadedFiles.addAll(files);
@@ -137,6 +141,10 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
                         nonShadedFiles,
                         logger);
 
+                this.postCopyAndShade(artifact,
+                        output,
+                        logger);
+
             }
             logger.outdent();
         }
@@ -150,4 +158,12 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
      */
     abstract byte[] shade(final byte[] content,
                           final Map<String, String> mappings);
+
+    /**
+     * This is invoked after and files are copy and shaded, the primary use case is copying javascript files
+     * after java files have been shaded.
+     */
+    abstract void postCopyAndShade(final J2clDependency artifact,
+                                   final J2clPath output,
+                                   final J2clLinePrinter logger) throws Exception;
 }

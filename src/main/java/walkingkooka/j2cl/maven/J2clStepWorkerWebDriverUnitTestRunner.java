@@ -70,26 +70,27 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
      */
     private J2clPath prepareJunitHostFileScriptPath(final J2clRequest request,
                                                     final J2clLinePrinter logger) throws IOException {
-        final J2clPath junitStartup;
+        final J2clPath hostHtml;
 
         logger.printLine("Prepare host file");
         logger.indent();
         {
             final J2clPath file = request.initialScriptFilename();
-            junitStartup = file.parent().append(CharSequences.subSequence(file.file().getName(), 0, -2) + "html");
+            hostHtml = file.parent()
+                    .append(CharSequences.subSequence(file.file().getName(), 0, -2) + "html");
 
             logger.printIndented("Compiled tests file", file);
-            logger.printIndented("JUnit startup file", junitStartup);
+            logger.printIndented("JUnit html host file", hostHtml);
 
             try (final InputStreamReader reader = new InputStreamReader(this.getClass().getResourceAsStream("junit.html"), DEFAULT_CHARSET)) {
                 final String junitHtml = CharStreams.toString(reader)
-                        .replace("<TEST_SCRIPT>", file.toString());
+                        .replace("<TEST_SCRIPT>", file.filename());
 
-                junitStartup.writeFile(junitHtml.getBytes(DEFAULT_CHARSET));
+                hostHtml.writeFile(junitHtml.getBytes(DEFAULT_CHARSET));
             }
         }
         logger.outdent();
-        return junitStartup;
+        return hostHtml;
 
     }
 

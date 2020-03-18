@@ -123,26 +123,49 @@
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>jsr250-api</artifactId>
-            <version>1.0</version>
-        </dependency>
-
         <!-- test dependencies -->
         <dependency>
-            <groupId>com.vertispan.j2cl</groupId>
-            <artifactId>gwttestcase-emul</artifactId>
-            <version>${j2cl.version}</version>
-            <scope>test</scope>
+            <groupId>com.google.jsinterop</groupId>
+            <artifactId>jsinterop-annotations</artifactId>
+            <version>2.0.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.vertispan.j2cl</groupId>
-            <artifactId>gwttestcase-emul</artifactId>
+            <artifactId>bootstrap</artifactId>
             <version>${j2cl.version}</version>
-            <classifier>sources</classifier>
-            <scope>test</scope>
+            <type>zip</type>
+            <classifier>jszip</classifier>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vertispan.j2cl</groupId>
+            <artifactId>javac-bootstrap-classpath</artifactId>
+            <version>${j2cl.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vertispan.j2cl</groupId>
+            <artifactId>jre</artifactId>
+            <version>${j2cl.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vertispan.j2cl</groupId>
+            <artifactId>jre</artifactId>
+            <version>${j2cl.version}</version>
+            <type>zip</type>
+            <classifier>jszip</classifier>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vertispan.jsinterop</groupId>
+            <artifactId>base</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
