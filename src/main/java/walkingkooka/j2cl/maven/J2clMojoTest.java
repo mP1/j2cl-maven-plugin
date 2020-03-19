@@ -182,7 +182,7 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
         return timeout;
     }
 
-    private final static int TEST_TIMEOUT_MINIMUM = 30;
+    private final static int TEST_TIMEOUT_MINIMUM = 10;
 
     // tests............................................................................................................
 

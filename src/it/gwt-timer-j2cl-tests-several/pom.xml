@@ -313,7 +313,7 @@
                                 <test>org.gwtproject.timer.client.TimerJ2clTest</test>
                                 <test>org.gwtproject.timer.client.TimerJ2clTest2</test>
                             </tests>
-                            <test-timeout>90</test-timeout>
+                            <test-timeout>30</test-timeout>
                         </configuration>
                     </execution>
                 </executions>

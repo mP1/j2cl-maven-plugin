@@ -290,7 +290,7 @@
                             <tests>
                                 <test>example.ExampleTest</test>
                             </tests>
-                            <test-timeout>90</test-timeout>
+                            <test-timeout>20</test-timeout>
                         </configuration>
                     </execution>
                 </executions>
