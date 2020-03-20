@@ -21,6 +21,7 @@ import com.google.j2cl.common.FrontendUtils.FileInfo;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.naming.StringName;
 import walkingkooka.naming.StringPath;
+import walkingkooka.text.CharSequences;
 import walkingkooka.text.LineEnding;
 import walkingkooka.text.pretty.Table;
 import walkingkooka.text.pretty.TextPretty;
@@ -162,9 +163,21 @@ final class J2clLinePrinter {
         //noinspection ConstantConditions
         if (null != values) {
             this.indent();
-            values.forEach(this::printLine);
+            values.forEach(this::printIndentedStringPrintLine);
             this.outdent();
         }
+    }
+
+    /**
+     * Errors, warnings and other messages from various Google tools like Transpiler or Closure compiler include a trailing EOL,
+     * remove and then print to avoid a blank line that follows.
+     */
+    private void printIndentedStringPrintLine(final String text) {
+        this.printLine(text.endsWith("\n") || text.endsWith("\r") ?
+                CharSequences.subSequence(text, 0, -1) :
+                text.endsWith("\n\r") ?
+                        CharSequences.subSequence(text, 0, -2) :
+                        text);
     }
 
     void print(final CharSequence line) {
