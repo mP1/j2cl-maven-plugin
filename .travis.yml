@@ -5,4 +5,7 @@ jdk:
 after_success:
 - mvn jacoco:report coveralls:report
 
+after_failure:
+- cat target/it-tests/*/build.log
+
 dist: trusty
