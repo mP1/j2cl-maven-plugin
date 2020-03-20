@@ -391,7 +391,7 @@ For more info click [here](http://googleclosure.blogspot.com/2010/10/pretty-prin
 <formatting>
     <param>PRETTY_PRINT</param>
     <param>PRINT_INPUT_DELIMITER</param>
-    <param></param>SINGLE_QUOTES</param>
+    <param>SINGLE_QUOTES</param>
 </formatting>
 ```
 

@@ -159,9 +159,9 @@
                             <!--
                             PRETTY_PRINT | PRINT_INPUT_DELIMITER | SINGLE_QUOTES
                             -->
-                                <formatting>PRETTY_PRINT</formatting>
-                                <formatting>PRINT_INPUT_DELIMITER</formatting>
-                                <formatting>SINGLE_QUOTES</formatting>
+                                <param>PRETTY_PRINT</param>
+                                <param>PRINT_INPUT_DELIMITER</param>
+                                <param>SINGLE_QUOTES</param>
                             </formatting>
                             <!--
                                 ECMASCRIPT3,
