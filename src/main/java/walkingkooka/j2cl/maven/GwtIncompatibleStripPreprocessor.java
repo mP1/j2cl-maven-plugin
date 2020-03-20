@@ -181,26 +181,15 @@ final class GwtIncompatibleStripPreprocessor {
                 JavaPreprocessor.preprocessFiles(javaFilesInput,
                         output.path(),
                         problems);
+                logger.printIndentedString("Message(s)", problems.getMessages());
+
                 final List<String> errors = problems.getErrors();
-                final int errorCount = errors.size();
+                logger.printIndentedString("Error(s)", errors);
+                logger.printIndentedString("Warning(s)", problems.getWarnings());
 
-                logger.printLine(errorCount + " Error(s)");
-                logger.indent();
-
-                {
-                    if (errorCount > 0) {
-                        logger.indent();
-                        errors.forEach(logger::printLine);
-                        logger.outdent();
-
-                        logger.printEndOfList();
-                        result = J2clStepResult.FAILED;
-                    } else {
-                        result = J2clStepResult.SUCCESS;
-                    }
-                    logger.printEndOfList();
-                }
-                logger.outdent();
+                result = errors.isEmpty() ?
+                        J2clStepResult.SUCCESS :
+                        J2clStepResult.FAILED;
             }
             logger.outdent();
         }
