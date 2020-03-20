@@ -12,45 +12,10 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.vertispan.j2cl</groupId>
-            <artifactId>bootstrap</artifactId>
-            <version>${j2cl.version}</version>
-            <type>zip</type>
-            <classifier>jszip</classifier>
+            <groupId>walkingkooka</groupId>
+            <artifactId>j2cl-uber</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
-
-        <dependency>
-            <groupId>com.vertispan.j2cl</groupId>
-            <artifactId>javac-bootstrap-classpath</artifactId>
-            <version>${j2cl.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.vertispan.j2cl</groupId>
-            <artifactId>jre</artifactId>
-            <version>${j2cl.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.vertispan.j2cl</groupId>
-            <artifactId>jre</artifactId>
-            <version>${j2cl.version}</version>
-            <type>zip</type>
-            <classifier>jszip</classifier>
-        </dependency>
-
-        <dependency>
-            <groupId>com.vertispan.jsinterop</groupId>
-            <artifactId>base</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>jsr250-api</artifactId>
-            <version>1.0</version>
-        </dependency>
-
     </dependencies>
 
     <build>
