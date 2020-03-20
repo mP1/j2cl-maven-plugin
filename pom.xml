@@ -538,9 +538,10 @@
                 </executions>
                 <configuration>
                     <cloneProjectsTo>${project.build.directory}/it-tests</cloneProjectsTo>
+                    <debug>true</debug>
                     <localRepositoryPath>${project.build.directory}/it-repo</localRepositoryPath>
                     <settingsFile>src/it/settings.xml</settingsFile>
-                    <debug>true</debug>
+                    <streamLogs>true</streamLogs>
                 </configuration>
             </plugin>
             <plugin>
