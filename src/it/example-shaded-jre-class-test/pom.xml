@@ -280,7 +280,7 @@
                             <tests>
                                 <test>example.testshadedjreclass.ExampleShadedJreClassJ2clTest</test>
                             </tests>
-                            <test-timeout>90</test-timeout>
+                            <test-timeout>30</test-timeout>
                         </configuration>
                     </execution>
                 </executions>
