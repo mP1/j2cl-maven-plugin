@@ -17,6 +17,11 @@
 
 package walkingkooka.j2cl.maven;
 
+import walkingkooka.text.CharSequences;
+
+import java.io.File;
+import java.nio.file.Files;
+
 /**
  * Compiles the java source to the target {@link J2clStepDirectory#output()}, with annotation processors enabled.
  */
@@ -49,5 +54,50 @@ final class J2clStepWorkerJavacCompilerUnpackedSource extends J2clStepWorkerJava
     @Override
     boolean shouldRunAnnotationProcessors() {
         return true;
+    }
+
+    /**
+     * If executing a test fixup the name of the generated javascript file.
+     */
+    @Override
+    void postCompile(final J2clDependency artifact,
+                     final J2clStepDirectory directory,
+                     final J2clLinePrinter logger) throws Exception {
+        final J2clRequest request = artifact.request();
+        if (false == artifact.isDependency() && J2clSourcesKind.TEST == request.sourcesKind()) {
+            this.junitProcessorPostFix(artifact, directory, logger);
+        }
+    }
+
+    private void junitProcessorPostFix(final J2clDependency artifact,
+                                       final J2clStepDirectory directory,
+                                       final J2clLinePrinter logger) throws Exception {
+        logger.indent();
+        {
+            logger.printLine("Junit processor post fixup");
+            logger.indent();
+            {
+                final J2clRequest request = artifact.request();
+                final J2clPath output = directory.output();
+
+                for (final String testSuiteClassName : request.entryPoints()) {
+                    logger.printLine(testSuiteClassName );
+
+                    final String testClassName = extractTestClassName(testSuiteClassName);
+                    final J2clPath generatedFilename = output.testAdapterSuiteGeneratedFilename(testClassName);
+                    final J2clPath correctFilename = output.testAdapterSuiteCorrectFilename(testClassName);
+
+                    Files.copy(generatedFilename.path(), correctFilename.path());
+                }
+            }
+            logger.outdent();
+        }
+        logger.outdent();
+    }
+
+    // 'javatests.org.gwtproject.timer.client.TimerJ2clTest_AdapterSuite' -> org.gwtproject.timer.client.TimerJ2clTest
+    static String extractTestClassName(final String typeName) {
+        return CharSequences.subSequence(typeName, "javatests.".length(), -"_AdapterSuite".length())
+                .toString();
     }
 }

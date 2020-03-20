@@ -20,6 +20,7 @@ package walkingkooka.j2cl.maven;
 import com.google.javascript.jscomp.CommandLineRunner;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
+import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import com.google.javascript.jscomp.DependencyOptions;
 import walkingkooka.collect.list.Lists;
@@ -49,6 +50,7 @@ class ClosureCompiler {
                            final Set<String> externs,
                            final Set<ClosureFormattingOption> formatting,
                            final LanguageMode languageOut,
+                           final boolean exportTestFunctions,
                            final List<J2clPath> sourceRoots,
                            final J2clPath output,
                            final String initialScriptFilename,
@@ -59,6 +61,7 @@ class ClosureCompiler {
                 sorted(externs),
                 formatting,
                 languageOut,
+                exportTestFunctions,
                 sorted(sourceRoots),
                 output,
                 initialScriptFilename,
@@ -77,6 +80,7 @@ class ClosureCompiler {
                                     final SortedSet<String> externs,
                                     final Set<ClosureFormattingOption> formatting,
                                     final LanguageMode languageOut,
+                                    final boolean exportTestFunctions,
                                     final SortedSet<J2clPath> sourceRoots,
                                     final J2clPath output,
                                     final String initialScriptFilename,
@@ -144,6 +148,7 @@ class ClosureCompiler {
 
                     final ClosureCompilerCommandLineRunner runner = new ClosureCompilerCommandLineRunner(compiler,
                             argumentsToArray(arguments),
+                            exportTestFunctions,
                             outputPrintStream,
                             outputPrintStream);
                     if (!runner.shouldRunCompiler()) {
@@ -274,10 +279,13 @@ class ClosureCompiler {
 
         ClosureCompilerCommandLineRunner(final Compiler compiler,
                                          final String[] args,
+                                         final boolean exportTestFunctions,
                                          final PrintStream out,
                                          final PrintStream err) {
             super(args, out, err);
             this.compiler = compiler;
+            this.exportTestFunctions = exportTestFunctions;
+
             setExitCodeReceiver(exitCode -> {
                 //noinspection ConstantConditions
                 this.exitCode = exitCode;
@@ -291,5 +299,14 @@ class ClosureCompiler {
         }
 
         private final Compiler compiler;
+
+        @Override
+        protected CompilerOptions createOptions() {
+            final CompilerOptions options = super.createOptions();
+            options.setExportTestFunctions(this.exportTestFunctions);
+            return options;
+        }
+
+        private final boolean exportTestFunctions;
     }
 }

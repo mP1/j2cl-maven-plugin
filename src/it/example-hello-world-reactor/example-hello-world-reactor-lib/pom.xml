@@ -6,11 +6,15 @@
     <artifactId>example-hello-world-reactor-lib</artifactId>
     <version>1.0</version>
 
+    <properties>
+        <j2cl.version>0.7-SNAPSHOT</j2cl.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.vertispan.j2cl</groupId>
             <artifactId>bootstrap</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>${j2cl.version}</version>
             <type>zip</type>
             <classifier>jszip</classifier>
         </dependency>
@@ -18,19 +22,19 @@
         <dependency>
             <groupId>com.vertispan.j2cl</groupId>
             <artifactId>javac-bootstrap-classpath</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>${j2cl.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.vertispan.j2cl</groupId>
             <artifactId>jre</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>${j2cl.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.vertispan.j2cl</groupId>
             <artifactId>jre</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>${j2cl.version}</version>
             <type>zip</type>
             <classifier>jszip</classifier>
         </dependency>

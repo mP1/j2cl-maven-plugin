@@ -79,6 +79,9 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
                             logger) ?
                             J2clStepResult.SUCCESS :
                             J2clStepResult.FAILED;
+                    if(J2clStepResult.SUCCESS == result) {
+                        this.postCompile(artifact, directory, logger);
+                    }
                 }
             }
         }
@@ -105,4 +108,11 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
      * Returns whether annotations processors should be run.
      */
     abstract boolean shouldRunAnnotationProcessors();
+
+    /**
+     * This is called after the compile
+     */
+    abstract void postCompile(final J2clDependency artifact,
+                              final J2clStepDirectory directory,
+                              final J2clLinePrinter logger) throws Exception;
 }
