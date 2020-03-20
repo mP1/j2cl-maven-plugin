@@ -94,9 +94,9 @@ final class J2clTranspiler {
                 final Problems problems = com.google.j2cl.transpiler.J2clTranspiler.transpile(options);
                 success = !problems.hasErrors();
 
-                log("error(s)", problems.getErrors(), logger);
-                log("warnings(s)", problems.getWarnings(), logger);
-                log("message(s)", problems.getMessages(), logger);
+                logger.printIndentedString("Error(s)", problems.getErrors());
+                logger.printIndentedString("Warnings(s)", problems.getWarnings());
+                logger.printIndentedString("Message(s)", problems.getMessages());
 
                 if (success) {
                     logger.printLine("Copy js to output");
@@ -115,23 +115,5 @@ final class J2clTranspiler {
         logger.outdent();
 
         return success;
-    }
-
-    private static void log(final String label,
-                            final List<String> messages,
-                            final J2clLinePrinter logger) {
-        final int count = messages.size();
-
-        logger.printLine(count + " " + label);
-        {
-            logger.indent();
-            {
-                logger.indent();
-                messages.forEach(logger::printLine);
-                logger.outdent();
-            }
-            logger.printEndOfList();
-            logger.outdent();
-        }
     }
 }
