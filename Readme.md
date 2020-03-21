@@ -150,71 +150,74 @@ Sample required plugin repositories
 ## Plugin
 
 Sample plugins declaration to use this Maven Plugin. The parameters under the `configuration` are described in further
-detail below.
+detail below. This assumes a property has also been defined to match the version in (j2cl-uber)](https://lgtm.com/projects/g/mP1/j2cl-uber)
 
+Properties definition.
 ```xml
-<plugins>
-    <plugin>
-        <groupId>walkingkooka</groupId>
-        <artifactId>j2cl-maven-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
-        <executions>
-            <execution>
-                <id>build-js</id>
-                <phase>prepare-package</phase>
-                <goals>
-                    <goal>build</goal>
-                </goals>
-                <configuration>
-                    <classpath-scope>runtime</classpath-scope>
-                    <compilation-level>ADVANCED</compilation-level>
-                    <defines>
-                        <jre.checkedMode>DISABLED</jre.checkedMode>
-                        <jre.checks.checkLevel>MINIMAL</jre.checks.checkLevel>
-                        <jsinterop.checks>DISABLED</jsinterop.checks>
-                    </defines>
-                    <entry-points>example.helloworld.app</entry-points>
-                    <externs></externs>
-                    <formatting/>
-                    <language-out>ECMASCRIPT_2016</language-out>
-                    <thread-pool-size>0</thread-pool-size>
-    
-                    <added-dependencies>
-                        <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:0.5-SNAPSHOT</param>
-                    </added-dependencies>
-                    <classpath-required>
-                        <!-- bootstrap must be the first entry -->
-                        <param>com.vertispan.j2cl:javac-bootstrap-classpath:0.5-SNAPSHOT</param>
-                        <param>com.vertispan.j2cl:jre:0.5-SNAPSHOT</param>
-                        <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT</param>
-                        <param>com.vertispan.j2cl:gwt-internal-annotations:jar:0.5-SNAPSHOT</param>
-                        <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
-                        <param>javax.annotation:jsr250-api:1.0</param>
-                    </classpath-required>
-                    <excluded-dependencies></excluded-dependencies>
-                    <javascript-source-required>
-                        <param>com.vertispan.j2cl:bootstrap:zip:jszip:0.5-SNAPSHOT</param>
-                        <param>com.vertispan.j2cl:jre:zip:jszip:0.5-SNAPSHOT</param>
-                    </javascript-source-required>
-                    <processing-skipped>
-                        <!-- jre & bootstrap transpiled versions also included as dependencies, skip transpiling-->
-                        <param>com.vertispan.j2cl:javac-bootstrap-classpath:0.5-SNAPSHOT</param>
-                        <param>com.vertispan.j2cl:jre:0.5-SNAPSHOT</param>
-                        <param>com.vertispan.j2cl:bootstrap:zip:jszip:0.5-SNAPSHOT</param>
-                        <param>com.vertispan.j2cl:jre:zip:jszip:0.5-SNAPSHOT</param>
-                        <!-- dependencies below only contain annotations -->
-                        <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
-                        <param>com.vertispan.j2cl:gwt-internal-annotations:jar:0.5-SNAPSHOT</param>
-                        <param>javax.annotation:jsr250-api:1.0</param>
-                    </processing-skipped>
-                    <replaced-dependencies>
-                        <param>com.vertispan.j2cl:gwt-internal-annotations:0.4-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:0.5-SNAPSHOT</param>
-                    </replaced-dependencies>
-                </configuration>
-            </execution>
-        </executions>
-    </plugin>
-</plugins>
+<properties>
+    <j2cl.version>0.7-SNAPSHOT</j2cl.version>
+</properties>
+```
+
+Plugin definition
+```xml
+<plugin>
+    <groupId>walkingkooka</groupId>
+    <artifactId>j2cl-maven-plugin</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <executions>
+        <execution>
+            <id>build-js</id>
+            <phase>prepare-package</phase>
+            <goals>
+                <goal>build</goal>
+            </goals>
+            <configuration>
+                <classpath-scope>runtime</classpath-scope>
+                <compilation-level>ADVANCED</compilation-level>
+                <defines>
+                    <jre.checkedMode>DISABLED</jre.checkedMode>
+                    <jre.checks.checkLevel>MINIMAL</jre.checks.checkLevel>
+                    <jsinterop.checks>DISABLED</jsinterop.checks>
+                </defines>
+                <entry-points>example.es5.app</entry-points>
+                <externs></externs>
+                <formatting/>
+                <language-out>ECMASCRIPT5</language-out>
+                <thread-pool-size>0</thread-pool-size>
+
+                <added-dependencies>
+                    <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:${j2cl.version}</param>
+                </added-dependencies>
+                <classpath-required>
+                    <param>com.vertispan.j2cl:javac-bootstrap-classpath:${j2cl.version}</param>
+                    <param>com.vertispan.j2cl:jre:${j2cl.version}</param>
+                    <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT</param>
+                    <param>com.vertispan.j2cl:gwt-internal-annotations:jar:${j2cl.version}</param>
+                    <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
+                </classpath-required>
+                <excluded-dependencies></excluded-dependencies>
+                <javascript-source-required>
+                    <param>com.vertispan.j2cl:bootstrap:zip:jszip:${j2cl.version}</param>
+                    <param>com.vertispan.j2cl:jre:zip:jszip:${j2cl.version}</param>
+                </javascript-source-required>
+                <processing-skipped>
+                    <!-- jre & bootstrap transpiled versions also included as dependencies, skip transpiling-->
+                    <param>com.vertispan.j2cl:javac-bootstrap-classpath:${j2cl.version}</param>
+                    <param>com.vertispan.j2cl:jre:${j2cl.version}</param>
+                    <param>com.vertispan.j2cl:bootstrap:zip:jszip:${j2cl.version}</param>
+                    <param>com.vertispan.j2cl:jre:zip:jszip:${j2cl.version}</param>
+                    <!-- dependencies below only contain annotations -->
+                    <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
+                    <param>com.vertispan.j2cl:gwt-internal-annotations:jar:${j2cl.version}</param>
+                </processing-skipped>
+                <replaced-dependencies>
+                    <param>com.vertispan.j2cl:gwt-internal-annotations:0.4-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:${j2cl.version}</param>
+                </replaced-dependencies>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
 ```
 
 
