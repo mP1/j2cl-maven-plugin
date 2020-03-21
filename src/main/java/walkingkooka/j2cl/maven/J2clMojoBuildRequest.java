@@ -147,6 +147,11 @@ final class J2clMojoBuildRequest extends J2clRequest {
     private String hash;
 
     @Override
+    List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     int testTimeout() {
         throw new UnsupportedOperationException();
     }

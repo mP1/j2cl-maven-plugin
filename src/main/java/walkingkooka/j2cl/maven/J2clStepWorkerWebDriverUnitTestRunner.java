@@ -18,11 +18,8 @@
 package walkingkooka.j2cl.maven;
 
 import com.google.common.io.CharStreams;
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.FluentWait;
 import walkingkooka.text.CharSequences;
 
@@ -30,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.time.Duration;
+import java.util.List;
 
 /**
  * Assumes that the closure compiler has completed successfully and then invokes web driver to execute the prepared
@@ -57,6 +55,7 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
         {
             final J2clRequest request = artifact.request();
             this.executeTestSuite(this.prepareJunitHostFileScriptPath(request, logger),
+                    request.browsers(),
                     request.testTimeout(),
                     logger);
         }
@@ -100,41 +99,46 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
      * Starts up webdriver and loads the javascript host file which will run all the tests.
      */
     private void executeTestSuite(final J2clPath startupHostFile,
+                                  final List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers,
                                   final int timeout,
                                   final J2clLinePrinter logger) throws Exception {
 
         logger.printLine("Test " + startupHostFile);
         logger.indent();
         {
-            WebDriver driver = null;
-            try {
-                WebDriverManager.chromedriver().setup();
-                driver = new ChromeDriver(new ChromeOptions().setHeadless(true));
-                driver.get("file://" + startupHostFile);
+            for (final J2clStepWorkerWebDriverUnitTestRunnerBrowser browser : browsers) {
+                logger.printLine(browser.name());
+                logger.indent();
+                {
+                    WebDriver driver = null;
+                    try {
+                        driver = browser.webDriver();
+                        driver.get("file://" + startupHostFile);
 
-                // loop and poll if tests are done
-                new FluentWait<>(driver)
-                        .withTimeout(Duration.ofSeconds(timeout))
-                        .withMessage("Tests failed to finish in timeout")
-                        .pollingEvery(Duration.ofMillis(100))
-                        .until(d -> isFinished(d));
+                        // loop and poll if tests are done
+                        new FluentWait<>(driver)
+                                .withTimeout(Duration.ofSeconds(timeout))
+                                .withMessage("Tests failed to finish in timeout")
+                                .pollingEvery(Duration.ofMillis(100))
+                                .until(d -> isFinished(d));
 
-                logger.printLine(executeScript(driver, "window.G_testRunner.getReport()"));
+                        logger.printLine(executeScript(driver, "window.G_testRunner.getReport()"));
 
-                // check for success
-                if (!isSuccess(driver)) {
-                    throw new J2clException("One or more test(s) failed");
-                }
-                logger.printLine("All test(s) successful!");
-            } catch (final J2clException rethrow) {
-                throw rethrow;
-            } catch (final Exception cause) {
-                cause.printStackTrace();
-                logger.printLine("Test(s) failed!");
-                throw cause;
-            } finally {
-                if (driver != null) {
-                    driver.quit();
+                        // check for success
+                        if (!isSuccess(driver)) {
+                            throw new J2clException("One or more test(s) failed");
+                        }
+                        logger.printLine("All test(s) successful!");
+                    } catch (final J2clException rethrow) {
+                        throw rethrow;
+                    } catch (final Exception cause) {
+                        cause.printStackTrace();
+                        logger.printLine("Test(s) failed!");
+                        throw cause;
+                    } finally {
+                        driver.quit();
+                    }
+                    logger.outdent();
                 }
             }
         }

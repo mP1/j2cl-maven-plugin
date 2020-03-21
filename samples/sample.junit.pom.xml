@@ -139,6 +139,10 @@
                             <goal>test</goal>
                         </goals>
                         <configuration>
+                            <browsers>
+                                <param>CHROME</param>
+                                <param>HTML_UNIT</param>
+                            </browsers>
                             <classpath-scope>test</classpath-scope>
                             <compilation-level>BUNDLE</compilation-level>
                             <defines>
