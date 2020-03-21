@@ -49,11 +49,12 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
                 artifact.getBaseVersion());
     }
 
-    private static J2clArtifactCoords with(final String groupId,
-                                           final String artifactId,
-                                           final String type,
-                                           final Optional<String> classifier,
-                                           final String version) {
+    // @VisibleForTesting
+    static J2clArtifactCoords with(final String groupId,
+                                   final String artifactId,
+                                   final String type,
+                                   final Optional<String> classifier,
+                                   final String version) {
         return new J2clArtifactCoords(groupId, artifactId, type, classifier, version);
     }
 
