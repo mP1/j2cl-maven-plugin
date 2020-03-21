@@ -59,9 +59,9 @@ enum J2clClasspathScope {
 
     private final Predicate<Artifact> filter;
 
-    public final String scope;
+    final String scope;
 
-    public static J2clClasspathScope commandLineOption(final String text) {
+    static J2clClasspathScope commandLineOption(final String text) {
         return Arrays.stream(values())
                 .filter(s -> s.scope.equals(text))
                 .findFirst()
