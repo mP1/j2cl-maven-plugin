@@ -166,36 +166,11 @@ abstract class J2clMojoBuildTest extends J2clMojo {
 
     // excludedDependencies..............................................................................................
 
-    /**
-     * A {@link Predicate} that matches any transitive dependencies that should be removed from the dependency graph.
-     * This should be applied during the dependency discover phase.
-     */
-    final Predicate<J2clArtifactCoords> excludedDependencies() {
-        final List<Predicate<J2clArtifactCoords>> filter = this.excludedDependencies.stream()
+    final List<Predicate<J2clArtifactCoords>> excludedDependencies() {
+        return this.excludedDependencies.stream()
                 .map(String::trim)
                 .map(this::groupArtifactOptionalClassifierAndVersionPredicate)
                 .collect(Collectors.toList());
-
-        return new Predicate<>() {
-            @Override
-            public boolean test(final J2clArtifactCoords coords) {
-                boolean exclude = false;
-
-                for (final Predicate<J2clArtifactCoords> possible : filter) {
-                    exclude = possible.test(coords);
-                    if (exclude) {
-                        break;
-                    }
-                }
-
-                return exclude;
-            }
-
-            @Override
-            public String toString() {
-                return String.join(",", J2clMojoBuildTest.this.excludedDependencies);
-            }
-        };
     }
 
     /**
@@ -222,7 +197,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
                 version = components[3];
                 break;
             default:
-                throw new IllegalArgumentException("Invalid coords, expected 3 components (groupId, artifactId, version) or 4 components (groupId, artifactId, version): " + CharSequences.quoteAndEscape(coords));
+                throw new IllegalArgumentException("Invalid coords, expected 3 components (groupId, artifactId, version) or 4 components (groupId, artifactId, classifier, version): " + CharSequences.quoteAndEscape(coords));
 
         }
 

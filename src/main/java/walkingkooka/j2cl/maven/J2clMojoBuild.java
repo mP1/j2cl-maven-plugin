@@ -40,7 +40,7 @@ public final class J2clMojoBuild extends J2clMojoBuildTest {
             final J2clRequest request = this.request(this.entryPoints(), this.initialScriptFilename());
             final J2clDependency project = this.gatherDependencies(request);
             project.prettyPrintDependencies();
-            request.verifyClasspathRequiredAndJavascriptSourceRequired();
+            request.verifyArtifactCoords();
 
             request.execute(project);
         } catch (final Throwable e) {
