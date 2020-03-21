@@ -57,11 +57,9 @@ Some pieces of the `vertispan/j2clmavenplugin` are currently missing:
 
 # Super sourcing
 
-When necessary to emulate missing JRE classes or replace with a browser substitute, super source java files should be
-placed place in a projects `resources/super`. Any java files under `/super` will be excluded from any of java compiling (javac). 
-
-Java 9 and later will fail to compile any source under package java, thus they must be excluded using the `/super`
-directory.
+The Google Web Tookit (GWT) provides a feature to allow two definitions of a java file to exist. One will be a compiled
+by javac and used in a regular JRE environment, the second will become the alternate which will be translated to javascript.
+A different alternative is to use shading which is mentioned below in the `Shade` section.
 
 
 
