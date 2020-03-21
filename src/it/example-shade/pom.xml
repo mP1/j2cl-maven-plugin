@@ -13,6 +13,10 @@
 
     <repositories>
         <repository>
+            <id>github-mp1-appengine-repo</id>
+            <url>https://maven-repo-254709.appspot.com</url>
+        </repository>
+        <repository>
             <id>google-snapshots</id>
             <url>https://oss.sonatype.org/content/repositories/google-snapshots/</url>
         </repository>
