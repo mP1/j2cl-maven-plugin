@@ -418,14 +418,13 @@ for compiling (javac).
 ```xml
 <processing-skipped>
     <!-- jre & bootstrap transpiled versions also included as dependencies, skip transpiling-->
-    <param>com.vertispan.j2cl:javac-bootstrap-classpath:0.5-SNAPSHOT</param>
-    <param>com.vertispan.j2cl:jre:0.5-SNAPSHOT</param>
-    <param>com.vertispan.j2cl:bootstrap:zip:jszip:0.5-SNAPSHOT</param>
-    <param>com.vertispan.j2cl:jre:zip:jszip:0.5-SNAPSHOT</param>
+    <param>com.vertispan.j2cl:javac-bootstrap-classpath:${j2cl.version}</param>
+    <param>com.vertispan.j2cl:jre:${j2cl.version}</param>
+    <param>com.vertispan.j2cl:bootstrap:zip:jszip:${j2cl.version}</param>
+    <param>com.vertispan.j2cl:jre:zip:jszip:${j2cl.version}</param>
     <!-- dependencies below only contain annotations -->
     <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
-    <param>com.vertispan.j2cl:gwt-internal-annotations:jar:0.5-SNAPSHOT</param>
-    <param>javax.annotation:jsr250-api:1.0</param>
+    <param>com.vertispan.j2cl:gwt-internal-annotations:jar:${j2cl.version}</param>
 </processing-skipped>
 ```
 
