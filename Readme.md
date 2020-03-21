@@ -295,8 +295,7 @@ The suggested value is typically `runtime`, for more info click [here](https://m
 
 ## compilation-level
 A closure compiler parameter that controls how the compilation, for more info click [here](https://developers.google.com/closure/compiler/docs/compilation_levels#enable-app). 
-
-    The Closure Compiler lets you choose from three levels of compilation, ranging from simple removal of whitespace and comments to aggressive code transformations.
+The Closure Compiler lets you choose from three levels of compilation, ranging from simple removal of whitespace and comments to aggressive code transformations.
 
 ```xml
 <compilation-level>ADVANCED</compilation-level>
