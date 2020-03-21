@@ -223,58 +223,22 @@ detail below.
 
 ## Dependencies
 
-The fragment below was taken directly from the integration tests present in this project.
+The fragment below contains two uber depdencies that take care of the many minimal dependencies that are required by a j2cl
+application and unit tests.
 
 ```xml
 <dependencies>
     <dependency>
-        <groupId>com.vertispan.j2cl</groupId>
-        <artifactId>bootstrap</artifactId>
-        <version>0.5-SNAPSHOT</version>
-        <type>zip</type>
-        <classifier>jszip</classifier>
-        <scope>provided</scope>
+        <groupId>walkingkooka</groupId>
+        <artifactId>j2cl-uber</artifactId>
+        <version>1.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
-        <groupId>com.vertispan.j2cl</groupId>
-        <artifactId>javac-bootstrap-classpath</artifactId>
-        <version>0.5-SNAPSHOT</version>
-        <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-        <groupId>com.vertispan.j2cl</groupId>
-        <artifactId>jre</artifactId>
-        <version>0.5-SNAPSHOT</version>
-        <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-        <groupId>com.vertispan.j2cl</groupId>
-        <artifactId>jre</artifactId>
-        <version>0.5-SNAPSHOT</version>
-        <type>zip</type>
-        <classifier>jszip</classifier>
-        <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-        <groupId>com.vertispan.jsinterop</groupId>
-        <artifactId>base</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-        <groupId>javax.annotation</groupId>
-        <artifactId>jsr250-api</artifactId>
-        <version>1.0</version>
-    </dependency>
-
-    <dependency>
-        <groupId>com.google.jsinterop</groupId>
-        <artifactId>jsinterop-annotations</artifactId>
-        <version>2.0.0</version>
+        <groupId>walkingkooka</groupId>
+        <artifactId>j2cl-uber-test</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <scope>test</scope>
     </dependency>
 </dependencies>
 ```
