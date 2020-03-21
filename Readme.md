@@ -273,12 +273,11 @@ The snippet below is a good starting point and forcibly includes a few minimally
 
 ```xml
 <classpath-required>
-    <param>com.vertispan.j2cl:javac-bootstrap-classpath:0.5-SNAPSHOT</param>
-    <param>com.vertispan.j2cl:jre:0.5-SNAPSHOT</param>
+    <param>com.vertispan.j2cl:javac-bootstrap-classpath:${j2cl.version}</param>
+    <param>com.vertispan.j2cl:jre:${j2cl.version}</param>
     <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT</param>
-    <param>com.vertispan.j2cl:gwt-internal-annotations:jar:0.5-SNAPSHOT</param>
+    <param>com.vertispan.j2cl:gwt-internal-annotations:jar:${j2cl.version}</param>
     <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
-    <param>javax.annotation:jsr250-api:1.0</param>
 </classpath-required>
 ```
 
