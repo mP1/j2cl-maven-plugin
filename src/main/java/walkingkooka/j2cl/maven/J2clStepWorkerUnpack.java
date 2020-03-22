@@ -51,25 +51,25 @@ final class J2clStepWorkerUnpack extends J2clStepWorker2 {
         logger.printIndented("Destination", dest);
         
         {
-            boolean javaFilesFound = this.extractSourceRoots(artifact, dest, logger);
+            boolean filesFound = this.extractSourceRoots(artifact, dest, logger);
 
-            if (false == javaFilesFound) {
+            if (false == filesFound) {
                 // if no source is available unpack the binary might be a jszip.
                 final Optional<J2clPath> archive = artifact.artifactFile();
                 if (archive.isPresent()) {
                     final J2clPath path = archive.get();
                     logger.printIndented("Archive", path);
                     logger.indent();
-                    javaFilesFound = archive.get().extractArchiveFiles(dest, logger).size() > 0;
+                    filesFound = archive.get().extractArchiveFiles(dest, logger).size() > 0;
                     logger.outdent();
                 }
             }
 
-            if(javaFilesFound) {
-                    logger.printLine("Java source found, transpiling will happen");
+            if(filesFound) {
+                    logger.printLine("Source files found, transpiling will happen");
                     result = J2clStepResult.SUCCESS;
             } else {
-                logger.printLine("No java source found, transpiling will not be attempted");
+                logger.printLine("No source files found, transpiling will not be attempted");
                 result = J2clStepResult.SUCCESS;
             }
         }
@@ -80,7 +80,7 @@ final class J2clStepWorkerUnpack extends J2clStepWorker2 {
     private boolean extractSourceRoots(final J2clDependency artifact,
                                        final J2clPath dest,
                                        final J2clLinePrinter logger) throws Exception {
-        boolean javaFilesFound = false;
+        boolean filesFound = false;
 
         final List<J2clPath> sourceRoots = artifact.sourcesRoot();
         logger.printIndented("Source root(s)", sourceRoots);
@@ -98,7 +98,7 @@ final class J2clStepWorkerUnpack extends J2clStepWorker2 {
                     }
 
                     // dont want to copy test-annotations will contain the generated class by any annotation processor.
-                    javaFilesFound |= source.isFile() ?
+                    filesFound |= source.isFile() ?
                             source.extractArchiveFiles(dest, logger).size() > 0 :
                             dest.copyFiles(source, source.gatherFiles(J2clPath.ALL_FILES), logger).size() > 0;
                 }
@@ -108,6 +108,6 @@ final class J2clStepWorkerUnpack extends J2clStepWorker2 {
         logger.outdent();
         logger.printEndOfList();
 
-        return javaFilesFound;
+        return filesFound;
     }
 }
