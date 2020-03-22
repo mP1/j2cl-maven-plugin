@@ -136,7 +136,9 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
                         logger.printLine("Test(s) failed!");
                         throw cause;
                     } finally {
-                        driver.quit();
+                        if(null != driver) {
+                            driver.quit();
+                        }
                     }
                     logger.outdent();
                 }
