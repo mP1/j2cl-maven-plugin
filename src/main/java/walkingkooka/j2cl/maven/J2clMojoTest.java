@@ -111,6 +111,7 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
                 this.externs(),
                 this.formatting(),
                 this.languageOut(),
+                this.browsers(),
                 testClassName,
                 this.testTimeout(),
                 this.mavenMiddleware(),
@@ -167,6 +168,20 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
 
     private boolean skipTests() {
         return this.skipTests;
+    }
+
+    // browser..........................................................................................................
+
+    /**
+     * One or more browsers that will be used as the test browser by webdriver.
+     */
+    @Parameter(alias = "browsers", required = true)
+    private List<String> browsers;
+
+    private List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers() {
+        return this.browsers.stream()
+                .map(J2clStepWorkerWebDriverUnitTestRunnerBrowser::fromCommandLine)
+                .collect(Collectors.toList());
     }
 
     // testTimeout.......................................................................................................

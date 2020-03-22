@@ -193,6 +193,9 @@
                             <goal>test</goal>
                         </goals>
                         <configuration>
+                            <browsers>
+                                <param>CHROME</param>
+                            </browsers>
                             <classpath-scope>test</classpath-scope>
                             <compilation-level>ADVANCED</compilation-level>
                             <defines>

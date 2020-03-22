@@ -71,6 +71,10 @@
                             <goal>build</goal>
                         </goals>
                         <configuration>
+                            <browsers>
+                                <param>CHROME</param>
+                                <param>HTML_UNIT</param>
+                            </browsers>
                             <classpath-scope>runtime</classpath-scope>
                             <compilation-level>ADVANCED</compilation-level>
                             <defines>

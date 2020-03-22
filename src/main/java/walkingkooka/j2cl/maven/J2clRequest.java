@@ -247,6 +247,10 @@ abstract class J2clRequest {
 
     private final LanguageMode languageOut;
 
+    // browsers.........................................................................................................
+
+    abstract List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers();
+
     // testTimeout......................................................................................................
 
     abstract int testTimeout();

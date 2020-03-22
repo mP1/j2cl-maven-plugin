@@ -47,6 +47,7 @@ final class J2clMojoTestRequest extends J2clRequest {
                                     final Set<String> externs,
                                     final Set<ClosureFormattingOption> formatting,
                                     final LanguageMode languageOut,
+                                    final List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers,
                                     final String testClassName,
                                     final int testTimeout,
                                     final J2clMavenMiddleware middleware,
@@ -66,6 +67,7 @@ final class J2clMojoTestRequest extends J2clRequest {
                 externs,
                 formatting,
                 languageOut,
+                browsers,
                 testClassName,
                 testTimeout,
                 middleware,
@@ -87,6 +89,7 @@ final class J2clMojoTestRequest extends J2clRequest {
                                 final Set<String> externs,
                                 final Set<ClosureFormattingOption> formatting,
                                 final LanguageMode languageOut,
+                                final List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers,
                                 final String testClassName,
                                 final int testTimeout,
                                 final J2clMavenMiddleware middleware,
@@ -109,6 +112,7 @@ final class J2clMojoTestRequest extends J2clRequest {
                 middleware,
                 executor,
                 logger);
+        this.browsers = browsers;
         this.testClassName = testClassName;
         this.testTimeout = testTimeout;
     }
@@ -136,6 +140,7 @@ final class J2clMojoTestRequest extends J2clRequest {
     String hash() {
         if (null == this.hash) {
             final HashBuilder hash = this.computeHash();
+            // no need to include browser or testTimeout in hash as these do no affect generated js
             hash.append(this.testClassName);
             this.hash = hash.toString();
         }
@@ -154,6 +159,13 @@ final class J2clMojoTestRequest extends J2clRequest {
     }
 
     private J2clDependency project;
+
+    @Override
+    List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers() {
+        return this.browsers;
+    }
+
+    private final List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers;
 
     private final String testClassName;
 

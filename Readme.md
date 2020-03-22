@@ -266,6 +266,21 @@ A list of artifacts (full maven coords) followed by a comma separated list of ar
 
 
 
+## browser (test)
+A list of browsers that are used by webdriver to execute transpiled unit tests. At least one must be selected out of
+the supported browsers listed below.
+
+```xml
+<browsers>
+   <param>CHROME</param>
+   <param>HTML_UNIT</param>
+</browsers>
+```
+
+If HTML_UNIT is selected the `language-out` should be set to `ECMASCRIPT5` as newer javascript constructs such as class
+are not supported by the html unit javascript engine. 
+
+
 ## classpath-required
 A list of artifacts that will be added to all classpaths. The first entry will be used as the bootstrap archive. If a
 dependency is present here but absent in `javascript-source-required` then it will never appear when js files are required.
