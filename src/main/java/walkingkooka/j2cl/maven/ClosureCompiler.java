@@ -26,6 +26,7 @@ import com.google.javascript.jscomp.DependencyOptions;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.text.LineEnding;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -163,8 +164,9 @@ class ClosureCompiler {
 
                     logger.printLine("Messages");
                     logger.indent();
-                    logger.emptyLine();
-                    logger.print(new String(outputBytes.toByteArray(), charset)); // the captured output will already have line endings.
+                    {
+                        logger.print(removeEmptyLines(new String(outputBytes.toByteArray(), charset))); // the captured output will already have line endings.
+                    }
                     logger.outdent();
 
                     // anything but zero means errors and initial file must also exist and is a FAIL.
@@ -309,4 +311,14 @@ class ClosureCompiler {
 
         private final boolean exportTestFunctions;
     }
+
+    private static CharSequence removeEmptyLines(final String text) {
+        return text.replace(CRCR, LineEnding.CR.toString())
+                .replace(NLCR, LineEnding.NL.toString())
+                .replace(NLNL, LineEnding.NL.toString());
+    }
+
+    private final static String CRCR = "" + LineEnding.CR + LineEnding.CR;
+    private final static String NLCR = "" + LineEnding.NL + LineEnding.CR;
+    private final static String NLNL = "" + LineEnding.NL + LineEnding.NL;
 }
