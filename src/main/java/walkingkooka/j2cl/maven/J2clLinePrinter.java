@@ -163,31 +163,9 @@ final class J2clLinePrinter {
         //noinspection ConstantConditions
         if (null != values) {
             this.indent();
-            values.forEach(this::printIndentedStringPrintLine);
+            values.forEach(this::printLine);
             this.outdent();
         }
-    }
-
-    /**
-     * Errors, warnings and other messages from various Google tools like Transpiler or Closure compiler include a trailing EOL,
-     * remove and then print to avoid a blank line that follows.
-     */
-    private void printIndentedStringPrintLine(final String text) {
-        this.printLine(endsWith(text, LineEnding.CR) ?
-                removeEnding(text, LineEnding.CR) :
-                endsWith(text, LineEnding.NL) ?
-                        removeEnding(text, LineEnding.NL) :
-                        endsWith(text, LineEnding.CRNL) ?
-                                removeEnding(text, LineEnding.CRNL) :
-                                text);
-    }
-
-    private static boolean endsWith(final String text, final LineEnding ending) {
-        return text.endsWith(ending.toString());
-    }
-
-    private static CharSequence removeEnding(final String text, final LineEnding ending) {
-        return CharSequences.subSequence(text, 0, -ending.length());
     }
 
     void print(final CharSequence line) {
