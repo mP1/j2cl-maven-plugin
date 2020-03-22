@@ -273,6 +273,7 @@ the supported browsers listed below.
 ```xml
 <browsers>
    <param>CHROME</param>
+   <param>FIREFOX</param>
    <param>HTML_UNIT</param>
 </browsers>
 ```

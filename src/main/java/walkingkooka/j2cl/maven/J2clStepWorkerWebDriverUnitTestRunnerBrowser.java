@@ -22,6 +22,8 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import walkingkooka.text.CharSequences;
 
@@ -38,6 +40,14 @@ enum J2clStepWorkerWebDriverUnitTestRunnerBrowser {
         WebDriver webDriver() {
             WebDriverManager.chromedriver().setup();
             return new ChromeDriver(new ChromeOptions().setHeadless(true));
+        }
+
+    },
+    FIREFOX {
+        @Override
+        WebDriver webDriver() {
+            WebDriverManager.firefoxdriver().setup();
+            return new FirefoxDriver(new FirefoxOptions().setHeadless(true));
         }
 
     },

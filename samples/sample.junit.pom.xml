@@ -141,6 +141,7 @@
                         <configuration>
                             <browsers>
                                 <param>CHROME</param>
+                                <param>FIREFOX</param>
                                 <param>HTML_UNIT</param>
                             </browsers>
                             <classpath-scope>test</classpath-scope>
