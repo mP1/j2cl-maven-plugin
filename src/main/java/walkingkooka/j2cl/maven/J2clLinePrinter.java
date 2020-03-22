@@ -173,11 +173,21 @@ final class J2clLinePrinter {
      * remove and then print to avoid a blank line that follows.
      */
     private void printIndentedStringPrintLine(final String text) {
-        this.printLine(text.endsWith("\n") || text.endsWith("\r") ?
-                CharSequences.subSequence(text, 0, -1) :
-                text.endsWith("\n\r") ?
-                        CharSequences.subSequence(text, 0, -2) :
-                        text);
+        this.printLine(endsWith(text, LineEnding.CR) ?
+                removeEnding(text, LineEnding.CR) :
+                endsWith(text, LineEnding.NL) ?
+                        removeEnding(text, LineEnding.NL) :
+                        endsWith(text, LineEnding.CRNL) ?
+                                removeEnding(text, LineEnding.CRNL) :
+                                text);
+    }
+
+    private static boolean endsWith(final String text, final LineEnding ending) {
+        return text.endsWith(ending.toString());
+    }
+
+    private static CharSequence removeEnding(final String text, final LineEnding ending) {
+        return CharSequences.subSequence(text, 0, -ending.length());
     }
 
     void print(final CharSequence line) {
