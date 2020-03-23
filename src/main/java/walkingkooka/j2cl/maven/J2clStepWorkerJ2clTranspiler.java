@@ -67,7 +67,7 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
 
         return J2clTranspiler.execute(classpath,
                 sourceRoot,
-                directory.output().emptyOrFail(),
+                directory.output().absentOrFail(),
                 logger) ?
                 J2clStepResult.SUCCESS :
                 J2clStepResult.FAILED;

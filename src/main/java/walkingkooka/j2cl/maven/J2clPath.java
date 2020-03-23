@@ -195,9 +195,10 @@ final class J2clPath implements Comparable<J2clPath> {
     }
 
     @SuppressWarnings("ThrowableNotThrown")
-    J2clPath emptyOrFail() throws IOException {
-        this.exists()
-                .ifPresent((p) -> new IllegalArgumentException("Directory exists: " + this));
+    J2clPath absentOrFail() throws IOException {
+        if (this.exists().isPresent()) {
+            throw new IllegalArgumentException("Directory exists: " + this);
+        }
 
         return this.createIfNecessary();
     }
