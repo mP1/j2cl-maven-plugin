@@ -43,7 +43,7 @@ final class J2clStepWorkerGwtIncompatibleStripPreprocessor extends J2clStepWorke
                             final J2clStepDirectory directory,
                             final J2clLinePrinter logger) throws Exception {
         return GwtIncompatibleStripPreprocessor.execute(Lists.of(artifact.step(J2clStep.COMPILE).output(), artifact.step(J2clStep.UNPACK).output()),
-                directory.output().emptyOrFail(),
+                directory.output().absentOrFail(),
                 logger);
     }
 }

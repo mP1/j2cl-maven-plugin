@@ -47,7 +47,7 @@ final class J2clStepWorkerUnpack extends J2clStepWorker2 {
                             final J2clLinePrinter logger) throws Exception {
         J2clStepResult result;
 
-        final J2clPath dest = directory.output().emptyOrFail();
+        final J2clPath dest = directory.output().absentOrFail();
         logger.printIndented("Destination", dest);
         
         {
