@@ -189,7 +189,6 @@
                                 <param>com.vertispan.j2cl:junit-processor:${j2cl.version}</param>
                                 <param>com.vertispan.j2cl:junit-emul:${j2cl.version}</param>
                             </classpath-required>
-                            <excluded-dependencies/>
                             <javascript-source-required>
                                 <param>com.vertispan.j2cl:bootstrap:zip:jszip:${j2cl.version}</param>
                                 <param>com.vertispan.j2cl:jre:zip:jszip:${j2cl.version}</param>

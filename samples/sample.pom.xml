@@ -120,7 +120,6 @@
                                 <jsinterop.checks>DISABLED</jsinterop.checks>
                             </defines>
                             <entry-points>example.helloworld.app</entry-points>
-                            <excluded-dependencies></excluded-dependencies>
                             <externs></externs>
                             <formatting>
                             <!--

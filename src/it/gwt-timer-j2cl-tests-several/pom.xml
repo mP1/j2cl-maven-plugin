@@ -115,15 +115,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.elemental2</groupId>
-            <artifactId>elemental2-dom</artifactId>
-            <classifier>sources</classifier>
-            <type>jar</type>
-            <version>1.0.0-RC1</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>com.google.jsinterop</groupId>
             <artifactId>jsinterop-annotations</artifactId>
             <version>2.0.0</version>
@@ -143,6 +134,16 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.vertispan.jsinterop</groupId>
+                <artifactId>base</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <testResources>
@@ -210,7 +211,7 @@
                             <externs/>
                             <formatting/>
                             <language-out>ECMASCRIPT_2016</language-out>
-                            <thread-pool-size>0</thread-pool-size>
+                            <thread-pool-size>1</thread-pool-size>
 
                             <added-dependencies>
                                 <param>
@@ -221,23 +222,20 @@
                                 <param>com.vertispan.j2cl:javac-bootstrap-classpath:${j2cl.version}</param>
                                 <param>com.vertispan.j2cl:jre:${j2cl.version}</param>
                                 <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
-                                <param>com.vertispan.jsinterop:base:1.0.0-SNAPSHOT</param>
                                 <param>com.vertispan.j2cl:gwt-internal-annotations:jar:${j2cl.version}</param>
                                 <!-- junit -->
                                 <param>com.vertispan.j2cl:junit-annotations:${j2cl.version}</param>
                                 <param>com.vertispan.j2cl:junit-processor:${j2cl.version}</param>
                                 <param>com.vertispan.j2cl:junit-emul:${j2cl.version}</param>
                             </classpath-required>
-                            <excluded-dependencies>
-                                <param>com.google.elemental2:elemental2-dom:sources:1.0.0-RC1</param>
-                            </excluded-dependencies>
                             <javascript-source-required>
                                 <param>com.vertispan.j2cl:bootstrap:zip:jszip:${j2cl.version}</param>
                                 <param>com.vertispan.j2cl:jre:zip:jszip:${j2cl.version}</param>
-                                <param>com.vertispan.jsinterop:base:1.0.0-SNAPSHOT</param>
                                 <param>com.vertispan.j2cl:closure-test:zip:jszip:${j2cl.version}</param>
                             </javascript-source-required>
                             <processing-skipped>
+                                <param>com.google.elemental2:elemental2-dom:sources:1.0.0-RC1</param>
+
                                 <!-- jre & bootstrap transpiled versions also included as dependencies, skip transpiling-->
                                 <param>com.vertispan.j2cl:javac-bootstrap-classpath:${j2cl.version}</param>
                                 <param>com.vertispan.j2cl:jre:${j2cl.version}</param>
@@ -255,7 +253,7 @@
                                 <param>com.vertispan.j2cl:junit-processor:${j2cl.version}</param>
                             </processing-skipped>
                             <replaced-dependencies>
-                                <param>com.google.jsinterop:base:1.0.0-RC1=com.vertispan.jsinterop:base:2.0.0</param>
+                                <param>com.google.jsinterop:base:1.0.0-RC1=com.vertispan.jsinterop:base:1.0.0-SNAPSHOT</param>
                                 <param>com.vertispan.j2cl:gwt-internal-annotations:0.4-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:${j2cl.version}</param>
                             </replaced-dependencies>
                             <skip-tests>false</skip-tests>

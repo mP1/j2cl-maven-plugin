@@ -102,7 +102,6 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
                 this.classpathScope(),
                 this.addedDependencies(),
                 this.classpathRequired(),
-                this.excludedDependencies(),
                 this.javascriptSourceRequired(),
                 this.processingSkipped(),
                 this.replacedDependencies(),
