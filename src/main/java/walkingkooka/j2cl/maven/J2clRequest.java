@@ -55,7 +55,6 @@ abstract class J2clRequest {
                         final J2clClasspathScope scope,
                         final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies,
                         final List<J2clArtifactCoords> classpathRequired,
-                        final List<Predicate<J2clArtifactCoords>> excluded,
                         final List<J2clArtifactCoords> javascriptSourceRequired,
                         final List<J2clArtifactCoords> processingSkipped,
                         final Map<J2clArtifactCoords, J2clArtifactCoords> replaced,
@@ -75,11 +74,6 @@ abstract class J2clRequest {
 
         this.addedDependencies = addedDependencies;
         this.classpathRequired = classpathRequired;
-        this.excluded = excluded;
-
-        this.unusedExcluded = Sets.ordered();
-        this.unusedExcluded.addAll(excluded);
-
         this.javascriptSourceRequired = javascriptSourceRequired;
         this.processingSkipped = processingSkipped;
         this.replaced = replaced;
@@ -143,26 +137,6 @@ abstract class J2clRequest {
      * Added to each discovered dependency as they are discovered.
      */
     private final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies;
-
-    final boolean isExcluded(final J2clArtifactCoords coords) {
-        return this.excluded.stream()
-                .anyMatch(p -> {
-                    final boolean excluded = p.test(coords);
-                    if (excluded) {
-                        this.unusedExcluded.remove(p);
-                    }
-                    return excluded;
-                }) ||
-                this.replaced.containsKey(coords);
-    }
-
-    private final List<Predicate<J2clArtifactCoords>> excluded;
-
-    /**
-     * Tracks all excluded-dependencies {@link Predicate} that have not matched at least one dependency.
-     * This will be used to later report and fail unused/unnecessary dependencies.
-     */
-    private final Set<Predicate<J2clArtifactCoords>> unusedExcluded;
 
     final List<J2clDependency> classpathRequired() {
         return this.classpathRequired.stream()
@@ -285,7 +259,6 @@ abstract class J2clRequest {
             v.forEach(a -> hash.append(a.toString()));
         });
         hash.append(this.classpathRequired.toString());
-        hash.append(this.excluded.toString());
         hash.append(this.javascriptSourceRequired.toString());
         hash.append(this.processingSkipped.toString());
         this.replaced.forEach((k, v) -> {
@@ -335,7 +308,6 @@ abstract class J2clRequest {
     final void verifyArtifactCoords() {
         this.verify(this.classpathRequired, "classpath-required");
         this.verify(this.javascriptSourceRequired, "javascript-required");
-        this.verifyExcluded();
         this.verify(this.processingSkipped, "processing-skipped");
     }
 
@@ -346,16 +318,6 @@ abstract class J2clRequest {
                 .collect(Collectors.toList());
         if (false == unknown.isEmpty()) {
             throw new IllegalArgumentException("Unknown " + label + " dependencies: " + join(unknown));
-        }
-    }
-
-    /**
-     * Will fail if one or more unused excluded dependencies predicates remained.
-     */
-    private void verifyExcluded() {
-        final Collection<Predicate<J2clArtifactCoords>> unused = this.unusedExcluded;
-        if (false == unused.isEmpty()) {
-            throw new IllegalArgumentException("Excluded dependencies filter matches no dependencies: " + join(unused));
         }
     }
 
@@ -534,7 +496,6 @@ abstract class J2clRequest {
     public String toString() {
         return this.base + " " +
                 this.classpathRequired + " " +
-                this.excluded + " " +
                 this.javascriptSourceRequired + " " +
                 this.processingSkipped + " " +
                 this.replaced + " " +

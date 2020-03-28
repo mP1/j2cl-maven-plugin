@@ -107,12 +107,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
                 continue;
             }
 
-            final J2clArtifactCoords coords = J2clArtifactCoords.with(artifact);
-            if(request.isExcluded(coords)) {
-                continue;
-            }
-
-            this.dependencyCoords.add(this.getOrCreate(coords).coords());
+            this.dependencyCoords.add(this.getOrCreate(J2clArtifactCoords.with(artifact)).coords());
         }
     }
 
@@ -132,8 +127,13 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private J2clDependency getOrCreate(final J2clArtifactCoords coords) {
-        final J2clDependency dependency = COORD_TO_DEPENDENCY.get(this.request().replacement(coords).orElse(coords));
+        return this.getOrCreate0(this.request()
+        .replacement(coords)
+        .orElse(coords));
+    }
 
+    private J2clDependency getOrCreate0(final J2clArtifactCoords coords) {
+        final J2clDependency dependency = COORD_TO_DEPENDENCY.get(coords);
         return null != dependency ?
                 dependency :
                 this.loadDependency(coords);
@@ -292,16 +292,6 @@ final class J2clDependency implements Comparable<J2clDependency> {
     boolean isProcessingRequired() {
         return false == this.isProcessingSkipped();
     }
-
-    // excluded..........................................................................................................
-
-    /**
-     * Excluded dependencies will return true, and will be ignored/removed during the dependency discovering phase.
-     */
-    boolean isExcluded() {
-        return this.request().isExcluded(this.coords());
-    }
-
 
     // shade............................................................................................................
 

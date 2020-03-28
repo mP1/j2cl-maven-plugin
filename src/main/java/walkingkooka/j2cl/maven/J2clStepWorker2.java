@@ -35,9 +35,6 @@ abstract class J2clStepWorker2 extends J2clStepWorker {
     final J2clStepResult execute(final J2clDependency artifact,
                                  final J2clStep step,
                                  final J2clLinePrinter logger) throws Exception {
-        if(artifact.isExcluded()) {
-            throw new IllegalArgumentException("Excluded dependency should not have tasks scheduled: " + CharSequences.quote(artifact.coords().toString()));
-        }
         final J2clStepResult result;
 
         final J2clStepDirectory directory = artifact.step(step);
