@@ -187,32 +187,32 @@ Plugin definition
                 <thread-pool-size>0</thread-pool-size>
 
                 <added-dependencies>
-                    <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:${j2cl.version}</param>
+                    <param>com.vertispan.jsinterop:base:*=com.vertispan.j2cl:gwt-internal-annotations:${j2cl.version}</param>
                 </added-dependencies>
                 <classpath-required>
-                    <param>com.vertispan.j2cl:javac-bootstrap-classpath:${j2cl.version}</param>
-                    <param>com.vertispan.j2cl:jre:${j2cl.version}</param>
-                    <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT</param>
-                    <param>com.vertispan.j2cl:gwt-internal-annotations:jar:${j2cl.version}</param>
-                    <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
+                    <param>com.vertispan.j2cl:javac-bootstrap-classpath:*</param>
+                    <param>com.vertispan.j2cl:jre:*</param>
+                    <param>com.vertispan.jsinterop:base:*</param>
+                    <param>com.vertispan.j2cl:gwt-internal-annotations:*</param>
+                    <param>com.google.jsinterop:jsinterop-annotations:*</param>
                 </classpath-required>
                 <excluded-dependencies></excluded-dependencies>
                 <javascript-source-required>
-                    <param>com.vertispan.j2cl:bootstrap:zip:jszip:${j2cl.version}</param>
-                    <param>com.vertispan.j2cl:jre:zip:jszip:${j2cl.version}</param>
+                    <param>com.vertispan.j2cl:bootstrap:zip:jszip:*</param>
+                    <param>com.vertispan.j2cl:jre:zip:jszip:*</param>
                 </javascript-source-required>
                 <ignored>
                     <!-- jre & bootstrap transpiled versions also included as dependencies, skip transpiling-->
-                    <param>com.vertispan.j2cl:javac-bootstrap-classpath:${j2cl.version}</param>
-                    <param>com.vertispan.j2cl:jre:${j2cl.version}</param>
-                    <param>com.vertispan.j2cl:bootstrap:zip:jszip:${j2cl.version}</param>
-                    <param>com.vertispan.j2cl:jre:zip:jszip:${j2cl.version}</param>
+                    <param>com.vertispan.j2cl:javac-bootstrap-classpath:*</param>
+                    <param>com.vertispan.j2cl:jre:*</param>
+                    <param>com.vertispan.j2cl:bootstrap:zip:jszip:*</param>
+                    <param>com.vertispan.j2cl:jre:zip:jszip:*</param>
                     <!-- dependencies below only contain annotations -->
-                    <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
-                    <param>com.vertispan.j2cl:gwt-internal-annotations:jar:${j2cl.version}</param>
+                    <param>com.google.jsinterop:jsinterop-annotations:*</param>
+                    <param>com.vertispan.j2cl:gwt-internal-annotations:*</param>
                 </ignored>
                 <replaced-dependencies>
-                    <param>com.vertispan.j2cl:gwt-internal-annotations:0.4-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:${j2cl.version}</param>
+                    <param>com.vertispan.j2cl:gwt-internal-annotations:*=com.vertispan.j2cl:gwt-internal-annotations:${j2cl.version}</param>
                 </replaced-dependencies>
             </configuration>
         </execution>
@@ -260,9 +260,11 @@ A list of artifacts (full maven coords) followed by a comma separated list of ar
 
 ```xml
 <added-dependencies>
-    <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:0.4-SNAPSHOT</param>
+    <param>com.vertispan.jsinterop:base:*-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:0.4-SNAPSHOT</param>
 </added-dependencies>
 ```
+
+Maven coordinates on the left side of each entry may have a wildcard in the version.
 
 
 
@@ -290,13 +292,15 @@ The snippet below is a good starting point and forcibly includes a few minimally
 
 ```xml
 <classpath-required>
-    <param>com.vertispan.j2cl:javac-bootstrap-classpath:${j2cl.version}</param>
-    <param>com.vertispan.j2cl:jre:${j2cl.version}</param>
-    <param>com.vertispan.jsinterop:base:jar:1.0.0-SNAPSHOT</param>
-    <param>com.vertispan.j2cl:gwt-internal-annotations:jar:${j2cl.version}</param>
-    <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
+    <param>com.vertispan.j2cl:javac-bootstrap-classpath:*</param>
+    <param>com.vertispan.j2cl:jre:*</param>
+    <param>com.vertispan.jsinterop:base:*</param>
+    <param>com.vertispan.j2cl:gwt-internal-annotations:*</param>
+    <param>com.google.jsinterop:jsinterop-annotations:*</param>
 </classpath-required>
 ```
+
+Maven coordinates may have a wildcard in the version.
 
 
 
@@ -369,15 +373,17 @@ for compiling (javac).
 ```xml
 <ignored>
     <!-- jre & bootstrap transpiled versions also included as dependencies, skip transpiling-->
-    <param>com.vertispan.j2cl:javac-bootstrap-classpath:${j2cl.version}</param>
-    <param>com.vertispan.j2cl:jre:${j2cl.version}</param>
-    <param>com.vertispan.j2cl:bootstrap:zip:jszip:${j2cl.version}</param>
-    <param>com.vertispan.j2cl:jre:zip:jszip:${j2cl.version}</param>
+    <param>com.vertispan.j2cl:javac-bootstrap-classpath:*</param>
+    <param>com.vertispan.j2cl:jre:*</param>
+    <param>com.vertispan.j2cl:bootstrap:zip:jszip:*</param>
+    <param>com.vertispan.j2cl:jre:zip:jszip:*</param>
     <!-- dependencies below only contain annotations -->
-    <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
-    <param>com.vertispan.j2cl:gwt-internal-annotations:jar:${j2cl.version}</param>
+    <param>com.google.jsinterop:jsinterop-annotations:*</param>
+    <param>com.vertispan.j2cl:gwt-internal-annotations:*</param>
 </ignored>
 ```
+
+Maven coordinates may have a wildcard in the version.
 
 
 
@@ -398,10 +404,12 @@ The snippet below is a good starting point and forcibly includes a few minimally
 
 ```xml
 <javascript-source-required>
-    <param>com.vertispan.j2cl:bootstrap:zip:jszip:0.5-SNAPSHOT</param>
-    <param>com.vertispan.j2cl:jre:zip:jszip:0.5-SNAPSHOT</param>
+    <param>com.vertispan.j2cl:bootstrap:zip:jszip:*</param>
+    <param>com.vertispan.j2cl:jre:zip:jszip:*</param>
 </javascript-source-required>
 ```
+
+Maven coordinates may have a wildcard in the version.
 
 
 
@@ -439,9 +447,11 @@ would be problematic and a customized substitute is available as a replacement.
 
 ```xml
 <replaced-dependencies>
-    <param>com.google.gwt:gwt-user:2.8.2=walkingkooka:example-excluded-dependencies-gwt-entrypoint:1.0</param>
+    <param>com.google.gwt:gwt-user:*=walkingkooka:example-excluded-dependencies-gwt-entrypoint:1.0</param>
 </replaced-dependencies>
 ```
+
+Maven coordinates on the left side of each entry may have a wildcard in the version.
 
 
 

@@ -140,6 +140,10 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private J2clDependency loadDependency(final J2clArtifactCoords coords) {
+        if (coords.isWildcardVersion()) {
+            throw new IllegalArgumentException("Dependency " + CharSequences.quoteAndEscape(coords.toString()) + " with version not declared, dependencies: " + COORD_TO_DEPENDENCY.keySet());
+        }
+
         final J2clRequest request = this.request();
         final MavenProject project = request.mavenMiddleware()
                 .mavenProject(coords.mavenArtifact(request.scope(), this.artifact.getArtifactHandler()));

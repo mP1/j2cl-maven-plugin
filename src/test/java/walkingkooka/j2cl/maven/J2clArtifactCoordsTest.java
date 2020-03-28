@@ -133,6 +133,16 @@ public final class J2clArtifactCoordsTest implements ClassTesting2<J2clArtifactC
     }
 
     @Test
+    public void testDifferentClassifierWildcardVersion() {
+        this.checkNotEquals(J2clArtifactCoords.with(GROUP, ARTIFACT, TYPE, Optional.ofNullable("different"), "*"));
+    }
+
+    @Test
+    public void testDifferentVersionWildcard() {
+        this.checkEquals(J2clArtifactCoords.with(GROUP, ARTIFACT, TYPE, CLASSIFIER, "*"));
+    }
+
+    @Test
     public void testDifferentVersion() {
         this.checkNotEquals(J2clArtifactCoords.with(GROUP, ARTIFACT, TYPE, CLASSIFIER, "different"));
     }
