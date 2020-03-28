@@ -259,8 +259,8 @@ abstract class J2clRequest {
             v.forEach(a -> hash.append(a.toString()));
         });
         hash.append(this.classpathRequired.toString());
-        hash.append(this.javascriptSourceRequired.toString());
         hash.append(this.ignored.toString());
+        hash.append(this.javascriptSourceRequired.toString());
         this.replaced.forEach((k, v) -> {
             hash.append(k.toString());
             hash.append(v.toString());
@@ -373,18 +373,19 @@ abstract class J2clRequest {
 
                 logger.printLine(artifact.toString());
                 logger.indent();
+                {
+                    if (required.isEmpty()) {
+                        this.jobs.remove(artifact);
+                        submit.add(artifact.job());
+                        logger.printLine("Queued " + artifact + " for submission " + submit.size());
+                    } else {
+                        logger.printLine("Waiting for " + required.size() + " dependencies");
+                        logger.indent();
 
-                if (required.isEmpty()) {
-                    this.jobs.remove(artifact);
-                    submit.add(artifact.job());
-                    logger.printLine("Queued " + artifact + " for submission " + submit.size());
-                } else {
-                    logger.printLine("Waiting for " + required.size() + " dependencies");
-                    logger.indent();
+                        required.forEach(r -> logger.printLine(r.toString()));
 
-                    required.forEach(r -> logger.printLine(r.toString()));
-
-                    logger.outdent();
+                        logger.outdent();
+                    }
                 }
 
                 logger.outdent();
