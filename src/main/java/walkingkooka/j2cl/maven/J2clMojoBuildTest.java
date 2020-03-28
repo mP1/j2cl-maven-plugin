@@ -94,6 +94,19 @@ abstract class J2clMojoBuildTest extends J2clMojo {
     private File output;
 
 
+    // ignored................................................................................................
+
+    final List<J2clArtifactCoords> ignored() {
+        return parseList(this.ignored);
+    }
+
+    /**
+     * List of artifacts that will not be processed at all. When required on the java classpath or source,
+     * the archive file will be added.
+     */
+    @Parameter(alias = "ignored", required = true)
+    private List<String> ignored;
+
     // javascriptSourceRequired........................................................................................
 
     final List<J2clArtifactCoords> javascriptSourceRequired() {
@@ -106,20 +119,8 @@ abstract class J2clMojoBuildTest extends J2clMojo {
     @Parameter(alias = "javascript-source-required", required = true)
     private List<String> javascriptSourceRequired;
 
-    // processingSkipped................................................................................................
 
-    final List<J2clArtifactCoords> processingSkipped() {
-        return parseList(this.processingSkipped);
-    }
-
-    /**
-     * List of artifacts that will not be processed at all. When required on the java classpath or source,
-     * the archive file will be added.
-     */
-    @Parameter(alias = "processing-skipped", required = true)
-    private List<String> processingSkipped;
-
-    private List<J2clArtifactCoords> parseList(final List<String> coords) {
+    private static List<J2clArtifactCoords> parseList(final List<String> coords) {
         return coords.stream()
                 .map(J2clArtifactCoords::parse)
                 .collect(Collectors.toList());

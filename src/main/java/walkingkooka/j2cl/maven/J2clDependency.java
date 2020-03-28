@@ -285,12 +285,12 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * the pshaded JRE binaries and the jszip form, each used dependening whether class files or java source is
      * required.
      */
-    boolean isProcessingSkipped() {
-        return this.request().isProcessingSkipped(this.coords);
+    boolean isIgnored() {
+        return this.request().isIgnored(this.coords);
     }
 
     boolean isProcessingRequired() {
-        return false == this.isProcessingSkipped();
+        return false == this.isIgnored();
     }
 
     // shade............................................................................................................

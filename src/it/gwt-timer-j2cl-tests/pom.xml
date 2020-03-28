@@ -249,12 +249,7 @@
                                 <param>com.vertispan.j2cl:junit-processor:${j2cl.version}</param>
                                 <param>com.vertispan.j2cl:junit-emul:${j2cl.version}</param>
                             </classpath-required>
-                            <javascript-source-required>
-                                <param>com.vertispan.j2cl:bootstrap:zip:jszip:${j2cl.version}</param>
-                                <param>com.vertispan.j2cl:jre:zip:jszip:${j2cl.version}</param>
-                                <param>com.vertispan.j2cl:closure-test:zip:jszip:${j2cl.version}</param>
-                            </javascript-source-required>
-                            <processing-skipped>
+                            <ignored>
                                 <param>com.google.elemental2:elemental2-dom:sources:1.0.0-RC1</param>
 
                                 <!-- jre & bootstrap transpiled versions also included as dependencies, skip transpiling-->
@@ -272,7 +267,12 @@
                                 <param>com.vertispan.j2cl:junit-annotations:${j2cl.version}</param>
                                 <param>com.vertispan.j2cl:junit-emul:${j2cl.version}</param>
                                 <param>com.vertispan.j2cl:junit-processor:${j2cl.version}</param>
-                            </processing-skipped>
+                            </ignored>
+                            <javascript-source-required>
+                                <param>com.vertispan.j2cl:bootstrap:zip:jszip:${j2cl.version}</param>
+                                <param>com.vertispan.j2cl:jre:zip:jszip:${j2cl.version}</param>
+                                <param>com.vertispan.j2cl:closure-test:zip:jszip:${j2cl.version}</param>
+                            </javascript-source-required>
                             <replaced-dependencies>
                                 <param>com.google.jsinterop:base:1.0.0-RC1=com.vertispan.jsinterop:base:1.0.0-SNAPSHOT</param>
                                 <param>com.vertispan.j2cl:gwt-internal-annotations:0.4-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:${j2cl.version}</param>
