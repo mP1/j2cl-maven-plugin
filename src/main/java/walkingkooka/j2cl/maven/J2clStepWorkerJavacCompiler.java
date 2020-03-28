@@ -58,7 +58,7 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
                         continue; // dont add a classpath required that is a parent of this artifact.
                     }
 
-                    if (dependency.isProcessingSkipped()) {
+                    if (dependency.isIgnored()) {
                         classpath.add(dependency.artifactFileOrFail());
                         continue;
                     }

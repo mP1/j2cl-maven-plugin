@@ -42,7 +42,7 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
                                   final J2clLinePrinter logger) throws Exception {
         final J2clPath sourceRoot;
 
-        if (artifact.isProcessingSkipped()) {
+        if (artifact.isIgnored()) {
             sourceRoot = artifact.step(J2clStep.UNPACK).output();
         } else {
             // source may have been shaded, have to check if a shade output directory exists.
@@ -59,7 +59,7 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
 
         final List<J2clPath> classpath = artifact.classpathAndDependencies()
                 .stream()
-                .map(d -> d.isProcessingSkipped() ?
+                .map(d -> d.isIgnored() ?
                         d.artifactFileOrFail() :
                         d.step(J2clStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED).output())
                 .flatMap(d -> d.exists().stream())

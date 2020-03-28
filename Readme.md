@@ -201,7 +201,7 @@ Plugin definition
                     <param>com.vertispan.j2cl:bootstrap:zip:jszip:${j2cl.version}</param>
                     <param>com.vertispan.j2cl:jre:zip:jszip:${j2cl.version}</param>
                 </javascript-source-required>
-                <processing-skipped>
+                <ignored>
                     <!-- jre & bootstrap transpiled versions also included as dependencies, skip transpiling-->
                     <param>com.vertispan.j2cl:javac-bootstrap-classpath:${j2cl.version}</param>
                     <param>com.vertispan.j2cl:jre:${j2cl.version}</param>
@@ -210,7 +210,7 @@ Plugin definition
                     <!-- dependencies below only contain annotations -->
                     <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
                     <param>com.vertispan.j2cl:gwt-internal-annotations:jar:${j2cl.version}</param>
-                </processing-skipped>
+                </ignored>
                 <replaced-dependencies>
                     <param>com.vertispan.j2cl:gwt-internal-annotations:0.4-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:${j2cl.version}</param>
                 </replaced-dependencies>
@@ -361,6 +361,25 @@ For more info click [here](http://googleclosure.blogspot.com/2010/10/pretty-prin
 ```
 
 
+# ignored
+A list of artifacts that will not be processed. This is used to avoid processing any bootstrap and jre artifacts, 
+as they come pre-processed, or only contain annotations that are not required during transpiling (j2cl) but necessary
+for compiling (javac).
+
+```xml
+<ignored>
+    <!-- jre & bootstrap transpiled versions also included as dependencies, skip transpiling-->
+    <param>com.vertispan.j2cl:javac-bootstrap-classpath:${j2cl.version}</param>
+    <param>com.vertispan.j2cl:jre:${j2cl.version}</param>
+    <param>com.vertispan.j2cl:bootstrap:zip:jszip:${j2cl.version}</param>
+    <param>com.vertispan.j2cl:jre:zip:jszip:${j2cl.version}</param>
+    <!-- dependencies below only contain annotations -->
+    <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
+    <param>com.vertispan.j2cl:gwt-internal-annotations:jar:${j2cl.version}</param>
+</ignored>
+```
+
+
 
 ## initial-script-filename (build)
 
@@ -408,26 +427,6 @@ The xml snippet below includes all currently available options, only one may be 
 
 ## output (build)
 This path is the final location of the final javascript.
-
-
-
-# processing-skipped
-A list of artifacts that will not be processed. This is used to avoid processing any bootstrap and jre artifacts, 
-as they come pre-processed, or only contain annotations that are not required during transpiling (j2cl) but necessary
-for compiling (javac).
-
-```xml
-<processing-skipped>
-    <!-- jre & bootstrap transpiled versions also included as dependencies, skip transpiling-->
-    <param>com.vertispan.j2cl:javac-bootstrap-classpath:${j2cl.version}</param>
-    <param>com.vertispan.j2cl:jre:${j2cl.version}</param>
-    <param>com.vertispan.j2cl:bootstrap:zip:jszip:${j2cl.version}</param>
-    <param>com.vertispan.j2cl:jre:zip:jszip:${j2cl.version}</param>
-    <!-- dependencies below only contain annotations -->
-    <param>com.google.jsinterop:jsinterop-annotations:jar:2.0.0</param>
-    <param>com.vertispan.j2cl:gwt-internal-annotations:jar:${j2cl.version}</param>
-</processing-skipped>
-```
 
 
 

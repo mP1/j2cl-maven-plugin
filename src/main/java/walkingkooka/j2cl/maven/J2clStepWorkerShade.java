@@ -49,7 +49,7 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
                                   final J2clLinePrinter logger) throws Exception {
         J2clStepResult result = null;
 
-        if (artifact.isProcessingSkipped()) {
+        if (artifact.isIgnored()) {
             result = J2clStepResult.SKIPPED;
         } else {
             logger.indent();

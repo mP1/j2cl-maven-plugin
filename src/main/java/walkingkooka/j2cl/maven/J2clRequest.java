@@ -55,8 +55,8 @@ abstract class J2clRequest {
                         final J2clClasspathScope scope,
                         final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies,
                         final List<J2clArtifactCoords> classpathRequired,
+                        final List<J2clArtifactCoords> ignored,
                         final List<J2clArtifactCoords> javascriptSourceRequired,
-                        final List<J2clArtifactCoords> processingSkipped,
                         final Map<J2clArtifactCoords, J2clArtifactCoords> replaced,
                         final CompilationLevel level,
                         final Map<String, String> defines,
@@ -74,8 +74,8 @@ abstract class J2clRequest {
 
         this.addedDependencies = addedDependencies;
         this.classpathRequired = classpathRequired;
+        this.ignored = ignored;
         this.javascriptSourceRequired = javascriptSourceRequired;
-        this.processingSkipped = processingSkipped;
         this.replaced = replaced;
 
         this.level = level;
@@ -150,6 +150,12 @@ abstract class J2clRequest {
 
     private final List<J2clArtifactCoords> classpathRequired;
 
+    final boolean isIgnored(final J2clArtifactCoords coords) {
+        return this.ignored.contains(coords);
+    }
+
+    private final List<J2clArtifactCoords> ignored;
+
     final boolean isJavascriptSourceRequired(final J2clArtifactCoords coords) {
         return this.javascriptSourceRequired.contains(coords);
     }
@@ -163,12 +169,6 @@ abstract class J2clRequest {
         return Stream.concat(this.classpathRequired.stream(), this.javascriptSourceRequired.stream())
                 .collect(Collectors.toCollection(Sets::sorted));
     }
-
-    final boolean isProcessingSkipped(final J2clArtifactCoords coords) {
-        return this.processingSkipped.contains(coords);
-    }
-
-    private final List<J2clArtifactCoords> processingSkipped;
 
     // replacements........................................................................................................
 
@@ -260,7 +260,7 @@ abstract class J2clRequest {
         });
         hash.append(this.classpathRequired.toString());
         hash.append(this.javascriptSourceRequired.toString());
-        hash.append(this.processingSkipped.toString());
+        hash.append(this.ignored.toString());
         this.replaced.forEach((k, v) -> {
             hash.append(k.toString());
             hash.append(v.toString());
@@ -308,7 +308,7 @@ abstract class J2clRequest {
     final void verifyArtifactCoords() {
         this.verify(this.classpathRequired, "classpath-required");
         this.verify(this.javascriptSourceRequired, "javascript-required");
-        this.verify(this.processingSkipped, "processing-skipped");
+        this.verify(this.ignored, "ignored");
     }
 
     private void verify(final Collection<J2clArtifactCoords> dependencies,
@@ -496,8 +496,8 @@ abstract class J2clRequest {
     public String toString() {
         return this.base + " " +
                 this.classpathRequired + " " +
+                this.ignored + " " +
                 this.javascriptSourceRequired + " " +
-                this.processingSkipped + " " +
                 this.replaced + " " +
                 this.scope + " " +
                 this.defines + " " +
