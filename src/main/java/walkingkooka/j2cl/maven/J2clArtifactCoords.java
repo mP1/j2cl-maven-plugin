@@ -113,7 +113,9 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
         if (0 == result) {
             result = this.artifactId.compareTo(other.artifactId);
             if (0 == result) {
-                result = this.version.compareTo(other.version);
+                result = this.isWildcardVersion() || other.isWildcardVersion() ?
+                        0 :
+                        this.version.compareTo(other.version);
                 if (0 == result) {
                     result = this.compareToClassifier().compareTo(other.compareToClassifier());
                 }
@@ -152,6 +154,10 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
 
     String version() {
         return this.version;
+    }
+
+    boolean isWildcardVersion() {
+        return this.version().equals("*");
     }
 
     private final String version;
