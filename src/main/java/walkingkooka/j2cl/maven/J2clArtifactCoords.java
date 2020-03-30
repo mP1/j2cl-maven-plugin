@@ -77,9 +77,18 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
         return new J2clArtifactCoords(this.groupId,
                 this.artifactId,
                 this.type,
-                Optional.of("sources"),
+                Optional.of(SOURCES),
                 this.version);
     }
+
+    /**
+     * Returns true if this coordinate is a sources.
+     */
+    boolean isSources() {
+        return this.classifier().stream().anyMatch(SOURCES::equalsIgnoreCase);
+    }
+
+    private final static String SOURCES = "sources";
 
     /**
      * Creates a {@link Artifact}
@@ -93,6 +102,15 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
                 this.type,
                 this.classifier.orElse(null),
                 handler);
+    }
+
+    /**
+     * Matches a coordinate if they share the same group and artifact but classifier != sources.
+     */
+    boolean isGroupArtifactSources(final J2clArtifactCoords other) {
+        return this.groupId().equals(other.groupId()) &&
+                this.artifactId().equals(other.artifactId()) &&
+                this.isSources() != other.isSources();
     }
 
     // Object...........................................................................................................

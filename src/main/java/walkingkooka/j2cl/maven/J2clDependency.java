@@ -297,6 +297,18 @@ final class J2clDependency implements Comparable<J2clDependency> {
         return false == this.isIgnored();
     }
 
+    /**
+     * Checks if this dependency is a duplicate of another, this tries to determine if this is a classifier=source
+     * for another binary artifact.
+     */
+    boolean isDuplicate() {
+        final J2clArtifactCoords coords = this.coords();
+
+        return J2clDependency.COORD_TO_DEPENDENCY.keySet()
+                .stream()
+                .anyMatch(c -> c.isGroupArtifactSources(coords));
+    }
+
     // shade............................................................................................................
 
     Map<String, String> shadeMappings() throws IOException {

@@ -332,7 +332,7 @@ abstract class J2clRequest {
      * Traverses the dependency graph creating job for each, for dependencies that are included.
      */
     private void prepareJobs(final J2clDependency artifact) {
-        if (artifact.isProcessingRequired() && false == this.jobs.containsKey(artifact)) {
+        if (false == artifact.isDuplicate() && artifact.isProcessingRequired() && false == this.jobs.containsKey(artifact)) {
             final Set<J2clDependency> dependencies = artifact.dependencies(); // dependencies()
 
             // keep transitive dependencies alphabetical sorted for better readability when trySubmitJob pretty prints queue processing.

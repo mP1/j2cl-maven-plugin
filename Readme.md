@@ -383,6 +383,10 @@ for compiling (javac).
 </ignored>
 ```
 
+Dependencies where `classifier=sources` that pair another dependency will automatically be ignored.
+
+TODO Maybe also ignore `classifier=jszip`.
+
 Maven coordinates may have a wildcard in the version.
 
 
