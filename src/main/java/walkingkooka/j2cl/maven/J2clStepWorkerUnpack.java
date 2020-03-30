@@ -60,7 +60,10 @@ final class J2clStepWorkerUnpack extends J2clStepWorker2 {
                     final J2clPath path = archive.get();
                     logger.printIndented("Archive", path);
                     logger.indent();
-                    filesFound = archive.get().extractArchiveFiles(dest, logger).size() > 0;
+                    {
+                        filesFound = archive.get()
+                            .extractArchiveFiles(dest, logger).size() > 0;
+                    }
                     logger.outdent();
                 }
             }
@@ -70,7 +73,7 @@ final class J2clStepWorkerUnpack extends J2clStepWorker2 {
                     result = J2clStepResult.SUCCESS;
             } else {
                 logger.printLine("No source files found, transpiling will not be attempted");
-                result = J2clStepResult.SUCCESS;
+                result = J2clStepResult.ABORTED;
             }
         }
 
