@@ -161,6 +161,15 @@ public final class J2clArtifactCoordsTest implements ClassTesting2<J2clArtifactC
         this.isSourcesAndCheck(notSources, false);
     }
 
+    @Test
+    public void testSource2() {
+        final J2clArtifactCoords sources = J2clArtifactCoords.with(GROUP, ARTIFACT, TYPE, Optional.of("sources"), VERSION);
+
+        assertSame(sources, sources.source());
+
+        this.isSourcesAndCheck(sources, true);
+    }
+
     // isSources...........................................................................................................
 
     @Test
