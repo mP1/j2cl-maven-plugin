@@ -29,6 +29,7 @@ import walkingkooka.text.CharSequences;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public final class J2clArtifactCoordsTest implements ClassTesting2<J2clArtifactCoords>,
@@ -151,8 +152,86 @@ public final class J2clArtifactCoordsTest implements ClassTesting2<J2clArtifactC
 
     @Test
     public void testSource() {
+        final J2clArtifactCoords notSources = J2clArtifactCoords.with(GROUP, ARTIFACT, TYPE, CLASSIFIER, VERSION);
+        final J2clArtifactCoords sources = notSources.source();
+
         assertEquals(J2clArtifactCoords.with(GROUP, ARTIFACT, TYPE, Optional.of("sources"), VERSION),
-                J2clArtifactCoords.with(GROUP, ARTIFACT, TYPE, CLASSIFIER, VERSION).source());
+                sources);
+        this.isSourcesAndCheck(sources, true);
+        this.isSourcesAndCheck(notSources, false);
+    }
+
+    // isSources...........................................................................................................
+
+    @Test
+    public void testIsSourceAbsentFalse() {
+        this.isSourcesAndCheck((String) null, false);
+    }
+
+    @Test
+    public void testIsSourceFalse() {
+        this.isSourcesAndCheck("abc", false);
+    }
+
+    @Test
+    public void testIsSourceTrue() {
+        this.isSourcesAndCheck("sources", true);
+    }
+
+    private void isSourcesAndCheck(final String sources, final boolean expected) {
+        this.isSourcesAndCheck(J2clArtifactCoords.with(GROUP, ARTIFACT, TYPE, Optional.ofNullable(sources), VERSION),
+                expected);
+    }
+
+    private void isSourcesAndCheck(final J2clArtifactCoords sources, final boolean expected) {
+        assertEquals(expected,
+                sources.isSources(),
+                () -> sources + " .isSources");
+    }
+
+    // isGroupArtifactSources........................................................................................
+
+    @Test
+    public void testIsGroupArtifactSourcesDifferentGroup() {
+        this.isGroupArtifactSourcesAndCheck("group1:artifact2:type3:classifier4:5",
+                "DIFFERENT:artifact2:type3:classifier4:5",
+                false);
+    }
+
+    @Test
+    public void testIsGroupArtifactSourcesDifferentArtifact() {
+        this.isGroupArtifactSourcesAndCheck("group1:artifact2:type3:classifier4:5",
+                "group1:DIFFERENT:type3:classifier4:5",
+                false);
+    }
+
+    @Test
+    public void testIsGroupArtifactSourcesSources() {
+        this.isGroupArtifactSourcesAndCheck("group1:artifact2:type3:classifier4:5",
+                "group1:artifact2:type3:sources:5",
+                true);
+    }
+
+    private void isGroupArtifactSourcesAndCheck(final String coords,
+                                                final String other,
+                                                final boolean expected) {
+
+        this.isGroupArtifactSourcesAndCheck(J2clArtifactCoords.parse(coords),
+                J2clArtifactCoords.parse(other),
+                expected);
+    }
+
+    private void isGroupArtifactSourcesAndCheck(final J2clArtifactCoords coords,
+                                                final J2clArtifactCoords other,
+                                                final boolean expected) {
+
+        assertEquals(expected,
+                coords.isGroupArtifactSources(other),
+                () -> coords + " .isGroupArtifactSources " + other);
+
+        assertEquals(expected,
+                other.isGroupArtifactSources(coords),
+                () -> other + " .isGroupArtifactSources " + coords);
     }
 
     // ToString.........................................................................................................
