@@ -49,7 +49,6 @@ final class J2clStepWorkerUnpack extends J2clStepWorker2 {
 
         final J2clPath dest = directory.output().absentOrFail();
         logger.printIndented("Destination", dest);
-        
         {
             boolean filesFound = this.extractSourceRoots(artifact, dest, logger);
 
@@ -69,8 +68,8 @@ final class J2clStepWorkerUnpack extends J2clStepWorker2 {
             }
 
             if(filesFound) {
-                    logger.printLine("Source files found, transpiling will happen");
-                    result = J2clStepResult.SUCCESS;
+                logger.printLine("Source files found, transpiling will happen");
+                result = J2clStepResult.SUCCESS;
             } else {
                 logger.printLine("No source files found, transpiling will not be attempted");
                 result = J2clStepResult.ABORTED;
@@ -87,6 +86,7 @@ final class J2clStepWorkerUnpack extends J2clStepWorker2 {
 
         final List<J2clPath> sourceRoots = artifact.sourcesRoot();
         logger.printIndented("Source root(s)", sourceRoots);
+
         logger.printLine("Unpacking...");
         logger.indent();
         {
