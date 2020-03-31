@@ -227,6 +227,8 @@
                                 <param>com.vertispan.j2cl:junit-emul:*</param>
                             </classpath-required>
                             <ignored>
+                                <param>com.google.elemental2:elemental2-dom:sources:*</param>
+
                                 <!-- jre & bootstrap transpiled versions also included as dependencies, skip transpiling-->
                                 <param>com.vertispan.j2cl:javac-bootstrap-classpath:*</param>
                                 <param>com.vertispan.j2cl:jre:*</param>
