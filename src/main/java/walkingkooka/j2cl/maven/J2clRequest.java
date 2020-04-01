@@ -40,7 +40,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -353,48 +352,59 @@ abstract class J2clRequest {
      */
     private int trySubmitJobs() {
         final J2clLogger j2clLogger = this.logger();
-
         final J2clLinePrinter logger = J2clLinePrinter.with(j2clLogger.printer(j2clLogger::debug));
-        logger.printLine("Submitting jobs");
-        logger.indent();
-        logger.printLine("Queue");
-        logger.indent();
 
         final List<Callable<J2clDependency>> submit = Lists.array();
+
         this.executeWithLock(() -> {
+            final String message;
 
-            //for readability sort jobs alphabetically as they will be printed and possibly submitted.....................
-            final SortedMap<J2clDependency, Set<J2clDependency>> alphaSortedJobs = Maps.sorted();
-            alphaSortedJobs.putAll(this.jobs);
-
-            for (final Entry<J2clDependency, Set<J2clDependency>> artifactAndDependencies : alphaSortedJobs.entrySet()) {
-                final J2clDependency artifact = artifactAndDependencies.getKey();
-                final Set<J2clDependency> required = artifactAndDependencies.getValue();
-
-                logger.printLine(artifact.toString());
+            logger.printLine("Submitting jobs");
+            logger.indent();
+            {
+                logger.printLine("Queue");
                 logger.indent();
-                {
-                    if (required.isEmpty()) {
-                        this.jobs.remove(artifact);
-                        submit.add(artifact.job());
-                        logger.printLine("Queued " + artifact + " for submission " + submit.size());
-                    } else {
-                        logger.printLine("Waiting for " + required.size() + " dependencies");
-                        logger.indent();
 
-                        required.forEach(r -> logger.printLine(r.toString()));
+                //for readability sort jobs alphabetically as they will be printed and possibly submitted.....................
+                final SortedMap<J2clDependency, Set<J2clDependency>> alphaSortedJobs = Maps.sorted();
+                alphaSortedJobs.putAll(this.jobs);
 
-                        logger.outdent();
+                for (final Entry<J2clDependency, Set<J2clDependency>> artifactAndDependencies : alphaSortedJobs.entrySet()) {
+                    final J2clDependency artifact = artifactAndDependencies.getKey();
+                    final Set<J2clDependency> required = artifactAndDependencies.getValue();
+
+                    logger.printLine(artifact.toString());
+                    logger.indent();
+                    {
+                        if (required.isEmpty()) {
+                            this.jobs.remove(artifact);
+                            submit.add(artifact.job());
+                            logger.printLine("Queued " + artifact + " for submission " + submit.size());
+                        } else {
+                            logger.printLine("Waiting for " + required.size() + " dependencies");
+                            logger.indent();
+
+                            required.forEach(r -> logger.printLine(r.toString()));
+
+                            logger.outdent();
+                        }
                     }
+                    logger.outdent();
                 }
 
-                logger.outdent();
+                final int submitCount = submit.size();
+                final int waiting = alphaSortedJobs.size() - submit.size();
+                final int running = this.running.get();
+
+                if (0 == submitCount && waiting > 0 && 0 == running) {
+                    throw new J2clException(submitCount + " jobs submitted with " + waiting + " several waiting and " + running + " running.");
+                }
+
+                message = submitCount + " job(s) submitted, " + running + " + running " + waiting + " waiting.";
             }
-
-            final int waiting = alphaSortedJobs.size() - submit.size();
-
             logger.outdent();
-            logger.printLine(submit.size() + " job(s) submitted, " + waiting + " waiting!!");
+
+            logger.printLine(message);
             logger.flush();
 
             submit.forEach(this::submitTask);
