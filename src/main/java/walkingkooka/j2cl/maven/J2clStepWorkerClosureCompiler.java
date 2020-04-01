@@ -86,7 +86,9 @@ final class J2clStepWorkerClosureCompiler extends J2clStepWorker2 {
         logger.indent();
 
         final List<J2clPath> sources = Lists.array();
-        if(artifact.isProcessingRequired()) {
+        if(artifact.isIgnored()) {
+            sources.add(artifact.artifactFileOrFail());
+        } else {
             final J2clPath transpiled = artifact.step(J2clStep.TRANSPILE).output();
             if (transpiled.exists().isPresent()) {
                 sources.add(transpiled);
@@ -101,8 +103,6 @@ final class J2clStepWorkerClosureCompiler extends J2clStepWorker2 {
             if (sources.isEmpty()) {
                 logger.printLine("No transpiled or unpacked output");
             }
-        } else {
-            sources.add(artifact.artifactFileOrFail());
         }
 
         logger.outdent();

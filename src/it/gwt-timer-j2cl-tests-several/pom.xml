@@ -216,7 +216,6 @@
                                 <param>com.vertispan.j2cl:gwt-internal-annotations:*</param>
                                 <!-- junit -->
                                 <param>com.vertispan.j2cl:junit-annotations:*</param>
-                                <param>com.vertispan.j2cl:junit-processor:*</param>
                                 <param>com.vertispan.j2cl:junit-emul:*</param>
                             </classpath-required>
                             <ignored>
@@ -236,7 +235,6 @@
                                 <param>com.vertispan.j2cl:closure-test:zip:jszip:*</param>
                                 <param>com.vertispan.j2cl:junit-annotations:*</param>
                                 <param>com.vertispan.j2cl:junit-emul:*</param>
-                                <param>com.vertispan.j2cl:junit-processor:*</param>
                             </ignored>
                             <javascript-source-required>
                                 <param>com.vertispan.j2cl:bootstrap:zip:jszip:*</param>

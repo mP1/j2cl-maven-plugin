@@ -327,23 +327,21 @@ abstract class J2clRequest {
                 .collect(Collectors.joining(", "));
     }
 
-    /**
-     * Traverses the dependency graph creating job for each, for dependencies that are included.
-     */
     private void prepareJobs(final J2clDependency artifact) {
-        if (artifact.isProcessingRequired() && false == this.jobs.containsKey(artifact)) {
-            final Set<J2clDependency> dependencies = artifact.dependencies(); // dependencies()
-
+        if (false == artifact.isIgnored() && false == this.jobs.containsKey(artifact)) {
             // keep transitive dependencies alphabetical sorted for better readability when trySubmitJob pretty prints queue processing.
             final Set<J2clDependency> required = Sets.sorted();
-            this.jobs.put(artifact, required);
 
-            dependencies.stream()
-                    .filter(J2clDependency::isProcessingRequired)
-                    .forEach(d -> {
-                        required.add(d);
-                        this.prepareJobs(d);
-                    });
+            if(false == artifact.isIgnored()) {
+                this.jobs.put(artifact, required);
+            }
+
+            for (final J2clDependency dependency : artifact.dependencies()) {
+                if (false == dependency.isIgnored()) {
+                    required.add(dependency);
+                    this.prepareJobs(dependency);
+                }
+            }
         }
     }
 

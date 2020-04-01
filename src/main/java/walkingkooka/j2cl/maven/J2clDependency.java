@@ -24,8 +24,14 @@ import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.text.CharSequences;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -199,7 +205,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private static boolean requiredFilter(final J2clArtifactCoords coords) {
-        return getOrFail(coords).isProcessingRequired();
+        return false == getOrFail(coords).isIgnored();
     }
 
     /**
@@ -267,13 +273,22 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private final J2clArtifactCoords coords;
 
     /**
-     * Only returns true for artifacts that are actually the java Bootstrap in some form.
+     * Only returns true for artifacts that have been declared as classpath required or identified as an annotation
+     * processor archive.
      */
-    private boolean isClasspathRequired() {
-        final J2clRequest request = this.request();
-        final J2clArtifactCoords coords = this.coords();
-        return request.isClasspathRequired(coords) || false == request.isJavascriptSourceRequired(coords);
+    boolean isClasspathRequired() {
+        if (null == this.classpathRequired) {
+            final J2clRequest request = this.request();
+            final J2clArtifactCoords coords = this.coords();
+
+            this.classpathRequired = request.isClasspathRequired(coords) ||
+                    false == request.isJavascriptSourceRequired(coords) ||
+                    this.isAnnotationProcessor();
+        }
+        return this.classpathRequired;
     }
+
+    private Boolean classpathRequired;
 
     /**
      * Only returns true for the JRE binary artifact
@@ -286,22 +301,48 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     /**
      * Used to test if a dependency should be ignored and the archive files used as they are. Examples of this include
-     * the pshaded JRE binaries and the jszip form, each used dependening whether class files or java source is
-     * required.
+     * the shaded JRE binaries and the jszip form, each used depending whether class files or java source are required.
      */
     boolean isIgnored() {
-        return this.request().isIgnored(this.coords);
+        if (null == this.ignored) {
+            this.ignored = this.request().isIgnored(this.coords) ||
+                    this.isAnnotationProcessor();
+        }
+        return this.ignored;
     }
 
-    boolean isProcessingRequired() {
-        return false == this.isIgnored();
+    private Boolean ignored;
+
+    /**
+     * Returns true if this dependency includes an annotation processor services file.
+     */
+    private boolean isAnnotationProcessor() {
+        if (null == this.annotationProcessor) {
+            final J2clPath file = this.artifactFile;
+            if (null != file) {
+                try (final FileSystem zip = FileSystems.newFileSystem(URI.create("jar:" + file.file().toURI()), Collections.emptyMap())) {
+                    this.annotationProcessor = Files.exists(zip.getPath(META_INF_SERVICES_PROCESSOR));
+                } catch (final IOException cause) {
+                    throw new J2clException("Failed reading archive", cause);
+                }
+            } else {
+                this.annotationProcessor = false;
+            }
+        }
+
+        return this.annotationProcessor;
     }
+
+    private Boolean annotationProcessor;
+
+    private final static String META_INF_SERVICES_PROCESSOR = "/META-INF/services/".concat(javax.annotation.processing.Processor.class.getName())
+            .replace('/', File.separatorChar);
 
     /**
      * Checks if this dependency is a duplicate of another, this tries to determine if this is a classifier=source
      * for another binary artifact.
      */
-    boolean isDuplicate() {
+    private boolean isDuplicate() {
         final J2clArtifactCoords coords = this.coords();
 
         return J2clDependency.COORD_TO_DEPENDENCY.keySet()
@@ -435,10 +476,6 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     // artifact.........................................................................................................
-
-    private Artifact artifact() {
-        return this.artifact;
-    }
 
     private final Artifact artifact;
 

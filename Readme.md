@@ -300,8 +300,8 @@ The snippet below is a good starting point and forcibly includes a few minimally
 </classpath-required>
 ```
 
-Maven coordinates may have a wildcard in the version.
-
+- Maven coordinates may have a wildcard in the version.
+- Archives with annotation processors will be automatically added.
 
 
 ## classpath-scope
@@ -383,7 +383,12 @@ for compiling (javac).
 </ignored>
 ```
 
-Dependencies where `classifier=sources` that pair another dependency will automatically be ignored.
+The following dependencies will automatically be detected and ignored.
+
+- Archives with annotation processors will be automatically added.
+- Dependency where `classifier=sources` pairs another dependency.
+
+
 
 TODO Maybe also ignore `classifier=jszip`.
 
@@ -413,8 +418,8 @@ The snippet below is a good starting point and forcibly includes a few minimally
 </javascript-source-required>
 ```
 
-Maven coordinates may have a wildcard in the version.
-
+- Maven coordinates may have a wildcard in the version.
+- - Archives with annotation processors will never appear on any stage requiring javascript source.
 
 
 ## language-out
