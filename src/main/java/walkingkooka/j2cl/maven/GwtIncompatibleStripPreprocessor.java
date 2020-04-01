@@ -204,8 +204,10 @@ final class GwtIncompatibleStripPreprocessor {
         logger.indent();
         {
             for (final J2clPath sourceRoot : sourceRoots) {
-                final SortedSet<J2clPath> copy = gatherFiles(sourceRoot, J2clPath.JAVASCRIPT_FILES);
-                output.copyFiles(sourceRoot, copy, logger);
+                if(sourceRoot.exists().isPresent()) {
+                    final SortedSet<J2clPath> copy = gatherFiles(sourceRoot, J2clPath.JAVASCRIPT_FILES);
+                    output.copyFiles(sourceRoot, copy, logger);
+                }
             }
         }
         logger.outdent();
