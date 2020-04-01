@@ -122,13 +122,6 @@
 
         <dependency>
             <groupId>walkingkooka</groupId>
-            <artifactId>j2cl-uber</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>walkingkooka</groupId>
             <artifactId>j2cl-uber-test</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>test</scope>

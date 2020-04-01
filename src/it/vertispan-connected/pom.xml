@@ -80,14 +80,17 @@
             <artifactId>j2cl-uber</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-
-        <dependency>
-            <groupId>walkingkooka</groupId>
-            <artifactId>j2cl-uber-test</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.google.jsinterop</groupId>
+                <artifactId>js-interop-annotations</artifactId>
+                <version>2.0.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <pluginRepositories>
         <pluginRepository>
@@ -136,7 +139,7 @@
                             <externs></externs>
                             <formatting/>
                             <language-out>ECMASCRIPT_2016</language-out>
-                            <thread-pool-size>0</thread-pool-size>
+                            <thread-pool-size>1</thread-pool-size>
 
                             <added-dependencies>
                                 <param>com.vertispan.jsinterop:base:jar:*=com.vertispan.j2cl:gwt-internal-annotations:${j2cl.version}</param>
