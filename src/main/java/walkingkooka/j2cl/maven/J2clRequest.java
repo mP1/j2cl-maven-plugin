@@ -398,7 +398,7 @@ abstract class J2clRequest {
                     throw new J2clException(submitCount + " jobs submitted with " + waiting + " several waiting and " + running + " running.");
                 }
 
-                message = submitCount + " job(s) submitted, " + running + " + running " + waiting + " waiting.";
+                message = submitCount + " job(s) submitted, " + running + " running " + waiting + " waiting.";
             }
             logger.outdent();
 
