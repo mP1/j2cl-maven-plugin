@@ -297,8 +297,17 @@ final class J2clPath implements Comparable<J2clPath> {
             copied.add(copyTargetPath);
         }
 
-        logger.printIndented("Copying", copied);
-
+        if (copied.isEmpty()) {
+            logger.printLine("Copied");
+            logger.indent();
+            {
+                logger.printIndentedLine(src.toString());
+                logger.printLine("0 file(s)");
+            }
+            logger.outdent();
+        } else {
+            logger.printIndented("Copied", copied);
+        }
         return copied;
     }
 
