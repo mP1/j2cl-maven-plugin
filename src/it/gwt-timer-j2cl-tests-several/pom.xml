@@ -204,7 +204,7 @@
                             <externs/>
                             <formatting/>
                             <language-out>ECMASCRIPT_2016</language-out>
-                            <thread-pool-size>1</thread-pool-size>
+                            <thread-pool-size>0</thread-pool-size>
 
                             <added-dependencies>
                                 <param>com.vertispan.jsinterop:base:jar:*=com.vertispan.j2cl:gwt-internal-annotations:${j2cl.version}</param>
