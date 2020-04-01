@@ -37,6 +37,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
@@ -84,80 +85,21 @@ final class GwtIncompatibleStripPreprocessor {
         logger.printLine("Preparing java files");
         logger.indent();
         {
-            for(final J2clPath sourceRoot : sourceRoots) {
-                if(sourceRoot.exists().isPresent()) {
-                    logger.indent();
+            for (final J2clPath sourceRoot : sourceRoots) {
+                final Set<J2clPath> copied = gatherFiles(sourceRoot, J2clPath.JAVA_FILES);
+                // find then copy from unpack to $output
+                final Collection<J2clPath> files = output.copyFiles(sourceRoot,
+                        copied,
+                        logger);
 
-                    // find then copy from unpack to $output
-                    final Collection<J2clPath> files = output.copyFiles(sourceRoot,
-                            gatherFiles(sourceRoot, J2clPath.JAVA_FILES),
-                            logger);
-
-                    // necessary to prepare FileInfo with correct sourceRoot otherwise stripped files will be written back to the wrong place.
-                    javaFiles.addAll(J2clPath.toFileInfo(files, output));
-                }
+                // necessary to prepare FileInfo with correct sourceRoot otherwise stripped files will be written back to the wrong place.
+                javaFiles.addAll(J2clPath.toFileInfo(files, output));
             }
             logger.printLine(javaFiles.size() + " file(s) count");
         }
         logger.outdent();
 
         return javaFiles;
-    }
-
-    /**
-     * Finds all files under the root that match the given {@link BiPredicate} collecting their paths into a {@link SortedSet}.
-     * and honours any ignore files if any found.
-     */
-    private static SortedSet<J2clPath> gatherFiles(final J2clPath root,
-                                                   final BiPredicate<Path, BasicFileAttributes> include) throws IOException {
-        final SortedSet<J2clPath> files = Sets.sorted();
-
-        final Map<Path, List<PathMatcher>> pathToMatchers = Maps.hash();
-        final List<PathMatcher> exclude = Lists.array();
-
-        Files.walkFileTree(root.path(), new SimpleFileVisitor<>() {
-
-            @Override
-            public FileVisitResult preVisitDirectory(final Path dir,
-                                                     final BasicFileAttributes attrs) throws IOException {
-                final J2clPath ignoreFile = J2clPath.with(dir).ignoreFile();
-                if (ignoreFile.exists().isPresent()) {
-                    final List<PathMatcher> matchers = Files.readAllLines(ignoreFile.path())
-                            .stream()
-                            .filter(l -> false == l.startsWith("#") | l.trim().length() > 0)
-                            .map(l -> FileSystems.getDefault().getPathMatcher("glob:" + dir + File.separator + l))
-                            .collect(Collectors.toList());
-                    pathToMatchers.put(dir, matchers);
-                    exclude.addAll(matchers);
-                }
-
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(final Path dir,
-                                                      final IOException cause) {
-                final List<PathMatcher> matchers = pathToMatchers.remove(dir);
-                if (null != matchers) {
-                    matchers.forEach(exclude::remove);
-                }
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFile(final Path file,
-                                             final BasicFileAttributes attributes) {
-                if (exclude.stream().noneMatch(m -> m.matches(file))) {
-                    if(include.test(file, attributes)) {
-                        files.add(J2clPath.with(file));
-                    }
-                }
-
-                return FileVisitResult.CONTINUE;
-            }
-        });
-
-        return files;
     }
 
     /**
@@ -204,12 +146,74 @@ final class GwtIncompatibleStripPreprocessor {
         logger.indent();
         {
             for (final J2clPath sourceRoot : sourceRoots) {
-                if(sourceRoot.exists().isPresent()) {
-                    final SortedSet<J2clPath> copy = gatherFiles(sourceRoot, J2clPath.JAVASCRIPT_FILES);
-                    output.copyFiles(sourceRoot, copy, logger);
-                }
+                final Set<J2clPath> copy = gatherFiles(sourceRoot, J2clPath.JAVASCRIPT_FILES);
+                output.copyFiles(sourceRoot, copy, logger);
             }
         }
         logger.outdent();
+    }
+
+    /**
+     * Finds all files under the root that match the given {@link BiPredicate} collecting their paths into a {@link SortedSet}.
+     * and honours any ignore files if any found.
+     */
+    private static Set<J2clPath> gatherFiles(final J2clPath root,
+                                             final BiPredicate<Path, BasicFileAttributes> include) throws IOException {
+
+        return root.exists().isPresent() ?
+                gatherFiles0(root, include) :
+                Sets.empty();
+    }
+
+    private static Set<J2clPath> gatherFiles0(final J2clPath root,
+                                              final BiPredicate<Path, BasicFileAttributes> include) throws IOException {
+        final SortedSet<J2clPath> files = Sets.sorted();
+
+        final Map<Path, List<PathMatcher>> pathToMatchers = Maps.hash();
+        final List<PathMatcher> exclude = Lists.array();
+
+        Files.walkFileTree(root.path(), new SimpleFileVisitor<>() {
+
+            @Override
+            public FileVisitResult preVisitDirectory(final Path dir,
+                                                     final BasicFileAttributes attrs) throws IOException {
+                final J2clPath ignoreFile = J2clPath.with(dir).ignoreFile();
+                if (ignoreFile.exists().isPresent()) {
+                    final List<PathMatcher> matchers = Files.readAllLines(ignoreFile.path())
+                            .stream()
+                            .filter(l -> false == l.startsWith("#") | l.trim().length() > 0)
+                            .map(l -> FileSystems.getDefault().getPathMatcher("glob:" + dir + File.separator + l))
+                            .collect(Collectors.toList());
+                    pathToMatchers.put(dir, matchers);
+                    exclude.addAll(matchers);
+                }
+
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(final Path dir,
+                                                      final IOException cause) {
+                final List<PathMatcher> matchers = pathToMatchers.remove(dir);
+                if (null != matchers) {
+                    matchers.forEach(exclude::remove);
+                }
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(final Path file,
+                                             final BasicFileAttributes attributes) {
+                if (exclude.stream().noneMatch(m -> m.matches(file))) {
+                    if (include.test(file, attributes)) {
+                        files.add(J2clPath.with(file));
+                    }
+                }
+
+                return FileVisitResult.CONTINUE;
+            }
+        });
+
+        return files;
     }
 }
