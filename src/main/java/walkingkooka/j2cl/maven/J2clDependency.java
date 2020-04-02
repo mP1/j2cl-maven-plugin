@@ -212,10 +212,16 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Returns the classpath and dependencies in order without any duplicates.
      */
     Set<J2clDependency> classpathAndDependencies() {
-        return Sets.readOnly(Stream.concat(this.request().classpathRequired().stream(), this.dependencies().stream())
+        return Sets.readOnly(Stream.concat(this.request().classpathRequired().stream(), Stream.concat(this.discoveredClassPath(), this.dependencies().stream()))
                 .filter(this::isDifferent)
                 .filter(J2clDependency::isClasspathRequired)
                 .collect(Collectors.toCollection(Sets::ordered)));
+    }
+
+    private Stream<J2clDependency> discoveredClassPath() {
+        return COORD_TO_DEPENDENCY.values()
+                .stream()
+                .filter(J2clDependency::isJreClassFiles);
     }
 
     private boolean isDifferent(final J2clDependency other) {
@@ -283,7 +289,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
             this.classpathRequired = request.isClasspathRequired(coords) ||
                     false == request.isJavascriptSourceRequired(coords) ||
-                    this.isAnnotationProcessor();
+                    this.isAnnotationProcessor() ||
+                    this.isJreClassFiles();
         }
         return this.classpathRequired;
     }
@@ -296,7 +303,9 @@ final class J2clDependency implements Comparable<J2clDependency> {
     boolean isJavascriptSourceRequired() {
         final J2clRequest request = this.request();
         final J2clArtifactCoords coords = this.coords();
-        return request.isJavascriptSourceRequired(coords) || false == request.isClasspathRequired(coords);
+        return (request.isJavascriptSourceRequired(coords) || false == request.isClasspathRequired(coords)) &&
+            false == this.isAnnotationProcessor() &&
+            false == this.isJreClassFiles();
     }
 
     /**
@@ -306,28 +315,22 @@ final class J2clDependency implements Comparable<J2clDependency> {
     boolean isIgnored() {
         if (null == this.ignored) {
             this.ignored = this.request().isIgnored(this.coords) ||
-                    this.isAnnotationProcessor();
+                    this.isAnnotationProcessor() ||
+                    this.isJreClassFiles();
         }
         return this.ignored;
     }
 
     private Boolean ignored;
 
+    // isAnnotationProcessor............................................................................................
+
     /**
      * Returns true if this dependency includes an annotation processor services file.
      */
     private boolean isAnnotationProcessor() {
         if (null == this.annotationProcessor) {
-            final J2clPath file = this.artifactFile;
-            if (null != file) {
-                try (final FileSystem zip = FileSystems.newFileSystem(URI.create("jar:" + file.file().toURI()), Collections.emptyMap())) {
-                    this.annotationProcessor = Files.exists(zip.getPath(META_INF_SERVICES_PROCESSOR));
-                } catch (final IOException cause) {
-                    throw new J2clException("Failed reading archive", cause);
-                }
-            } else {
-                this.annotationProcessor = false;
-            }
+            this.testArchive();
         }
 
         return this.annotationProcessor;
@@ -335,8 +338,51 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     private Boolean annotationProcessor;
 
-    private final static String META_INF_SERVICES_PROCESSOR = "/META-INF/services/".concat(javax.annotation.processing.Processor.class.getName())
+    // isJreClassFiles..................................................................................................
+
+    /**
+     * Returns true if this archive contains JRE class files, by testing if java.lang.Class class file exists.
+     */
+    private boolean isJreClassFiles() {
+        if (null == this.jreClassFiles) {
+            this.testArchive();
+        }
+
+        return this.jreClassFiles;
+    }
+
+    private Boolean jreClassFiles;
+
+    /**
+     * Attempts to open the archive and detect if a file exists otherwise returns false.
+     */
+    private synchronized void testArchive() {
+        final boolean annotationProcessor;
+        final boolean jreClassFiles;
+
+        final J2clPath file = this.artifactFile;
+        if (null != file) {
+            try (final FileSystem zip = FileSystems.newFileSystem(URI.create("jar:" + file.file().toURI()), Collections.emptyMap())) {
+                annotationProcessor = Files.exists(zip.getPath(META_INF_SERVICES_PROCESSOR));
+                jreClassFiles = Files.exists(zip.getPath(JAVA_LANG_CLASS_CLASSFILE));
+            } catch (final IOException cause) {
+                throw new J2clException("Failed reading archive while trying to test", cause);
+            }
+        } else {
+            annotationProcessor = false;
+            jreClassFiles = false;
+        }
+
+        this.annotationProcessor = annotationProcessor;
+        this.jreClassFiles = jreClassFiles;
+    }
+
+    private final static String JAVA_LANG_CLASS_CLASSFILE = "/java/lang/Class.class";
+    private final static String META_INF_SERVICES_PROCESSOR = "/META-INF/services/"
+            .concat(javax.annotation.processing.Processor.class.getName())
             .replace('/', File.separatorChar);
+
+    // isDuplicate......................................................................................................
 
     /**
      * Checks if this dependency is a duplicate of another, this tries to determine if this is a classifier=source
