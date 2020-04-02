@@ -565,7 +565,7 @@
                     <debug>true</debug>
                     <localRepositoryPath>${project.build.directory}/it-repo</localRepositoryPath>
                     <settingsFile>src/it/settings.xml</settingsFile>
-                    <streamLogs>true</streamLogs>
+                    <streamLogs>false</streamLogs>
                 </configuration>
             </plugin>
             <plugin>
