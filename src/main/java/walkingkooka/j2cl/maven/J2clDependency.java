@@ -234,39 +234,6 @@ final class J2clDependency implements Comparable<J2clDependency> {
         return null != this.artifactFile;
     }
 
-    // pretty...........................................................................................................
-
-    /**
-     * Pretty prints all dependencies with indentation.
-     */
-    J2clDependency prettyPrintDependencies() {
-        this.dependencies();
-
-        final Set<J2clDependency> sorted = Sets.sorted();
-        sorted.addAll(COORD_TO_DEPENDENCY.values());
-
-        final J2clLogger logger = this.request.logger();
-
-        final J2clLinePrinter printer = J2clLinePrinter.with(logger.printer(logger::debug));
-        printer.printLine("Dependencies graph for all artifacts");
-        printer.indent();
-
-        for (J2clDependency artifact : sorted) {
-            printer.printLine(artifact.toString());
-            printer.indent();
-            {
-                for (J2clDependency dependency : artifact.dependencies()) {
-                    printer.printLine(dependency.toString());
-                }
-            }
-            printer.outdent();
-        }
-        printer.outdent();
-        printer.flush();
-
-        return this;
-    }
-
     // coords...........................................................................................................
 
     J2clArtifactCoords coords() {
@@ -509,6 +476,39 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private final J2clRequest request;
+
+    // pretty...........................................................................................................
+
+    /**
+     * Pretty prints all dependencies with indentation.
+     */
+    J2clDependency prettyPrintDependencies() {
+        this.dependencies();
+
+        final Set<J2clDependency> sorted = Sets.sorted();
+        sorted.addAll(COORD_TO_DEPENDENCY.values());
+
+        final J2clLogger logger = this.request.logger();
+
+        final J2clLinePrinter printer = J2clLinePrinter.with(logger.printer(logger::debug));
+        printer.printLine("Dependencies graph for all artifacts");
+        printer.indent();
+
+        for (J2clDependency artifact : sorted) {
+            printer.printLine(artifact.toString());
+            printer.indent();
+            {
+                for (J2clDependency dependency : artifact.dependencies()) {
+                    printer.printLine(dependency.toString());
+                }
+            }
+            printer.outdent();
+        }
+        printer.outdent();
+        printer.flush();
+
+        return this;
+    }
 
     // job..............................................................................................................
 
