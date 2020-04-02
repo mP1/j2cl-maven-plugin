@@ -302,7 +302,7 @@ The snippet below is a good starting point and forcibly includes a few minimally
 
 - Maven coordinates may have a wildcard in the version.
 - Archives with annotation processors will be automatically added.
-- Archives with JRE classes will be automatically added.
+- Archives with JRE classes (including bootstrap) will be automatically added.
 
 
 ## classpath-scope
@@ -374,7 +374,6 @@ for compiling (javac).
 ```xml
 <ignored>
     <!-- jre & bootstrap transpiled versions also included as dependencies, skip transpiling-->
-    <param>com.vertispan.j2cl:javac-bootstrap-classpath:*</param>
     <param>com.vertispan.j2cl:bootstrap:zip:jszip:*</param>
     <param>com.vertispan.j2cl:jre:zip:jszip:*</param>
     <!-- dependencies below only contain annotations -->
@@ -386,7 +385,7 @@ for compiling (javac).
 The following dependencies will automatically be detected and ignored.
 
 - Archives with annotation processors will be automatically added.
-- Archives with JRE classes will be automatically added.
+- Archives with JRE classes (including bootstrap) will be automatically added.
 - Dependency where `classifier=sources` pairs another dependency.
 
 
