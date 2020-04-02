@@ -199,7 +199,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
             dependency.dependencies = tree.get(coords)
                     .stream()
-                    .map(J2clDependency::getOrFail)
+                    .map(c -> J2clDependency.getOrFail(request.replacement(c).orElse(c)))
                     .collect(Collectors.toCollection(Sets::sorted));
         }
     }
