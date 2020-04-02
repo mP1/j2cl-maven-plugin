@@ -188,7 +188,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
         final J2clDependencyGraphCalculator calculator = J2clDependencyGraphCalculator.with(flat,
                 request.required()
         .stream()
-        .filter(J2clDependency::requiredFilter)
+        .filter(J2clDependency::isTransitiveRequired)
         .collect(Collectors.toCollection(Sets::sorted)));
 
         final Map<J2clArtifactCoords, Set<J2clArtifactCoords>> tree = calculator.run();
@@ -204,8 +204,14 @@ final class J2clDependency implements Comparable<J2clDependency> {
         }
     }
 
-    private static boolean requiredFilter(final J2clArtifactCoords coords) {
-        return false == getOrFail(coords).isIgnored();
+    /**
+     * This will match any given coord that is a bootstrap or JRE file or anything that is not ignored.
+     */
+    private static boolean isTransitiveRequired(final J2clArtifactCoords coords) {
+        final J2clDependency dependency = getOrFail(coords);
+        final boolean ignored = dependency.isIgnored();
+        return false == ignored ||
+                ignored && dependency.isBootstrapOrJreFiles();
     }
 
     /**
@@ -221,7 +227,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private Stream<J2clDependency> discoveredBootstrapAndJre() {
         return COORD_TO_DEPENDENCY.values()
                 .stream()
-                .filter(J2clDependency::isBootstrapAndJreFiles);
+                .filter(J2clDependency::isBootstrapOrJreFiles);
     }
 
     private boolean isDifferent(final J2clDependency other) {
@@ -315,7 +321,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Returns true if this dependency is a JRE bootstrap or JRE class files.
      */
-    private boolean isBootstrapAndJreFiles() {
+    private boolean isBootstrapOrJreFiles() {
         return this.isJreBootstrapClassFiles() ||
             this.isJreClassFiles() ||
             this.isJavascriptBootstrapFiles() ||
