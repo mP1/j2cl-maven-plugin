@@ -373,9 +373,6 @@ for compiling (javac).
 
 ```xml
 <ignored>
-    <!-- jre & bootstrap transpiled versions also included as dependencies, skip transpiling-->
-    <param>com.vertispan.j2cl:bootstrap:zip:jszip:*</param>
-    <param>com.vertispan.j2cl:jre:zip:jszip:*</param>
     <!-- dependencies below only contain annotations -->
     <param>com.google.jsinterop:jsinterop-annotations:*</param>
     <param>com.vertispan.j2cl:gwt-internal-annotations:*</param>
@@ -413,8 +410,7 @@ The snippet below is a good starting point and forcibly includes a few minimally
 
 ```xml
 <javascript-source-required>
-    <param>com.vertispan.j2cl:bootstrap:zip:jszip:*</param>
-    <param>com.vertispan.j2cl:jre:zip:jszip:*</param>
+    <param>group1:artifact2:filetype3:classifier4:version5</param>
 </javascript-source-required>
 ```
 
