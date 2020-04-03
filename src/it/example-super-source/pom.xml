@@ -7,6 +7,8 @@
     <version>1.0</version>
     <packaging>war</packaging>
 
+    <description>Simple app that includes a super-sourced class</description>
+
     <properties>
         <j2cl.version>0.7-SNAPSHOT</j2cl.version>
     </properties>

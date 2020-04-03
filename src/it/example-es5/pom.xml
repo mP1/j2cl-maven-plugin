@@ -7,6 +7,8 @@
     <version>1.0</version>
     <packaging>war</packaging>
 
+    <description>A simple app that transpiled to javascript 5</description>
+
     <properties>
         <j2cl.version>0.7-SNAPSHOT</j2cl.version>
     </properties>
