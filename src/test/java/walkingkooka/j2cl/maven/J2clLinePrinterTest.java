@@ -46,6 +46,19 @@ public final class J2clLinePrinterTest implements ClassTesting2<J2clLinePrinter>
     }
 
     @Test
+    public void testLineStart() {
+        final StringBuilder b = new StringBuilder();
+        final J2clLinePrinter printer = this.printer(b);
+
+        printer.print("1");
+        printer.lineStart();
+        printer.print("2");
+        printer.flush();
+
+        this.check("1" + EOL + "2", b);
+    }
+
+    @Test
     public void testPrint() {
         final StringBuilder b = new StringBuilder();
         final J2clLinePrinter printer = this.printer(b);
