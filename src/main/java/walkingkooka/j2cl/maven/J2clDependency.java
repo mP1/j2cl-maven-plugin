@@ -18,8 +18,12 @@
 package walkingkooka.j2cl.maven;
 
 import com.google.common.collect.Streams;
+import org.apache.bcel.Constants;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Opcodes;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
@@ -27,11 +31,16 @@ import walkingkooka.text.CharSequences;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -210,7 +219,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
                 .stream()
                 .map(J2clDependency::coords)
                 .map(request::dependencyOrFail)
-                .filter(J2clDependency::isBootstrapOrJreFiles)
+                .filter(J2clDependency::isAnnotationsBootstrapOrJreFiles)
                 .map(J2clDependency::coords)
                 .collect(Collectors.toCollection(Sets::sorted));
 
@@ -237,7 +246,9 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Returns the classpath and dependencies in order without any duplicates.
      */
     Set<J2clDependency> classpathAndDependencies() {
-        return Sets.readOnly(Stream.concat(this.discoveredBootstrapAndJre(), Stream.concat(this.request().classpathRequired().stream(), this.dependencies().stream()))
+        return Sets.readOnly(Stream.concat(this.discoveredBootstrapAndJre(),
+                    Stream.concat(this.request().classpathRequired().stream(),
+                        this.dependencies().stream()))
                 .filter(this::isDifferent)
                 .filter(J2clDependency::isClasspathRequired)
                 .collect(Collectors.toCollection(Sets::ordered)));
@@ -246,7 +257,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private Stream<J2clDependency> discoveredBootstrapAndJre() {
         return COORD_TO_DEPENDENCY.values()
                 .stream()
-                .filter(J2clDependency::isBootstrapOrJreFiles);
+                .filter(J2clDependency::isAnnotationsBootstrapOrJreClassFiles);
     }
 
     private boolean isDifferent(final J2clDependency other) {
@@ -281,6 +292,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
             this.classpathRequired = request.isClasspathRequired(coords) ||
                     false == request.isJavascriptSourceRequired(coords) ||
+                    this.isAnnotationClassFiles() ||
                     this.isAnnotationProcessor() ||
                     this.isJreBootstrapClassFiles() ||
                     this.isJreClassFiles();
@@ -297,6 +309,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
         final J2clRequest request = this.request();
         final J2clArtifactCoords coords = this.coords();
         return (request.isJavascriptSourceRequired(coords) || false == request.isClasspathRequired(coords)) &&
+            false == this.isAnnotationClassFiles() &&
             false == this.isAnnotationProcessor() &&
             this.isJavascriptBootstrapFiles() ||
             this.isJavascriptFiles() ||
@@ -305,12 +318,13 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     /**
-     * Used to test if a dependency should be ignored and the archive files used as they are. Examples of this include
-     * the shaded JRE binaries and the jszip form, each used depending whether class files or java source are required.
+     * Used to test if a dependency should be ignored and the archive files used as they are, such as class files
+     * which should appear on the classpath, or javascript source that should appear in javascript processing.
      */
     boolean isIgnored() {
         if (null == this.ignored) {
             this.ignored = this.request().isIgnored(this.coords) ||
+                    this.isAnnotationClassFiles() ||
                     this.isAnnotationProcessor() ||
                     this.isJavascriptBootstrapFiles() ||
                     this.isJavascriptFiles() ||
@@ -321,6 +335,38 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private Boolean ignored;
+
+    // isAnnotationClassFiles...........................................................................................
+
+    /**
+     * Returns true if this dependency only includes annotation class files.
+     */
+    boolean isAnnotationClassFiles() {
+        if (null == this.annotationClassFiles) {
+            this.testArchive();
+        }
+
+        return this.annotationClassFiles;
+    }
+
+    private Boolean annotationClassFiles;
+
+    /**
+     * Returns true if this dependency is only annotations, a JRE bootstrap or JRE class files.
+     */
+    private boolean isAnnotationsBootstrapOrJreClassFiles() {
+        return this.isAnnotationClassFiles() ||
+                this.isJreBootstrapClassFiles() ||
+                this.isJreClassFiles();
+    }
+
+    /**
+     * Returns true if this dependency is only annotations, a JRE bootstrap or JRE class and javascript files.
+     */
+    private boolean isAnnotationsBootstrapOrJreFiles() {
+        return this.isAnnotationClassFiles() ||
+                this.isBootstrapOrJreFiles();
+    }
 
     // isAnnotationProcessor............................................................................................
 
@@ -382,7 +428,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Returns true if this archive contains JRE bootstrap class files, by testing if java.lang.Class class file exists.
      */
-    private boolean isJreBootstrapClassFiles() {
+    boolean isJreBootstrapClassFiles() {
         if (null == this.jreBootstrapClassFiles) {
             this.testArchive();
         }
@@ -397,7 +443,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Returns true if this archive contains JRE class files, by testing if java.lang.Class class file exists.
      */
-    private boolean isJreClassFiles() {
+    boolean isJreClassFiles() {
         if (null == this.jreClassFiles) {
             this.testArchive();
         }
@@ -408,9 +454,11 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private Boolean jreClassFiles;
 
     /**
-     * Attempts to open the archive and detect if a file exists otherwise returns false.
+     * Attempts to open the archive and detect if a file exists or contains only annotation class files setting various flags.
      */
     private synchronized void testArchive() {
+        final boolean annotationClassFiles;
+
         final boolean annotationProcessor;
         final boolean javascriptBootstrapFiles;
         final boolean javascriptFiles;
@@ -427,10 +475,54 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
                 jreBootstrapClassFiles = Files.exists(zip.getPath(JAVA_BOOTSTRAP_CLASSFILE));
                 jreClassFiles = Files.exists(zip.getPath(JAVA_CLASSFILE));
+
+                if (false == (annotationProcessor || javascriptBootstrapFiles || javascriptFiles || jreBootstrapClassFiles || jreClassFiles)) {
+                    final boolean[] annotations = new boolean[1];
+
+                    Files.walkFileTree(zip.getPath("/"),
+                            new SimpleFileVisitor<>() {
+
+                                @Override
+                                public FileVisitResult visitFile(final Path file,
+                                                                 final BasicFileAttributes attrs) throws IOException {
+                                    final FileVisitResult result;
+
+                                    final String path = file.toString();
+                                    if (path.startsWith(META_INF) || false == path.endsWith(".class")) {
+                                        result = FileVisitResult.CONTINUE;
+                                    } else {
+                                        final int annotationOrInterface = isAnnotationOrInterface(Files.readAllBytes(file));
+
+                                        switch (annotationOrInterface) {
+                                            case 0: // class file
+                                                annotations[0] = false;
+                                                result = FileVisitResult.TERMINATE;
+                                                break;
+                                            case 1: // interface ignore
+                                                result = FileVisitResult.CONTINUE;
+                                                break;
+                                            case 2: // annotation
+                                                annotations[0] = true;
+                                                result = FileVisitResult.CONTINUE;
+                                                break;
+                                            default:
+                                                result = null;
+                                                break;
+                                        }
+                                    }
+
+                                    return result;
+                                }
+                            });
+                    annotationClassFiles = annotations[0];
+                } else {
+                    annotationClassFiles = false;
+                }
             } catch (final IOException cause) {
                 throw new J2clException("Failed reading archive while trying to test", cause);
             }
         } else {
+            annotationClassFiles = false;
             annotationProcessor = false;
 
             javascriptBootstrapFiles = false;
@@ -440,6 +532,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
             jreClassFiles = false;
         }
 
+        this.annotationClassFiles = annotationClassFiles;
         this.annotationProcessor = annotationProcessor;
 
         this.javascriptBootstrapFiles = javascriptBootstrapFiles;
@@ -453,9 +546,42 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private final static String JAVA_CLASSFILE = "/java/lang/Class.class";
     private final static String JAVASCRIPT_BOOTSTRAP = "/closure/goog/base.js";
     private final static String JAVASCRIPT_FILE = "/java/lang/Class.java.js";
-    private final static String META_INF_SERVICES_PROCESSOR = "/META-INF/services/"
+    private final static String META_INF = "/META-INF/";
+    private final static String META_INF_SERVICES_PROCESSOR = META_INF + "services/"
             .concat(javax.annotation.processing.Processor.class.getName())
             .replace('/', File.separatorChar);
+
+    /**
+     * Returns true if the class file is an annotation type by checking that it implements Annotation.
+     */
+    static int isAnnotationOrInterface(final byte[] content) {
+        final int[] result = new int[1];
+
+        new ClassReader(content).accept(new ClassVisitor(Opcodes.ASM7) {
+
+            @Override
+            public void visit(final int version,
+                              final int access,
+                              final String name,
+                              final String signature,
+                              final String superName,
+                              final String[] interfaces) {
+                if ((access & Constants.ACC_INTERFACE) > 0) {
+                    result[0] =1;
+                }
+
+                // annotations implement java.lang.annotation.Annotation
+                if (null != interfaces && Lists.of(interfaces).contains(ANNOTATION_TYPE)) {
+                    result[0] = 2;
+                }
+            }
+        }, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG);
+        return result[0];
+    }
+
+    private final static String ANNOTATION_TYPE = Annotation.class.getName()
+        .replace('.', '/');
+
 
     // isDuplicate......................................................................................................
 
