@@ -301,8 +301,9 @@ The snippet below is a good starting point and forcibly includes a few minimally
 ```
 
 - Maven coordinates may have a wildcard in the version.
-- Archives with annotation processors will be automatically added.
-- Archives with JRE classes (including bootstrap) will be automatically added.
+- Archives with only annotation class files.
+- Archives with annotation processors.
+- Archives with JRE classes (including bootstrap).
 
 
 ## classpath-scope
@@ -374,15 +375,16 @@ for compiling (javac).
 ```xml
 <ignored>
     <!-- dependencies below only contain annotations -->
-    <param>com.google.jsinterop:jsinterop-annotations:*</param>
-    <param>com.vertispan.j2cl:gwt-internal-annotations:*</param>
+    <param>group1:artifact2:*</param>
+    <param>group1:artifact2:version3</param>
 </ignored>
 ```
 
 The following dependencies will automatically be detected and ignored.
 
-- Archives with annotation processors will be automatically added.
-- Archives with JRE classes (including bootstrap) will be automatically added.
+- Archives with only annotation class files.
+- Archives with annotation processors.
+- Archives with JRE classes (including bootstrap).
 - Dependency where `classifier=sources` pairs another dependency.
 
 

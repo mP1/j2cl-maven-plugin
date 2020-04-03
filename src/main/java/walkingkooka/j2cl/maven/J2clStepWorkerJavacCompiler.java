@@ -50,36 +50,46 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
             if (javaSourceFiles.isEmpty()) {
                 source = null;
             } else {
+                final List<J2clPath> bootstrap = Lists.array();
                 final List<J2clPath> classpath = Lists.array();
+
                 final J2clStep compiledStep = this.compiledStep();
 
                 for (final J2clDependency dependency : artifact.classpathAndDependencies()) {
-                    if(dependency.dependencies().contains(artifact)) {
+                    if (dependency.dependencies().contains(artifact)) {
                         continue; // dont add a classpath required that is a parent of this artifact.
                     }
 
-                    if (dependency.isIgnored()) {
+                    if (dependency.isJreBootstrapClassFiles()) {
+                        bootstrap.add(dependency.artifactFileOrFail());
+                        continue;
+                    }
+
+                    if (dependency.isClasspathRequired()) {
                         classpath.add(dependency.artifactFileOrFail());
                         continue;
                     }
+
                     dependency.step(compiledStep)
                             .output()
                             .exists()
                             .ifPresent(classpath::add);
                 }
 
-                if(classpath.isEmpty()) {
+                if (classpath.isEmpty()) {
                     result = J2clStepResult.SKIPPED; // project could have no source files.
                 } else {
-                    result = JavacCompiler.execute(classpath.size() > 1 ? classpath.subList(0, 1) : Lists.empty(),
-                            classpath.size() >= 1 ? classpath.subList(1, classpath.size()) : Lists.empty(),
+
+
+                    result = JavacCompiler.execute(bootstrap,
+                            classpath,
                             javaSourceFiles,
                             directory.output().absentOrFail(),
                             this.shouldRunAnnotationProcessors(),
                             logger) ?
                             J2clStepResult.SUCCESS :
                             J2clStepResult.FAILED;
-                    if(J2clStepResult.SUCCESS == result) {
+                    if (J2clStepResult.SUCCESS == result) {
                         this.postCompile(artifact, directory, logger);
                     }
                 }
