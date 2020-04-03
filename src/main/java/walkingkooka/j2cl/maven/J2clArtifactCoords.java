@@ -107,6 +107,15 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
     }
 
     /**
+     * Returns true if the group, artifact are the same but the version is different. Note that wildcards are not honoured.
+     */
+    boolean isSameGroupArtifactDifferentVersion(final J2clArtifactCoords other) {
+        return this.groupId().equals(other.groupId()) &&
+                this.artifactId().equals(other.artifactId()) &&
+                false == this.version().equals(other.version());
+    }
+
+    /**
      * Matches a coordinate if they share the same group and artifact but classifier != sources.
      */
     boolean isGroupArtifactSources(final J2clArtifactCoords other) {

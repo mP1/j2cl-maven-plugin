@@ -62,6 +62,16 @@
         </repository>
     </repositories>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.google.jsinterop</groupId>
+                <artifactId>jsinterop-annotations</artifactId>
+                <version>2.0.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>com.google.elemental2</groupId>
@@ -81,16 +91,6 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.google.jsinterop</groupId>
-                <artifactId>js-interop-annotations</artifactId>
-                <version>2.0.0</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <pluginRepositories>
         <pluginRepository>
@@ -159,6 +159,7 @@
                             </javascript-source-required>
                             <replaced-dependencies>
                                 <param>com.google.jsinterop:base:*=com.vertispan.jsinterop:base:1.0.0-SNAPSHOT</param>
+                                <param>com.google.jsinterop:jsinterop-annotations:*=com.google.jsinterop:jsinterop-annotations:2.0.0</param>
                                 <param>com.vertispan.j2cl:gwt-internal-annotations:*=com.vertispan.j2cl:gwt-internal-annotations:${j2cl.version}</param>
                             </replaced-dependencies>
                         </configuration>

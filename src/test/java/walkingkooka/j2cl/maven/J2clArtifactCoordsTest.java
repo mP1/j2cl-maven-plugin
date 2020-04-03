@@ -198,6 +198,49 @@ public final class J2clArtifactCoordsTest implements ClassTesting2<J2clArtifactC
                 () -> sources + " .isSources");
     }
 
+    // isSameGroupArtifactDifferentVersion..............................................................................
+
+    @Test
+    public void testIsSameGroupArtifactAndDifferentVersionDifferentGroup() {
+        this.isSameGroupArtifactsAndDifferentVersionAndCheck("group1:artifact2:version3", "DIFFERENT:artifact2:version3", false);
+    }
+
+    @Test
+    public void testIsSameGroupArtifactAndDifferentVersionDifferentArtifact() {
+        this.isSameGroupArtifactsAndDifferentVersionAndCheck("group1:artifact2:version3", "group1:DIFFERENT:version3", false);
+    }
+
+    @Test
+    public void testIsSameGroupArtifactAndDifferentVersionDifferentVersion() {
+        this.isSameGroupArtifactsAndDifferentVersionAndCheck("group1:artifact2:version3", "group1:artifact2:DIFFERENT", true);
+    }
+
+    @Test
+    public void testIsSameGroupArtifactAndDifferentVersionDifferentType() {
+        this.isSameGroupArtifactsAndDifferentVersionAndCheck("group1:artifact2:type3:classifier4:version5", "group1:artifact2:DIFFERENT:classifier4:version5", false);
+    }
+
+    @Test
+    public void testIsSameGroupArtifactAndDifferentVersionDifferentClassifier() {
+        this.isSameGroupArtifactsAndDifferentVersionAndCheck("group1:artifact2:type3:classifier4:version5", "group1:artifact2:type3:DIFFERENT:version5", false);
+    }
+
+    private void isSameGroupArtifactsAndDifferentVersionAndCheck(final String coords,
+                                                                 final String other,
+                                                                 final boolean expected) {
+        this.isSameGroupArtifactsAndDifferentVersionAndCheck(J2clArtifactCoords.parse(coords),
+                J2clArtifactCoords.parse(other),
+                expected);
+    }
+
+    private void isSameGroupArtifactsAndDifferentVersionAndCheck(final J2clArtifactCoords coords,
+                                                                 final J2clArtifactCoords other,
+                                                                 final boolean expected) {
+        assertEquals(expected,
+                coords.isSameGroupArtifactDifferentVersion(other),
+                () -> coords + ".isSameGroupArtifactDifferentVersion " + other);
+    }
+
     // isGroupArtifactSources........................................................................................
 
     @Test

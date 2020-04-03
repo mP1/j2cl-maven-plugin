@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public final class J2ClDependencyGraphCalculatorTest {
 
@@ -41,6 +42,26 @@ public final class J2ClDependencyGraphCalculatorTest {
     private final static String R1 = "group:r1:1.0";
     private final static String R2 = "group:r2:1.0";
     private final static String R3 = "group:r3:1.0";
+
+    @Test
+    public void testMappingWithWildcardFails() {
+        final Map<String, String> flat = Maps.of(A1, "group1:artifact2:*");
+        final String required = "group4:artifact5:version6";
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            J2clDependencyGraphCalculator.with(transform(flat), transformCsv(required));
+        });
+    }
+
+    @Test
+    public void testRequiredWithWildcardFails() {
+        final Map<String, String> flat = Maps.of(A1, "group1:artifact2:version3");
+        final String required = "group4:artifact5:*";
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            J2clDependencyGraphCalculator.with(transform(flat), transformCsv(required));
+        });
+    }
 
     @Test
     public void testWithoutDependency() {

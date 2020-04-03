@@ -17,6 +17,7 @@
 
 package walkingkooka.j2cl.maven;
 
+import com.google.common.collect.Streams;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
 import walkingkooka.collect.list.Lists;
@@ -67,14 +68,39 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     /**
-     * Lookup the coords returning the dependency
+     * Verifies there are not dependencies that share the same group and artifact id but differ in other components.
      */
-    static J2clDependency getOrFail(final J2clArtifactCoords coords) {
-        return get(coords)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown coords " + CharSequences.quote(coords.toString()) + "\n" + COORD_TO_DEPENDENCY.keySet() + "\n" + COORD_TO_DEPENDENCY));
+    static void verifyWithoutConflictsOrDuplicates() {
+        final Set<J2clArtifactCoords> duplicateCoords = Sets.sorted();
+        final List<String> duplicatesText = Lists.array();
+
+        for (final J2clArtifactCoords coords : COORD_TO_DEPENDENCY.keySet()) {
+            // must have been the duplicate of another coord.
+            if (duplicateCoords.contains(coords)) {
+                continue;
+            }
+
+            final List<J2clArtifactCoords> duplicates = COORD_TO_DEPENDENCY.keySet()
+                    .stream()
+                    .filter(possible -> coords.isSameGroupArtifactDifferentVersion(possible))
+                    .collect(Collectors.toList());
+
+            if (duplicates.size() > 0) {
+                duplicateCoords.add(coords);
+                duplicateCoords.addAll(duplicates);
+
+                duplicatesText.add(Streams.concat(Stream.of(coords), duplicates.stream())
+                        .map(J2clArtifactCoords::toString)
+                        .collect(Collectors.joining(", ", coords + ", ", "")));
+            }
+        }
+
+        if (duplicateCoords.size() > 0) {
+            throw new IllegalStateException(duplicateCoords.size() + " duplicate(s)\n" + duplicatesText.stream().collect(Collectors.joining("\n")));
+        }
     }
 
-    private final static Map<J2clArtifactCoords, J2clDependency> COORD_TO_DEPENDENCY = Maps.sorted();
+    final static Map<J2clArtifactCoords, J2clDependency> COORD_TO_DEPENDENCY = Maps.sorted();
 
     // ctor.............................................................................................................
 
@@ -134,8 +160,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     private J2clDependency getOrCreate(final J2clArtifactCoords coords) {
         return this.getOrCreate0(this.request()
-        .replacement(coords)
-        .orElse(coords));
+                .coords(coords)
+                .orElse(coords));
     }
 
     private J2clDependency getOrCreate0(final J2clArtifactCoords coords) {
@@ -180,38 +206,31 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private void computeTransitiveDependencies() {
         final J2clRequest request = this.request();
 
-        final Map<J2clArtifactCoords, Set<J2clArtifactCoords>> flat = Maps.sorted();
-        for(final Entry<J2clArtifactCoords, J2clDependency> coordAndDependency : COORD_TO_DEPENDENCY.entrySet()) {
-            flat.put(coordAndDependency.getKey(), coordAndDependency.getValue().dependencyCoords);
+        final Set<J2clArtifactCoords> required = COORD_TO_DEPENDENCY.values()
+                .stream()
+                .map(J2clDependency::coords)
+                .map(request::dependencyOrFail)
+                .filter(J2clDependency::isBootstrapOrJreFiles)
+                .map(J2clDependency::coords)
+                .collect(Collectors.toCollection(Sets::sorted));
+
+        final Map<J2clArtifactCoords, Set<J2clArtifactCoords>> coordToDependencies = Maps.sorted();
+
+        for (final Entry<J2clArtifactCoords, J2clDependency> coordAndDependency : COORD_TO_DEPENDENCY.entrySet()) {
+            coordToDependencies.put(coordAndDependency.getKey(), coordAndDependency.getValue().dependencyCoords);
         }
+        final Map<J2clArtifactCoords, Set<J2clArtifactCoords>> calculated = J2clDependencyGraphCalculator.with(coordToDependencies, required)
+                .run();
 
-        final J2clDependencyGraphCalculator calculator = J2clDependencyGraphCalculator.with(flat,
-                request.required()
-        .stream()
-        .filter(J2clDependency::isTransitiveRequired)
-        .collect(Collectors.toCollection(Sets::sorted)));
-
-        final Map<J2clArtifactCoords, Set<J2clArtifactCoords>> tree = calculator.run();
-
-        for(final Entry<J2clArtifactCoords, J2clDependency> coordAndDependency : COORD_TO_DEPENDENCY.entrySet()) {
+        for (final Entry<J2clArtifactCoords, J2clDependency> coordAndDependency : COORD_TO_DEPENDENCY.entrySet()) {
             final J2clArtifactCoords coords = coordAndDependency.getKey();
             final J2clDependency dependency = coordAndDependency.getValue();
 
-            dependency.dependencies = tree.get(coords)
+            dependency.dependencies = calculated.get(coords)
                     .stream()
-                    .map(c -> J2clDependency.getOrFail(request.replacement(c).orElse(c)))
+                    .map(request::dependencyOrFail)
                     .collect(Collectors.toCollection(Sets::sorted));
         }
-    }
-
-    /**
-     * This will match any given coord that is a bootstrap or JRE file or anything that is not ignored.
-     */
-    private static boolean isTransitiveRequired(final J2clArtifactCoords coords) {
-        final J2clDependency dependency = getOrFail(coords);
-        final boolean ignored = dependency.isIgnored();
-        return false == ignored ||
-                ignored && dependency.isBootstrapOrJreFiles();
     }
 
     /**
