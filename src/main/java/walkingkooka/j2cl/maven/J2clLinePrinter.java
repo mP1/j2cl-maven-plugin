@@ -21,7 +21,6 @@ import com.google.j2cl.common.FrontendUtils.FileInfo;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.naming.StringName;
 import walkingkooka.naming.StringPath;
-import walkingkooka.text.CharSequences;
 import walkingkooka.text.LineEnding;
 import walkingkooka.text.pretty.Table;
 import walkingkooka.text.pretty.TextPretty;
@@ -102,6 +101,8 @@ final class J2clLinePrinter {
                     J2clLinePrinter.this.printLine(path);
                     printer.indent();
                 }
+
+                this.level++;
             }
 
             @Override
@@ -110,11 +111,20 @@ final class J2clLinePrinter {
                 if (false == path.isEmpty()) {
                     printer.outdent();
                 }
+
+                this.level--;
             }
 
             private String toPath(final List<StringName> names) {
-                return toPath(names, StringPath.SEPARATOR);
+                final String path = toPath(names, StringPath.SEPARATOR);
+                return 0 == this.level ?
+                        "/" + path :
+                        path;
             }
+
+            // https://github.com/mP1/j2cl-maven-plugin/issues/258
+            // helpers identify a root path so a leading slash can be added.
+            private int level;
 
             @Override
             public void children(final Set<StringPath> paths, final IndentingPrinter printer) {
