@@ -158,7 +158,7 @@ public final class J2clLinePrinterTest implements ClassTesting2<J2clLinePrinter>
         printer.printIndented("label1", List.of(path("/path/to")));
 
         this.check("label1\n" +
-                        "    path\n" +
+                        "    /path\n" +
                         "      to\n" +
                         "  1 file(s)",
                 b);
@@ -172,7 +172,7 @@ public final class J2clLinePrinterTest implements ClassTesting2<J2clLinePrinter>
         printer.printIndented("label1", List.of(path("/path/to"), path("/path/to2")));
 
         this.check("label1\n" +
-                        "    path\n" +
+                        "    /path\n" +
                         "      to                                                           to2\n" +
                         "  2 file(s)",
                 b);
