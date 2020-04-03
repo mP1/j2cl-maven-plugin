@@ -188,6 +188,10 @@ final class J2clLinePrinter {
         this.printer.print(this.printer.lineEnding());
     }
 
+    void lineStart() {
+        this.printer.lineStart();
+    }
+
     void printEndOfList() {
         this.printLine("*** END ***");
     }

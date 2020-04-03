@@ -165,6 +165,7 @@ class ClosureCompiler {
                     logger.printLine("Messages");
                     logger.indent();
                     {
+                        logger.lineStart(); // https://github.com/mP1/j2cl-maven-plugin/issues/254
                         logger.print(removeEmptyLines(new String(outputBytes.toByteArray(), charset))); // the captured output will already have line endings.
                     }
                     logger.outdent();
