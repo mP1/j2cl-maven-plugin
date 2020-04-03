@@ -8,7 +8,7 @@
     <artifactId>vertispan-connected</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>Connected</name>
+    <name>Vertispan Connected</name>
     <description>Simple Graphs and Flowcharts in GWT, source included is
         https://github.com/Vertispan/connected/commit/278671d6b8e5f103506bb0edbc7ef2af9d2ae0df
     </description>

@@ -7,8 +7,7 @@
     <artifactId>gwt-timer-j2cl-tests-several</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <name>GWT Timer J2CL Tests</name>
-    <description>Test cases for the J2Cl tests</description>
+    <name>GWT Timer J2CL Tests (several)</name>
     <url>https://github.com/gwtproject/gwt-timer</url>
 
     <organization>
