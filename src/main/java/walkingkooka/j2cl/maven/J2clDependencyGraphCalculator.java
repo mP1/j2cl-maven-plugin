@@ -23,6 +23,7 @@ import walkingkooka.collect.set.Sets;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A calculator that creates a {@link Map} where each artifact is mapped to all its descendants including the addition of the requireds.
@@ -40,9 +41,29 @@ final class J2clDependencyGraphCalculator {
         this.flat = Maps.sorted();
         flat.forEach((k, v) -> {
             final Set<J2clArtifactCoords> values = Sets.sorted();
+
+            final String wildcard = v.stream()
+                    .filter(J2clArtifactCoords::isWildcardVersion)
+                    .map(J2clArtifactCoords::toString)
+                    .collect(Collectors.joining(","));
+            if (wildcard.length() > 0) {
+                throw new IllegalArgumentException("Mapping of " + k + " may not contain wildcards=" + wildcard);
+            }
+
             values.addAll(v);
             this.flat.put(k, values);
         });
+
+        {
+            final String wildcard = required.stream()
+                    .filter(J2clArtifactCoords::isWildcardVersion)
+                    .map(J2clArtifactCoords::toString)
+                    .collect(Collectors.joining(","));
+            if (wildcard.length() > 0) {
+                throw new IllegalArgumentException("Required may not contain wildcards=" + wildcard);
+            }
+        }
+
         this.required = required;
     }
 

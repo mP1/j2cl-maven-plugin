@@ -22,6 +22,7 @@ import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.text.CharSequences;
 
 import java.util.Collection;
 import java.util.List;
@@ -41,7 +42,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Context about a build/test request. It contains common properties shared by different phases of the build/test process,
@@ -139,7 +139,7 @@ abstract class J2clRequest {
 
     final List<J2clDependency> classpathRequired() {
         return this.classpathRequired.stream()
-                .map(J2clDependency::getOrFail)
+                .map(this::dependencyOrFail)
                 .collect(Collectors.toList());
     }
 
@@ -162,19 +162,26 @@ abstract class J2clRequest {
     private final List<J2clArtifactCoords> javascriptSourceRequired;
 
     /**
-     * Returns the coords for all required artifacts, basically combining the {@link #classpathRequired} and {@link #javascriptSourceRequired}.
+     * Gets the dependency for the given coords honouring any defined replacements.
      */
-    final Set<J2clArtifactCoords> required() {
-        return Stream.concat(this.classpathRequired.stream(), this.javascriptSourceRequired.stream())
-                .collect(Collectors.toCollection(Sets::sorted));
+    final Optional<J2clDependency> dependency(final J2clArtifactCoords coords) {
+        return J2clDependency.get(this.coords(coords).orElse(coords));
+    }
+
+    /**
+     * Gets the dependency for the given coords honouring any defined replacements.
+     */
+    final J2clDependency dependencyOrFail(final J2clArtifactCoords coords) {
+        return this.dependency(coords)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown coords " + CharSequences.quote(coords.toString()) + "\n" + J2clDependency.COORD_TO_DEPENDENCY.keySet() + "\n" + J2clDependency.COORD_TO_DEPENDENCY));
     }
 
     // replacements........................................................................................................
 
     /**
-     * Accepts the coords and returns the replacement if one is available.
+     * Accepts the coords and returns the getCoords if one is available.
      */
-    final Optional<J2clArtifactCoords> replacement(final J2clArtifactCoords coords) {
+    final Optional<J2clArtifactCoords> coords(final J2clArtifactCoords coords) {
         return Optional.ofNullable(this.replaced.get(coords));
     }
 
@@ -305,6 +312,7 @@ abstract class J2clRequest {
     }
 
     final void verifyArtifactCoords() {
+        J2clDependency.verifyWithoutConflictsOrDuplicates();
         this.verify(this.classpathRequired, "classpath-required");
         this.verify(this.javascriptSourceRequired, "javascript-required");
         this.verify(this.ignored, "ignored");
