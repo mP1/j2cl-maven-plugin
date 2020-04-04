@@ -90,7 +90,7 @@ enum J2clStep {
     COMPILE {
         @Override
         String directoryName() {
-            return "2-javac-annotation-processors-compiled-source";
+            return "2-javac-enabled-annotation-processors-source";
         }
 
         @Override
@@ -140,7 +140,7 @@ enum J2clStep {
     COMPILE_GWT_INCOMPATIBLE_STRIPPED {
         @Override
         String directoryName() {
-            return "4-javac-compiled-gwt-incompatible-stripped";
+            return "4-javac-gwt-incompatible-stripped-source";
         }
 
         @Override
@@ -166,7 +166,7 @@ enum J2clStep {
     SHADE_JAVA_SOURCE {
         @Override
         String directoryName() {
-            return "5-shade-java-source";
+            return "5-shaded-java-source";
         }
 
         @Override
@@ -192,7 +192,7 @@ enum J2clStep {
     SHADE_CLASS_FILES {
         @Override
         String directoryName() {
-            return "6-shade-class-files";
+            return "6-shaded-class-files";
         }
 
         @Override
@@ -241,7 +241,7 @@ enum J2clStep {
     CLOSURE_COMPILER {
         @Override
         String directoryName() {
-            return "8-closure-compiler-output";
+            return "8-closure-compile";
         }
 
         @Override
@@ -291,7 +291,7 @@ enum J2clStep {
     JUNIT_WEBDRIVER_TESTS {
         @Override
         String directoryName() {
-            return "9-junit-webdriver-tests";
+            return "9-junit-tests";
         }
 
         @Override
