@@ -162,7 +162,7 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
 
     // skipTests........................................................................................................
 
-    @Parameter(defaultValue = "false", property = "maven.test.skip")
+    @Parameter(alias = "skip-tests", defaultValue = "false", property = "maven.test.skip")
     private boolean skipTests;
 
     private boolean skipTests() {
