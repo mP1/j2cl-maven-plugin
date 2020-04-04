@@ -95,7 +95,7 @@ final class GwtIncompatibleStripPreprocessor {
                 // necessary to prepare FileInfo with correct sourceRoot otherwise stripped files will be written back to the wrong place.
                 javaFiles.addAll(J2clPath.toFileInfo(files, output));
             }
-            logger.printLine(javaFiles.size() + " file(s) count");
+            logger.printLine(javaFiles.size() + " file(s)");
         }
         logger.outdent();
 
