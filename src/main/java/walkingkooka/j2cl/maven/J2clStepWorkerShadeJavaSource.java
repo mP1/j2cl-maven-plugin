@@ -97,7 +97,11 @@ final class J2clStepWorkerShadeJavaSource extends J2clStepWorkerShade {
                 logger.indent();
                 {
                     final Set<J2clPath> copy = sourceRoot.gatherFiles(J2clPath.JAVASCRIPT_FILES);
-                    output.copyFiles(sourceRoot, copy, logger);
+                    output.copyFiles(sourceRoot,
+                            copy,
+                            J2clPathTargetFile.REPLACE,
+                            J2clPath.COPY_FILE_CONTENT_VERBATIM,
+                            logger);
                 }
                 logger.outdent();
             }

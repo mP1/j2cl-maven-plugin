@@ -38,8 +38,10 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
@@ -52,27 +54,21 @@ class ClosureCompiler {
                            final Set<ClosureFormattingOption> formatting,
                            final LanguageMode languageOut,
                            final boolean exportTestFunctions,
-                           final List<J2clPath> sourceRoots,
+                           final Map<J2clPath, J2clPathTargetFile> sources,
                            final J2clPath output,
                            final String initialScriptFilename,
                            final J2clLinePrinter logger) throws Exception {
         return compile0(compilationLevel,
                 defines,
                 entryPoints,
-                sorted(externs),
+                new TreeSet<>(externs),
                 formatting,
                 languageOut,
                 exportTestFunctions,
-                sorted(sourceRoots),
+                sources,
                 output,
                 initialScriptFilename,
                 logger);
-    }
-
-    private static <T> SortedSet<T> sorted(final Collection<T> collection) {
-        final SortedSet<T> sorted = Sets.sorted();
-        sorted.addAll(collection);
-        return sorted;
     }
 
     private static boolean compile0(final CompilationLevel compilationLevel,
@@ -82,23 +78,27 @@ class ClosureCompiler {
                                     final Set<ClosureFormattingOption> formatting,
                                     final LanguageMode languageOut,
                                     final boolean exportTestFunctions,
-                                    final SortedSet<J2clPath> sourceRoots,
+                                    final Map<J2clPath, J2clPathTargetFile> sources,
                                     final J2clPath output,
                                     final String initialScriptFilename,
                                     final J2clLinePrinter logger) throws Exception {
         int fileCount = 0;
 
         final J2clPath unitedSourceRoot = output.append("sources");
-        logger.printLine(sourceRoots.size() + " Source(s)");
+        logger.printLine(sources.size() + " Source(s)");
         logger.indent();
         {
-            for (final J2clPath sourceRoot : sourceRoots) {
+            for (final Entry<J2clPath, J2clPathTargetFile> sourceRootAndTargetFile : sources.entrySet()) {
+                final J2clPath sourceRoot = sourceRootAndTargetFile.getKey();
+                final J2clPathTargetFile targetFile = sourceRootAndTargetFile.getValue();
                 logger.printLine(sourceRoot.toString());
                 logger.indent();
                 {
                     final Collection<J2clPath> copied;
                     if (sourceRoot.isFile()) {
-                        copied = sourceRoot.extractArchiveFiles(unitedSourceRoot, logger);
+                        copied = sourceRoot.extractArchiveFiles(unitedSourceRoot,
+                            targetFile,
+                            logger);
                     } else {
                         // if unpack/output dont want to copy java source.
                         final BiPredicate<Path, BasicFileAttributes> filter = sourceRoot.isUnpackOutput() ?
@@ -107,6 +107,8 @@ class ClosureCompiler {
 
                         copied = unitedSourceRoot.copyFiles(sourceRoot,
                                 sourceRoot.gatherFiles(filter),
+                                targetFile,
+                                J2clPath.COPY_FILE_CONTENT_VERBATIM,
                                 logger);
                     }
                     fileCount += copied.size();

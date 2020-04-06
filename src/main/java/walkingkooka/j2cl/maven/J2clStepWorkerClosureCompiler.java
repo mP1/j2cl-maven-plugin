@@ -17,9 +17,9 @@
 
 package walkingkooka.j2cl.maven;
 
-import walkingkooka.collect.list.Lists;
+import walkingkooka.collect.map.Maps;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * Calls the closure compiler and assembles the final Javascript output.
@@ -42,7 +42,7 @@ final class J2clStepWorkerClosureCompiler extends J2clStepWorker2 {
                                   final J2clStepDirectory directory,
                                   final J2clLinePrinter logger) throws Exception {
         final J2clRequest request = artifact.request();
-        final List<J2clPath> sources;
+        final Map<J2clPath, J2clPathTargetFile> sources;
 
         logger.printLine("Discovering source roots");
         logger.indent();
@@ -51,10 +51,10 @@ final class J2clStepWorkerClosureCompiler extends J2clStepWorker2 {
             logger.indent();
             {
                 for (final J2clDependency dependency : artifact.dependencies()) {
-                    if(false == dependency.isJavascriptSourceRequired()) {
+                    if (false == dependency.isJavascriptSourceRequired()) {
                         continue;
                     }
-                    sources.addAll(this.addSources(dependency, logger));
+                    sources.putAll(this.addSources(dependency, logger));
                 }
             }
             logger.outdent();
@@ -80,31 +80,35 @@ final class J2clStepWorkerClosureCompiler extends J2clStepWorker2 {
                 J2clStepResult.FAILED;
     }
 
-    private List<J2clPath> addSources(final J2clDependency artifact,
-                                      final J2clLinePrinter logger) {
+    private Map<J2clPath, J2clPathTargetFile> addSources(final J2clDependency artifact,
+                                                         final J2clLinePrinter logger) {
+        final Map<J2clPath, J2clPathTargetFile> sources = Maps.sorted();
+
         logger.printLine(artifact.toString());
         logger.indent();
+        {
+            final J2clPathTargetFile targetFiles = artifact.isJreJavascriptFiles() ?
+                    J2clPathTargetFile.SKIP :
+                    J2clPathTargetFile.REPLACE;
+            if (artifact.isIgnored()) {
+                sources.put(artifact.artifactFileOrFail(), targetFiles);
+            } else {
+                final J2clPath transpiled = artifact.step(J2clStep.TRANSPILE).output();
+                if (transpiled.exists().isPresent()) {
+                    sources.put(transpiled, targetFiles);
+                }
 
-        final List<J2clPath> sources = Lists.array();
-        if(artifact.isIgnored()) {
-            sources.add(artifact.artifactFileOrFail());
-        } else {
-            final J2clPath transpiled = artifact.step(J2clStep.TRANSPILE).output();
-            if (transpiled.exists().isPresent()) {
-                sources.add(transpiled);
-            }
+                // add unpack anyway as it might contain js originally accompanying java source.
+                final J2clPath unpack = artifact.step(J2clStep.UNPACK).output();
+                if (unpack.exists().isPresent()) {
+                    sources.put(unpack, targetFiles);
+                }
 
-            // add unpack anyway as it might contain js originally accompanying java source.
-            final J2clPath unpack = artifact.step(J2clStep.UNPACK).output();
-            if (unpack.exists().isPresent()) {
-                sources.add(unpack);
-            }
-
-            if (sources.isEmpty()) {
-                logger.printLine("No transpiled or unpacked output");
+                if (sources.isEmpty()) {
+                    logger.printLine("No transpiled or unpacked output");
+                }
             }
         }
-
         logger.outdent();
         return sources;
     }

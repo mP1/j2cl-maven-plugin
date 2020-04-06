@@ -61,7 +61,7 @@ final class J2clStepWorkerUnpack extends J2clStepWorker2 {
                     logger.indent();
                     {
                         filesFound = archive.get()
-                            .extractArchiveFiles(dest, logger).size() > 0;
+                            .extractArchiveFiles(dest, J2clPathTargetFile.REPLACE, logger).size() > 0;
                     }
                     logger.outdent();
                 }
@@ -102,8 +102,12 @@ final class J2clStepWorkerUnpack extends J2clStepWorker2 {
 
                     // dont want to copy test-annotations will contain the generated class by any annotation processor.
                     filesFound |= source.isFile() ?
-                            source.extractArchiveFiles(dest, logger).size() > 0 :
-                            dest.copyFiles(source, source.gatherFiles(J2clPath.ALL_FILES), logger).size() > 0;
+                            source.extractArchiveFiles(dest, J2clPathTargetFile.REPLACE, logger).size() > 0 :
+                            dest.copyFiles(source,
+                                    source.gatherFiles(J2clPath.ALL_FILES),
+                                    J2clPathTargetFile.REPLACE,
+                                    J2clPath.COPY_FILE_CONTENT_VERBATIM,
+                                    logger).size() > 0;
                 }
                 logger.outdent();
             }
