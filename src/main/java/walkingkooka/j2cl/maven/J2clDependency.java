@@ -19,38 +19,26 @@ package walkingkooka.j2cl.maven;
 
 import com.google.common.collect.Streams;
 import org.apache.bcel.Constants;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.project.MavenProject;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.Opcodes;
+import org.apache.maven.artifact.*;
+import org.apache.maven.project.*;
+import org.objectweb.asm.*;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
-import walkingkooka.text.CharSequences;
+import walkingkooka.text.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.net.URI;
+import java.io.*;
+import java.lang.annotation.*;
+import java.net.*;
 import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.nio.file.*;
+import java.nio.file.attribute.*;
+import java.util.*;
+import java.util.Map.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
+import java.util.function.*;
+import java.util.stream.*;
 
 /**
  * Represents a single artifact including the project or any of its dependencies. These will in turn have java files etc.
@@ -628,37 +616,87 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     private final J2clRequest request;
 
-    // pretty...........................................................................................................
+    // print............................................................................................................
+
+    /**
+     * Prints a dependency graph and various metadata that will be used to plan the approach for building.
+     */
+    void print() {
+        final J2clLogger logger = request.logger();
+        final J2clLinePrinter printer = J2clLinePrinter.with(logger.printer(logger::debug));
+        printer.printLine("Dependencies");
+        printer.indent();
+        {
+            this.prettyPrintDependencies(printer);
+            this.printPlanMetadata(printer);
+        }
+        printer.outdent();
+    }
 
     /**
      * Pretty prints all dependencies with indentation.
      */
-    J2clDependency prettyPrintDependencies() {
+    private void prettyPrintDependencies(final J2clLinePrinter printer) {
         this.dependencies();
 
         final Set<J2clDependency> sorted = Sets.sorted();
         sorted.addAll(COORD_TO_DEPENDENCY.values());
 
-        final J2clLogger logger = this.request.logger();
-
-        final J2clLinePrinter printer = J2clLinePrinter.with(logger.printer(logger::debug));
-        printer.printLine("Dependencies graph for all artifacts");
+        printer.printLine("Graph");
         printer.indent();
+        {
 
-        for (J2clDependency artifact : sorted) {
-            printer.printLine(artifact.toString());
-            printer.indent();
-            {
-                for (J2clDependency dependency : artifact.dependencies()) {
-                    printer.printLine(dependency.toString());
+            for (J2clDependency artifact : sorted) {
+                printer.printLine(artifact.toString());
+                printer.indent();
+                {
+                    for (J2clDependency dependency : artifact.dependencies()) {
+                        printer.printLine(dependency.toString());
+                    }
                 }
+                printer.outdent();
             }
-            printer.outdent();
         }
         printer.outdent();
         printer.flush();
+    }
 
-        return this;
+    /**
+     * Prints all the plan metadata such as:
+     * <ul>
+     *  <li>classpath required dependencies</li>
+     *  <li>ignored dependencies</li>
+     *  <li>javascript source required dependencies</li>
+     * </ul>
+     */
+    private void printPlanMetadata(final J2clLinePrinter printer) {
+        printer.printLine("Metadata");
+        printer.indent();
+        {
+            this.print("Annotation processor", J2clDependency::isAnnotationProcessor, printer);
+            this.print("Annotation only class files", J2clDependency::isAnnotationClassFiles, printer);
+            this.print("Classpath required", J2clDependency::isClasspathRequired, printer);
+            this.print("JRE bootstrap class files", J2clDependency::isJreBootstrapClassFiles, printer);
+            this.print("JRE class files", J2clDependency::isJreClassFiles, printer);
+            this.print("Ignored dependencies", J2clDependency::isIgnored, printer);
+            this.print("Javascript source required", J2clDependency::isJavascriptSourceRequired, printer);
+            this.print("Javascript bootstrap class files", J2clDependency::isJavascriptBootstrapFiles, printer);
+            this.print("Javascript class files", J2clDependency::isJavascriptFiles, printer);
+        }
+        printer.outdent();
+        printer.flush();
+    }
+
+    private void print(final String label,
+                       final Predicate<J2clDependency> filter,
+                       final J2clLinePrinter printer) {
+
+        printer.printIndentedString(label,
+                J2clDependency.COORD_TO_DEPENDENCY.values()
+                        .stream()
+                        .filter(filter)
+                        .map(J2clDependency::toString)
+                        .collect(Collectors.toList()));
     }
 
     // job..............................................................................................................
