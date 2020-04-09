@@ -8,7 +8,6 @@
     <packaging>war</packaging>
 
     <properties>
-        <j2cl.version>0.7-SNAPSHOT</j2cl.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.outputEncoding>UTF-8</project.build.outputEncoding>
         <maven.compiler.source>1.9</maven.compiler.source>

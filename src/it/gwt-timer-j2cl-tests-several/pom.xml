@@ -36,8 +36,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <j2cl.version>0.7-SNAPSHOT</j2cl.version>
-
         <maven.compiler.source>1.9</maven.compiler.source>
         <maven.compiler.target>1.9</maven.compiler.target>
         <maven.compiler.plugin>3.7.0</maven.compiler.plugin>

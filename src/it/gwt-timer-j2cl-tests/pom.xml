@@ -40,7 +40,6 @@
         <maven.compiler.plugin>3.7.0</maven.compiler.plugin>
 
         <elemental2.version>1.0.0-RC1</elemental2.version>
-        <j2cl.version>0.7-SNAPSHOT</j2cl.version>
     </properties>
 
     <repositories>
