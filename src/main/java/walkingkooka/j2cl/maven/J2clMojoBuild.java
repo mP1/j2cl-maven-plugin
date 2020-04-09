@@ -18,13 +18,15 @@
 package walkingkooka.j2cl.maven;
 
 
-import org.apache.maven.plugin.*;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.*;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
-import java.nio.file.*;
-import java.util.*;
-import java.util.stream.*;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Builds the given project and all of its dependencies in the correct order producing a single JS file.

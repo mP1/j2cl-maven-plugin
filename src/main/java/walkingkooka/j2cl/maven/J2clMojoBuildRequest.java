@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.function.Predicate;
 
 /**
  * A {@link J2clRequest} that accompanies a build. The entry points and initial-script-filename are taken from the pom.
