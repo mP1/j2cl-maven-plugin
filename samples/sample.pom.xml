@@ -6,10 +6,6 @@
     <artifactId>sample-artifact-id</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
-
-    <properties>
-        <j2cl.version>0.7-SNAPSHOT</j2cl.version>
-    </properties>
     
     <repositories>
         <repository>

@@ -152,16 +152,11 @@ Sample required plugin repositories
 Sample plugins declaration to use this Maven Plugin. The parameters under the `configuration` are described in further
 detail below. This assumes a property has also been defined to match the version in (j2cl-uber)](https://lgtm.com/projects/g/mP1/j2cl-uber)
 
-Properties definition.
-```xml
-<properties>
-    <j2cl.version>0.7-SNAPSHOT</j2cl.version>
-</properties>
-```
+
 
 Plugin definition
 ```xml
-<plugin>
+ <plugin>
     <groupId>walkingkooka</groupId>
     <artifactId>j2cl-maven-plugin</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -174,46 +169,46 @@ Plugin definition
             </goals>
             <configuration>
                 <classpath-scope>runtime</classpath-scope>
+                <!--
+                BUNDLE, WHITESPACE_ONLY, SIMPLE, ADVANCED
+                -->
                 <compilation-level>ADVANCED</compilation-level>
                 <defines>
                     <jre.checkedMode>DISABLED</jre.checkedMode>
                     <jre.checks.checkLevel>MINIMAL</jre.checks.checkLevel>
                     <jsinterop.checks>DISABLED</jsinterop.checks>
                 </defines>
-                <entry-points>example.es5.app</entry-points>
+                <entry-points>example.helloworld.app</entry-points>
                 <externs></externs>
-                <formatting/>
-                <language-out>ECMASCRIPT5</language-out>
+                <formatting>
+                <!--
+                PRETTY_PRINT | PRINT_INPUT_DELIMITER | SINGLE_QUOTES
+                -->
+                    <param>PRETTY_PRINT</param>
+                    <param>PRINT_INPUT_DELIMITER</param>
+                    <param>SINGLE_QUOTES</param>
+                </formatting>
+                <!--
+                    ECMASCRIPT3,
+                    ECMASCRIPT5,
+                    ECMASCRIPT5_STRICT,
+                    ECMASCRIPT_2015,
+                    ECMASCRIPT_2016,
+                    ECMASCRIPT_2017,
+                    ECMASCRIPT_2018,
+                    ECMASCRIPT_2019,
+                    STABLE
+                -->
+                <language-out>ECMASCRIPT_2016</language-out>
                 <thread-pool-size>0</thread-pool-size>
 
-                <added-dependencies>
-                    <param>com.vertispan.jsinterop:base:*=com.vertispan.j2cl:gwt-internal-annotations:${j2cl.version}</param>
-                </added-dependencies>
+                <added-dependencies/>
                 <classpath-required>
-                    <param>com.vertispan.j2cl:javac-bootstrap-classpath:*</param>
-                    <param>com.vertispan.j2cl:jre:*</param>
-                    <param>com.vertispan.jsinterop:base:*</param>
-                    <param>com.vertispan.j2cl:gwt-internal-annotations:*</param>
-                    <param>com.google.jsinterop:jsinterop-annotations:*</param>
+                    <param>walkingkooka:jsinterop-base:*</param>
                 </classpath-required>
-                <excluded-dependencies></excluded-dependencies>
-                <javascript-source-required>
-                    <param>com.vertispan.j2cl:bootstrap:zip:jszip:*</param>
-                    <param>com.vertispan.j2cl:jre:zip:jszip:*</param>
-                </javascript-source-required>
-                <ignored>
-                    <!-- jre & bootstrap transpiled versions also included as dependencies, skip transpiling-->
-                    <param>com.vertispan.j2cl:javac-bootstrap-classpath:*</param>
-                    <param>com.vertispan.j2cl:jre:*</param>
-                    <param>com.vertispan.j2cl:bootstrap:zip:jszip:*</param>
-                    <param>com.vertispan.j2cl:jre:zip:jszip:*</param>
-                    <!-- dependencies below only contain annotations -->
-                    <param>com.google.jsinterop:jsinterop-annotations:*</param>
-                    <param>com.vertispan.j2cl:gwt-internal-annotations:*</param>
-                </ignored>
-                <replaced-dependencies>
-                    <param>com.vertispan.j2cl:gwt-internal-annotations:*=com.vertispan.j2cl:gwt-internal-annotations:${j2cl.version}</param>
-                </replaced-dependencies>
+                <ignored/>
+                <javascript-source-required/>
+                <replaced-dependencies/>
             </configuration>
         </execution>
     </executions>
@@ -292,11 +287,7 @@ The snippet below is a good starting point and forcibly includes a few minimally
 
 ```xml
 <classpath-required>
-    <param>com.vertispan.j2cl:javac-bootstrap-classpath:*</param>
-    <param>com.vertispan.j2cl:jre:*</param>
-    <param>com.vertispan.jsinterop:base:*</param>
-    <param>com.vertispan.j2cl:gwt-internal-annotations:*</param>
-    <param>com.google.jsinterop:jsinterop-annotations:*</param>
+    <param>walkingkooka:jsinterop-base:*</param>
 </classpath-required>
 ```
 

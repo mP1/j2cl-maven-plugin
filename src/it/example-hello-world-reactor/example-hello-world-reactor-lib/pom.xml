@@ -6,10 +6,6 @@
     <artifactId>example-hello-world-reactor-lib</artifactId>
     <version>1.0</version>
 
-    <properties>
-        <j2cl.version>0.7-SNAPSHOT</j2cl.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>walkingkooka</groupId>

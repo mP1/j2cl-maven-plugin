@@ -9,10 +9,6 @@
 
     <description>A simple app that transpiled to javascript 5</description>
 
-    <properties>
-        <j2cl.version>0.7-SNAPSHOT</j2cl.version>
-    </properties>
-
     <repositories>
         <repository>
             <id>github-mp1-appengine-repo</id>
