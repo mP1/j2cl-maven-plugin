@@ -23,7 +23,6 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * Maven coordinates that identifies a single dependency or artifact.
@@ -196,34 +195,28 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
      * separating components with a dash instead of a colon.
      */
     String directorySafeName() {
-        return this.buildString(this::safeEncoder, '-');
-    }
-
-    private String safeEncoder(final String name) {
-        return name.replace(":", "--");
+        return this.toString()
+                .replace(":", "--");
     }
 
     @Override
     public String toString() {
-        return this.buildString(Function.identity(), ':');
-    }
-
-    private String buildString(final Function<String, String> encoder,
-                               final char separator) {
         final StringBuilder b = new StringBuilder();
-        b.append(encoder.apply(this.groupId));
-        b.append(separator);
-        b.append(encoder.apply(this.artifactId));
-        b.append(separator);
-        b.append(encoder.apply(this.type));
+        b.append(this.groupId);
+        b.append(SEPARATOR);
+        b.append(this.artifactId);
+        b.append(SEPARATOR);
+        b.append(this.type);
         this.classifier.ifPresent(c -> {
-            b.append(separator);
-            b.append(encoder.apply(c));
+            b.append(SEPARATOR);
+            b.append(c);
         });
 
-        b.append(separator);
-        b.append(encoder.apply(this.version));
+        b.append(SEPARATOR);
+        b.append(this.version);
 
         return b.toString();
     }
+
+    private final static char SEPARATOR = ':';
 }

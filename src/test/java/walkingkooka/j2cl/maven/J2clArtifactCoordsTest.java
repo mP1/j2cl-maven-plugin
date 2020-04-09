@@ -286,6 +286,27 @@ public final class J2clArtifactCoordsTest implements ClassTesting2<J2clArtifactC
                 () -> other + " .isGroupArtifactSources " + coords);
     }
 
+    // directorySafeName.................................................................................................
+
+    @Test
+    public void testDirectorySafeNameGroupArtifactVersion() {
+        this.directorySafeNameAndCheck("group1:artifact2:version3", "group1--artifact2--jar--version3");
+    }
+
+    @Test
+    public void testDirectorySafeNameGroupArtifactVersionWithDash() {
+        this.directorySafeNameAndCheck("group-1:artifact-2:version-3", "group-1--artifact-2--jar--version-3");
+    }
+
+    @Test
+    public void testDirectorySafeNameGroupArtifactClassifierVersion() {
+        this.directorySafeNameAndCheck("group1:artifact2:type3:classifier4:version5", "group1--artifact2--type3--classifier4--version5");
+    }
+
+    private void directorySafeNameAndCheck(final String coords, final String directoryName) {
+        assertEquals(directoryName, J2clArtifactCoords.parse(coords).directorySafeName(), () -> "Coords: " + CharSequences.quoteAndEscape(coords));
+    }
+
     // ToString.........................................................................................................
 
     @Test
