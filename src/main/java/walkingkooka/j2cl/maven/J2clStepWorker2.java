@@ -17,8 +17,6 @@
 
 package walkingkooka.j2cl.maven;
 
-import walkingkooka.text.CharSequences;
-
 /**
  * Any step that requires its working directory to be created before it can work.
  */

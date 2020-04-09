@@ -19,7 +19,6 @@ package walkingkooka.j2cl.maven;
 
 import walkingkooka.text.CharSequences;
 
-import java.io.File;
 import java.nio.file.Files;
 
 /**

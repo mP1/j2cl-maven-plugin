@@ -19,26 +19,39 @@ package walkingkooka.j2cl.maven;
 
 import com.google.common.collect.Streams;
 import org.apache.bcel.Constants;
-import org.apache.maven.artifact.*;
-import org.apache.maven.project.*;
-import org.objectweb.asm.*;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.project.MavenProject;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Opcodes;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
-import walkingkooka.text.*;
+import walkingkooka.text.CharSequences;
 
-import java.io.*;
-import java.lang.annotation.*;
-import java.net.*;
+import java.io.File;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.net.URI;
 import java.nio.file.FileSystem;
-import java.nio.file.*;
-import java.nio.file.attribute.*;
-import java.util.*;
-import java.util.Map.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.*;
-import java.util.function.*;
-import java.util.stream.*;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Represents a single artifact including the project or any of its dependencies. These will in turn have java files etc.
