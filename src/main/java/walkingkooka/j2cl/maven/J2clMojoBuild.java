@@ -18,15 +18,13 @@
 package walkingkooka.j2cl.maven;
 
 
-import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.*;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.plugins.annotations.*;
 
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.nio.file.*;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * Builds the given project and all of its dependencies in the correct order producing a single JS file.
@@ -39,7 +37,7 @@ public final class J2clMojoBuild extends J2clMojoBuildTest {
         try {
             final J2clRequest request = this.request(this.entryPoints(), this.initialScriptFilename());
             final J2clDependency project = this.gatherDependencies(request);
-            project.prettyPrintDependencies();
+            project.print();
             request.verifyArtifactCoords();
 
             request.execute(project);
