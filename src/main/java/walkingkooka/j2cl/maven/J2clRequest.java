@@ -179,7 +179,7 @@ abstract class J2clRequest {
     // replacements........................................................................................................
 
     /**
-     * Accepts the coords and returns the getCoords if one is available.
+     * Accepts the given coords and returns a replacement coords if one has been defined.
      */
     final Optional<J2clArtifactCoords> coords(final J2clArtifactCoords coords) {
         return Optional.ofNullable(this.replaced.get(coords));
