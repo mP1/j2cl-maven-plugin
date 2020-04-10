@@ -64,7 +64,7 @@ final class J2clPath implements Comparable<J2clPath> {
      */
     private static BiPredicate<Path, BasicFileAttributes> fileEndsWith(final String extension) {
         return (p, a) -> Files.isRegularFile(p) && p.getFileName().toString().endsWith(extension);
-    };
+    }
 
     /**
      * Matches all files but not directories.
@@ -101,99 +101,6 @@ final class J2clPath implements Comparable<J2clPath> {
         this.path = path;
     }
 
-    boolean isFile() {
-        return Files.isRegularFile(this.path());
-    }
-
-    /**
-     * Returns true if this file is a java file.
-     */
-    boolean isJava() {
-        return this.filename().endsWith(".java");
-    }
-
-    /**
-     * Builds a new path holding the ignore file.
-     */
-    J2clPath ignoreFile() {
-        return this.append(IGNORE_FILE);
-    }
-
-    /**
-     * The name of the ignore file which is used during the unpack phase to filter files.
-     */
-    private static final String IGNORE_FILE = FILE_PREFIX + "-ignore.txt";
-
-    /**
-     * Builds a new path holding the output directory within this directory.
-     */
-    J2clPath output() {
-        return this.append(OUTPUT);
-    }
-
-    /**
-     * Only returns true if this path is the output directory of an UNPACK.
-     */
-    boolean isUnpackOutput() {
-        return this.filename().equals(OUTPUT) &&
-                this.path().getParent().getFileName().toString().equals(J2clStep.UNPACK.directoryName());
-    }
-
-    private final static String OUTPUT = "output";
-
-    /**
-     * Builds a new path holding the shade mapping file.
-     */
-    J2clPath shadeFile() {
-        return this.append(SHADE_FILE);
-    }
-
-    /**
-     * The name of the shade file used during {@link J2clStep#SHADE_JAVA_SOURCE} and the package prefix to be removed.
-     */
-    static final String SHADE_FILE = FILE_PREFIX + "-shade.txt";
-
-    boolean isTestAnnotation() {
-        final Path path = this.path();
-        return Files.isDirectory(path) && path.getFileName().toString().equals("test-annotations");
-    }
-
-    /**
-     * Returns true if the given {@link Path} belongs to the super under this path.
-     */
-    boolean isSuperSource(final Path path) {
-        return this.path.relativize(path).toString().startsWith("super");
-    }
-
-    /**
-     * Builds the name of the testsuite javascript file from the class name. It should appear in the output directory.
-     */
-    J2clPath testAdapterSuiteGeneratedFilename(final String testClassName) {
-        //  'org.gwtproject.timer.client.TimerJ2clTest');
-        return this.append(testClassName.replace('.', File.separatorChar) + TESTSUITE_FILEEXTENSION);
-    }
-
-    /**
-     * Using the output directory and the testClassName and computes the testSuite js path.
-     */
-    J2clPath testAdapterSuiteCorrectFilename(final String testClassName) {
-        // goog.module('javatests.org.gwtproject.timer.client.TimerJ2clTest_AdapterSuite');
-        return this.append(("/javatests/" + testClassName + "_AdapterSuite")
-                .replace('.', File.separatorChar)
-                + ".js");
-    }
-
-    private final static String TESTSUITE_FILEEXTENSION = ".testsuite";
-
-    J2clPath parent() {
-        return new J2clPath(this.path().getParent());
-    }
-
-    J2clPath createIfNecessary() throws IOException {
-        Files.createDirectories(this.path());
-        return this;
-    }
-
     @SuppressWarnings("ThrowableNotThrown")
     J2clPath absentOrFail() throws IOException {
         if (this.exists().isPresent()) {
@@ -203,50 +110,8 @@ final class J2clPath implements Comparable<J2clPath> {
         return this.createIfNecessary();
     }
 
-    Optional<J2clPath> exists() {
-        return Optional.ofNullable(Files.exists(this.path()) ? this : null);
-    }
-
-    J2clPath removeAll() throws IOException {
-        Files.walkFileTree(this.path(),
-                new SimpleFileVisitor<>() {
-                    @Override
-                    public FileVisitResult postVisitDirectory(final Path dir,
-                                                              final IOException cause) throws IOException {
-                        Files.delete(dir);
-                        return FileVisitResult.CONTINUE;
-                    }
-
-                    @Override
-                    public FileVisitResult visitFile(final Path file,
-                                                     final BasicFileAttributes attrs) throws IOException {
-                        Files.delete(file);
-                        return FileVisitResult.CONTINUE;
-                    }
-                });
-        return this;
-    }
-
     J2clPath append(final String directory) {
         return J2clPath.with(Paths.get(this.path.toString(), directory));
-    }
-
-    /**
-     * Writes the content to this path.
-     */
-    J2clPath writeFile(final byte[] contents) throws IOException {
-        Files.write(this.path(), contents, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-        return this;
-    }
-
-    /**
-     * Uses to collect all files that match the {@link BiPredicate} and returns a sorted {@link Set}.
-     */
-    Set<J2clPath> gatherFiles(final BiPredicate<Path, BasicFileAttributes> matcher) throws IOException {
-        return Files.find(this.path(), Integer.MAX_VALUE, matcher)
-                .map(J2clPath::with)
-                .sorted()
-                .collect(Collectors.toCollection(Sets::sorted));
     }
 
     /**
@@ -292,7 +157,7 @@ final class J2clPath implements Comparable<J2clPath> {
 
             final J2clPath copyTargetPath = J2clPath.with(copyTarget);
             Files.write(copyTarget,
-                        contentTransformer.apply(Files.readAllBytes(filePath), copyTargetPath));
+                    contentTransformer.apply(Files.readAllBytes(filePath), copyTargetPath));
 
             copied.add(copyTargetPath);
         }
@@ -310,6 +175,17 @@ final class J2clPath implements Comparable<J2clPath> {
         }
         return copied;
     }
+
+    J2clPath createIfNecessary() throws IOException {
+        Files.createDirectories(this.path());
+        return this;
+    }
+
+    Optional<J2clPath> exists() {
+        return Optional.ofNullable(Files.exists(this.path()) ? this : null);
+    }
+
+    // extract..........................................................................................................
 
     /**
      * Extract ALL the files from this archive, returning number of files extracted
@@ -366,6 +242,109 @@ final class J2clPath implements Comparable<J2clPath> {
     }
 
     /**
+     * Uses to collect all files that match the {@link BiPredicate} and returns a sorted {@link Set}.
+     */
+    Set<J2clPath> gatherFiles(final BiPredicate<Path, BasicFileAttributes> matcher) throws IOException {
+        return Files.find(this.path(), Integer.MAX_VALUE, matcher)
+                .map(J2clPath::with)
+                .sorted()
+                .collect(Collectors.toCollection(Sets::sorted));
+    }
+
+    boolean isFile() {
+        return Files.isRegularFile(this.path());
+    }
+
+    /**
+     * Builds a new path holding the ignore file.
+     */
+    J2clPath ignoreFile() {
+        return this.append(IGNORE_FILE);
+    }
+
+    /**
+     * The name of the ignore file which is used during the unpack phase to filter files.
+     */
+    private static final String IGNORE_FILE = FILE_PREFIX + "-ignore.txt";
+
+    /**
+     * Returns true if this file is a java file.
+     */
+    boolean isJava() {
+        return this.filename().endsWith(".java");
+    }
+
+    /**
+     * Builds a new path holding the output directory within this directory.
+     */
+    J2clPath output() {
+        return this.append(OUTPUT);
+    }
+
+    /**
+     * Only returns true if this path is the output directory of an UNPACK.
+     */
+    boolean isUnpackOutput() {
+        return this.filename().equals(OUTPUT) &&
+                this.path().getParent().getFileName().toString().equals(J2clStep.UNPACK.directoryName());
+    }
+
+    private final static String OUTPUT = "output";
+
+    J2clPath parent() {
+        return new J2clPath(this.path().getParent());
+    }
+
+    Path path() {
+        return this.path;
+    }
+
+    private final Path path;
+
+    String filename() {
+        return this.path().getFileName().toString();
+    }
+
+    File file() {
+        return this.path().toFile();
+    }
+
+    /**
+     * Performs a recursive file delete on this path.
+     */
+    J2clPath removeAll() throws IOException {
+        Files.walkFileTree(this.path(),
+                new SimpleFileVisitor<>() {
+                    @Override
+                    public FileVisitResult postVisitDirectory(final Path dir,
+                                                              final IOException cause) throws IOException {
+                        Files.delete(dir);
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                    @Override
+                    public FileVisitResult visitFile(final Path file,
+                                                     final BasicFileAttributes attrs) throws IOException {
+                        Files.delete(file);
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
+        return this;
+    }
+
+    /**
+     * Builds a new path holding the shade mapping file.
+     */
+    J2clPath shadeFile() {
+        return this.append(SHADE_FILE);
+    }
+
+    /**
+     * The name of the shade file used during {@link J2clStep#SHADE_JAVA_SOURCE} and the package prefix to be removed.
+     */
+    static final String SHADE_FILE = FILE_PREFIX + "-shade.txt";
+
+    /**
      * Used to read the {@link #SHADE_FILE} properties file.
      */
     Map<String, String> readShadeFile() throws IOException {
@@ -379,19 +358,45 @@ final class J2clPath implements Comparable<J2clPath> {
         }
     }
 
-    String filename() {
-        return this.path().getFileName().toString();
+    /**
+     * Returns true if the given {@link Path} belongs to the super under this path.
+     */
+    boolean isSuperSource(final Path path) {
+        return this.path.relativize(path).toString().startsWith("super");
     }
 
-    Path path() {
-        return this.path;
+    boolean isTestAnnotation() {
+        final Path path = this.path();
+        return Files.isDirectory(path) && path.getFileName().toString().equals("test-annotations");
     }
 
-    File file() {
-        return this.path().toFile();
+    /**
+     * Builds the name of the testsuite javascript file from the class name. It should appear in the output directory.
+     */
+    J2clPath testAdapterSuiteGeneratedFilename(final String testClassName) {
+        //  'org.gwtproject.timer.client.TimerJ2clTest');
+        return this.append(testClassName.replace('.', File.separatorChar) + TESTSUITE_FILEEXTENSION);
     }
 
-    private final Path path;
+    /**
+     * Using the output directory and the testClassName and computes the testSuite js path.
+     */
+    J2clPath testAdapterSuiteCorrectFilename(final String testClassName) {
+        // goog.module('javatests.org.gwtproject.timer.client.TimerJ2clTest_AdapterSuite');
+        return this.append(("/javatests/" + testClassName + "_AdapterSuite")
+                .replace('.', File.separatorChar)
+                + ".js");
+    }
+
+    private final static String TESTSUITE_FILEEXTENSION = ".testsuite";
+
+    /**
+     * Writes the content to this path.
+     */
+    J2clPath writeFile(final byte[] contents) throws IOException {
+        Files.write(this.path(), contents, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        return this;
+    }
 
     // Object...........................................................................................................
 
