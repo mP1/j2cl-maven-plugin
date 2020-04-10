@@ -206,7 +206,7 @@ Plugin definition
                 <classpath-required>
                     <param>walkingkooka:jsinterop-base:*</param>
                 </classpath-required>
-                <ignored/>
+                <ignored-dependencies/>
                 <javascript-source-required/>
                 <replaced-dependencies/>
             </configuration>
@@ -364,11 +364,11 @@ as they come pre-processed, or only contain annotations that are not required du
 for compiling (javac).
 
 ```xml
-<ignored>
+<ignored-dependencies>
     <!-- dependencies below only contain annotations -->
     <param>group1:artifact2:*</param>
     <param>group1:artifact2:version3</param>
-</ignored>
+</ignored-dependencies>
 ```
 
 The following dependencies will automatically be detected and ignored.

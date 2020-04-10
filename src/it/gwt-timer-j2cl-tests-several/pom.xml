@@ -207,10 +207,10 @@
                                 <param>walkingkooka:jsinterop-base:*</param>
                                 <param>walkingkooka:j2cl-junit-java:*</param>
                             </classpath-required>
-                            <ignored>
+                            <ignored-dependencies>
                                 <param>com.google.elemental2:elemental2-dom:jar:sources:*</param>
                                 <param>walkingkooka:j2cl-junit-java:*</param>
-                            </ignored>
+                            </ignored-dependencies>
                             <javascript-source-required>
                                 <param>walkingkooka:jsinterop-base:*</param>
                                 <param>walkingkooka:j2cl-junit-javascript:*</param>
