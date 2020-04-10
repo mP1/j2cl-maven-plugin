@@ -1,2 +1,0 @@
-example.shade.java.io=java.io
-example.shade.javaio=java.io
