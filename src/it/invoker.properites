@@ -30,8 +30,7 @@
 
 # A boolean value controlling the network behavior of Maven, defaults to "false"
 # Since plugin version 1.4
-#
- invoker.offline = true
+# invoker.offline = true
 
 # The path to the properties file from which to load system properties, defaults to the
 # filename given by the plugin parameter testPropertiesFile
