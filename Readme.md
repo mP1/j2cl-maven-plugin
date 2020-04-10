@@ -263,7 +263,7 @@ Maven coordinates on the left side of each entry may have a wildcard in the vers
 
 
 
-## browser (test)
+## browsers (test)
 A list of browsers that are used by webdriver to execute transpiled unit tests. At least one must be selected out of
 the supported browsers listed below.
 
@@ -292,9 +292,15 @@ The snippet below is a good starting point and forcibly includes a few minimally
 ```
 
 - Maven coordinates may have a wildcard in the version.
-- Archives with only annotation class files.
-- Archives with annotation processors.
-- Archives with JRE classes (including bootstrap).
+
+
+
+Archives with the following conditions will automatically marked as equivalent to adding a `classpath-required` entry.
+
+- Annotation processors.
+- JRE classes (including bootstrap).
+- Only annotation class files.
+
 
 
 ## classpath-scope
@@ -358,7 +364,7 @@ For more info click [here](http://googleclosure.blogspot.com/2010/10/pretty-prin
 ```
 
 
-# ignored
+# ignored-dependencies
 A list of artifacts that will not be processed. This is used to avoid processing any bootstrap and jre artifacts, 
 as they come pre-processed, or only contain annotations that are not required during transpiling (j2cl) but necessary
 for compiling (javac).
@@ -371,18 +377,16 @@ for compiling (javac).
 </ignored-dependencies>
 ```
 
-The following dependencies will automatically be detected and ignored.
+- Maven coordinates may have a wildcard in the version.
 
-- Archives with only annotation class files.
-- Archives with annotation processors.
-- Archives with JRE classes (including bootstrap).
+
+
+Archives with the following conditions will automatically marked as equivalent to adding a `ignored-dependencies` entry.
+
+- Annotation processors.
 - Dependency where `classifier=sources` pairs another dependency.
-
-
-
-TODO Maybe also ignore `classifier=jszip`.
-
-Maven coordinates may have a wildcard in the version.
+- JRE classes & javascript (including bootstrap).
+- Only annotation class files.
 
 
 
@@ -408,7 +412,13 @@ The snippet below is a good starting point and forcibly includes a few minimally
 ```
 
 - Maven coordinates may have a wildcard in the version.
-- - Archives with annotation processors will never appear on any stage requiring javascript source.
+
+
+
+Archives with the following conditions will automatically marked as equivalent to adding a `javascript-source-required` entry.
+
+- Archives with only JRE javascript (including bootstrap).
+
 
 
 ## language-out
@@ -496,11 +506,11 @@ cost of longer build times.
 
 
 
-# Ignore file(s)
+# Ignored file(s)
 
 A facility that is almost identical to `.gitignore` files is also supported and honoured when source files are processed.
-If a `.walkingkooka-j2cl-maven-plugin-ignored-files.txt` is present in a source directory all patterns within it are honoured for
-the current and sub directories. Comments, empty lines and no limit is placed on the number of lines with patterns in the file.
+If a `.walkingkooka-j2cl-maven-plugin-ignored-files.txt` is present in a source directory all patterns within it are honoured
+for the current and sub directories.
 
 The actual patterns are PathMatcher [glob patterns](https://docs.oracle.com/javase/tutorial/essential/io/fileOps.html#glob)
 without the leading `glob:` prefix.
@@ -508,7 +518,7 @@ without the leading `glob:` prefix.
 - Blank lines are ignored
 - Lines beginning with HASH are considered to be comments and are ignored.
 - All other lines are used to build a glob pattern, using the java snippet directly below
-- No support is provided for escaping or any sort.
+- No support is provided for escaping of any sort.
 
 
 
