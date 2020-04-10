@@ -86,9 +86,7 @@
                             <thread-pool-size>0</thread-pool-size>
 
                             <added-dependencies/>
-                            <classpath-required>
-                                <param>walkingkooka:jsinterop-base:*</param>
-                            </classpath-required>
+                            <classpath-required/>
                             <ignored-dependencies/>
                             <javascript-source-required/>
                             <replaced-dependencies>

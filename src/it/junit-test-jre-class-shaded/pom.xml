@@ -161,10 +161,7 @@
                             <thread-pool-size>1</thread-pool-size>
 
                             <added-dependencies/>
-                            <classpath-required>
-                                <param>walkingkooka:jsinterop-base:*</param>
-                                <param>walkingkooka:j2cl-junit-java:*</param>
-                            </classpath-required>
+                            <classpath-required/>
                             <ignored-dependencies>
                                 <param>walkingkooka:j2cl-junit-java:*</param>
                             </ignored-dependencies>

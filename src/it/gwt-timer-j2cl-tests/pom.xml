@@ -196,10 +196,7 @@
                             <thread-pool-size>0</thread-pool-size>
 
                             <added-dependencies/>
-                            <classpath-required>
-                                <param>walkingkooka:jsinterop-base:*</param>
-                                <param>walkingkooka:j2cl-junit-java:*</param>
-                            </classpath-required>
+                            <classpath-required/>
                             <ignored-dependencies>
                                 <param>com.google.elemental2:elemental2-dom:jar:sources:*</param>
                                 <param>walkingkooka:j2cl-junit-java:*</param>

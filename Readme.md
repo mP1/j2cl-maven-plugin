@@ -204,7 +204,8 @@ Plugin definition
 
                 <added-dependencies/>
                 <classpath-required>
-                    <param>walkingkooka:jsinterop-base:*</param>
+                    <param>group-id-1:artifact-id-2:*</param>
+                    <param>group-id-1:artifact-id-2:version-3</param>
                 </classpath-required>
                 <ignored-dependencies/>
                 <javascript-source-required/>
@@ -287,11 +288,18 @@ The snippet below is a good starting point and forcibly includes a few minimally
 
 ```xml
 <classpath-required>
-    <param>walkingkooka:jsinterop-base:*</param>
+    <param>group-id-1:artifact-id-2:*</param>
+    <param>group-id-1:artifact-id-2:version-3</param>
 </classpath-required>
 ```
 
 - Maven coordinates may have a wildcard in the version.
+<<<<<<< HEAD
+- Archives with only annotation class files.
+- Archives with annotation processors.
+- Archives with JRE classes (including bootstrap).
+- Archives with `.walkingkooka-j2cl-maven-plugin-classpath-required.txt` do not require an entry.
+=======
 
 
 
@@ -301,6 +309,7 @@ Archives with the following conditions will automatically marked as equivalent t
 - JRE classes (including bootstrap).
 - Only annotation class files.
 
+>>>>>>> 2a3656400e038423e675db9a77a13597979964f6
 
 
 ## classpath-scope
@@ -503,6 +512,13 @@ cost of longer build times.
 ```xml
 <thread-pool-size>0</thread-pool-size>
 ```
+
+
+
+# Classpath required file(s)
+
+A dependency archive with a `.walkingkooka-j2cl-maven-plugin-classpath-required.txt` file in its root is equivalent to
+adding an `classpath-required` entry to the plugin pom.
 
 
 
