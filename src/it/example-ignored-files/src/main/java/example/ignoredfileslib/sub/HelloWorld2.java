@@ -14,14 +14,24 @@
  * limitations under the License.
  *
  */
+package example.ignoredfileslib.sub;
 
-package example.ignorefile.sub;
+import jsinterop.annotations.JsType;
 
-import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
-public class IgnoredFile2 {
+/**
+ * A simple hello world example.
+ *
+ * <p>Note that it is marked as @JsType as we would like to call have whole class available to use
+ * from JavaScript.
+ */
+@JsType
+public class HelloWorld2 {
 
-    public File file() {
-        return null;
+    public static String messagePart2() {
+        return "Message part2";
     }
 }

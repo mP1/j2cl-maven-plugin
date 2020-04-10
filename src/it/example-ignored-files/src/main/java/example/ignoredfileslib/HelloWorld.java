@@ -13,9 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package example.ignorefilelib;
+package example.ignoredfileslib;
 
-import example.ignorefilelib.sub.HelloWorld2;
+import example.ignoredfileslib.sub.HelloWorld2;
 import jsinterop.annotations.JsType;
 
 import java.util.Arrays;
@@ -34,6 +34,6 @@ public class HelloWorld {
     public static String getHelloWorld() {
         final List<String> list = Arrays.asList("A1", "C3", "B2");
         Collections.sort(list);
-        return "j2cl-maven-plugin-ignore.txt Hello from Java!->" + list + HelloWorld2.messagePart2();
+        return "j2cl-maven-plugin-ignored-files.txt Hello from Java!->" + list + HelloWorld2.messagePart2();
     }
 }

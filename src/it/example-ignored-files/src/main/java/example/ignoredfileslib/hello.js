@@ -17,10 +17,10 @@
 // We don't need JavaScript for document.write but for the sake having a richer
 // example, here is a JavaScript module that uses our Java code.
 
-goog.module('example.ignorefilelib.hello');
+goog.module('example.ignoredfileslib.hello');
 
 // Here we use goog.require to import the Java HelloWorld class to this module.
-const HelloWorld = goog.require('example.ignorefilelib.HelloWorld');
+const HelloWorld = goog.require('example.ignoredfileslib.HelloWorld');
 
 /**
  * Document write to browser page

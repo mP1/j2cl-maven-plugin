@@ -1,4 +1,4 @@
-package example.ignorefilelib;
+package example.ignoredfileslib;
 
 import java.io.File;
 
