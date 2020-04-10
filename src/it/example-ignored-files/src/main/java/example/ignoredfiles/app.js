@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-goog.module('example.ignorefile.app');
+goog.module('example.ignoredfiles.app');
 
 // This is the entry point of our app.
 // Feel free to use any of the fancy new JS features; Closure compiler will take
 // care of making your app run in an older browser if needed.
-var {sayHello} = goog.require('example.ignorefilelib.hello');
+var {sayHello} = goog.require('example.ignoredfileslib.hello');
 
 sayHello();

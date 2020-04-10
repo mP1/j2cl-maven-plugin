@@ -499,7 +499,7 @@ cost of longer build times.
 # Ignore file(s)
 
 A facility that is almost identical to `.gitignore` files is also supported and honoured when source files are processed.
-If a `walkingkooka-j2cl-maven-plugin-ignore.txt` is present in a source directory all patterns within it are honoured for
+If a `.walkingkooka-j2cl-maven-plugin-ignored-files.txt` is present in a source directory all patterns within it are honoured for
 the current and sub directories. Comments, empty lines and no limit is placed on the number of lines with patterns in the file.
 
 The actual patterns are PathMatcher [glob patterns](https://docs.oracle.com/javase/tutorial/essential/io/fileOps.html#glob)
