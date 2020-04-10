@@ -92,18 +92,18 @@ abstract class J2clMojoBuildTest extends J2clMojo {
     private File output;
 
 
-    // ignored................................................................................................
+    // ignoredDependencies................................................................................................
 
-    final List<J2clArtifactCoords> ignored() {
-        return parseList(this.ignored);
+    final List<J2clArtifactCoords> ignoredDependencies() {
+        return parseList(this.ignoredDependencies);
     }
 
     /**
      * List of artifacts that will not be processed at all. When required on the java classpath or source,
      * the archive file will be added.
      */
-    @Parameter(alias = "ignored", required = true)
-    private List<String> ignored;
+    @Parameter(alias = "ignored-dependencies", required = true)
+    private List<String> ignoredDependencies;
 
     // javascriptSourceRequired........................................................................................
 

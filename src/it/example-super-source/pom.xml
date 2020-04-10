@@ -86,7 +86,7 @@
                             <classpath-required>
                                 <param>walkingkooka:jsinterop-base:*</param>
                             </classpath-required>
-                            <ignored/>
+                            <ignored-dependencies/>
                             <javascript-source-required/>
                             <replaced-dependencies>
                                 <param>com.google.jsinterop:base:*=walkingkooka:jsinterop-base:1.0-SNAPSHOT</param>

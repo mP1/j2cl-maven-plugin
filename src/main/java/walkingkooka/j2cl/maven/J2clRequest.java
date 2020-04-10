@@ -54,7 +54,7 @@ abstract class J2clRequest {
                         final J2clClasspathScope scope,
                         final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies,
                         final List<J2clArtifactCoords> classpathRequired,
-                        final List<J2clArtifactCoords> ignored,
+                        final List<J2clArtifactCoords> ignoredDependencies,
                         final List<J2clArtifactCoords> javascriptSourceRequired,
                         final Map<J2clArtifactCoords, J2clArtifactCoords> replaced,
                         final CompilationLevel level,
@@ -73,7 +73,7 @@ abstract class J2clRequest {
 
         this.addedDependencies = addedDependencies;
         this.classpathRequired = classpathRequired;
-        this.ignored = ignored;
+        this.ignoredDependencies = ignoredDependencies;
         this.javascriptSourceRequired = javascriptSourceRequired;
         this.replaced = replaced;
 
@@ -150,10 +150,10 @@ abstract class J2clRequest {
     private final List<J2clArtifactCoords> classpathRequired;
 
     final boolean isIgnored(final J2clArtifactCoords coords) {
-        return this.ignored.contains(coords);
+        return this.ignoredDependencies.contains(coords);
     }
 
-    private final List<J2clArtifactCoords> ignored;
+    private final List<J2clArtifactCoords> ignoredDependencies;
 
     final boolean isJavascriptSourceRequired(final J2clArtifactCoords coords) {
         return this.javascriptSourceRequired.contains(coords);
@@ -265,7 +265,7 @@ abstract class J2clRequest {
             v.forEach(a -> hash.append(a.toString()));
         });
         hash.append(this.classpathRequired.toString());
-        hash.append(this.ignored.toString());
+        hash.append(this.ignoredDependencies.toString());
         hash.append(this.javascriptSourceRequired.toString());
         this.replaced.forEach((k, v) -> {
             hash.append(k.toString());
@@ -315,7 +315,7 @@ abstract class J2clRequest {
         J2clDependency.verifyWithoutConflictsOrDuplicates();
         this.verify(this.classpathRequired, "classpath-required");
         this.verify(this.javascriptSourceRequired, "javascript-required");
-        this.verify(this.ignored, "ignored");
+        this.verify(this.ignoredDependencies, "ignoredDependencies");
     }
 
     private void verify(final Collection<J2clArtifactCoords> dependencies,
@@ -513,7 +513,7 @@ abstract class J2clRequest {
     public String toString() {
         return this.base + " " +
                 this.classpathRequired + " " +
-                this.ignored + " " +
+                this.ignoredDependencies + " " +
                 this.javascriptSourceRequired + " " +
                 this.replaced + " " +
                 this.scope + " " +

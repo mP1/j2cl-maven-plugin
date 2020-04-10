@@ -678,7 +678,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Prints all the plan metadata such as:
      * <ul>
      *  <li>classpath required dependencies</li>
-     *  <li>ignored dependencies</li>
+     *  <li>ignoredDependencies dependencies</li>
      *  <li>javascript source required dependencies</li>
      * </ul>
      */
