@@ -7,7 +7,6 @@
     <artifactId>j2cl-maven-plugin-example-test</artifactId>
     <version>1.0</version>
 
-    <name>Example test using src and test classes</name>
     <description>Test cases for the J2Cl tests</description>
 
     <licenses>
@@ -20,13 +19,11 @@
     <inceptionYear>2020</inceptionYear>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
         <maven.compiler.source>1.9</maven.compiler.source>
         <maven.compiler.target>1.9</maven.compiler.target>
         <maven.compiler.plugin>3.7.0</maven.compiler.plugin>
 
-        <elemental2.version>1.0.0-RC1</elemental2.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <repositories>
