@@ -292,7 +292,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
             final J2clRequest request = this.request();
             final J2clArtifactCoords coords = this.coords();
 
-            this.classpathRequired = (this.classpathRequiredFile || request.isClasspathRequired(coords) || false == request.isJavascriptSourceRequired(coords)) ||
+            this.classpathRequired = (this.classpathRequiredFile || request.isClasspathRequired(coords) || false == (this.javascriptSourceRequiredFile || request.isJavascriptSourceRequired(coords))) ||
                     this.isAnnotationClassFiles() ||
                     this.isAnnotationProcessor() ||
                     this.isJreBootstrapClassFiles() ||
@@ -308,17 +308,26 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Returns true for artifacts that only contain javascript.
      */
     boolean isJavascriptSourceRequired() {
-        final J2clRequest request = this.request();
-        final J2clArtifactCoords coords = this.coords();
+        if (null == this.javascriptSourceRequired) {
+            this.testArchive();
 
-        return (request.isJavascriptSourceRequired(coords) || false == (this.classpathRequiredFile || request.isClasspathRequired(coords))) &&
-                false == this.isAnnotationClassFiles() &&
-                false == this.isAnnotationProcessor() &&
-                this.isJavascriptBootstrapFiles() ||
-                this.isJavascriptFiles() ||
-                false == this.isJreBootstrapClassFiles() &&
-                        false == this.isJreClassFiles();
+            final J2clRequest request = this.request();
+            final J2clArtifactCoords coords = this.coords();
+
+            this.javascriptSourceRequired = (this.javascriptSourceRequiredFile || request.isJavascriptSourceRequired(coords) || false == (this.classpathRequiredFile || request.isClasspathRequired(coords))) &&
+                    false == this.isAnnotationClassFiles() &&
+                    false == this.isAnnotationProcessor() &&
+                    this.isJavascriptBootstrapFiles() ||
+                    this.isJavascriptFiles() ||
+                    false == this.isJreBootstrapClassFiles() &&
+                            false == this.isJreClassFiles();
+        }
+
+        return this.javascriptSourceRequired;
     }
+
+    private Boolean javascriptSourceRequired;
+    private boolean javascriptSourceRequiredFile;
 
     /**
      * Used to test if a dependency should be ignored and the archive files used as they are, such as class files
@@ -462,9 +471,10 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private synchronized void testArchive() {
         final boolean annotationClassFiles;
         final boolean annotationProcessor;
-        final boolean classpathRequired;
+        final boolean classpathRequiredFile;
         final boolean javascriptBootstrapFiles;
         final boolean javascriptFiles;
+        final boolean javascriptSourceRequiredFile;
         final boolean jreBootstrapClassFiles;
         final boolean jreClassFiles;
 
@@ -473,10 +483,12 @@ final class J2clDependency implements Comparable<J2clDependency> {
             try (final FileSystem zip = FileSystems.newFileSystem(URI.create("jar:" + file.file().toURI()), Collections.emptyMap())) {
                 annotationProcessor = Files.exists(zip.getPath(META_INF_SERVICES_PROCESSOR));
 
-                classpathRequired = Files.exists(zip.getPath(CLASSFILE_REQUIRED));
+                classpathRequiredFile = Files.exists(zip.getPath(CLASSFILE_REQUIRED));
 
                 javascriptBootstrapFiles = Files.exists(zip.getPath(JAVASCRIPT_BOOTSTRAP));
                 javascriptFiles = Files.exists(zip.getPath(JAVASCRIPT_FILE));
+
+                javascriptSourceRequiredFile = Files.exists(zip.getPath(JAVASCRIPT_SOURCE_REQUIRED));
 
                 jreBootstrapClassFiles = Files.exists(zip.getPath(JAVA_BOOTSTRAP_CLASSFILE));
                 jreClassFiles = Files.exists(zip.getPath(JAVA_CLASSFILE));
@@ -530,10 +542,12 @@ final class J2clDependency implements Comparable<J2clDependency> {
             annotationClassFiles = false;
             annotationProcessor = false;
 
-            classpathRequired = false;
+            classpathRequiredFile = false;
 
             javascriptBootstrapFiles = false;
             javascriptFiles = false;
+
+            javascriptSourceRequiredFile = false;
 
             jreBootstrapClassFiles = false;
             jreClassFiles = false;
@@ -542,10 +556,12 @@ final class J2clDependency implements Comparable<J2clDependency> {
         this.annotationClassFiles = annotationClassFiles;
         this.annotationProcessor = annotationProcessor;
 
-        this.classpathRequiredFile = classpathRequired;
+        this.classpathRequiredFile = classpathRequiredFile;
 
         this.javascriptBootstrapFiles = javascriptBootstrapFiles;
         this.javascriptFiles = javascriptFiles;
+
+        this.javascriptSourceRequiredFile = javascriptSourceRequiredFile;
 
         this.jreBootstrapClassFiles = jreBootstrapClassFiles;
         this.jreClassFiles = jreClassFiles;
@@ -556,6 +572,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private final static String JAVA_CLASSFILE = "/java/lang/Class.class";
     private final static String JAVASCRIPT_BOOTSTRAP = "/closure/goog/base.js";
     private final static String JAVASCRIPT_FILE = "/java/lang/Class.java.js";
+    private final static String JAVASCRIPT_SOURCE_REQUIRED = "/" + J2clPath.FILE_PREFIX + "-javascript-source-required.txt";
     private final static String META_INF = "/META-INF/";
     private final static String META_INF_SERVICES_PROCESSOR = META_INF + "services/" + javax.annotation.processing.Processor.class.getName();
 
