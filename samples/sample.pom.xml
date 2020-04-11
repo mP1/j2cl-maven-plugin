@@ -145,7 +145,10 @@
                                 <param>group-id-1:artifact-id-2:version-3</param>
                             </classpath-required>
                             <ignored-dependencies/>
-                            <javascript-source-required/>
+                            <javascript-source-required>
+                                <param>group-id-1:artifact-id-2:*</param>
+                                <param>group-id-1:artifact-id-2:version-3</param>
+                            </javascript-source-required>
                             <replaced-dependencies/>
                         </configuration>
                     </execution>

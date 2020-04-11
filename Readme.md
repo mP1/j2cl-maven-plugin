@@ -510,14 +510,18 @@ cost of longer build times.
 
 
 
-# Classpath required file(s)
+# Special files
+
+
+
+## Classpath required file(s)
 
 A dependency archive with a `.walkingkooka-j2cl-maven-plugin-classpath-required.txt` file in its root is equivalent to
 adding an `classpath-required` entry to the plugin pom.
 
 
 
-# Ignored file(s)
+## Ignored file(s)
 
 A facility that is almost identical to `.gitignore` files is also supported and honoured when source files are processed.
 If a `.walkingkooka-j2cl-maven-plugin-ignored-files.txt` is present in a source directory all patterns within it are honoured
@@ -530,6 +534,13 @@ without the leading `glob:` prefix.
 - Lines beginning with HASH are considered to be comments and are ignored.
 - All other lines are used to build a glob pattern, using the java snippet directly below
 - No support is provided for escaping of any sort.
+
+
+
+## Javascript source required file(s)
+
+A dependency archive with a `.walkingkooka-j2cl-maven-plugin-javascript-source-required.txt` file in its root is equivalent to
+adding an `javascript-source-required` entry to the plugin pom.
 
 
 

@@ -1,0 +1,3 @@
+#
+# This file must appear in the root of the built archive. The content is unimportant and ignored.
+#
