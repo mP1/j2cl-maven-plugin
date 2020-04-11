@@ -246,9 +246,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Returns the classpath and dependencies in order without any duplicates.
      */
     Set<J2clDependency> classpathAndDependencies() {
-        return Sets.readOnly(Stream.concat(this.discoveredBootstrapAndJre(),
-                    Stream.concat(this.request().classpathRequired().stream(),
-                        this.dependencies().stream()))
+        return Sets.readOnly(Stream.concat(this.discoveredBootstrapAndJre(), Stream.of(this))
+                .flatMap(d -> Stream.concat(Stream.of(d), d.dependencies().stream()))
                 .filter(this::isDifferent)
                 .filter(J2clDependency::isClasspathRequired)
                 .collect(Collectors.toCollection(Sets::ordered)));
@@ -257,7 +256,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private Stream<J2clDependency> discoveredBootstrapAndJre() {
         return COORD_TO_DEPENDENCY.values()
                 .stream()
-                .filter(J2clDependency::isAnnotationsBootstrapOrJreClassFiles);
+                .filter(J2clDependency::isAnnotationsBootstrapOrJreClassFiles)
+                .flatMap(d -> Stream.concat(Stream.of(d), d.dependencies().stream()));
     }
 
     private boolean isDifferent(final J2clDependency other) {
