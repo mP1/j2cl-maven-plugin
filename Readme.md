@@ -294,12 +294,6 @@ The snippet below is a good starting point and forcibly includes a few minimally
 ```
 
 - Maven coordinates may have a wildcard in the version.
-<<<<<<< HEAD
-- Archives with only annotation class files.
-- Archives with annotation processors.
-- Archives with JRE classes (including bootstrap).
-- Archives with `.walkingkooka-j2cl-maven-plugin-classpath-required.txt` do not require an entry.
-=======
 
 
 
@@ -308,8 +302,9 @@ Archives with the following conditions will automatically marked as equivalent t
 - Annotation processors.
 - JRE classes (including bootstrap).
 - Only annotation class files.
+- If the file `.walkingkooka-j2cl-maven-plugin-classpath-required.txt` is present.
 
->>>>>>> 2a3656400e038423e675db9a77a13597979964f6
+
 
 
 ## classpath-scope
