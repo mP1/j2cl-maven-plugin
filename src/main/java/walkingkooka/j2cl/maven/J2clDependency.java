@@ -287,6 +287,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     boolean isClasspathRequired() {
         if (null == this.classpathRequired) {
+            this.testArchive();
+
             final J2clRequest request = this.request();
             final J2clArtifactCoords coords = this.coords();
 
