@@ -29,7 +29,6 @@ import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.text.CharSequences;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.URI;
@@ -556,9 +555,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private final static String JAVASCRIPT_BOOTSTRAP = "/closure/goog/base.js";
     private final static String JAVASCRIPT_FILE = "/java/lang/Class.java.js";
     private final static String META_INF = "/META-INF/";
-    private final static String META_INF_SERVICES_PROCESSOR = META_INF + "services/"
-            .concat(javax.annotation.processing.Processor.class.getName())
-            .replace('/', File.separatorChar);
+    private final static String META_INF_SERVICES_PROCESSOR = META_INF + "services/" + javax.annotation.processing.Processor.class.getName();
 
     /**
      * Returns true if the class file is an annotation type by checking that it implements Annotation.
