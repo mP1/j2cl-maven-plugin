@@ -291,8 +291,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
             final J2clRequest request = this.request();
             final J2clArtifactCoords coords = this.coords();
 
-            this.classpathRequired = request.isClasspathRequired(coords) ||
-                    false == request.isJavascriptSourceRequired(coords) ||
+            this.classpathRequired = (this.classpathRequiredFile || request.isClasspathRequired(coords) || false == request.isJavascriptSourceRequired(coords)) ||
                     this.isAnnotationClassFiles() ||
                     this.isAnnotationProcessor() ||
                     this.isJreBootstrapClassFiles() ||
@@ -302,20 +301,22 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private Boolean classpathRequired;
+    private boolean classpathRequiredFile;
 
     /**
-     * Only returns true for the JRE binary artifact
+     * Returns true for artifacts that only contain javascript.
      */
     boolean isJavascriptSourceRequired() {
         final J2clRequest request = this.request();
         final J2clArtifactCoords coords = this.coords();
-        return (request.isJavascriptSourceRequired(coords) || false == request.isClasspathRequired(coords)) &&
-            false == this.isAnnotationClassFiles() &&
-            false == this.isAnnotationProcessor() &&
-            this.isJavascriptBootstrapFiles() ||
-            this.isJavascriptFiles() ||
-            false == this.isJreBootstrapClassFiles() &&
-            false == this.isJreClassFiles();
+
+        return (request.isJavascriptSourceRequired(coords) || false == (this.classpathRequiredFile || request.isClasspathRequired(coords))) &&
+                false == this.isAnnotationClassFiles() &&
+                false == this.isAnnotationProcessor() &&
+                this.isJavascriptBootstrapFiles() ||
+                this.isJavascriptFiles() ||
+                false == this.isJreBootstrapClassFiles() &&
+                        false == this.isJreClassFiles();
     }
 
     /**
@@ -459,8 +460,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     private synchronized void testArchive() {
         final boolean annotationClassFiles;
-
         final boolean annotationProcessor;
+        final boolean classpathRequired;
         final boolean javascriptBootstrapFiles;
         final boolean javascriptFiles;
         final boolean jreBootstrapClassFiles;
@@ -470,6 +471,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
         if (null != file) {
             try (final FileSystem zip = FileSystems.newFileSystem(URI.create("jar:" + file.file().toURI()), Collections.emptyMap())) {
                 annotationProcessor = Files.exists(zip.getPath(META_INF_SERVICES_PROCESSOR));
+
+                classpathRequired = Files.exists(zip.getPath(CLASSFILE_REQUIRED));
 
                 javascriptBootstrapFiles = Files.exists(zip.getPath(JAVASCRIPT_BOOTSTRAP));
                 javascriptFiles = Files.exists(zip.getPath(JAVASCRIPT_FILE));
@@ -526,6 +529,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
             annotationClassFiles = false;
             annotationProcessor = false;
 
+            classpathRequired = false;
+
             javascriptBootstrapFiles = false;
             javascriptFiles = false;
 
@@ -536,6 +541,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
         this.annotationClassFiles = annotationClassFiles;
         this.annotationProcessor = annotationProcessor;
 
+        this.classpathRequiredFile = classpathRequired;
+
         this.javascriptBootstrapFiles = javascriptBootstrapFiles;
         this.javascriptFiles = javascriptFiles;
 
@@ -543,6 +550,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
         this.jreClassFiles = jreClassFiles;
     }
 
+    private final static String CLASSFILE_REQUIRED = "/" + J2clPath.FILE_PREFIX + "-classpath-required.txt";
     private final static String JAVA_BOOTSTRAP_CLASSFILE = "/java/lang/invoke/MethodType.class";
     private final static String JAVA_CLASSFILE = "/java/lang/Class.class";
     private final static String JAVASCRIPT_BOOTSTRAP = "/closure/goog/base.js";

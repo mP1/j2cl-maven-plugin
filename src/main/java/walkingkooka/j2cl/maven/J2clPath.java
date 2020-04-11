@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
  */
 final class J2clPath implements Comparable<J2clPath> {
 
-    private static final String FILE_PREFIX = ".walkingkooka-j2cl-maven-plugin";
+    static final String FILE_PREFIX = ".walkingkooka-j2cl-maven-plugin";
 
     static final BiPredicate<Path, BasicFileAttributes> CLASS_FILES = fileEndsWith(".class");
     static final BiPredicate<Path, BasicFileAttributes> JAVA_FILES = fileEndsWith(".java");
