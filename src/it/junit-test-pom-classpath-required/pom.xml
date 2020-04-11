@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>walkingkooka</groupId>
-    <artifactId>j2cl-maven-plugin-it-junit-test</artifactId>
+    <artifactId>j2cl-maven-plugin-it-junit-test-pom-classpath-required</artifactId>
     <version>1.0</version>
 
     <licenses>
@@ -127,7 +127,7 @@
                 <version>@project.version@</version>
                 <executions>
                     <execution>
-                        <id>j2cl-maven-plugin-it-junit-test</id>
+                        <id>j2cl-maven-plugin-it-junit-test-pom-classpath-required</id>
                         <phase>test</phase>
                         <goals>
                             <goal>test</goal>
