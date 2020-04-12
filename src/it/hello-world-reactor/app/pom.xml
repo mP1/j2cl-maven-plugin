@@ -85,7 +85,6 @@
                             <language-out>ECMASCRIPT_2016</language-out>
                             <thread-pool-size>0</thread-pool-size>
 
-                            <added-dependencies/>
                             <classpath-required/>
                             <ignored-dependencies/>
                             <javascript-source-required/>

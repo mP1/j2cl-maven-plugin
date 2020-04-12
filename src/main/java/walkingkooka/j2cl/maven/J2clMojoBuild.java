@@ -56,7 +56,6 @@ public final class J2clMojoBuild extends J2clMojoBuildTest {
         return J2clMojoBuildRequest.with(this.cache(),
                 this.output(),
                 this.classpathScope(),
-                this.addedDependencies(),
                 this.classpathRequired(),
                 this.ignoredDependencies(),
                 this.javascriptSourceRequired(),

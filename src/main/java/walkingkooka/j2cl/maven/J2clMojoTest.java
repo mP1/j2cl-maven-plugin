@@ -100,7 +100,6 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
         return J2clMojoTestRequest.with(this.cache(),
                 this.output(),
                 this.classpathScope(),
-                this.addedDependencies(),
                 this.classpathRequired(),
                 this.ignoredDependencies(),
                 this.javascriptSourceRequired(),

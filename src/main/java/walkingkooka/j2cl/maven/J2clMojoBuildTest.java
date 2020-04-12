@@ -133,36 +133,6 @@ abstract class J2clMojoBuildTest extends J2clMojo {
         return J2clDependency.gather(this.project(), request);
     }
 
-    // autoAddedDependencies.............................................................................................
-
-    final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies() {
-        final Map<J2clArtifactCoords, List<J2clArtifactCoords>> lookup = Maps.sorted();
-
-        for (final String mapping : this.addedDependencies) {
-            final int equalsSign = mapping.indexOf('=');
-            if (-1 == equalsSign) {
-                throw new IllegalArgumentException("Replacement dependency missing '=' in " + CharSequences.quoteAndEscape(mapping));
-            }
-
-            final String autoAdded = mapping.substring(equalsSign + 1);
-
-            lookup.put(J2clArtifactCoords.parse(mapping.substring(0, equalsSign)), Arrays.stream(autoAdded.split(","))
-                    .map(String::trim)
-                    .map(J2clArtifactCoords::parse)
-                    .collect(Collectors.toList())
-            );
-        }
-
-        return Maps.readOnly(lookup);
-    }
-
-    /**
-     * A {@link List} of parent artifact to a comma separated list of dependencies to auto add, with the former separated
-     * from the later by an equals sign.
-     */
-    @Parameter(alias = "added-dependencies", required = true)
-    private List<String> addedDependencies = Lists.array();
-
     // replacedDependencies.............................................................................................
 
     final Map<J2clArtifactCoords, J2clArtifactCoords> replacedDependencies() {

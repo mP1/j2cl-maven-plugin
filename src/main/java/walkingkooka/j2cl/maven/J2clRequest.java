@@ -52,7 +52,6 @@ abstract class J2clRequest {
     J2clRequest(final J2clPath base,
                         final J2clPath target,
                         final J2clClasspathScope scope,
-                        final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies,
                         final List<J2clArtifactCoords> classpathRequired,
                         final List<J2clArtifactCoords> ignoredDependencies,
                         final List<J2clArtifactCoords> javascriptSourceRequired,
@@ -71,7 +70,6 @@ abstract class J2clRequest {
         this.target = target;
         this.scope = scope;
 
-        this.addedDependencies = addedDependencies;
         this.classpathRequired = classpathRequired;
         this.ignoredDependencies = ignoredDependencies;
         this.javascriptSourceRequired = javascriptSourceRequired;
@@ -123,19 +121,6 @@ abstract class J2clRequest {
     final J2clPath target;
 
     // dependencies.....................................................................................................
-
-    /**
-     * Get all dependencies added via the added-dependencies maven plugin parameter
-     * or an empty list.
-     */
-    final List<J2clArtifactCoords> addedDependencies(final J2clArtifactCoords coords) {
-        return this.addedDependencies.getOrDefault(coords, Lists.empty());
-    }
-
-    /**
-     * Added to each discovered dependency as they are discovered.
-     */
-    private final Map<J2clArtifactCoords, List<J2clArtifactCoords>> addedDependencies;
 
     final List<J2clDependency> classpathRequired() {
         return this.classpathRequired.stream()
@@ -260,10 +245,6 @@ abstract class J2clRequest {
                 .append(this.level.toString());
         hash.append(this.sourcesKind().name());
 
-        this.addedDependencies.forEach((k, v) -> {
-            hash.append(k.toString());
-            v.forEach(a -> hash.append(a.toString()));
-        });
         hash.append(this.classpathRequired.toString());
         hash.append(this.ignoredDependencies.toString());
         hash.append(this.javascriptSourceRequired.toString());

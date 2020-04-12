@@ -139,7 +139,6 @@
                             <language-out>ECMASCRIPT_2016</language-out>
                             <thread-pool-size>0</thread-pool-size>
 
-                            <added-dependencies/>
                             <classpath-required>
                                 <param>group-id-1:artifact-id-2:*</param>
                                 <param>group-id-1:artifact-id-2:version-3</param>
