@@ -96,7 +96,6 @@
                             <language-out>ECMASCRIPT_2016</language-out>
                             <thread-pool-size>1</thread-pool-size>
 
-                            <added-dependencies/>
                             <classpath-required>
                                 <param>walkingkooka:j2cl-maven-plugin-it-junit-test-pom-javascript-source-required-dependency:*</param>
                             </classpath-required>

@@ -132,7 +132,6 @@ final class J2clDependency implements Comparable<J2clDependency> {
         }
 
         this.gatherDeclaredDependencies();
-        this.addAddedDependencies();
     }
 
     private void gatherDeclaredDependencies() {
@@ -154,17 +153,6 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     private static boolean isSystemScope(final Artifact artifact) {
         return Artifact.SCOPE_SYSTEM.equals(artifact.getScope());
-    }
-
-    private void addAddedDependencies() {
-        final J2clRequest request = this.request();
-
-        for (final J2clArtifactCoords added : request.addedDependencies(this.coords())) {
-            if (false == this.dependencyCoords.contains(added)) {
-                this.getOrCreate(added);
-                this.dependencyCoords.add(added);
-            }
-        }
     }
 
     private J2clDependency getOrCreate(final J2clArtifactCoords coords) {

@@ -202,7 +202,6 @@ Plugin definition
                 <language-out>ECMASCRIPT_2016</language-out>
                 <thread-pool-size>0</thread-pool-size>
 
-                <added-dependencies/>
                 <classpath-required>
                     <param>group-id-1:artifact-id-2:*</param>
                     <param>group-id-1:artifact-id-2:version-3</param>
@@ -246,21 +245,6 @@ application and unit tests.
 
 Many parameters are actually used to tweak and configure the Closure compiler. Refer to the Closure documentation for
 more information.
-
-
-
-## added-dependencies
-A list of artifacts (full maven coords) followed by a comma separated list of artifacts that will become dependencies of
- the former. This is necessary as several J2CL specific artifacts such as those in the example below are referenced
- and required in the special JRE, but not declared as actual `<dependency>` in their `pom.xml`.
-
-```xml
-<added-dependencies>
-    <param>com.vertispan.jsinterop:base:*-SNAPSHOT=com.vertispan.j2cl:gwt-internal-annotations:0.4-SNAPSHOT</param>
-</added-dependencies>
-```
-
-Maven coordinates on the left side of each entry may have a wildcard in the version.
 
 
 
