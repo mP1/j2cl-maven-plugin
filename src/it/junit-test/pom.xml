@@ -162,9 +162,7 @@
 
                             <added-dependencies/>
                             <classpath-required/>
-                            <ignored-dependencies>
-                                <param>walkingkooka:j2cl-junit-java:*</param>
-                            </ignored-dependencies>
+                            <ignored-dependencies/>
                             <javascript-source-required/>
                             <replaced-dependencies>
                                 <param>com.google.jsinterop:base:*=walkingkooka:jsinterop-base:1.0-SNAPSHOT</param>

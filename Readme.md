@@ -391,8 +391,7 @@ Archives with the following conditions will automatically marked as equivalent t
 - Dependency where `classifier=sources` pairs another dependency.
 - JRE classes & javascript (including bootstrap).
 - Only annotation class files.
-
-
+- If the file `.walkingkooka-j2cl-maven-plugin-ignored-dependency.txt` is present.
 
 ## initial-script-filename (build)
 
@@ -518,6 +517,13 @@ cost of longer build times.
 
 A dependency archive with a `.walkingkooka-j2cl-maven-plugin-classpath-required.txt` file in its root is equivalent to
 adding an `classpath-required` entry to the plugin pom.
+
+
+
+## Ignored dependency file(s)
+
+A dependency archive with a `.walkingkooka-j2cl-maven-plugin-ignored-dependency.txt` file in its root is equivalent to
+adding an `ignored-dependency` entry to the plugin pom.
 
 
 

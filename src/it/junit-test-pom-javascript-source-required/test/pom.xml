@@ -100,9 +100,7 @@
                             <classpath-required>
                                 <param>walkingkooka:j2cl-maven-plugin-it-junit-test-pom-javascript-source-required-dependency:*</param>
                             </classpath-required>
-                            <ignored-dependencies>
-                                <param>walkingkooka:j2cl-junit-java:*</param>
-                            </ignored-dependencies>
+                            <ignored-dependencies/>
                             <javascript-source-required>
                                 <param>walkingkooka:j2cl-maven-plugin-it-junit-test-pom-javascript-source-required-dependency:*</param>
                             </javascript-source-required>
