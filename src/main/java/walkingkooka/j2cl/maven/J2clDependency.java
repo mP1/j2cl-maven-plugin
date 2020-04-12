@@ -335,7 +335,9 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     boolean isIgnored() {
         if (null == this.ignored) {
-            this.ignored = this.request().isIgnored(this.coords) ||
+            this.testArchive();
+
+            this.ignored = this.ignoredFile || this.request().isIgnored(this.coords) ||
                     this.isAnnotationClassFiles() ||
                     this.isAnnotationProcessor() ||
                     this.isJavascriptBootstrapFiles() ||
@@ -347,6 +349,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private Boolean ignored;
+    private Boolean ignoredFile;
 
     // isAnnotationClassFiles...........................................................................................
 
@@ -472,6 +475,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
         final boolean annotationClassFiles;
         final boolean annotationProcessor;
         final boolean classpathRequiredFile;
+        final boolean ignoredFile;
         final boolean javascriptBootstrapFiles;
         final boolean javascriptFiles;
         final boolean javascriptSourceRequiredFile;
@@ -484,6 +488,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
                 annotationProcessor = Files.exists(zip.getPath(META_INF_SERVICES_PROCESSOR));
 
                 classpathRequiredFile = Files.exists(zip.getPath(CLASSFILE_REQUIRED));
+
+                ignoredFile = Files.exists(zip.getPath(IGNORED_DEPENDENCY));
 
                 javascriptBootstrapFiles = Files.exists(zip.getPath(JAVASCRIPT_BOOTSTRAP));
                 javascriptFiles = Files.exists(zip.getPath(JAVASCRIPT_FILE));
@@ -544,6 +550,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
             classpathRequiredFile = false;
 
+            ignoredFile = false;
+
             javascriptBootstrapFiles = false;
             javascriptFiles = false;
 
@@ -558,6 +566,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
         this.classpathRequiredFile = classpathRequiredFile;
 
+        this.ignoredFile = ignoredFile;
+
         this.javascriptBootstrapFiles = javascriptBootstrapFiles;
         this.javascriptFiles = javascriptFiles;
 
@@ -568,6 +578,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private final static String CLASSFILE_REQUIRED = "/" + J2clPath.FILE_PREFIX + "-classpath-required.txt";
+    private final static String IGNORED_DEPENDENCY = "/" + J2clPath.FILE_PREFIX + "-ignored-dependency.txt";
     private final static String JAVA_BOOTSTRAP_CLASSFILE = "/java/lang/invoke/MethodType.class";
     private final static String JAVA_CLASSFILE = "/java/lang/Class.class";
     private final static String JAVASCRIPT_BOOTSTRAP = "/closure/goog/base.js";

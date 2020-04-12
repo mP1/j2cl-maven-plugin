@@ -8,6 +8,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <name>GWT Timer J2CL Tests</name>
+    <description>Also tests the &lt;ignored-dependency%gt;</description>
     <url>https://github.com/gwtproject/gwt-timer</url>
 
     <organization>
@@ -190,7 +191,6 @@
                             <classpath-required/>
                             <ignored-dependencies>
                                 <param>com.google.elemental2:elemental2-dom:jar:sources:*</param>
-                                <param>walkingkooka:j2cl-junit-java:*</param>
                             </ignored-dependencies>
                             <javascript-source-required/>
                             <replaced-dependencies>
