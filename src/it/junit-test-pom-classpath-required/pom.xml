@@ -149,7 +149,7 @@
                             <externs/>
                             <formatting/>
                             <language-out>ECMASCRIPT_2016</language-out>
-                            <thread-pool-size>1</thread-pool-size>
+                            <thread-pool-size>0</thread-pool-size>
 
                             <classpath-required/>
                             <ignored-dependencies/>
