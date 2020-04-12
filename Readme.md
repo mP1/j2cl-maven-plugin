@@ -537,20 +537,13 @@ without the leading `glob:` prefix.
 
 
 
-## Javascript source required file(s)
-
-A dependency archive with a `.walkingkooka-j2cl-maven-plugin-javascript-source-required.txt` file in its root is equivalent to
-adding an `javascript-source-required` entry to the plugin pom.
-
-
-
-## Processing
+### Processing
 
 Files are ignored before the Google preprocessor attempts to remove classes and class members are annotated with `@Gwt-Incompatible`.
 
 
 
-## Sample walkingkooka-j2cl-maven-plugin-ignore.txt
+### Sample walkingkooka-j2cl-maven-plugin-ignored-files.txt
 
 ```text
 # This is a comment and ignored. The two blank lines are also ignored.
@@ -560,6 +553,15 @@ Files are ignored before the Google preprocessor attempts to remove classes and 
 IgnoredFile1.*
 sub2/IgnoredFile2.*
 ``` 
+
+
+
+## Javascript source required file(s)
+
+A dependency archive with a `.walkingkooka-j2cl-maven-plugin-javascript-source-required.txt` file in its root is equivalent to
+adding an `javascript-source-required` entry to the plugin pom.
+
+
 
 
 # Shade file(s)
