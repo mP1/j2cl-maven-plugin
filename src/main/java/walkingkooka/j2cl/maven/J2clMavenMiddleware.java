@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
@@ -31,12 +32,17 @@ import java.util.Optional;
 public interface J2clMavenMiddleware {
 
     static J2clMavenMiddleware of(final MavenSession mavenSession,
-                                  final RepositorySystem repositorySystem,
-                                  final RepositorySystemSession repositorySession,
-                                  final List<RemoteRepository> repositories,
                                   final ProjectBuilder projectBuilder,
-                                  final MavenProject project) {
-        return J2clMavenMiddlewareImpl.with(mavenSession, repositorySystem, repositorySession, repositories, projectBuilder, project);
+                                  final List<ArtifactRepository> remoteArtifactRepositories,
+                                  final List<RemoteRepository> remoteRepositories,
+                                  final RepositorySystemSession repositorySession,
+                                  final RepositorySystem repositorySystem) {
+        return J2clMavenMiddlewareImpl.with(mavenSession,
+                projectBuilder,
+                remoteArtifactRepositories,
+                remoteRepositories,
+                repositorySession,
+                repositorySystem);
     }
 
     /**

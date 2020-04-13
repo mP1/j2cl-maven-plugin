@@ -34,7 +34,6 @@ import walkingkooka.text.CharSequences;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -283,12 +282,11 @@ abstract class J2clMojoBuildTest extends J2clMojo {
     final J2clMavenMiddleware mavenMiddleware() {
         if (null == this.mavenMiddleware) {
             this.mavenMiddleware = J2clMavenMiddleware.of(this.mavenSession,
-                    this.repositorySystem,
-                    this.repositorySession,
-                    this.repositories,
                     this.projectBuilder,
-                    this.project);
-
+                    this.project.getRemoteArtifactRepositories(),
+                    this.repositories,
+                    this.repositorySession,
+                    this.repositorySystem);
         }
         return this.mavenMiddleware;
     }
