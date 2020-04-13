@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
@@ -38,26 +39,31 @@ import java.util.Optional;
 final class J2clMavenMiddlewareImpl implements J2clMavenMiddleware {
 
     static J2clMavenMiddleware with(final MavenSession mavenSession,
-                                    final RepositorySystem repositorySystem,
-                                    final RepositorySystemSession repositorySession,
-                                    final List<RemoteRepository> repositories,
                                     final ProjectBuilder projectBuilder,
-                                    final MavenProject project) {
-        return new J2clMavenMiddlewareImpl(mavenSession, repositorySystem, repositorySession, repositories, projectBuilder, project);
+                                    final List<ArtifactRepository> remoteArtifactRepositories,
+                                    final List<RemoteRepository> remoteRepositories,
+                                    final RepositorySystemSession repositorySession,
+                                    final RepositorySystem repositorySystem) {
+        return new J2clMavenMiddlewareImpl(mavenSession,
+                projectBuilder,
+                remoteArtifactRepositories,
+                remoteRepositories,
+                repositorySession,
+                repositorySystem);
     }
 
     private J2clMavenMiddlewareImpl(final MavenSession mavenSession,
-                                    final RepositorySystem repositorySystem,
-                                    final RepositorySystemSession repositorySession,
-                                    final List<RemoteRepository> remoteRepositories,
                                     final ProjectBuilder projectBuilder,
-                                    final MavenProject project) {
+                                    final List<ArtifactRepository> remoteArtifactRepositories,
+                                    final List<RemoteRepository> remoteRepositories,
+                                    final RepositorySystemSession repositorySession,
+                                    final RepositorySystem repositorySystem) {
         this.mavenSession = mavenSession;
-        this.repositorySystem = repositorySystem;
-        this.repositorySession = repositorySession;
-        this.remoteRepositories = remoteRepositories;
         this.projectBuilder = projectBuilder;
-        this.project = project;
+        this.remoteArtifactRepositories = remoteArtifactRepositories;
+        this.remoteRepositories = remoteRepositories;
+        this.repositorySession = repositorySession;
+        this.repositorySystem = repositorySystem;
     }
 
     @Override
@@ -65,7 +71,7 @@ final class J2clMavenMiddlewareImpl implements J2clMavenMiddleware {
         final ProjectBuildingRequest request = new DefaultProjectBuildingRequest(this.mavenSession.getProjectBuildingRequest());
         request.setProject(null);
         request.setResolveDependencies(true);
-        request.setRemoteRepositories(this.project.getRemoteArtifactRepositories());
+        request.setRemoteRepositories(this.remoteArtifactRepositories);
 
         try {
             return this.projectBuilder.build(artifact, false, request)
@@ -92,9 +98,9 @@ final class J2clMavenMiddlewareImpl implements J2clMavenMiddleware {
     }
 
     private final MavenSession mavenSession;
-    private final RepositorySystem repositorySystem;
-    private final RepositorySystemSession repositorySession;
-    private final List<RemoteRepository> remoteRepositories;
     private final ProjectBuilder projectBuilder;
-    private final MavenProject project;
+    private final List<ArtifactRepository> remoteArtifactRepositories;
+    private final List<RemoteRepository> remoteRepositories;
+    private final RepositorySystemSession repositorySession;
+    private final RepositorySystem repositorySystem;
 }
