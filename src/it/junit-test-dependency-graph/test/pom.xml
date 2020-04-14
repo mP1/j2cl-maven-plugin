@@ -106,6 +106,7 @@
                             <classpath-required/>
                             <ignored-dependencies>
                                 <param>walkingkooka:j2cl-maven-plugin-it-junit-test-dependency-graph-excluded:*</param>
+                                <param>walkingkooka:j2cl-maven-plugin-it-junit-test-dependency-graph-excluded2:*</param>
                             </ignored-dependencies>
                             <javascript-source-required/>
                             <replaced-dependencies>
