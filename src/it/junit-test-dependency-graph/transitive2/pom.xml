@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>walkingkooka</groupId>
-    <artifactId>j2cl-maven-plugin-it-junit-test-dependency-graph-dependency</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>j2cl-maven-plugin-it-junit-test-dependency-graph-transitive</artifactId>
+    <version>2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -21,43 +21,7 @@
             <artifactId>j2cl-uber</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-
-        <dependency>
-            <groupId>walkingkooka</groupId>
-            <artifactId>j2cl-maven-plugin-it-junit-test-dependency-graph-excluded</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        
-        <!-- will be ignored by dependencyManagement entry below -->
-        <dependency>
-            <groupId>walkingkooka</groupId>
-            <artifactId>j2cl-maven-plugin-it-junit-test-dependency-graph-transitive</artifactId>
-            <version>2.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>walkingkooka</groupId>
-            <artifactId>j2cl-maven-plugin-it-junit-test-dependency-graph-transitive</artifactId>
-            <version>1.0-SNAPSHOT</version>
-
-            <exclusions>
-                <exclusion>
-                    <groupId>walkingkooka</groupId>
-                    <artifactId>j2cl-maven-plugin-it-junit-test-dependency-graph-excluded2</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
     </dependencies>
-    
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>walkingkooka</groupId>
-                <artifactId>j2cl-maven-plugin-it-junit-test-dependency-graph-transitive</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <build>
         <plugins>
