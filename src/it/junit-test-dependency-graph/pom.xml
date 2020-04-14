@@ -10,6 +10,7 @@
     <modules>
         <module>excluded2</module>
         <module>transitive</module>
+        <module>transitive2</module>
         <module>excluded</module>
         <module>dependency</module>
         <module>test</module>
