@@ -55,11 +55,7 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
 
                 final J2clStep compiledStep = this.compiledStep();
 
-                for (final J2clDependency dependency : artifact.classpathAndDependencies()) {
-                    if (dependency.dependencies().contains(artifact)) {
-                        continue; // dont add a classpath required that is a parent of this artifact.
-                    }
-
+                for (final J2clDependency dependency : artifact.dependencies()) {
                     if (dependency.isJreBootstrapClassFiles()) {
                         bootstrap.add(dependency.artifactFileOrFail());
                         continue;
@@ -79,8 +75,6 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
                 if (classpath.isEmpty()) {
                     result = J2clStepResult.SKIPPED; // project could have no source files.
                 } else {
-
-
                     result = JavacCompiler.execute(bootstrap,
                             classpath,
                             javaSourceFiles,

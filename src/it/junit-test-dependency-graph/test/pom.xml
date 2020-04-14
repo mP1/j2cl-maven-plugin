@@ -104,15 +104,9 @@
                             <thread-pool-size>0</thread-pool-size>
 
                             <classpath-required/>
-                            <ignored-dependencies>
-                                <param>walkingkooka:j2cl-maven-plugin-it-junit-test-dependency-graph-excluded:*</param>
-                                <param>walkingkooka:j2cl-maven-plugin-it-junit-test-dependency-graph-excluded2:*</param>
-                            </ignored-dependencies>
+                            <ignored-dependencies/>
                             <javascript-source-required/>
-                            <replaced-dependencies>
-                                <param>com.google.jsinterop:base:*=walkingkooka:jsinterop-base:1.0-SNAPSHOT</param>
-                                <param>com.google.jsinterop:jsinterop-annotations:*=com.google.jsinterop:jsinterop-annotations:2.0.0</param>
-                            </replaced-dependencies>
+
                             <skip-tests>false</skip-tests>
                             <tests>
                                 <test>test.JunitTest</test>

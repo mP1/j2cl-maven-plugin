@@ -22,13 +22,11 @@ import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
-import walkingkooka.text.CharSequences;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.Callable;
@@ -55,7 +53,6 @@ abstract class J2clRequest {
                         final List<J2clArtifactCoords> classpathRequired,
                         final List<J2clArtifactCoords> ignoredDependencies,
                         final List<J2clArtifactCoords> javascriptSourceRequired,
-                        final Map<J2clArtifactCoords, J2clArtifactCoords> replaced,
                         final CompilationLevel level,
                         final Map<String, String> defines,
                         final Set<String> externs,
@@ -73,7 +70,6 @@ abstract class J2clRequest {
         this.classpathRequired = classpathRequired;
         this.ignoredDependencies = ignoredDependencies;
         this.javascriptSourceRequired = javascriptSourceRequired;
-        this.replaced = replaced;
 
         this.level = level;
         this.defines = defines;
@@ -122,12 +118,6 @@ abstract class J2clRequest {
 
     // dependencies.....................................................................................................
 
-    final List<J2clDependency> classpathRequired() {
-        return this.classpathRequired.stream()
-                .map(this::dependencyOrFail)
-                .collect(Collectors.toList());
-    }
-
     final boolean isClasspathRequired(final J2clArtifactCoords coords) {
         return this.classpathRequired.contains(coords);
     }
@@ -145,32 +135,6 @@ abstract class J2clRequest {
     }
 
     private final List<J2clArtifactCoords> javascriptSourceRequired;
-
-    /**
-     * Gets the dependency for the given coords honouring any defined replacements.
-     */
-    final Optional<J2clDependency> dependency(final J2clArtifactCoords coords) {
-        return J2clDependency.get(this.coords(coords).orElse(coords));
-    }
-
-    /**
-     * Gets the dependency for the given coords honouring any defined replacements.
-     */
-    final J2clDependency dependencyOrFail(final J2clArtifactCoords coords) {
-        return this.dependency(coords)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown coords " + CharSequences.quote(coords.toString()) + "\n" + J2clDependency.COORD_TO_DEPENDENCY.keySet() + "\n" + J2clDependency.COORD_TO_DEPENDENCY));
-    }
-
-    // replacements........................................................................................................
-
-    /**
-     * Accepts the given coords and returns a replacement coords if one has been defined.
-     */
-    final Optional<J2clArtifactCoords> coords(final J2clArtifactCoords coords) {
-        return Optional.ofNullable(this.replaced.get(coords));
-    }
-
-    private final Map<J2clArtifactCoords, J2clArtifactCoords> replaced;
 
     // java.............................................................................................................
 
@@ -248,10 +212,6 @@ abstract class J2clRequest {
         hash.append(this.classpathRequired.toString());
         hash.append(this.ignoredDependencies.toString());
         hash.append(this.javascriptSourceRequired.toString());
-        this.replaced.forEach((k, v) -> {
-            hash.append(k.toString());
-            hash.append(v.toString());
-        });
 
         this.defines.forEach((k, v) -> hash.append(k).append(v));
         this.externs.forEach(hash::append);
@@ -292,18 +252,20 @@ abstract class J2clRequest {
         this.await();
     }
 
-    final void verifyArtifactCoords() {
-        J2clDependency.verifyWithoutConflictsOrDuplicates();
-        this.verify(this.classpathRequired, "classpath-required");
-        this.verify(this.javascriptSourceRequired, "javascript-required");
-        this.verify(this.ignoredDependencies, "ignoredDependencies");
+    final void verifyArtifactCoords(final Set<J2clArtifactCoords> all) {
+        verify(this.classpathRequired, "classpath-required", all);
+        verify(this.javascriptSourceRequired, "javascript-required", all);
+        verify(this.ignoredDependencies, "ignoredDependencies", all);
     }
 
-    private void verify(final Collection<J2clArtifactCoords> dependencies,
-                        final String label) {
-        final Collection<J2clArtifactCoords> unknown = dependencies.stream()
-                .filter(d -> false == J2clDependency.get(d).isPresent())
+
+    private static void verify(final Collection<J2clArtifactCoords> filtered,
+                        final String label,
+                        final Set<J2clArtifactCoords> all) {
+        final Collection<J2clArtifactCoords> unknown = filtered.stream()
+                .filter(c -> false == all.contains(c))
                 .collect(Collectors.toList());
+
         if (false == unknown.isEmpty()) {
             throw new IllegalArgumentException("Unknown " + label + " dependencies: " + join(unknown));
         }
@@ -496,7 +458,6 @@ abstract class J2clRequest {
                 this.classpathRequired + " " +
                 this.ignoredDependencies + " " +
                 this.javascriptSourceRequired + " " +
-                this.replaced + " " +
                 this.scope + " " +
                 this.defines + " " +
                 this.entryPoints() + " " +

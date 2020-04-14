@@ -40,7 +40,7 @@ final class J2clDependencyGraphCalculator {
         super();
         this.flat = Maps.sorted();
         flat.forEach((k, v) -> {
-            final Set<J2clArtifactCoords> values = Sets.sorted();
+            final Set<J2clArtifactCoords> values = J2clArtifactCoords.set();
 
             final String wildcard = v.stream()
                     .filter(J2clArtifactCoords::isWildcardVersion)
@@ -76,7 +76,7 @@ final class J2clDependencyGraphCalculator {
 
     private void addRequiredToLeaves() {
         for(final J2clArtifactCoords leaf : this.leaves) {
-            Set<J2clArtifactCoords> children = Sets.sorted();
+            Set<J2clArtifactCoords> children = J2clArtifactCoords.set();
 
             for(final J2clArtifactCoords required : this.required) {
                 if(required.equals(leaf)) {
@@ -102,7 +102,7 @@ final class J2clDependencyGraphCalculator {
             if (children.isEmpty()) {
                 this.leaves.add(parent);
             } else {
-                final Set<J2clArtifactCoords> collected = Sets.sorted();
+                final Set<J2clArtifactCoords> collected = J2clArtifactCoords.set();
                 this.collectTransitives(parent, children, collected);
                 this.tree.put(parent, collected);
             }
@@ -131,7 +131,7 @@ final class J2clDependencyGraphCalculator {
             for (final Entry<J2clArtifactCoords, Set<J2clArtifactCoords>> parentToDependencies : this.tree.entrySet()) {
                 final Set<J2clArtifactCoords> children = parentToDependencies.getValue();
 
-                final Set<J2clArtifactCoords> descendants = Sets.sorted();
+                final Set<J2clArtifactCoords> descendants = J2clArtifactCoords.set();
                 descendants.addAll(children);
 
                 for (J2clArtifactCoords child : children) {
@@ -171,7 +171,7 @@ final class J2clDependencyGraphCalculator {
     /**
      * Coords to artifacts without any dependencies.
      */
-    private final Set<J2clArtifactCoords> leaves = Sets.sorted();
+    private final Set<J2clArtifactCoords> leaves = J2clArtifactCoords.set();
 
 
     /**

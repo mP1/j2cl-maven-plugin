@@ -148,6 +148,75 @@ public final class J2clArtifactCoordsTest implements ClassTesting2<J2clArtifactC
         this.checkNotEquals(J2clArtifactCoords.with(GROUP, ARTIFACT, TYPE, CLASSIFIER, "different"));
     }
 
+    // dependencyManagement ............................................................................................
+
+    @Test
+    public void testDependencyManagementDifferentGroupId() {
+        this.dependencyManagementTransformerAndCheck("group1:artifact2:version3",
+         "DIFFERENT:artifact2:version3");
+    }
+
+    @Test
+    public void testDependencyManagementDifferentGroupId2() {
+        this.dependencyManagementTransformerAndCheck("group1:artifact2:version3",
+         "DIFFERENT:artifact2:99");
+    }
+
+    @Test
+    public void testDependencyManagementDifferentArtifactId() {
+        this.dependencyManagementTransformerAndCheck("group1:artifact2:version3",
+         "group1:DIFFERENT:version3");
+    }
+
+    @Test
+    public void testDependencyManagementDifferentArtifactId2() {
+        this.dependencyManagementTransformerAndCheck("group1:artifact2:version3",
+         "group1:DIFFERENT:99");
+    }
+
+    @Test
+    public void testDependencyManagementDifferentVersion() {
+        this.dependencyManagementTransformerAndCheck("group1:artifact2:version3",
+         "group1:artifact2:DIFFERENT",
+          "group1:artifact2:version3");
+    }
+
+    @Test
+    public void testDependencyManagementDifferentVersion2() {
+        this.dependencyManagementTransformerAndCheck("group1:artifact2:version3",
+         "group1:artifact2:type3:classifier4:DIFFERENT-VERSION",
+          "group1:artifact2:type3:classifier4:version3");
+    }
+
+    @Test
+    public void testDependencyManagementDifferentVersion3() {
+        this.dependencyManagementTransformerAndCheck("group1:artifact2:999",
+         "group1:artifact2:type3:classifier4:DIFFERENT-VERSION",
+          "group1:artifact2:type3:classifier4:999");
+    }
+
+    private void dependencyManagementTransformerAndCheck(final String dependencyManagement,
+                                                         final String test) {
+        this.dependencyManagementTransformerAndCheck(dependencyManagement, test, test);
+    }
+
+    private void dependencyManagementTransformerAndCheck(final String dependencyManagement,
+                                                         final String test,
+                                                         final String expected) {
+        this.dependencyManagementTransformerAndCheck(J2clArtifactCoords.parse(dependencyManagement),
+                J2clArtifactCoords.parse(test),
+                J2clArtifactCoords.parse(expected));
+    }
+
+    private void dependencyManagementTransformerAndCheck(final J2clArtifactCoords dependencyManagement,
+                                                         final J2clArtifactCoords coords,
+                                                         final J2clArtifactCoords expected) {
+
+        assertEquals(expected,
+                dependencyManagement.dependencyManagementTransformer().apply(coords),
+                () -> "dependenecyManagement" + dependencyManagement + " transform " + coords);
+    }
+
     // sources...........................................................................................................
 
     @Test

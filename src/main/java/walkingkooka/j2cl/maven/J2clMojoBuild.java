@@ -39,9 +39,6 @@ public final class J2clMojoBuild extends J2clMojoBuildTest {
         try {
             final J2clRequest request = this.request(this.entryPoints(), this.initialScriptFilename());
             final J2clDependency project = this.gatherDependencies(request);
-            project.print();
-            request.verifyArtifactCoords();
-
             request.execute(project);
         } catch (final Throwable e) {
             throw new MojoExecutionException("Failed to build project, check logs above", e);
@@ -59,7 +56,6 @@ public final class J2clMojoBuild extends J2clMojoBuildTest {
                 this.classpathRequired(),
                 this.ignoredDependencies(),
                 this.javascriptSourceRequired(),
-                this.replacedDependencies(),
                 this.compilationLevel(),
                 this.defines(),
                 this.externs(),

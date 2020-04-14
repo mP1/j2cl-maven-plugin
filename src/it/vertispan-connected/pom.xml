@@ -76,12 +76,34 @@
             <groupId>com.google.elemental2</groupId>
             <artifactId>elemental2-dom</artifactId>
             <version>1.0.0-RC1</version>
+
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.jsinterop</groupId>
+                    <artifactId>base</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.jsinterop</groupId>
+                    <artifactId>jsinterop-annotations</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>org.gwtproject.event</groupId>
             <artifactId>gwt-event</artifactId>
             <version>HEAD-SNAPSHOT</version>
+
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.jsinterop</groupId>
+                    <artifactId>base</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.jsinterop</groupId>
+                    <artifactId>jsinterop-annotations</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -143,10 +165,6 @@
                             <classpath-required/>
                             <ignored-dependencies/>
                             <javascript-source-required/>
-                            <replaced-dependencies>
-                                <param>com.google.jsinterop:base:*=walkingkooka:jsinterop-base:1.0-SNAPSHOT</param>
-                                <param>com.google.jsinterop:jsinterop-annotations:*=com.google.jsinterop:jsinterop-annotations:2.0.0</param>
-                            </replaced-dependencies>
                         </configuration>
                     </execution>
                 </executions>
