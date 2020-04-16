@@ -176,7 +176,7 @@ public final class J2ClDependencyGraphCalculatorTest {
         assertNotEquals(Maps.empty(), flat, "flat is must not empty");
         assertNotEquals(Sets.empty(), required, "required is must not empty");
 
-        final Set<J2clArtifactCoords> unknownRequireds = Sets.sorted();
+        final Set<J2clArtifactCoords> unknownRequireds = J2clArtifactCoords.set();
         unknownRequireds.addAll(required);
         unknownRequireds.removeAll(flat.keySet());
         assertEquals(Sets.empty(), unknownRequireds, "Required contains dependencies not found in flat: " + flat);

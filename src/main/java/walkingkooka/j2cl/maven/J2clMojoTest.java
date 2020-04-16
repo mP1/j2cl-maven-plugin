@@ -77,8 +77,6 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
                 {
                     final J2clMojoTestRequest request = this.request(test);
                     final J2clDependency project = this.gatherDependencies(request);
-                    project.print();
-                    request.verifyArtifactCoords();
 
                     try {
                         request.setProject(project);
@@ -103,7 +101,6 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
                 this.classpathRequired(),
                 this.ignoredDependencies(),
                 this.javascriptSourceRequired(),
-                this.replacedDependencies(),
                 this.compilationLevel(),
                 this.defines(),
                 this.externs(),

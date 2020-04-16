@@ -208,7 +208,6 @@ Plugin definition
                 </classpath-required>
                 <ignored-dependencies/>
                 <javascript-source-required/>
-                <replaced-dependencies/>
             </configuration>
         </execution>
     </executions>
@@ -430,23 +429,6 @@ The xml snippet below includes all currently available options, only one may be 
 
 ## output (build)
 This path is the final location of the final javascript.
-
-
-
-## replaced-dependencies
-
-A Map of dependencies with replacements as the value. The artifact-id, group-id and version-id must be used for both.
-Due to colons being present in the coords, a list of strings is used to express the original to replacement.
-This is useful if your application requires a few gwt-user classes/interfaces and referencing the entire jar file
-would be problematic and a customized substitute is available as a replacement.
-
-```xml
-<replaced-dependencies>
-    <param>com.google.gwt:gwt-user:*=walkingkooka:example-excluded-dependencies-gwt-entrypoint:1.0</param>
-</replaced-dependencies>
-```
-
-Maven coordinates on the left side of each entry may have a wildcard in the version.
 
 
 

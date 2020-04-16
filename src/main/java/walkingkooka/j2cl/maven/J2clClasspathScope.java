@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import walkingkooka.text.CharSequences;
 
@@ -53,8 +54,9 @@ enum J2clClasspathScope {
         this.filter = new ScopeArtifactFilter(scope)::include;
     }
 
-    Predicate<Artifact> scopeFilter() {
-        return this.filter;
+    Predicate<String> scopeFilter() {
+        // only the scope is important and used during filtering.
+        return (s) -> this.filter.test(new DefaultArtifact("groupId", "artifactId", "version", s, "type", "class", null));
     }
 
     private final Predicate<Artifact> filter;

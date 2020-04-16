@@ -20,14 +20,31 @@ package walkingkooka.j2cl.maven;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.model.Dependency;
+import walkingkooka.collect.set.Sets;
 
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Maven coordinates that identifies a single dependency or artifact.
  */
 final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
+
+    /**
+     * Creates a sorted {@link Set} to hold coords.
+     */
+    static Set<J2clArtifactCoords> set() {
+        return Sets.sorted();
+    }
+
+    /**
+     * A comparator that compares two coords ignoring the version.
+     */
+    static Comparator<J2clArtifactCoords> IGNORE_VERSION_COMPARATOR = J2clArtifactCoordsComparator.INSTANCE;
 
     static J2clArtifactCoords parse(final String coords) {
         final org.eclipse.aether.artifact.DefaultArtifact artifact = new org.eclipse.aether.artifact.DefaultArtifact(coords);
@@ -38,6 +55,14 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
                 artifact.getExtension(),
                 Optional.ofNullable(classifier.isEmpty() ? null : classifier),
                 artifact.getBaseVersion());
+    }
+
+    static J2clArtifactCoords with(final Dependency dependency) {
+        return with(dependency.getGroupId(),
+                dependency.getArtifactId(),
+                dependency.getType(),
+                Optional.ofNullable(dependency.getClassifier()),
+                dependency.getVersion());
     }
 
     static J2clArtifactCoords with(final Artifact artifact) {
@@ -90,6 +115,19 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
     }
 
     private final static String SOURCES = "sources";
+
+    /**
+     * Returns a {@link Function} which will be used to transform coords when they match an individual dependencyManagement POM entry.
+     */
+    Function<J2clArtifactCoords, J2clArtifactCoords> dependencyManagementTransformer() {
+        return this::dependencyManagementTransformer;
+    }
+
+    private J2clArtifactCoords dependencyManagementTransformer(final J2clArtifactCoords coords) {
+        return this.isSameGroupArtifactDifferentVersion(coords) ?
+                new J2clArtifactCoords(coords.groupId, coords.artifactId, coords.type, coords.classifier, this.version) :
+                coords;
+    }
 
     /**
      * Creates a {@link Artifact}
@@ -152,7 +190,7 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
         return result;
     }
 
-    private String compareToClassifier() {
+    String compareToClassifier() {
         return this.classifier.orElse("");
     }
 

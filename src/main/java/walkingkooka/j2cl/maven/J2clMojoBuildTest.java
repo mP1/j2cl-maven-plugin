@@ -28,8 +28,6 @@ import org.apache.maven.project.ProjectBuilder;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
-import walkingkooka.collect.list.Lists;
-import walkingkooka.collect.map.Maps;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;
@@ -131,30 +129,6 @@ abstract class J2clMojoBuildTest extends J2clMojo {
     final J2clDependency gatherDependencies(final J2clRequest request) {
         return J2clDependency.gather(this.project(), request);
     }
-
-    // replacedDependencies.............................................................................................
-
-    final Map<J2clArtifactCoords, J2clArtifactCoords> replacedDependencies() {
-        final Map<J2clArtifactCoords, J2clArtifactCoords> lookup = Maps.sorted();
-
-        for (final String mapping : this.replacedDependencies) {
-            final String mapping2 = mapping.trim();
-            final int equalsSign = mapping2.indexOf('=');
-            if (-1 == equalsSign) {
-                throw new IllegalArgumentException("Replacement dependency missing '=' in " + CharSequences.quoteAndEscape(mapping2));
-            }
-            lookup.put(J2clArtifactCoords.parse(mapping2.substring(0, equalsSign)), J2clArtifactCoords.parse(mapping2.substring(equalsSign + 1)));
-        }
-
-        return Maps.readOnly(lookup);
-    }
-
-    /**
-     * A list of artifact to artifact separated by equals sign. A {@link Map} cant be used because of maven coords
-     * containing a colon.
-     */
-    @Parameter(alias = "replaced-dependencies", required = true)
-    private List<String> replacedDependencies = Lists.array();
 
     // JAVA.............................................................................................................
 

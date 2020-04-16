@@ -20,6 +20,10 @@ import jsinterop.annotations.JsType;
 @JsType
 public class Transitive {
 
+    static {
+        Transitive.class.getFields(); // this should have been excluded by a dependencyManagement version=1.0
+    }
+
     public static String getMessage() {
         return "transitive.Transitive v2.0";
     }

@@ -57,7 +57,7 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
         logger.printLine("Preparing...");
         logger.printIndented("Source path(s)", sourceRoot);
 
-        final List<J2clPath> classpath = artifact.classpathAndDependencies()
+        final List<J2clPath> classpath = artifact.dependencies()
                 .stream()
                 .map(d -> d.isIgnored() ?
                         d.artifactFileOrFail() :
