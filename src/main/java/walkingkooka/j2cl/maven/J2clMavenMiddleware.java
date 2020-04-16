@@ -18,6 +18,8 @@
 package walkingkooka.j2cl.maven;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
@@ -31,19 +33,26 @@ import java.util.Optional;
 
 public interface J2clMavenMiddleware {
 
-    static J2clMavenMiddleware of(final MavenSession mavenSession,
+    static J2clMavenMiddleware of(final ArtifactHandlerManager artifactHandlerManager,
+                                  final MavenSession mavenSession,
                                   final ProjectBuilder projectBuilder,
                                   final List<ArtifactRepository> remoteArtifactRepositories,
                                   final List<RemoteRepository> remoteRepositories,
                                   final RepositorySystemSession repositorySession,
                                   final RepositorySystem repositorySystem) {
-        return J2clMavenMiddlewareImpl.with(mavenSession,
+        return J2clMavenMiddlewareImpl.with(artifactHandlerManager,
+                mavenSession,
                 projectBuilder,
                 remoteArtifactRepositories,
                 remoteRepositories,
                 repositorySession,
                 repositorySystem);
     }
+
+    /**
+     * Fetches the {@link ArtifactHandler} for the given type.
+     */
+    ArtifactHandler artifactHandler(final String type);
 
     /**
      * Returns a {@link MavenProject} given an {@link Artifact}.
