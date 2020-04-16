@@ -19,7 +19,6 @@ package walkingkooka.j2cl.maven;
 
 import com.google.common.collect.Streams;
 import org.apache.bcel.Constants;
-import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
@@ -151,7 +150,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
         J2clRequest request = this.request();
         final J2clClasspathScope scope = request.scope();
         final MavenProject project = this.project();
-        final ArtifactHandler artifactHandler = project.getArtifact().getArtifactHandler(); // TODO hack should identify actual handler
+        final J2clMavenMiddleware middleware = request.mavenMiddleware();
 
         for (final Dependency dependency : project.getDependencies()) {
             // filter if wrong scope
@@ -171,10 +170,10 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
             // transform the coords to the corrected version if any dependencyManagement entries exist.
             final J2clArtifactCoords corrected = dependencyManagement.apply(coords);
+            final String type = coords.type();
 
-            // TODO need to find a way to query actual ArtifactHandler
             final MavenProject childProject = request.mavenMiddleware()
-                    .mavenProject(corrected.mavenArtifact(scope, artifactHandler));
+                    .mavenProject(corrected.mavenArtifact(scope, middleware.artifactHandler(null == type ? "jar" : type)));
 
             final J2clDependency child = new J2clDependency(childProject,
                     Optional.of(request.mavenMiddleware().mavenFile(corrected.toString()).orElseThrow(() -> new IllegalArgumentException("Archive file missing for " + CharSequences.quote(coords.toString())))),

@@ -18,6 +18,8 @@
 package walkingkooka.j2cl.maven;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
@@ -38,13 +40,15 @@ import java.util.Optional;
 
 final class J2clMavenMiddlewareImpl implements J2clMavenMiddleware {
 
-    static J2clMavenMiddleware with(final MavenSession mavenSession,
+    static J2clMavenMiddleware with(final ArtifactHandlerManager artifactHandlerManager,
+                                    final MavenSession mavenSession,
                                     final ProjectBuilder projectBuilder,
                                     final List<ArtifactRepository> remoteArtifactRepositories,
                                     final List<RemoteRepository> remoteRepositories,
                                     final RepositorySystemSession repositorySession,
                                     final RepositorySystem repositorySystem) {
-        return new J2clMavenMiddlewareImpl(mavenSession,
+        return new J2clMavenMiddlewareImpl(artifactHandlerManager,
+                mavenSession,
                 projectBuilder,
                 remoteArtifactRepositories,
                 remoteRepositories,
@@ -52,12 +56,14 @@ final class J2clMavenMiddlewareImpl implements J2clMavenMiddleware {
                 repositorySystem);
     }
 
-    private J2clMavenMiddlewareImpl(final MavenSession mavenSession,
+    private J2clMavenMiddlewareImpl(final ArtifactHandlerManager artifactHandlerManager,
+                                    final MavenSession mavenSession,
                                     final ProjectBuilder projectBuilder,
                                     final List<ArtifactRepository> remoteArtifactRepositories,
                                     final List<RemoteRepository> remoteRepositories,
                                     final RepositorySystemSession repositorySession,
                                     final RepositorySystem repositorySystem) {
+        this.artifactHandlerManager = artifactHandlerManager;
         this.mavenSession = mavenSession;
         this.projectBuilder = projectBuilder;
         this.remoteArtifactRepositories = remoteArtifactRepositories;
@@ -65,6 +71,16 @@ final class J2clMavenMiddlewareImpl implements J2clMavenMiddleware {
         this.repositorySession = repositorySession;
         this.repositorySystem = repositorySystem;
     }
+
+    /**
+     * Fetches the {@link ArtifactHandler} for the given type.
+     */
+    @Override
+    public ArtifactHandler artifactHandler(final String type) {
+        return this.artifactHandlerManager.getArtifactHandler(type);
+    }
+
+    private ArtifactHandlerManager artifactHandlerManager;
 
     @Override
     public MavenProject mavenProject(final Artifact artifact) {

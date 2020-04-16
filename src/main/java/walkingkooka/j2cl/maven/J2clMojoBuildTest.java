@@ -20,6 +20,7 @@ package walkingkooka.j2cl.maven;
 
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -250,12 +251,16 @@ abstract class J2clMojoBuildTest extends J2clMojo {
 
     // mavenMiddleware..................................................................................................
 
+    @Component
+    private ArtifactHandlerManager artifactHandlerManager;
+
     /**
      * Factory that creates a {@link J2clMavenMiddleware}
      */
     final J2clMavenMiddleware mavenMiddleware() {
         if (null == this.mavenMiddleware) {
-            this.mavenMiddleware = J2clMavenMiddleware.of(this.mavenSession,
+            this.mavenMiddleware = J2clMavenMiddleware.of(this.artifactHandlerManager,
+                    this.mavenSession,
                     this.projectBuilder,
                     this.project.getRemoteArtifactRepositories(),
                     this.repositories,
