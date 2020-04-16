@@ -385,14 +385,16 @@ final class J2clDependency implements Comparable<J2clDependency> {
         printer.indent();
         {
             this.print("Annotation processor", J2clDependency::isAnnotationProcessor, printer);
+
             this.print("Annotation only class files", J2clDependency::isAnnotationClassFiles, printer);
-            this.print("Classpath required", J2clDependency::isClasspathRequired, printer);
             this.print("JRE bootstrap class files", J2clDependency::isJreBootstrapClassFiles, printer);
             this.print("JRE class files", J2clDependency::isJreClassFiles, printer);
-            this.print("Ignored dependencies", J2clDependency::isIgnored, printer);
-            this.print("Javascript source required", J2clDependency::isJavascriptSourceRequired, printer);
             this.print("Javascript bootstrap class files", J2clDependency::isJavascriptBootstrapFiles, printer);
             this.print("Javascript class files", J2clDependency::isJavascriptFiles, printer);
+
+            this.print("Classpath required", J2clDependency::isClasspathRequired, printer);
+            this.print("Ignored dependencies", J2clDependency::isIgnored, printer);
+            this.print("Javascript source required", J2clDependency::isJavascriptSourceRequired, printer);
         }
         printer.outdent();
         printer.flush();
