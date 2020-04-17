@@ -99,7 +99,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
         this.artifactFile = artifactFile;
         this.request = request;
 
-        all.add(this);
+        J2clDependency.all.add(this);
     }
 
     private void gather(final Predicate<String> scopeFilter,
@@ -230,7 +230,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private void verify() {
         this.verifyWithoutConflictsOrDuplicates();
 
-        this.request().verifyArtifactCoords(this.all
+        this.request().verifyArtifactCoords(J2clDependency.all
                 .stream()
                 .map(J2clDependency::coords)
                 .collect(Collectors.toCollection(Sets::sorted)));
@@ -243,7 +243,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
         final Set<J2clArtifactCoords> duplicateCoords = J2clArtifactCoords.set();
         final List<String> duplicatesText = Lists.array();
 
-        for (final J2clDependency dependency : this.all) {
+        for (final J2clDependency dependency : J2clDependency.all) {
             final J2clArtifactCoords coords = dependency.coords();
 
             // must have been the duplicate of another coord.
@@ -251,7 +251,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
                 continue;
             }
 
-            final List<J2clArtifactCoords> duplicates = this.all.stream()
+            final List<J2clArtifactCoords> duplicates = J2clDependency.all.stream()
                     .map(J2clDependency::coords)
                     .filter(possible -> coords.isSameGroupArtifactDifferentVersion(possible))
                     .collect(Collectors.toList());
@@ -468,7 +468,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     // isDependency.....................................................................................................
 
     boolean isDependency() {
-        return null != this.artifactFile;
+        return this.artifactFile().isPresent();
     }
 
     /**
