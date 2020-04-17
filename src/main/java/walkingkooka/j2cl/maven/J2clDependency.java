@@ -388,8 +388,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
             this.print("Annotation only class files", J2clDependency::isAnnotationClassFiles, printer);
             this.print("JRE bootstrap class files", J2clDependency::isJreBootstrapClassFiles, printer);
             this.print("JRE class files", J2clDependency::isJreClassFiles, printer);
-            this.print("Javascript bootstrap class files", J2clDependency::isJavascriptBootstrapFiles, printer);
-            this.print("Javascript class files", J2clDependency::isJavascriptFiles, printer);
+            this.print("Javascript bootstrap class files", J2clDependency::isJreJavascriptBootstrapFiles, printer);
+            this.print("Javascript class files", J2clDependency::isJreJavascriptFiles, printer);
 
             this.print("Classpath required", J2clDependency::isClasspathRequired, printer);
             this.print("Ignored dependencies", J2clDependency::isIgnored, printer);
@@ -507,8 +507,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
             this.javascriptSourceRequired = (this.javascriptSourceRequiredFile || request.isJavascriptSourceRequired(coords) || false == (this.classpathRequiredFile || request.isClasspathRequired(coords))) &&
                     false == this.isAnnotationClassFiles() &&
                     false == this.isAnnotationProcessor() &&
-                    this.isJavascriptBootstrapFiles() ||
-                    this.isJavascriptFiles() ||
+                    this.isJreJavascriptBootstrapFiles() ||
+                    this.isJreJavascriptFiles() ||
                     false == this.isJreBootstrapClassFiles() &&
                             false == this.isJreClassFiles();
         }
@@ -530,8 +530,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
             this.ignored = this.ignoredFile || this.request().isIgnored(this.coords) ||
                     this.isAnnotationClassFiles() ||
                     this.isAnnotationProcessor() ||
-                    this.isJavascriptBootstrapFiles() ||
-                    this.isJavascriptFiles() ||
+                    this.isJreJavascriptBootstrapFiles() ||
+                    this.isJreJavascriptFiles() ||
                     this.isJreBootstrapClassFiles() ||
                     this.isJreClassFiles();
         }
@@ -594,39 +594,39 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private boolean isBootstrapOrJreFiles() {
         return this.isJreBootstrapClassFiles() ||
             this.isJreClassFiles() ||
-            this.isJavascriptBootstrapFiles() ||
-            this.isJavascriptFiles();
+            this.isJreJavascriptBootstrapFiles() ||
+            this.isJreJavascriptFiles();
     }
 
-    // isJavascriptBootstrapFiles..................................................................................................
+    // isJreJavascriptBootstrapFiles..................................................................................................
 
     /**
      * Returns true if this archive contains JAVASCRIPT bootstrap class files, by testing if java.lang.Class class file exists.
      */
-    boolean isJavascriptBootstrapFiles() {
-        if (null == this.javascriptBootstrapFiles) {
+    boolean isJreJavascriptBootstrapFiles() {
+        if (null == this.jreJavascriptBootstrapFiles) {
             this.testArchive();
         }
 
-        return this.javascriptBootstrapFiles;
+        return this.jreJavascriptBootstrapFiles;
     }
 
-    private Boolean javascriptBootstrapFiles;
+    private Boolean jreJavascriptBootstrapFiles;
 
-    // isJavascriptFiles..................................................................................................
+    // isJreJavascriptFiles..................................................................................................
 
     /**
      * Returns true if this archive contains JAVASCRIPT  files, by testing if java.lang.  file exists.
      */
-    boolean isJavascriptFiles() {
-        if (null == this.javascriptFiles) {
+    boolean isJreJavascriptFiles() {
+        if (null == this.jreJavascriptFiles) {
             this.testArchive();
         }
 
-        return this.javascriptFiles;
+        return this.jreJavascriptFiles;
     }
 
-    private Boolean javascriptFiles;
+    private Boolean jreJavascriptFiles;
 
     // isJreBootstrapClassFiles..................................................................................................
 
@@ -666,8 +666,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
         final boolean annotationProcessor;
         final boolean classpathRequiredFile;
         final boolean ignoredFile;
-        final boolean javascriptBootstrapFiles;
-        final boolean javascriptFiles;
+        final boolean jreJavascriptBootstrapFiles;
+        final boolean jreJavascriptFiles;
         final boolean javascriptSourceRequiredFile;
         final boolean jreBootstrapClassFiles;
         final boolean jreClassFiles;
@@ -681,15 +681,15 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
                 ignoredFile = Files.exists(zip.getPath(IGNORED_DEPENDENCY));
 
-                javascriptBootstrapFiles = Files.exists(zip.getPath(JAVASCRIPT_BOOTSTRAP));
-                javascriptFiles = Files.exists(zip.getPath(JAVASCRIPT_FILE));
+                jreJavascriptBootstrapFiles = Files.exists(zip.getPath(JAVASCRIPT_BOOTSTRAP));
+                jreJavascriptFiles = Files.exists(zip.getPath(JAVASCRIPT_FILE));
 
                 javascriptSourceRequiredFile = Files.exists(zip.getPath(JAVASCRIPT_SOURCE_REQUIRED));
 
                 jreBootstrapClassFiles = Files.exists(zip.getPath(JAVA_BOOTSTRAP_CLASSFILE));
                 jreClassFiles = Files.exists(zip.getPath(JAVA_CLASSFILE));
 
-                if (false == (annotationProcessor || javascriptBootstrapFiles || javascriptFiles || jreBootstrapClassFiles || jreClassFiles)) {
+                if (false == (annotationProcessor || jreJavascriptBootstrapFiles || jreJavascriptFiles || jreBootstrapClassFiles || jreClassFiles)) {
                     final boolean[] annotations = new boolean[1];
 
                     Files.walkFileTree(zip.getPath("/"),
@@ -742,8 +742,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
             ignoredFile = false;
 
-            javascriptBootstrapFiles = false;
-            javascriptFiles = false;
+            jreJavascriptBootstrapFiles = false;
+            jreJavascriptFiles = false;
 
             javascriptSourceRequiredFile = false;
 
@@ -758,8 +758,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
         this.ignoredFile = ignoredFile;
 
-        this.javascriptBootstrapFiles = javascriptBootstrapFiles;
-        this.javascriptFiles = javascriptFiles;
+        this.jreJavascriptBootstrapFiles = jreJavascriptBootstrapFiles;
+        this.jreJavascriptFiles = jreJavascriptFiles;
 
         this.javascriptSourceRequiredFile = javascriptSourceRequiredFile;
 

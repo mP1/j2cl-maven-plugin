@@ -104,6 +104,8 @@ final class J2clTranspiler {
                     {
                         output.copyFiles(sourcePath,
                                 jsInput,
+                                J2clPathTargetFile.REPLACE,
+                                J2clPath.COPY_FILE_CONTENT_VERBATIM,
                                 logger);
                     }
                     logger.outdent();

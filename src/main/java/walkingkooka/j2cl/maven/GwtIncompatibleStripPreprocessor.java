@@ -90,6 +90,8 @@ final class GwtIncompatibleStripPreprocessor {
                 // find then copy from unpack to $output
                 final Collection<J2clPath> files = output.copyFiles(sourceRoot,
                         copied,
+                        J2clPathTargetFile.REPLACE,
+                        J2clPath.COPY_FILE_CONTENT_VERBATIM,
                         logger);
 
                 // necessary to prepare FileInfo with correct sourceRoot otherwise stripped files will be written back to the wrong place.
@@ -147,7 +149,11 @@ final class GwtIncompatibleStripPreprocessor {
         {
             for (final J2clPath sourceRoot : sourceRoots) {
                 final Set<J2clPath> copy = gatherFiles(sourceRoot, J2clPath.JAVASCRIPT_FILES);
-                output.copyFiles(sourceRoot, copy, logger);
+                output.copyFiles(sourceRoot,
+                        copy,
+                        J2clPathTargetFile.REPLACE,
+                        J2clPath.COPY_FILE_CONTENT_VERBATIM,
+                        logger);
             }
         }
         logger.outdent();
