@@ -122,7 +122,12 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
                                 .pollingEvery(Duration.ofMillis(100))
                                 .until(d -> isFinished(d));
 
-                        logger.printLine(executeScript(driver, "return window.G_testRunner.getReport()"));
+                        logger.indent();
+                        try {
+                            logger.printLine(executeScript(driver, "return window.G_testRunner.getReport()"));
+                        } finally {
+                            logger.outdent();
+                        }
 
                         // check for success
                         if (!isSuccess(driver)) {
