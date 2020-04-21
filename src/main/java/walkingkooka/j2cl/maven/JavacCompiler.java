@@ -105,7 +105,7 @@ final class JavacCompiler {
     private static String toClasspathStringList(final List<J2clPath> entries) {
         return entries.stream()
                 .map(J2clPath::toString)
-                .collect(Collectors.joining(SystemProperty.JAVA_CLASS_PATH_SEPARATOR.value()));
+                .collect(Collectors.joining(SystemProperty.JAVA_CLASS_PATH_SEPARATOR.requiredPropertyValue()));
     }
 
     /**
