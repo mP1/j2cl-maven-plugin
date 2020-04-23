@@ -86,6 +86,7 @@
                             <formatting>
                                 <param>PRETTY_PRINT</param>
                             </formatting>
+                            <java-compiler-arguments/>
                             <language-out>ECMASCRIPT5</language-out>
                             <thread-pool-size>0</thread-pool-size>
 

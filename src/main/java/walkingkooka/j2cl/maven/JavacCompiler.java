@@ -28,6 +28,7 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -39,6 +40,7 @@ final class JavacCompiler {
                            final Collection<J2clPath> classpath,
                            final List<J2clPath> newSourceFiles, // files being compiled
                            final J2clPath newClassFilesOutput,
+                           final Set<String>  javaCompilerArguments,
                            final boolean runAnnotationProcessors,
                            final J2clLinePrinter logger) throws Exception {
         // try and add options in alpha order...
@@ -50,6 +52,9 @@ final class JavacCompiler {
         if(false == runAnnotationProcessors) {
             options.add("-proc:none");
         }
+
+        // this assumes the arguments are well formed.
+        options.addAll(javaCompilerArguments);
 
         final boolean success;
         {

@@ -29,6 +29,7 @@ import org.apache.maven.project.ProjectBuilder;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
+import walkingkooka.collect.set.Sets;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;
@@ -204,6 +205,21 @@ abstract class J2clMojoBuildTest extends J2clMojo {
     @Parameter(required = true)
     private List<String> formatting = new ArrayList<>();
 
+    // javaCompilerArguments.............................................................................................
+
+    /**
+     * The javaCompilerArguments options if any are set. The original order is lost and further processing receives them as a {@link SortedSet}.
+     */
+    final Set<String> javaCompilerArguments() {
+        return this.javaCompilerArguments.stream()
+                .map(String::trim)
+                .collect(Collectors.toCollection(Sets::sorted));
+    }
+
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+    @Parameter(alias = "java-compiler-arguments", required = true)
+    private List<String> javaCompilerArguments = new ArrayList<>();
+    
     // language-out.....................................................................................................
 
     final LanguageMode languageOut() {

@@ -154,6 +154,9 @@
                             </defines>
                             <externs/>
                             <formatting/>
+                            <java-compiler-arguments>
+                                <param>-Aannotation-processor-argument=value</param>
+                            </java-compiler-arguments>
                             <language-out>ECMASCRIPT_2016</language-out>
                             <thread-pool-size>0</thread-pool-size>
 

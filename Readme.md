@@ -407,6 +407,18 @@ Archives with the following conditions will automatically marked as equivalent t
 
 
 
+## java-compiler-arguments
+
+This may be used to pass additional arguments to javac such as an annotation processor argument.
+
+```xml
+<java-compiler-arguments>
+    <param>-Aannotation-processor-argument=value</param>
+</java-compiler-arguments>
+```
+
+
+
 ## language-out
 The output language of the resulting javascript.
 
