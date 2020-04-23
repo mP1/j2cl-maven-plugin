@@ -84,6 +84,7 @@
                             <entry-points>app.app</entry-points>
                             <externs></externs>
                             <formatting/>
+                            <java-compiler-arguments/>
                             <language-out>ECMASCRIPT5</language-out>
                             <thread-pool-size>0</thread-pool-size>
 

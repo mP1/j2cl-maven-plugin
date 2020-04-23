@@ -79,6 +79,7 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
                             classpath,
                             javaSourceFiles,
                             directory.output().absentOrFail(),
+                            artifact.request().javaCompilerArguments(),
                             this.shouldRunAnnotationProcessors(),
                             logger) ?
                             J2clStepResult.SUCCESS :

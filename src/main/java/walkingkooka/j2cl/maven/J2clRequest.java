@@ -57,6 +57,7 @@ abstract class J2clRequest {
                         final Map<String, String> defines,
                         final Set<String> externs,
                         final Set<ClosureFormattingOption> formatting,
+                        final Set<String> javaCompilerArguments,
                         final LanguageMode languageOut,
                         final J2clMavenMiddleware middleware,
                         final ExecutorService executor,
@@ -75,6 +76,7 @@ abstract class J2clRequest {
         this.defines = defines;
         this.externs = externs;
         this.formatting = formatting;
+        this.javaCompilerArguments = javaCompilerArguments;
         this.languageOut = languageOut;
 
         this.middleware = middleware;
@@ -169,6 +171,12 @@ abstract class J2clRequest {
     private final Set<ClosureFormattingOption> formatting;
 
     abstract J2clPath initialScriptFilename();
+
+    private final Set<String> javaCompilerArguments;
+
+    final Set<String> javaCompilerArguments() {
+        return this.javaCompilerArguments;
+    }
 
     final LanguageMode languageOut() {
         return this.languageOut;
