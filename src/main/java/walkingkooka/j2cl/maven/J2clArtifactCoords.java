@@ -22,6 +22,7 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.model.Dependency;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.text.CharSequences;
 
 import java.util.Comparator;
 import java.util.Objects;
@@ -208,6 +209,13 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
 
     String type() {
         return this.type;
+    }
+
+    String typeOrDefault() {
+        final String type = this.type();
+        return CharSequences.isNullOrEmpty(type) ?
+                "jar" :
+                type;
     }
 
     private final String type;
