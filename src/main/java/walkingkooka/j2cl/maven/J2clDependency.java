@@ -32,6 +32,7 @@ import walkingkooka.collect.set.Sets;
 import walkingkooka.predicate.Predicates;
 import walkingkooka.text.CharSequences;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.URI;
@@ -910,24 +911,29 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Returns all source roots including resources which can be directories or archives.
      */
     List<J2clPath> sourcesRoot() {
-        final List<J2clPath> sources = this.compileSourceRoots();
-        return sources.size() > 0 ?
-                sources :
-                this.sourcesArchivePath();
-    }
-
-    private List<J2clPath> compileSourceRoots() {
         final J2clRequest request = this.request();
-        return request
-                .sourcesKind()
-                .compileSourceRoots(this.project(), request.base());
-    }
+        final List<J2clPath> sources = Lists.array();
 
-    private List<J2clPath> sourcesArchivePath() {
-        return this.request.mavenMiddleware()
-                .mavenFile(this.coords.source().toString())
-                .map(Lists::of)
-                .orElse(Lists.empty());
+        final MavenProject project = this.project();
+        final File projectBase = project.getFile();
+        if(null != projectBase) {
+            sources.addAll(request
+                    .sourcesKind()
+                    .compileSourceRoots(project, J2clPath.with(projectBase.toPath())));
+        }
+        // no project source try and sources archive and then jar file itself
+        if(sources.isEmpty()) {
+            final J2clArtifactCoords coords = this.coords();
+            final J2clMavenMiddleware middleware = request.mavenMiddleware();
+
+            middleware.mavenFile(coords.source().toString()).map(sources::add);
+
+            if(sources.isEmpty()) {
+                middleware.mavenFile(coords.toString()).map(sources::add);
+            }
+        }
+
+        return Lists.readOnly(sources);
     }
 
     // toString.........................................................................................................
