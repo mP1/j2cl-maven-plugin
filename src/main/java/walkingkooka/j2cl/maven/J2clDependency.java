@@ -72,7 +72,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     static J2clDependency gather(final MavenProject project,
                                  final J2clRequest request) {
-        final J2clDependency root = new J2clDependency(project,
+        final J2clDependency root = new J2clDependency(J2clArtifactCoords.with(project.getArtifact()),
+                project,
                 Optional.empty(),
                 request);
         root.gather(request.scope().scopeFilter(), Predicates.never(), Function.identity());
@@ -91,10 +92,12 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     // ctor.............................................................................................................
 
-    private J2clDependency(final MavenProject project,
+    private J2clDependency(final J2clArtifactCoords coords,
+                           final MavenProject project,
                            final Optional<J2clPath> artifactFile,
                            final J2clRequest request) {
         super();
+        this.coords = coords;
         this.project = project;
         this.artifactFile = artifactFile;
         this.request = request;
@@ -170,15 +173,12 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
             // transform the coords to the corrected version if any dependencyManagement entries exist.
             final J2clArtifactCoords corrected = dependencyManagement.apply(coords);
-            final String type = coords.type();
+            final MavenProject childProject = middleware.mavenProject(corrected.mavenArtifact(scope, middleware.artifactHandler(coords.typeOrDefault())));
 
-            final MavenProject childProject = request.mavenMiddleware()
-                    .mavenProject(corrected.mavenArtifact(scope, middleware.artifactHandler(null == type ? "jar" : type)));
-
-            final J2clDependency child = new J2clDependency(childProject,
-                    Optional.of(request.mavenMiddleware().mavenFile(corrected.toString()).orElseThrow(() -> new IllegalArgumentException("Archive file missing for " + CharSequences.quote(coords.toString())))),
-                    request);
-            this.dependencies.add(child);
+            this.dependencies.add(new J2clDependency(corrected,
+                    childProject,
+                    Optional.of(middleware.mavenFile(corrected.toString()).orElseThrow(() -> new IllegalArgumentException("Archive file missing for " + CharSequences.quote(corrected.toString())))),
+                    request));
 
             childExclusions.add(exclusions(parentExclusions, dependency));
         }
@@ -431,16 +431,13 @@ final class J2clDependency implements Comparable<J2clDependency> {
     // coords...........................................................................................................
 
     J2clArtifactCoords coords() {
-        if(null == this.coords) {
-            this.coords = J2clArtifactCoords.with(this.project.getArtifact());
-        }
         return this.coords;
     }
 
     /**
      * The coords containing the groupid, artifact-id, version and classifier
      */
-    private J2clArtifactCoords coords;
+    private final J2clArtifactCoords coords;
 
     // project...........................................................................................................
 

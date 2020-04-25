@@ -89,6 +89,41 @@ public final class J2clArtifactCoordsTest implements ClassTesting2<J2clArtifactC
                 () -> "parse " + CharSequences.quoteAndEscape(text));
     }
 
+    // typeOrDefault.....................................................................................................
+
+    @Test
+    public void testTypeOrDefaultNull() {
+        final J2clArtifactCoords coords = J2clArtifactCoords.with("group1",
+                "artifact2",
+                null,
+                Optional.ofNullable("classifier3"),
+                "version4");
+        typeOrDefaultAndCheck(coords, "jar");
+    }
+
+    @Test
+    public void testTypeOrDefaultEmpty() {
+        final J2clArtifactCoords coords = J2clArtifactCoords.with("group1",
+                "artifact2",
+                "",
+                Optional.ofNullable("classifier3"),
+                "version4");
+        typeOrDefaultAndCheck(coords, "jar");
+    }
+
+    @Test
+    public void testTypeOrDefault() {
+        this.typeOrDefaultAndCheck("group1:artifact2:type3:classifier4:version5", "type3");
+    }
+
+    private void typeOrDefaultAndCheck(final String parse, final String type) {
+        this.typeOrDefaultAndCheck(J2clArtifactCoords.parse(parse), type);
+    }
+
+    private void typeOrDefaultAndCheck(final J2clArtifactCoords coords, final String type) {
+        assertEquals(type, coords.typeOrDefault(), () -> coords + "  typeOrDefault");
+    }
+
     // comparable........................................................................................................
 
     @Test
