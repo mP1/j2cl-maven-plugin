@@ -527,7 +527,7 @@ Files are ignored before the Google preprocessor attempts to remove classes and 
 
 
 
-### Sample walkingkooka-j2cl-maven-plugin-ignored-files.txt
+### Sample .walkingkooka-j2cl-maven-plugin-ignored-files.txt
 
 ```text
 # This is a comment and ignored. The two blank lines are also ignored.
