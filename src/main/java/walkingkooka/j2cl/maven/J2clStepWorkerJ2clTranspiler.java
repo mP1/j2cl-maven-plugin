@@ -45,13 +45,7 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
         if (artifact.isIgnored()) {
             sourceRoot = artifact.step(J2clStep.UNPACK).output();
         } else {
-            // source may have been shaded, have to check if a shade output directory exists.
-            final J2clPath possibleShade = artifact.step(J2clStep.SHADE_JAVA_SOURCE).output();
-            if (possibleShade.exists().isPresent()) {
-                sourceRoot = possibleShade;
-            } else {
-                sourceRoot = artifact.step(J2clStep.GWT_INCOMPATIBLE_STRIP).output();
-            }
+            sourceRoot = shadeOrCompileGwtIncompatibleStripped(artifact);
         }
 
         logger.printLine("Preparing...");
@@ -61,8 +55,8 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
                 .stream()
                 .map(d -> d.isIgnored() ?
                         d.artifactFileOrFail() :
-                        d.step(J2clStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED).output())
-                .flatMap(d -> d.exists().stream())
+                        shadeOrCompileGwtIncompatibleStripped(d))
+                        .flatMap(d -> d.exists().stream())
                 .collect(Collectors.toList());
 
         return J2clTranspiler.execute(classpath,
@@ -71,5 +65,15 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
                 logger) ?
                 J2clStepResult.SUCCESS :
                 J2clStepResult.FAILED;
+    }
+
+    /**
+     * Try the shaded/output if that exists or fallback to compile-gwt-incompatible-stripped/output
+     */
+    private static J2clPath shadeOrCompileGwtIncompatibleStripped(final J2clDependency dependency) {
+        return dependency.step(J2clStep.SHADE_JAVA_SOURCE)
+                .output()
+                .exists()
+                .orElseGet(() -> dependency.step(J2clStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED).output());
     }
 }
