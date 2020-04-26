@@ -346,15 +346,28 @@ final class J2clPath implements Comparable<J2clPath> {
     static final String SHADE_FILE = FILE_PREFIX + "-shade.txt";
 
     /**
-     * Used to read the {@link #SHADE_FILE} properties file.
+     * Used to read the {@link #SHADE_FILE} properties file. Note the {@link Map} keeps entries in the file order.
      */
     Map<String, String> readShadeFile() throws IOException {
         try (final InputStream file = new FileInputStream(this.file())) {
-            final Properties properties = new Properties();
-            properties.load(file);
+            final Map<String, String> map = Maps.ordered();
+            final Properties properties = new Properties() {
 
-            final Map<String, String> map = Maps.sorted();
-            properties.forEach((k, v) -> map.put((String) k, (String) v));
+                private static final long serialVersionUID = -7831642683636345017L;
+
+                // not necessary to override setProperty but just in case future load call setProperty and not put
+
+                @Override
+                public synchronized Object setProperty(final String key, final String value) {
+                    return map.put(key, value);
+                }
+
+                @Override
+                public synchronized Object put(final Object key, final Object value) {
+                    return this.setProperty((String) key, (String) value);
+                }
+            };
+            properties.load(file);
             return map;
         }
     }
