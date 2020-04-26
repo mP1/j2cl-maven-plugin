@@ -1,0 +1,6 @@
+#
+# Order is important
+#
+test.javautilprefs=java.util.prefs
+test.javautil=java.util
+
