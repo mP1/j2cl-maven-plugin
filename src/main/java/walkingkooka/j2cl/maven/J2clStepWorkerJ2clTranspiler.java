@@ -45,7 +45,7 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
         if (artifact.isIgnored()) {
             sourceRoot = artifact.step(J2clStep.UNPACK).output();
         } else {
-            sourceRoot = shadeOrCompileGwtIncompatibleStripped(artifact);
+            sourceRoot = shadeOrCompileGwtIncompatibleStripped(artifact, J2clStep.SHADE_JAVA_SOURCE, J2clStep.GWT_INCOMPATIBLE_STRIP);
         }
 
         logger.printLine("Preparing...");
@@ -55,8 +55,8 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
                 .stream()
                 .map(d -> d.isIgnored() ?
                         d.artifactFileOrFail() :
-                        shadeOrCompileGwtIncompatibleStripped(d))
-                        .flatMap(d -> d.exists().stream())
+                        shadeOrCompileGwtIncompatibleStripped(d, J2clStep.SHADE_CLASS_FILES, J2clStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED))
+                .flatMap(d -> d.exists().stream())
                 .collect(Collectors.toList());
 
         return J2clTranspiler.execute(classpath,
@@ -68,12 +68,14 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
     }
 
     /**
-     * Try the shaded/output if that exists or fallback to compile-gwt-incompatible-stripped/output
+     * Tries the $first/output and if that is absent tries $second/output.
      */
-    private static J2clPath shadeOrCompileGwtIncompatibleStripped(final J2clDependency dependency) {
-        return dependency.step(J2clStep.SHADE_JAVA_SOURCE)
+    private static J2clPath shadeOrCompileGwtIncompatibleStripped(final J2clDependency dependency,
+                                                                  final J2clStep tryFirst,
+                                                                  final J2clStep second) {
+        return dependency.step(tryFirst)
                 .output()
                 .exists()
-                .orElseGet(() -> dependency.step(J2clStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED).output());
+                .orElseGet(() -> dependency.step(second).output());
     }
 }
