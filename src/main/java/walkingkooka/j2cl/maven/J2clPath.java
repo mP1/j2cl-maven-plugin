@@ -58,10 +58,22 @@ final class J2clPath implements Comparable<J2clPath> {
 
     static final String FILE_PREFIX = ".walkingkooka-j2cl-maven-plugin";
 
+    /**
+     * Matches all files but not directories.
+     */
+    static final Predicate<Path> ALL_FILES = Files::isRegularFile;
+
     static final Predicate<Path> CLASS_FILES = fileEndsWith(".class");
     static final Predicate<Path> JAVA_FILES = fileEndsWith(".java");
     static final Predicate<Path> JAVASCRIPT_FILES = fileEndsWith(".js");
     static final Predicate<Path> NATIVE_JAVASCRIPT_FILES = fileEndsWith(".native.js");
+
+    /**
+     * Matches all files that end with the given extension, assumes the extension includes a leading dot.
+     */
+    private static Predicate<Path> fileEndsWith(final String extension) {
+        return ALL_FILES.and((p) -> p.getFileName().toString().endsWith(extension));
+    }
 
     /**
      * This filter filters the /META-INF directory when extracting from an archive.
@@ -69,23 +81,9 @@ final class J2clPath implements Comparable<J2clPath> {
     static final Predicate<Path> WITHOUT_META_INF = (p) -> false == p.startsWith("/META-INF");
 
     /**
-     * Matches all files that end with the given extension, assumes the extension includes a leading dot.
-     */
-    private static Predicate<Path> fileEndsWith(final String extension) {
-        return (p) -> Files.isRegularFile(p) && p.getFileName().toString().endsWith(extension);
-    }
-
-    /**
-     * Matches all files but not directories.
-     */
-    static final Predicate<Path> ALL_FILES = Files::isRegularFile;
-
-    /**
      * Matches all files except for java source.
      */
-    static final Predicate<Path> ALL_FILES_EXCEPT_JAVA = (p) -> {
-        return Files.isRegularFile(p) && false == p.getFileName().toString().endsWith(".java");
-    };
+    static final Predicate<Path> ALL_FILES_EXCEPT_JAVA = ALL_FILES.and((p) -> false == p.getFileName().toString().endsWith(".java"));
 
     static List<File> toFiles(final Collection<J2clPath> paths) {
         return paths.stream().map(J2clPath::file).collect(Collectors.toList());
