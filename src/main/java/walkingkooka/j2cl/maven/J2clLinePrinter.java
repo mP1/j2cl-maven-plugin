@@ -90,69 +90,72 @@ final class J2clLinePrinter {
         this.printer.lineStart();
         this.printLine(label);
         this.indent();
-        this.indent();
+        {
+            this.indent();
+            {
+                new TreePrinting<StringPath, StringName>() {
 
-        new TreePrinting<StringPath, StringName>() {
+                    @Override
+                    public void branchBegin(final List<StringName> names, final IndentingPrinter printer) {
+                        final String path = this.toPath(names);
+                        if (false == path.isEmpty()) {
+                            J2clLinePrinter.this.printLine(path);
+                            printer.indent();
+                        }
 
-            @Override
-            public void branchBegin(final List<StringName> names, final IndentingPrinter printer) {
-                final String path = this.toPath(names);
-                if (false == path.isEmpty()) {
-                    J2clLinePrinter.this.printLine(path);
-                    printer.indent();
-                }
+                        this.level++;
+                    }
 
-                this.level++;
+                    @Override
+                    public void branchEnd(final List<StringName> names, final IndentingPrinter printer) {
+                        final String path = this.toPath(names);
+                        if (false == path.isEmpty()) {
+                            printer.outdent(); // @see branchBegin
+                        }
+
+                        this.level--;
+                    }
+
+                    private String toPath(final List<StringName> names) {
+                        final String path = toPath(names, StringPath.SEPARATOR);
+                        return 0 == this.level ?
+                                "/" + path :
+                                path;
+                    }
+
+                    // https://github.com/mP1/j2cl-maven-plugin/issues/258
+                    // helpers identify a root path so a leading slash can be added.
+                    private int level;
+
+                    @Override
+                    public void children(final Set<StringPath> paths, final IndentingPrinter printer) {
+                        Table table = TextPretty.table();
+
+                        int i = 0;
+                        for (final StringPath path : paths) {
+                            final int column = i % COLUMN_COUNT;
+                            final int row = i / COLUMN_COUNT;
+                            table = table.setCell(column,
+                                    row,
+                                    path.name().toString());
+
+                            i++;
+                        }
+
+                        table = TABLE_TRANSFORMER.apply(table);
+
+                        for (int r = 0; r < table.maxRow(); r++) {
+                            J2clLinePrinter.this.printLine(TextPretty.rowColumnsToLine((column -> 1), LineEnding.SYSTEM)
+                                    .apply(table.row(r)));
+                        }
+                    }
+                }.biConsumer()
+                        .accept(paths.stream().map(toStringPath).collect(Collectors.toCollection(Sets::sorted)),
+                                this.printer);
             }
-
-            @Override
-            public void branchEnd(final List<StringName> names, final IndentingPrinter printer) {
-                final String path = this.toPath(names);
-                if (false == path.isEmpty()) {
-                    printer.outdent();
-                }
-
-                this.level--;
-            }
-
-            private String toPath(final List<StringName> names) {
-                final String path = toPath(names, StringPath.SEPARATOR);
-                return 0 == this.level ?
-                        "/" + path :
-                        path;
-            }
-
-            // https://github.com/mP1/j2cl-maven-plugin/issues/258
-            // helpers identify a root path so a leading slash can be added.
-            private int level;
-
-            @Override
-            public void children(final Set<StringPath> paths, final IndentingPrinter printer) {
-                Table table = TextPretty.table();
-
-                int i = 0;
-                for (final StringPath path : paths) {
-                    final int column = i % COLUMN_COUNT;
-                    final int row = i / COLUMN_COUNT;
-                    table = table.setCell(column,
-                            row,
-                            path.name().toString());
-
-                    i++;
-                }
-
-                table = TABLE_TRANSFORMER.apply(table);
-
-                for (int r = 0; r < table.maxRow(); r++) {
-                    J2clLinePrinter.this.printLine(TextPretty.rowColumnsToLine((column -> 1), LineEnding.SYSTEM)
-                            .apply(table.row(r)));
-                }
-            }
-        }.biConsumer()
-                .accept(paths.stream().map(toStringPath).collect(Collectors.toCollection(Sets::sorted)),
-                        this.printer);
-        this.outdent();
-        this.printLine(paths.size() + " file(s)");
+            this.outdent();
+            this.printLine(paths.size() + " file(s)");
+        }
         this.outdent();
     }
 
@@ -173,7 +176,9 @@ final class J2clLinePrinter {
         //noinspection ConstantConditions
         if (null != values) {
             this.indent();
-            values.forEach(this::printLine);
+            {
+                values.forEach(this::printLine);
+            }
             this.outdent();
         }
     }
@@ -184,7 +189,9 @@ final class J2clLinePrinter {
 
     void printIndentedLine(final CharSequence line) {
         this.indent();
-        this.printLine(line);
+        {
+            this.printLine(line);
+        }
         this.outdent();
     }
 
