@@ -64,6 +64,11 @@ final class J2clPath implements Comparable<J2clPath> {
     static final Predicate<Path> NATIVE_JAVASCRIPT_FILES = fileEndsWith(".native.js");
 
     /**
+     * This filter filters the /META-INF directory when extracting from an archive.
+     */
+    static final Predicate<Path> WITHOUT_META_INF = (p) -> false == p.startsWith("/META-INF");
+
+    /**
      * Matches all files that end with the given extension, assumes the extension includes a leading dot.
      */
     private static Predicate<Path> fileEndsWith(final String extension) {
@@ -190,12 +195,14 @@ final class J2clPath implements Comparable<J2clPath> {
     /**
      * Extract ALL the files from this archive, returning number of files extracted
      */
-    Set<J2clPath> extractArchiveFiles(final J2clPath target,
+    Set<J2clPath> extractArchiveFiles(final Predicate<Path> filter,
+                                      final J2clPath target,
                                       final J2clPathTargetFile copy,
                                       final J2clLinePrinter logger) throws IOException {
         final URI uri = URI.create("jar:" + this.path().toAbsolutePath().toUri());
         try (final FileSystem zip = FileSystems.newFileSystem(uri, Maps.empty())) {
             return this.extractArchiveFiles0(zip.getPath("/"),
+                    filter,
                     target,
                     copy,
                     logger);
@@ -209,10 +216,11 @@ final class J2clPath implements Comparable<J2clPath> {
      * This produces output that shows the files processed in alphabetical order.
      */
     private Set<J2clPath> extractArchiveFiles0(final Path source,
+                                               final Predicate<Path> filter,
                                                final J2clPath target,
                                                final J2clPathTargetFile copy,
                                                final J2clLinePrinter logger) throws IOException {
-        final Set<J2clPath> files = J2clPath.with(source).gatherFiles(J2clPath.ALL_FILES);
+        final Set<J2clPath> files = J2clPath.with(source).gatherFiles(filter.and(J2clPath.ALL_FILES));
         if (files.isEmpty()) {
             logger.printIndentedLine("No files");
         } else {

@@ -95,9 +95,10 @@ class ClosureCompiler {
                 {
                     final Collection<J2clPath> copied;
                     if (sourceRoot.isFile()) {
-                        copied = sourceRoot.extractArchiveFiles(unitedSourceRoot,
-                            targetFile,
-                            logger);
+                        copied = sourceRoot.extractArchiveFiles(J2clPath.WITHOUT_META_INF,
+                                unitedSourceRoot,
+                                targetFile,
+                                logger);
                     } else {
                         // if unpack/output dont want to copy java source.
                         final Predicate<Path> filter = sourceRoot.isUnpackOutput() ?
