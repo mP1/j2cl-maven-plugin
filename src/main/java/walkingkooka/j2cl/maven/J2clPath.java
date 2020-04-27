@@ -369,7 +369,7 @@ final class J2clPath implements Comparable<J2clPath> {
                 private void checkPackage(final String value, final String label) {
                     try {
                         PackageName.with(value);
-                    } catch (final IllegalArgumentException cause) {
+                    } catch (final Exception cause) {
                         throw new J2clException("Invalid property " + label + " (type) " + CharSequences.quoteAndEscape(value) + " in " + this);
                     }
                 }
