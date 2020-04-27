@@ -48,6 +48,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -57,27 +58,27 @@ final class J2clPath implements Comparable<J2clPath> {
 
     static final String FILE_PREFIX = ".walkingkooka-j2cl-maven-plugin";
 
-    static final BiPredicate<Path, BasicFileAttributes> CLASS_FILES = fileEndsWith(".class");
-    static final BiPredicate<Path, BasicFileAttributes> JAVA_FILES = fileEndsWith(".java");
-    static final BiPredicate<Path, BasicFileAttributes> JAVASCRIPT_FILES = fileEndsWith(".js");
-    static final BiPredicate<Path, BasicFileAttributes> NATIVE_JAVASCRIPT_FILES = fileEndsWith(".native.js");
+    static final Predicate<Path> CLASS_FILES = fileEndsWith(".class");
+    static final Predicate<Path> JAVA_FILES = fileEndsWith(".java");
+    static final Predicate<Path> JAVASCRIPT_FILES = fileEndsWith(".js");
+    static final Predicate<Path> NATIVE_JAVASCRIPT_FILES = fileEndsWith(".native.js");
 
     /**
      * Matches all files that end with the given extension, assumes the extension includes a leading dot.
      */
-    private static BiPredicate<Path, BasicFileAttributes> fileEndsWith(final String extension) {
-        return (p, a) -> Files.isRegularFile(p) && p.getFileName().toString().endsWith(extension);
+    private static Predicate<Path> fileEndsWith(final String extension) {
+        return (p) -> Files.isRegularFile(p) && p.getFileName().toString().endsWith(extension);
     }
 
     /**
      * Matches all files but not directories.
      */
-    static final BiPredicate<Path, BasicFileAttributes> ALL_FILES = (p, a) -> Files.isRegularFile(p);
+    static final Predicate<Path> ALL_FILES = Files::isRegularFile;
 
     /**
      * Matches all files except for java source.
      */
-    static final BiPredicate<Path, BasicFileAttributes> ALL_FILES_EXCEPT_JAVA = (p, a) -> {
+    static final Predicate<Path> ALL_FILES_EXCEPT_JAVA = (p) -> {
         return Files.isRegularFile(p) && false == p.getFileName().toString().endsWith(".java");
     };
 
@@ -247,8 +248,8 @@ final class J2clPath implements Comparable<J2clPath> {
     /**
      * Uses to collect all files that match the {@link BiPredicate} and returns a sorted {@link Set}.
      */
-    Set<J2clPath> gatherFiles(final BiPredicate<Path, BasicFileAttributes> matcher) throws IOException {
-        return Files.find(this.path(), Integer.MAX_VALUE, matcher)
+    Set<J2clPath> gatherFiles(final Predicate<Path> filter) throws IOException {
+        return Files.find(this.path(), Integer.MAX_VALUE, (p, a) -> filter.test(p))
                 .map(J2clPath::with)
                 .sorted()
                 .collect(Collectors.toCollection(Sets::sorted));
