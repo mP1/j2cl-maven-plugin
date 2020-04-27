@@ -34,7 +34,6 @@ import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +41,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 class ClosureCompiler {
@@ -101,7 +100,7 @@ class ClosureCompiler {
                             logger);
                     } else {
                         // if unpack/output dont want to copy java source.
-                        final BiPredicate<Path, BasicFileAttributes> filter = sourceRoot.isUnpackOutput() ?
+                        final Predicate<Path> filter = sourceRoot.isUnpackOutput() ?
                                 J2clPath.ALL_FILES_EXCEPT_JAVA :
                                 J2clPath.ALL_FILES;
 

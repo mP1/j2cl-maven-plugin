@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -164,7 +165,7 @@ final class GwtIncompatibleStripPreprocessor {
      * and honours any ignore files if any found.
      */
     private static Set<J2clPath> gatherFiles(final J2clPath root,
-                                             final BiPredicate<Path, BasicFileAttributes> include) throws IOException {
+                                             final Predicate<Path> include) throws IOException {
 
         return root.exists().isPresent() ?
                 gatherFiles0(root, include) :
@@ -172,7 +173,7 @@ final class GwtIncompatibleStripPreprocessor {
     }
 
     private static Set<J2clPath> gatherFiles0(final J2clPath root,
-                                              final BiPredicate<Path, BasicFileAttributes> include) throws IOException {
+                                              final Predicate<Path> include) throws IOException {
         final SortedSet<J2clPath> files = Sets.sorted();
 
         final Map<Path, List<PathMatcher>> pathToMatchers = Maps.hash();
@@ -211,7 +212,7 @@ final class GwtIncompatibleStripPreprocessor {
             public FileVisitResult visitFile(final Path file,
                                              final BasicFileAttributes attributes) {
                 if (exclude.stream().noneMatch(m -> m.matches(file))) {
-                    if (include.test(file, attributes)) {
+                    if (include.test(file)) {
                         files.add(J2clPath.with(file));
                     }
                 }

@@ -32,13 +32,12 @@ import walkingkooka.collect.map.Maps;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -67,7 +66,7 @@ final class J2clStepWorkerShadeJavaSource extends J2clStepWorkerShade {
     }
 
     @Override
-    BiPredicate<Path, BasicFileAttributes> fileFilter() {
+    Predicate<Path> fileFilter() {
         return J2clPath.JAVA_FILES;
     }
 

@@ -22,11 +22,10 @@ import walkingkooka.text.CharSequences;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 /**
  * If the dependency source has a shade file, create an output directory with selected shaded class files combined
@@ -152,7 +151,7 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
         logger.outdent();
     }
 
-    abstract BiPredicate<Path, BasicFileAttributes> fileFilter();
+    abstract Predicate<Path> fileFilter();
 
     /**
      * Reads the file and shades the source text or class file type references.

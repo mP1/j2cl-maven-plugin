@@ -44,7 +44,7 @@ final class J2clTranspiler {
             final List<J2clPath> nativeJsAndJsInput = Lists.array();
 
             if (sourcePath.exists().isPresent()) {
-                sourcePath.gatherFiles((p, a) -> J2clPath.JAVA_FILES.test(p, a) || J2clPath.JAVASCRIPT_FILES.test(p, a) || J2clPath.NATIVE_JAVASCRIPT_FILES.test(p, a))
+                sourcePath.gatherFiles(J2clPath.JAVA_FILES.or(J2clPath.JAVASCRIPT_FILES.or(J2clPath.NATIVE_JAVASCRIPT_FILES)))
                         .forEach(f -> {
                             final String filename = f.filename();
                             if (CharSequences.endsWith(filename, ".java")) {

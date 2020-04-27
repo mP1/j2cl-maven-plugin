@@ -23,10 +23,9 @@ import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.commons.Remapper;
 
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 /**
  * Scans the output of the previous step for any shade java class files and if any are found writes the result to an output directory.
@@ -53,7 +52,7 @@ final class J2clStepWorkerShadeClassFile extends J2clStepWorkerShade {
     }
 
     @Override
-    BiPredicate<Path, BasicFileAttributes> fileFilter() {
+    Predicate<Path> fileFilter() {
         return J2clPath.CLASS_FILES;
     }
 
