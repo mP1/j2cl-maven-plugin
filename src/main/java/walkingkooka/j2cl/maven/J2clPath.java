@@ -21,6 +21,8 @@ import com.google.j2cl.common.FrontendUtils.FileInfo;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.reflect.PackageName;
+import walkingkooka.text.CharSequences;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -359,7 +361,17 @@ final class J2clPath implements Comparable<J2clPath> {
 
                 @Override
                 public synchronized Object setProperty(final String key, final String value) {
+                    this.checkPackage(key, "key");
+                    this.checkPackage(value, "value");
                     return map.put(key, value);
+                }
+
+                private void checkPackage(final String value, final String label) {
+                    try {
+                        PackageName.with(value);
+                    } catch (final IllegalArgumentException cause) {
+                        throw new J2clException("Invalid property " + label + " (type) " + CharSequences.quoteAndEscape(value) + " in " + this);
+                    }
                 }
 
                 @Override
