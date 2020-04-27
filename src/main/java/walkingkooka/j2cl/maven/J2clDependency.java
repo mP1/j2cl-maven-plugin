@@ -742,10 +742,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
                                                                  final BasicFileAttributes attrs) throws IOException {
                                     final FileVisitResult result;
 
-                                    final String path = file.toString();
-                                    if (path.startsWith(META_INF) || false == path.endsWith(".class")) {
-                                        result = FileVisitResult.CONTINUE;
-                                    } else {
+                                    if (J2clPath.WITHOUT_META_INF.test(file) && J2clPath.CLASS_FILES.test(file)) {
                                         final int annotationOrInterface = isAnnotationOrInterface(Files.readAllBytes(file));
 
                                         switch (annotationOrInterface) {
@@ -764,6 +761,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
                                                 result = null;
                                                 break;
                                         }
+                                    } else {
+                                        result = FileVisitResult.CONTINUE;
                                     }
 
                                     return result;
@@ -816,8 +815,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private final static String JAVASCRIPT_BOOTSTRAP = "/closure/goog/base.js";
     private final static String JAVASCRIPT_FILE = "/java/lang/Class.java.js";
     private final static String JAVASCRIPT_SOURCE_REQUIRED = "/" + J2clPath.FILE_PREFIX + "-javascript-source-required.txt";
-    private final static String META_INF = "/META-INF/";
-    private final static String META_INF_SERVICES_PROCESSOR = META_INF + "services/" + javax.annotation.processing.Processor.class.getName();
+    private final static String META_INF_SERVICES_PROCESSOR = "/META-INF/services/" + javax.annotation.processing.Processor.class.getName();
 
     /**
      * Returns true if the class file is an annotation type by checking that it implements Annotation.
