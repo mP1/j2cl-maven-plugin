@@ -153,13 +153,13 @@ public final class J2clLinePrinterTest implements ClassTesting2<J2clLinePrinter>
     @Test
     public void testPrintIndentedPathCollection() {
         final StringBuilder b = new StringBuilder();
-        final J2clLinePrinter printer = this.printer(b);
+        final J2clLinePrinter printer = this.printer2(b);
 
         printer.printIndented("label1", List.of(path("/path/to")));
 
         this.check("label1\n" +
-                        "    /path\n" +
-                        "      to\n" +
+                        "    /path<\n" +
+                        "      to<\n" +
                         "  1 file(s)",
                 b);
     }
@@ -167,13 +167,13 @@ public final class J2clLinePrinterTest implements ClassTesting2<J2clLinePrinter>
     @Test
     public void testPrintIndentedPathCollection2() {
         final StringBuilder b = new StringBuilder();
-        final J2clLinePrinter printer = this.printer(b);
+        final J2clLinePrinter printer = this.printer2(b);
 
         printer.printIndented("label1", List.of(path("/path/to"), path("/path/to2")));
 
         this.check("label1\n" +
-                        "    /path\n" +
-                        "      to                                                           to2\n" +
+                        "    /path<\n" +
+                        "      to                                                           to2<\n" +
                         "  2 file(s)",
                 b);
     }
@@ -205,7 +205,12 @@ public final class J2clLinePrinterTest implements ClassTesting2<J2clLinePrinter>
     }
 
     private J2clLinePrinter printer(final StringBuilder b) {
-        return J2clLinePrinter.with(Printers.stringBuilder(b, EOL));
+        return J2clLinePrinter.with(Printers.stringBuilder(b, EOL), null);
+    }
+
+    private J2clLinePrinter printer2(final StringBuilder b) {
+        return J2clLinePrinter.with(Printers.stringBuilder(b, EOL),
+            Printers.stringBuilder(b, EOL).printedLine((line, lineEnding, printer) -> b.append( line + "<" + lineEnding)));
     }
 
     private void check(final CharSequence expected, final StringBuilder b) {
@@ -221,7 +226,7 @@ public final class J2clLinePrinterTest implements ClassTesting2<J2clLinePrinter>
     @Test
     public void testToString() {
         final Printer printer = Printers.fake();
-        this.toStringAndCheck(J2clLinePrinter.with(printer), printer.toString());
+        this.toStringAndCheck(J2clLinePrinter.with(printer, Printers.fake()), printer.toString());
     }
 
     // ClassTesting.....................................................................................................

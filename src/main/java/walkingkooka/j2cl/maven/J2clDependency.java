@@ -31,6 +31,7 @@ import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.predicate.Predicates;
 import walkingkooka.text.CharSequences;
+import walkingkooka.text.printer.Printers;
 
 import java.io.File;
 import java.io.IOException;
@@ -346,7 +347,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     void print(final boolean printMetadata) {
         final J2clLogger logger = this.request.logger();
-        final J2clLinePrinter printer = J2clLinePrinter.with(logger.printer(logger::debug));
+        final J2clLinePrinter printer = J2clLinePrinter.with(logger.printer(logger::info), null);
         printer.printLine("Dependencies");
         printer.indent();
         {
