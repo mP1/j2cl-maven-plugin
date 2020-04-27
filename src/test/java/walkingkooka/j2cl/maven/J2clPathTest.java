@@ -23,11 +23,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.rules.TemporaryFolder;
 import walkingkooka.HashCodeEqualsDefinedTesting2;
+import walkingkooka.collect.map.Maps;
 import walkingkooka.compare.ComparableTesting2;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.Optional;
 
@@ -200,6 +202,41 @@ public final class J2clPathTest implements ComparableTesting2<J2clPath>, HashCod
     public void testShadeFile() {
         final J2clPath path = this.createObject();
         this.checkPath(path.shadeFile(), path + File.separator + ".walkingkooka-j2cl-maven-plugin-shade.txt");
+    }
+
+    @Test
+    public void testShadeFileRead() throws Exception {
+        assertEquals(Maps.of("package1", "package2"), this.writeShadeFile("package1=package2").readShadeFile());
+    }
+
+    @Test
+    public void testShadeFileRead2() throws Exception {
+        assertEquals(Maps.of("package1", "package2", "package3", "package4"), this.writeShadeFile("package1=package2\npackage3=package4").readShadeFile());
+    }
+
+    @Test
+    public void testShadeFileInvalidPropertyKeyFails() throws Exception {
+        this.readShadeFileFails("*package1=package2");
+    }
+
+    @Test
+    public void testShadeFileInvalidPropertyKeyFails2() throws Exception {
+        this.readShadeFileFails("package1=package2\n*package3=package4");
+    }
+
+    @Test
+    public void testShadeFileInvalidPropertyValueFails() throws Exception {
+        this.readShadeFileFails("package1=*package2");
+    }
+
+    private J2clPath writeShadeFile(final String content) throws Exception {
+        final J2clPath shade = this.createObject().shadeFile();
+        shade.writeFile(content.getBytes(Charset.defaultCharset()));
+        return shade;
+    }
+
+    private void readShadeFileFails(final String content) throws Exception {
+        assertThrows(J2clException.class, () -> this.writeShadeFile(content).readShadeFile());
     }
 
     @Test
