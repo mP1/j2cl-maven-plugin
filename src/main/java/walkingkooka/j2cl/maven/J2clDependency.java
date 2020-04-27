@@ -80,7 +80,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
         root.gather(request.scope().scopeFilter(), Predicates.never(), Function.identity());
         root.verify();
         root.addBootstrapClasspath();
-        root.print();
+        root.print(true);
 
         return root;
     }
@@ -228,13 +228,17 @@ final class J2clDependency implements Comparable<J2clDependency> {
         this.dependencies.addAll(dependencies);
     }
 
+    /**
+     * Checks that dependency coords do not have version conflicts, duplicates, and classpath required, javascript source
+     * required and ignored dependency declarations.
+     */
     private void verify() {
         this.verifyWithoutConflictsOrDuplicates();
-
-        this.request().verifyArtifactCoords(J2clDependency.all
+        this.request().verifyClasspathRequiredJavascriptSourceRequiredIgnoredDependencies(J2clDependency.all
                 .stream()
                 .map(J2clDependency::coords)
-                .collect(Collectors.toCollection(Sets::sorted)));
+                .collect(Collectors.toCollection(Sets::sorted)),
+                this);
     }
 
     /**
@@ -268,6 +272,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
         }
 
         if (duplicateCoords.size() > 0) {
+            this.print(false);
+
             throw new IllegalStateException(duplicateCoords.size() + " duplicate(s)\n" + duplicatesText.stream().collect(Collectors.joining("\n")));
         }
     }
@@ -336,17 +342,55 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     /**
      * Prints a dependency graph and various metadata that will be used to plan the approach for building.
+     * The printMetadata flag will be false when printing dependencies before a verify exception is thrown.
      */
-    void print() {
+    void print(final boolean printMetadata) {
         final J2clLogger logger = this.request.logger();
         final J2clLinePrinter printer = J2clLinePrinter.with(logger.printer(logger::debug));
         printer.printLine("Dependencies");
         printer.indent();
         {
+            if (false == printMetadata) {
+                this.expandDependencies(); // @see #expandDepenencies
+            }
             this.prettyPrintDependencies(printer);
-            this.printPlanMetadata(printer);
+
+            if (printMetadata) {
+                this.printPlanMetadata(printer);
+            }
         }
         printer.outdent();
+        printer.flush();
+    }
+
+    /**
+     * This is necessary so {@link #prettyPrintDependencies(J2clLinePrinter)} will not fail because {@link #dependencies2} will be null.
+     */
+    private void expandDependencies() {
+        // collect entire tree without duplicates...
+        final Map<J2clArtifactCoords, J2clDependency> coordToDependency = Maps.sorted(J2clArtifactCoords.IGNORE_VERSION_COMPARATOR);
+        coordToDependency.put(this.coords(), this);
+
+        for (final J2clDependency dependency : this.dependencies) {
+            coordToDependency.put(dependency.coords(), dependency);
+        }
+
+        // some coords will have multiple J2clDependency instances replace them all.
+        final Set<J2clDependency> dependencies = set();
+        for (final J2clDependency dependency : coordToDependency.values()) {
+            final Set<J2clDependency> singletons = set();
+            for (final J2clDependency child : dependency.dependencies) {
+                final J2clDependency childSingleton = coordToDependency.get(child.coords());
+                if (null == childSingleton) {
+                    continue;
+                }
+
+                singletons.add(childSingleton);
+                dependencies.add(childSingleton);
+            }
+            dependency.dependencies2 = singletons;
+            dependency.dependencies = null; // no longer needed
+        }
     }
 
     /**

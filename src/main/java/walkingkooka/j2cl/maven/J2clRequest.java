@@ -229,6 +229,40 @@ abstract class J2clRequest {
         return hash;
     }
 
+    // verify...........................................................................................................
+
+    /**
+     * Verifies all 3 groups of coords using the project to print all dependencies if an test has failed.
+     */
+    final void verifyClasspathRequiredJavascriptSourceRequiredIgnoredDependencies(final Set<J2clArtifactCoords> all,
+                                                                                  final J2clDependency project) {
+        verify(this.classpathRequired, "classpath-required", all, project);
+        verify(this.javascriptSourceRequired, "javascript-required", all, project);
+        verify(this.ignoredDependencies, "ignoredDependencies", all, project);
+    }
+
+    private static void verify(final Collection<J2clArtifactCoords> filtered,
+                               final String label,
+                               final Set<J2clArtifactCoords> all,
+                               final J2clDependency project) {
+        final Collection<J2clArtifactCoords> unknown = filtered.stream()
+                .filter(c -> false == all.contains(c))
+                .collect(Collectors.toList());
+
+        if (false == unknown.isEmpty()) {
+            project.print(false);
+
+            throw new IllegalArgumentException("Unknown " + label + " dependencies: " + join(unknown));
+        }
+    }
+
+    private static String join(final Collection<?> items) {
+        return items.stream()
+                .map(Object::toString)
+                .sorted()
+                .collect(Collectors.joining(", "));
+    }
+
     // logger...........................................................................................................
 
     /**
@@ -258,32 +292,6 @@ abstract class J2clRequest {
             throw new J2clException("Unable to find a leaf dependencies(dependency without dependencies), job failed.");
         }
         this.await();
-    }
-
-    final void verifyArtifactCoords(final Set<J2clArtifactCoords> all) {
-        verify(this.classpathRequired, "classpath-required", all);
-        verify(this.javascriptSourceRequired, "javascript-required", all);
-        verify(this.ignoredDependencies, "ignoredDependencies", all);
-    }
-
-
-    private static void verify(final Collection<J2clArtifactCoords> filtered,
-                        final String label,
-                        final Set<J2clArtifactCoords> all) {
-        final Collection<J2clArtifactCoords> unknown = filtered.stream()
-                .filter(c -> false == all.contains(c))
-                .collect(Collectors.toList());
-
-        if (false == unknown.isEmpty()) {
-            throw new IllegalArgumentException("Unknown " + label + " dependencies: " + join(unknown));
-        }
-    }
-
-    private static String join(final Collection<?> items) {
-        return items.stream()
-                .map(Object::toString)
-                .sorted()
-                .collect(Collectors.joining(", "));
     }
 
     private void prepareJobs(final J2clDependency artifact) {
