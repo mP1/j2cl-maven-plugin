@@ -622,15 +622,6 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private Boolean annotationClassFiles;
 
     /**
-     * Returns true if this dependency is only annotations, a JRE bootstrap or JRE class files.
-     */
-    private boolean isAnnotationsBootstrapOrJreClassFiles() {
-        return this.isAnnotationClassFiles() ||
-                this.isJreBootstrapClassFiles() ||
-                this.isJreClassFiles();
-    }
-
-    /**
      * Returns true if this dependency is only annotations, a JRE bootstrap or JRE class and javascript files.
      */
     private boolean isAnnotationsBootstrapOrJreFiles() {
