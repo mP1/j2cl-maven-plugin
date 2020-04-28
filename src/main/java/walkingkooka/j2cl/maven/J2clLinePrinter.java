@@ -25,6 +25,7 @@ import walkingkooka.text.LineEnding;
 import walkingkooka.text.pretty.Table;
 import walkingkooka.text.pretty.TextPretty;
 import walkingkooka.text.pretty.TreePrinting;
+import walkingkooka.text.pretty.TreePrintingBranches;
 import walkingkooka.text.printer.IndentingPrinter;
 import walkingkooka.text.printer.Printer;
 
@@ -122,6 +123,11 @@ final class J2clLinePrinter {
                                                      final Function<T, StringPath> toStringPath,
                                                      final IndentingPrinter printer) {
         new TreePrinting<StringPath, StringName>() {
+
+            @Override
+            public TreePrintingBranches branches(final StringPath parent) {
+                return TreePrintingBranches.SORTED; // the entire tree will be lexical sorted.
+            }
 
             @Override
             public void branchBegin(final List<StringName> names, final IndentingPrinter printer) {
