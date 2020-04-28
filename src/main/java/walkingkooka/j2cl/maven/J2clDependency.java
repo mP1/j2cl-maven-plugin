@@ -283,23 +283,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     private void addBootstrapClasspath() {
         final Map<J2clArtifactCoords, J2clDependency> coordToDependency = gatherCoordToDependency();
-
-        // some coords will have multiple J2clDependency instances replace them all.
-        final Set<J2clDependency> dependencies = set();
-        for (final J2clDependency dependency : coordToDependency.values()) {
-            final Set<J2clDependency> singletons = set();
-            for (final J2clDependency child : dependency.dependencies) {
-                final J2clDependency childSingleton = coordToDependency.get(child.coords());
-                if (null == childSingleton) {
-                    throw new NullPointerException("Missing " + child.coords() + "\n" + coordToDependency.values());
-                }
-
-                singletons.add(childSingleton);
-                dependencies.add(childSingleton);
-            }
-            dependency.dependencies2 = singletons;
-            dependency.dependencies = null; // no longer needed
-        }
+        this.reduceDuplicateDependencies(coordToDependency, MISSING_FAILS);
 
         final Collection<J2clDependency> bootstrapAndJreDependencies = collectBootstrapAndJreWithDependencies(coordToDependency.values());
         addIfAbsent(coordToDependency.values(), bootstrapAndJreDependencies);
@@ -318,6 +302,33 @@ final class J2clDependency implements Comparable<J2clDependency> {
         }
 
         return coordToDependency;
+    }
+
+    private final static boolean MISSING_FAILS = true;
+    private final static boolean MISSING_SKIP = !MISSING_FAILS;
+
+    private void reduceDuplicateDependencies(final Map<J2clArtifactCoords, J2clDependency> coordToDependency,
+                                             final boolean missingFails) {
+        // some coords will have multiple J2clDependency instances replace them all.
+        final Set<J2clDependency> dependencies = set();
+        for (final J2clDependency dependency : coordToDependency.values()) {
+            final Set<J2clDependency> singletons = set();
+            for (final J2clDependency child : dependency.dependencies) {
+                final J2clDependency childSingleton = coordToDependency.get(child.coords());
+
+                if (null == childSingleton) {
+                    if (missingFails) {
+                        throw new NullPointerException("Missing " + child.coords() + "\n" + coordToDependency.values());
+                    }
+                    continue;
+                }
+
+                singletons.add(childSingleton);
+                dependencies.add(childSingleton);
+            }
+            dependency.dependencies2 = singletons;
+            dependency.dependencies = null; // no longer needed
+        }
     }
 
     /**
@@ -396,24 +407,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * This is necessary so {@link #prettyPrintDependencies(J2clLinePrinter)} will not fail because {@link #dependencies2} will be null.
      */
     private void expandDependencies() {
-        final Map<J2clArtifactCoords, J2clDependency> coordToDependency = gatherCoordToDependency();
-
-        // some coords will have multiple J2clDependency instances replace them all.
-        final Set<J2clDependency> dependencies = set();
-        for (final J2clDependency dependency : coordToDependency.values()) {
-            final Set<J2clDependency> singletons = set();
-            for (final J2clDependency child : dependency.dependencies) {
-                final J2clDependency childSingleton = coordToDependency.get(child.coords());
-                if (null == childSingleton) {
-                    continue;
-                }
-
-                singletons.add(childSingleton);
-                dependencies.add(childSingleton);
-            }
-            dependency.dependencies2 = singletons;
-            dependency.dependencies = null; // no longer needed
-        }
+        this.reduceDuplicateDependencies(this.gatherCoordToDependency(), MISSING_SKIP);
     }
 
     /**
