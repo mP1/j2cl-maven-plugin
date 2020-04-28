@@ -22,7 +22,6 @@ import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
-import walkingkooka.text.printer.Printers;
 
 import java.util.Collection;
 import java.util.List;
@@ -207,12 +206,12 @@ abstract class J2clRequest {
      * Returns a sha1 hash in hex digits that uniquely identifies this request using components.
      * Requests should cache the hash for performance reasons.
      */
-    abstract String hash();
+    abstract HashBuilder computeHash();
 
     /**
      * Creates a {@link HashBuilder} and hashes most of the properties of a request.
      */
-    final HashBuilder computeHash() {
+    final HashBuilder computeHash0() {
         final HashBuilder hash = HashBuilder.empty()
                 .append(this.scope.toString())
                 .append(this.level.toString());
@@ -225,9 +224,7 @@ abstract class J2clRequest {
         this.defines.forEach((k, v) -> hash.append(k).append(v));
         this.externs.forEach(hash::append);
         this.formatting.forEach(hash::append);
-        hash.append(this.languageOut);
-
-        return hash;
+        return hash.append(this.languageOut);
     }
 
     // verify...........................................................................................................

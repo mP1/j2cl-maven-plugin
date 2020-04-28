@@ -128,20 +128,12 @@ final class J2clMojoTestRequest extends J2clRequest {
     }
 
     @Override
-    String hash() {
-        if (null == this.hash) {
-            final HashBuilder hash = this.computeHash();
-            // no need to include browser or testTimeout in hash as these do no affect generated js
-            hash.append(this.testClassName);
-            this.hash = hash.toString();
-        }
-        return this.hash;
-    }
+    HashBuilder computeHash() {
+        return this.computeHash0()
 
-    /**
-     * Lazily computed and cached hash.
-     */
-    private String hash;
+                // no need to include browser or testTimeout in hash as these do no affect generated js
+                .append(this.testClassName);
+    }
 
     J2clMojoTestRequest setProject(final J2clDependency project) {
         this.project = project;
