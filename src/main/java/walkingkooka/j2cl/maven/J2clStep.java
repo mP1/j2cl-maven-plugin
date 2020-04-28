@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import walkingkooka.collect.list.Lists;
+import walkingkooka.text.printer.PrintedLineHandler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -331,12 +332,15 @@ enum J2clStep {
         final List<CharSequence> lines = Lists.array(); // these lines will be written to a log file.
         final String prefix = artifact.coords() + "-" + this;
 
-        final J2clLinePrinter logger = J2clLinePrinter.with(j2clLogger.printer(j2clLogger::debug)
-                .printedLine((line, eol, p) -> {
-                    p.print(line);
-                    p.flush();
-                    lines.add(line);
-                }));
+        final PrintedLineHandler lineHandler = (line, eol, p) -> {
+            p.print(line);
+            p.flush();
+            lines.add(line);
+        };
+
+        // TODO would be nice to detect log level of Maven logger
+        final J2clLinePrinter logger = J2clLinePrinter.with(j2clLogger.printer(j2clLogger::info).printedLine(lineHandler),
+                j2clLogger.printer(j2clLogger::debug).printedLine(lineHandler));
         try {
             final J2clStepResult result;
             if (artifact.isDependency() && this.skipIfDependency()) {

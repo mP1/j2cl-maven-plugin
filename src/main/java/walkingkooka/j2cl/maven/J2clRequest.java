@@ -22,6 +22,7 @@ import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.text.printer.Printers;
 
 import java.util.Collection;
 import java.util.List;
@@ -317,7 +318,7 @@ abstract class J2clRequest {
      */
     private int trySubmitJobs() {
         final J2clLogger j2clLogger = this.logger();
-        final J2clLinePrinter logger = J2clLinePrinter.with(j2clLogger.printer(j2clLogger::debug));
+        final J2clLinePrinter logger = J2clLinePrinter.with(j2clLogger.printer(j2clLogger::info), null);
 
         final List<Callable<J2clDependency>> submit = Lists.array();
 

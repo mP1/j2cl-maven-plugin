@@ -25,6 +25,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.text.CharSequences;
+import walkingkooka.text.printer.Printers;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,7 +54,7 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
         if (false == this.skipTests()) {
             try {
                 final J2clLogger logger = this.logger();
-                this.executeTests(J2clLinePrinter.with(logger.printer(logger::debug)));
+                this.executeTests(J2clLinePrinter.with(logger.printer(logger::info), null));
             } catch (final MojoExecutionException cause) {
                 throw cause;
             } catch (final Exception cause) {
