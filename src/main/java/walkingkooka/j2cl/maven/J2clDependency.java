@@ -31,7 +31,6 @@ import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.predicate.Predicates;
 import walkingkooka.text.CharSequences;
-import walkingkooka.text.printer.Printers;
 
 import java.io.File;
 import java.io.IOException;
@@ -283,13 +282,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Add the bootstrap and classpath dependencies to all other dependencies............................................
      */
     private void addBootstrapClasspath() {
-        // collect entire tree without duplicates...
-        final Map<J2clArtifactCoords, J2clDependency> coordToDependency = Maps.sorted(J2clArtifactCoords.IGNORE_VERSION_COMPARATOR);
-        coordToDependency.put(this.coords(), this);
-
-        for (final J2clDependency dependency : this.dependencies) {
-            coordToDependency.put(dependency.coords(), dependency);
-        }
+        final Map<J2clArtifactCoords, J2clDependency> coordToDependency = gatherCoordToDependency();
 
         // some coords will have multiple J2clDependency instances replace them all.
         final Set<J2clDependency> dependencies = set();
@@ -308,33 +301,68 @@ final class J2clDependency implements Comparable<J2clDependency> {
             dependency.dependencies = null; // no longer needed
         }
 
-        // collect only bootstrap and classpath entries...
-        final Collection<J2clDependency> bootstrapAndClasspath = coordToDependency.values().stream()
-                .filter(J2clDependency::isAnnotationsBootstrapOrJreFiles)
-                .collect(Collectors.toCollection(Sets::sorted));
+        final Collection<J2clDependency> bootstrapAndJreDependencies = collectBootstrapAndJreWithDependencies(coordToDependency.values());
+        addIfAbsent(coordToDependency.values(), bootstrapAndJreDependencies);
+        makeDependenciesGetterReadOnly(coordToDependency.values());
+    }
 
-        // collect dependencies of bootstrap/classpath
-        final Collection<J2clDependency> bootDependencies = bootstrapAndClasspath.stream()
+    /**
+     * Build a {@link Map} holding a mapping of coordinates to dependency. This assumes that all dependencies with the same coords are equivalent.
+     */
+    private Map<J2clArtifactCoords, J2clDependency> gatherCoordToDependency() {
+        final Map<J2clArtifactCoords, J2clDependency> coordToDependency = Maps.sorted(J2clArtifactCoords.IGNORE_VERSION_COMPARATOR);
+        coordToDependency.put(this.coords(), this);
+
+        for (final J2clDependency dependency : this.dependencies) {
+            coordToDependency.put(dependency.coords(), dependency);
+        }
+
+        return coordToDependency;
+    }
+
+    /**
+     * Returns all bootstrap and JRE and their dependencies.
+     */
+    private static Collection<J2clDependency> collectBootstrapAndJreWithDependencies(final Collection<J2clDependency> all) {
+        final Collection<J2clDependency> bootstrapAndJre = all.stream()
+                .filter(J2clDependency::isAnnotationsBootstrapOrJreFiles)
+                .collect(Collectors.toCollection(J2clDependency::set));
+
+        final Collection<J2clDependency> dependencies = bootstrapAndJre.stream()
                 .flatMap(d -> d.dependencies2.stream())
                 .filter(d -> false == d.isIgnored())
-                .collect(Collectors.toCollection(Sets::sorted));
+                .collect(Collectors.toCollection(J2clDependency::set));
+        addIfAbsent(dependencies, bootstrapAndJre);
 
-        // add bootstrap/cp to bootstrap dependencies that are not ignored
-        bootDependencies.stream()
-                .filter(d -> false == d.isIgnored())
-                .forEach(d -> d.dependencies2.addAll(bootstrapAndClasspath));
+        bootstrapAndJre.addAll(dependencies);
+        return bootstrapAndJre;
+    }
 
-        // combine bootstrap, classpath and dependencies.
-        final Set<J2clDependency> required = set();
-        required.addAll(bootstrapAndClasspath);
-        required.addAll(bootDependencies);
+    /**
+     * Adds all the ifAbsents if they are absent from the all
+     */
+    private static void addIfAbsent(final Collection<J2clDependency> all, final Collection<J2clDependency> ifAbsent) {
+        all.stream()
+                .filter(d -> false == d.isIgnored() && false == ifAbsent.contains(d))
+                .forEach(d -> d.addIfAbsent(ifAbsent));
+    }
 
-        // add bootstrap and classpath files to all other dependencies...
-        coordToDependency.values().stream()
-                .filter(d -> false == d.isIgnored() && false == bootDependencies.contains(d))
-                .forEach(d -> d.dependencies2.addAll(required));
+    /**
+     * Adds any of the ifAbsent dependencies if they are new and not present in this.
+     */
+    private void addIfAbsent(final Collection<J2clDependency> ifAbsent) {
+        for (final J2clDependency maybe : ifAbsent) {
+            if (false == this.dependencies2.contains(maybe)) {
+                this.dependencies2.add(maybe);
+            }
+        }
+    }
 
-        coordToDependency.values().forEach(d -> {
+    /**
+     * Updates the field returned by {@link #dependencies()} so it returns a read only {@link Set}.
+     */
+    private static void makeDependenciesGetterReadOnly(final Collection<J2clDependency> all) {
+        all.forEach(d -> {
             d.dependencies2 = Sets.readOnly(d.dependencies2);
         });
     }
@@ -368,13 +396,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * This is necessary so {@link #prettyPrintDependencies(J2clLinePrinter)} will not fail because {@link #dependencies2} will be null.
      */
     private void expandDependencies() {
-        // collect entire tree without duplicates...
-        final Map<J2clArtifactCoords, J2clDependency> coordToDependency = Maps.sorted(J2clArtifactCoords.IGNORE_VERSION_COMPARATOR);
-        coordToDependency.put(this.coords(), this);
-
-        for (final J2clDependency dependency : this.dependencies) {
-            coordToDependency.put(dependency.coords(), dependency);
-        }
+        final Map<J2clArtifactCoords, J2clDependency> coordToDependency = gatherCoordToDependency();
 
         // some coords will have multiple J2clDependency instances replace them all.
         final Set<J2clDependency> dependencies = set();
