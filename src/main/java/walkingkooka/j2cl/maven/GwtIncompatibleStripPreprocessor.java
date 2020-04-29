@@ -86,18 +86,22 @@ final class GwtIncompatibleStripPreprocessor {
         logger.printLine("Preparing java files");
         logger.indent();
         {
-            for (final J2clPath sourceRoot : sourceRoots) {
-                final Set<J2clPath> copied = gatherFiles(sourceRoot, J2clPath.JAVA_FILES);
-                // find then copy from unpack to $output
-                final Collection<J2clPath> files = output.copyFiles(sourceRoot,
-                        copied,
-                        J2clPathTargetFile.REPLACE,
-                        J2clPath.COPY_FILE_CONTENT_VERBATIM,
-                        logger);
+            logger.indent();
+            {
+                for (final J2clPath sourceRoot : sourceRoots) {
+                    final Set<J2clPath> copied = gatherFiles(sourceRoot, J2clPath.JAVA_FILES);
+                    // find then copy from unpack to $output
+                    final Collection<J2clPath> files = output.copyFiles(sourceRoot,
+                            copied,
+                            J2clPathTargetFile.REPLACE,
+                            J2clPath.COPY_FILE_CONTENT_VERBATIM,
+                            logger);
 
-                // necessary to prepare FileInfo with correct sourceRoot otherwise stripped files will be written back to the wrong place.
-                javaFiles.addAll(J2clPath.toFileInfo(files, output));
+                    // necessary to prepare FileInfo with correct sourceRoot otherwise stripped files will be written back to the wrong place.
+                    javaFiles.addAll(J2clPath.toFileInfo(files, output));
+                }
             }
+            logger.outdent();
             logger.printLine(javaFiles.size() + " file(s)");
         }
         logger.outdent();

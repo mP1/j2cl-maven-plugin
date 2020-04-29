@@ -110,29 +110,39 @@ final class J2clLinePrinter {
                                              final Collection<T> paths,
                                              final Function<T, StringPath> toStringPath,
                                              final J2clLinePrinterFormat format) {
-        this.printer.lineStart();
-        this.printLine(label);
-        this.printer.lineStart();
-        this.indent();
-        {
+        this.lineStart();
+        if (label.isEmpty()) {
+            this.printIndentedStringPath0(paths, toStringPath, format);
+        } else {
+            this.printLine(label);
+            this.lineStart();
             this.indent();
             {
-//                format.print(paths, toStringPath, this.treePrinter);
-                switch(format) {
-                    case FLAT:
-                        printFlat(paths, toStringPath, this.treePrinter);
-                        break;
-                    case TREE:
-                        printTree(paths, toStringPath, this.treePrinter);
-                        break;
-                    default:
-                        NeverError.unhandledEnum(format, J2clLinePrinterFormat.values());
-                }
+                this.printIndentedStringPath0(paths, toStringPath, format);
             }
             this.outdent();
-            this.printLine(paths.size() + " file(s)");
+        }
+    }
+
+    private <T> void printIndentedStringPath0(final Collection<T> paths,
+                                              final Function<T, StringPath> toStringPath,
+                                              final J2clLinePrinterFormat format) {
+        this.indent();
+        {
+//                format.print(paths, toStringPath, this.treePrinter);
+            switch (format) {
+                case FLAT:
+                    printFlat(paths, toStringPath, this.treePrinter);
+                    break;
+                case TREE:
+                    printTree(paths, toStringPath, this.treePrinter);
+                    break;
+                default:
+                    NeverError.unhandledEnum(format, J2clLinePrinterFormat.values());
+            }
         }
         this.outdent();
+        this.printLine(paths.size() + " file(s)");
     }
 
     /**
@@ -216,6 +226,8 @@ final class J2clLinePrinter {
         }.biConsumer()
                 .accept(paths.stream().map(toStringPath).collect(Collectors.toCollection(Sets::sorted)),
                         printer);
+        printer.lineStart();
+        printer.flush();
     }
 
     private final static int COLUMN_COUNT = 2;
