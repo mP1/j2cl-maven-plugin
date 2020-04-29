@@ -36,9 +36,9 @@ import java.util.stream.Collectors;
  */
 final class JavacCompiler {
 
-    static boolean execute(final List<J2clPath> bootstrap,
-                           final Collection<J2clPath> classpath,
-                           final List<J2clPath> newSourceFiles, // files being compiled
+    static boolean execute(final Set<J2clPath> bootstrap,
+                           final Set<J2clPath> classpath,
+                           final Set<J2clPath> newSourceFiles, // files being compiled
                            final J2clPath newClassFilesOutput,
                            final Set<String>  javaCompilerArguments,
                            final boolean runAnnotationProcessors,
@@ -107,7 +107,7 @@ final class JavacCompiler {
         return compiler;
     }
 
-    private static String toClasspathStringList(final List<J2clPath> entries) {
+    private static String toClasspathStringList(final Collection<J2clPath> entries) {
         return entries.stream()
                 .map(J2clPath::toString)
                 .collect(Collectors.joining(SystemProperty.JAVA_CLASS_PATH_SEPARATOR.requiredPropertyValue()));

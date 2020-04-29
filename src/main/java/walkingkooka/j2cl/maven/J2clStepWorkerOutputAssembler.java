@@ -52,7 +52,6 @@ final class J2clStepWorkerOutputAssembler extends J2clStepWorker2 {
 
         if (target.copyFiles(source,
                 files,
-                J2clPathTargetFile.REPLACE,
                 J2clPath.COPY_FILE_CONTENT_VERBATIM,
                 logger).isEmpty()) {
             logger.printLine("No files copied, transpile step likely failed with warnings that are actually errors.");
