@@ -19,6 +19,7 @@ package walkingkooka.j2cl.maven;
 
 import com.google.common.collect.Lists;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.text.CharSequences;
 
 import java.io.IOException;
 import java.net.URI;
@@ -67,8 +68,20 @@ final class J2clStepWorkerHash extends J2clStepWorker {
 
         final J2clStepDirectory directory = artifact.setDirectory(hash.toString())
                 .step(J2clStep.HASH);
+
+        final String txt = hashItemNames.stream()
+                .map(t -> {
+                    if (t.startsWith(DEPENDENCIES)) {
+                        // remove any run on leading zeroes...added by hashDependencies
+                        final int colon = t.indexOf(':');
+                        t = DEPENDENCIES + Integer.parseInt(t.substring(DEPENDENCIES.length(), colon)) + t.substring(colon);
+                    }
+                    return t;
+                })
+                .collect(Collectors.joining("\n"));
+
         directory.hashFile()
-                .writeFile(hashItemNames.stream().collect(Collectors.joining("\n")).getBytes(Charset.defaultCharset()));
+                .writeFile(txt.getBytes(Charset.defaultCharset()));
         return J2clStepResult.SUCCESS;
     }
 
@@ -85,8 +98,9 @@ final class J2clStepWorkerHash extends J2clStepWorker {
             logger.printLine(dependency.toString());
             logger.indent();
             {
+                // leading zeroes added to keep keys in numeric order, so dependencies-0 is followed by dependencies-1 not dependencies-10
                 final J2clPath dependencyFile = dependency.artifactFileOrFail();
-                hashItemNames.add("dependency-" + i + ": " + dependencyFile.filename());
+                hashItemNames.add(DEPENDENCIES + CharSequences.padLeft("" + i, 10, '0') + ": " + dependencyFile.filename());
                 hash.append(dependencyFile.path());
 
                 i++;
@@ -98,6 +112,8 @@ final class J2clStepWorkerHash extends J2clStepWorker {
         logger.outdent();
         logger.emptyLine();
     }
+
+    private final static String DEPENDENCIES = "dependencies-";
 
     private void hashArtifactSources(final J2clDependency artifact,
                                      final HashBuilder hash,
