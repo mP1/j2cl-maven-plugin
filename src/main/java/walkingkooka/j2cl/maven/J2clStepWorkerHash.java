@@ -18,9 +18,11 @@
 package walkingkooka.j2cl.maven;
 
 import com.google.common.collect.Lists;
+import walkingkooka.collect.set.Sets;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -56,19 +58,23 @@ final class J2clStepWorkerHash extends J2clStepWorker {
     J2clStepResult execute(final J2clDependency artifact,
                            final J2clStep step,
                            final J2clLinePrinter logger) throws Exception {
+        final Set<String> hashItemNames = Sets.sorted();
         final HashBuilder hash = artifact.request()
-            .computeHash();
+                .computeHash(hashItemNames);
 
-        this.hashDependencies(artifact, hash, logger);
-        this.hashArtifactSources(artifact, logger, hash);
+        this.hashDependencies(artifact, hash, hashItemNames, logger);
+        this.hashArtifactSources(artifact, hash, hashItemNames, logger);
 
-        artifact.setDirectory(hash.toString())
+        final J2clStepDirectory directory = artifact.setDirectory(hash.toString())
                 .step(J2clStep.HASH);
+        directory.hashFile()
+                .writeFile(hashItemNames.stream().collect(Collectors.joining("\n")).getBytes(Charset.defaultCharset()));
         return J2clStepResult.SUCCESS;
     }
 
     private void hashDependencies(final J2clDependency artifact,
                                   final HashBuilder hash,
+                                  final Set<String> hashItemNames,
                                   final J2clLinePrinter logger) throws IOException {
         final Set<J2clDependency> dependencies = artifact.dependencies(); // dependencies();
         logger.printLine(dependencies.size() + " Dependencies");
@@ -80,7 +86,9 @@ final class J2clStepWorkerHash extends J2clStepWorker {
             logger.printLine(dependency.toString());
             logger.indent();
             {
-                hash.append(dependency.artifactFileOrFail().path());
+                final J2clPath dependencyFile = dependency.artifactFileOrFail();
+                hashItemNames.add("dependency: " + dependencyFile.filename());
+                hash.append(dependencyFile.path());
             }
             logger.outdent();
         }
@@ -91,45 +99,53 @@ final class J2clStepWorkerHash extends J2clStepWorker {
     }
 
     private void hashArtifactSources(final J2clDependency artifact,
-                                     final J2clLinePrinter logger,
-                                     final HashBuilder hash) throws IOException {
+                                     final HashBuilder hash,
+                                     final Set<String> hashItemNames,
+                                     final J2clLinePrinter logger) throws IOException {
         final List<J2clPath> compileSourcesRoot = artifact.sourcesRoot();
 
         if (compileSourcesRoot.isEmpty()) {
-            this.hashArchiveFile(artifact, hash, logger);
+            this.hashArchiveFile(artifact, hash, hashItemNames, logger);
         } else {
-            this.hashCompileSourceRoots(hash,
-                    compileSourcesRoot.stream().map(J2clPath::path).collect(Collectors.toList()),
+            this.hashCompileSourceRoots(compileSourcesRoot.stream().map(J2clPath::path).collect(Collectors.toList()),
+                    hash,
+                    hashItemNames,
                     logger);
         }
     }
 
     private void hashArchiveFile(final J2clDependency artifact,
                                  final HashBuilder hash,
+                                 final Set<String> hashItemNames,
                                  final J2clLinePrinter logger) throws IOException {
         final J2clPath file = artifact.artifactFileOrFail();
         try (final FileSystem zip = FileSystems.newFileSystem(URI.create("jar:" + file.file().toURI()), Collections.emptyMap())) {
-            this.hashCompileSourceRoots(hash, zip.getRootDirectories(), logger);
+            this.hashCompileSourceRoots(zip.getRootDirectories(),
+                    hash,
+                    hashItemNames,
+                    logger);
         }
     }
 
 
-    private void hashCompileSourceRoots(final HashBuilder hash,
-                                        final Iterable<Path> roots,
+    private void hashCompileSourceRoots(final Iterable<Path> roots,
+                                        final HashBuilder hash,
+                                        final Set<String> hashItemNames,
                                         final J2clLinePrinter logger) throws IOException {
         logger.printLine(Lists.newArrayList(roots).size() + " Source root(s)");
         logger.indent();
 
         for (final Path root : roots) {
-            this.hashDirectoryTree(hash, root, logger);
+            hashItemNames.add("compile-source-root: " + root.getFileName());
+            this.hashDirectoryTree(root, hash, logger);
         }
 
         logger.printEndOfList();
         logger.outdent();
     }
 
-    private void hashDirectoryTree(final HashBuilder hash,
-                                   final Path root,
+    private void hashDirectoryTree(final Path root,
+                                   final HashBuilder hash,
                                    final J2clLinePrinter logger) throws IOException {
         logger.printLine(root.toString());
         logger.indent();

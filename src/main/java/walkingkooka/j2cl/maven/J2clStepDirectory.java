@@ -56,6 +56,13 @@ final class J2clStepDirectory {
     }
 
     /**
+     * The file that will capture the components of a hashing.
+     */
+    J2clPath hashFile() {
+        return this.path.hashFile();
+    }
+
+    /**
      * The output directory for the javac compiler, transpiler etc.
      */
     J2clPath output() {
