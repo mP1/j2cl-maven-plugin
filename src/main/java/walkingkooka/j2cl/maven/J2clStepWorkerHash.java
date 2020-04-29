@@ -80,15 +80,16 @@ final class J2clStepWorkerHash extends J2clStepWorker {
         logger.printLine(dependencies.size() + " Dependencies");
         logger.indent();
 
-        // printLine dependency and their hashes...this assumes dependencies have had their hash code already computed.
-
+        int i = 0;
         for (final J2clDependency dependency : dependencies) {
             logger.printLine(dependency.toString());
             logger.indent();
             {
                 final J2clPath dependencyFile = dependency.artifactFileOrFail();
-                hashItemNames.add("dependency: " + dependencyFile.filename());
+                hashItemNames.add("dependency-" + i + ": " + dependencyFile.filename());
                 hash.append(dependencyFile.path());
+
+                i++;
             }
             logger.outdent();
         }
