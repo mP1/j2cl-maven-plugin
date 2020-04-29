@@ -61,9 +61,9 @@ final class JavacCompiler {
             logger.printLine("Parameters");
             logger.indent();
             {
-                logger.printIndented("Bootstrap", bootstrap);
-                logger.printIndented("Classpath(s)", classpath);
-                logger.printIndented("New java file(s)", newSourceFiles); // printLine full paths here might be mixed sources...
+                logger.printIndented("Bootstrap", bootstrap, J2clLinePrinterFormat.FLAT);
+                logger.printIndented("Classpath(s)", classpath, J2clLinePrinterFormat.FLAT);
+                logger.printIndented("New java file(s)", newSourceFiles, J2clLinePrinterFormat.TREE); // order should not be important so tree
                 logger.printIndented("Output", newClassFilesOutput);
                 logger.printIndentedString("Option(s)", options);
             }
