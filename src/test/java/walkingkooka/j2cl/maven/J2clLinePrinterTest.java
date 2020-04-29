@@ -151,11 +151,26 @@ public final class J2clLinePrinterTest implements ClassTesting2<J2clLinePrinter>
     }
 
     @Test
-    public void testPrintIndentedPathCollection() {
+    public void testPrintIndentedPathCollectionFlat() {
         final StringBuilder b = new StringBuilder();
         final J2clLinePrinter printer = this.printer2(b);
 
-        printer.printIndented("label1", List.of(path("/path/to")));
+        printer.printIndented("label1", List.of(path("/path/2"), path("/path/1"), path("/path/3")), J2clLinePrinterFormat.FLAT);
+
+        this.check("label1\n" +
+                        "    /path/2<\n" +
+                        "    /path/1<\n" +
+                        "    /path/3<\n" +
+                        "  3 file(s)",
+                b);
+    }
+
+    @Test
+    public void testPrintIndentedPathCollectionTree() {
+        final StringBuilder b = new StringBuilder();
+        final J2clLinePrinter printer = this.printer2(b);
+
+        printer.printIndented("label1", List.of(path("/path/to")), J2clLinePrinterFormat.TREE);
 
         this.check("label1\n" +
                         "    /path<\n" +
@@ -165,11 +180,11 @@ public final class J2clLinePrinterTest implements ClassTesting2<J2clLinePrinter>
     }
 
     @Test
-    public void testPrintIndentedPathCollection2() {
+    public void testPrintIndentedPathCollectionTree2() {
         final StringBuilder b = new StringBuilder();
         final J2clLinePrinter printer = this.printer2(b);
 
-        printer.printIndented("label1", List.of(path("/path/to"), path("/path/to2")));
+        printer.printIndented("label1", List.of(path("/path/to"), path("/path/to2")), J2clLinePrinterFormat.TREE);
 
         this.check("label1\n" +
                         "    /path<\n" +

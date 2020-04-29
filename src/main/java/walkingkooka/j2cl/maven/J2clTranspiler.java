@@ -65,10 +65,10 @@ final class J2clTranspiler {
             logger.printLine("Parameters");
             logger.indent();
             {
-                logger.printIndented("Classpath(s)", classpath);
-                logger.printIndented("*.java Source(s)", javaInput);
-                logger.printIndented("*.native.js source(s)", nativeJsInput);
-                logger.printIndented("*.js source(s)", jsInput);
+                logger.printIndented("Classpath(s)", classpath, J2clLinePrinterFormat.FLAT);
+                logger.printIndented("*.java Source(s)", javaInput, J2clLinePrinterFormat.TREE);
+                logger.printIndented("*.native.js source(s)", nativeJsInput, J2clLinePrinterFormat.TREE);
+                logger.printIndented("*.js source(s)", jsInput, J2clLinePrinterFormat.TREE);
                 logger.printIndented("Output", output);
             }
             logger.outdent();
@@ -110,7 +110,9 @@ final class J2clTranspiler {
                     }
                     logger.outdent();
 
-                    logger.printIndented("Output file(s) after copy", output.gatherFiles(J2clPath.ALL_FILES));
+                    logger.printIndented("Output file(s) after copy",
+                        output.gatherFiles(J2clPath.ALL_FILES),
+                        J2clLinePrinterFormat.TREE);
                 }
             }
         }

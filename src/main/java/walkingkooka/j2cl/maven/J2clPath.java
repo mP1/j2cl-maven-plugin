@@ -169,11 +169,11 @@ final class J2clPath implements Comparable<J2clPath> {
             }
             logger.outdent();
         } else {
-            logger.printIndented("Copied", copied);
+            logger.printIndented("Copied", copied, J2clLinePrinterFormat.TREE);
         }
 
         if (false == skipped.isEmpty()) {
-            logger.printIndented("Skipped", skipped);
+            logger.printIndented("Skipped", skipped, J2clLinePrinterFormat.TREE);
         }
 
         return copied;
@@ -248,7 +248,7 @@ final class J2clPath implements Comparable<J2clPath> {
             Files.copy(filePath, copyTarget, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        logger.printIndented("Extracting", files);
+        logger.printIndented("Extracting", files, J2clLinePrinterFormat.TREE);
     }
 
     /**

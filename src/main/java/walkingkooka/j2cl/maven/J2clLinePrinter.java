@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import com.google.j2cl.common.FrontendUtils.FileInfo;
+import walkingkooka.NeverError;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.naming.StringName;
 import walkingkooka.naming.StringPath;
@@ -75,10 +76,12 @@ final class J2clLinePrinter {
      * Note the file paths within the tree will be printed to the second printer.
      */
     void printIndented(final String label,
-                       final Collection<J2clPath> paths) {
+                       final Collection<J2clPath> paths,
+                       final J2clLinePrinterFormat format) {
         this.printIndentedStringPath(label,
                 paths,
-                this::toStringPath);
+                this::toStringPath,
+                format);
     }
 
     private StringPath toStringPath(final J2clPath path) {
@@ -89,10 +92,12 @@ final class J2clLinePrinter {
      * Note the file paths within the tree will be printed to the second printer.
      */
     void printIndentedFileInfo(final String label,
-                               final Collection<FileInfo> paths) {
+                               final Collection<FileInfo> paths,
+                               final J2clLinePrinterFormat format) {
         this.printIndentedStringPath(label,
                 paths,
-                this::toStringPath);
+                this::toStringPath,
+                format);
     }
 
     private StringPath toStringPath(final FileInfo fileInfo) {
@@ -103,7 +108,8 @@ final class J2clLinePrinter {
 
     private <T> void printIndentedStringPath(final String label,
                                              final Collection<T> paths,
-                                             final Function<T, StringPath> toStringPath) {
+                                             final Function<T, StringPath> toStringPath,
+                                             final J2clLinePrinterFormat format) {
         this.printer.lineStart();
         this.printLine(label);
         this.printer.lineStart();
@@ -111,7 +117,17 @@ final class J2clLinePrinter {
         {
             this.indent();
             {
-                printIndentedStringPath0(paths, toStringPath, this.treePrinter);
+//                format.print(paths, toStringPath, this.treePrinter);
+                switch(format) {
+                    case FLAT:
+                        printFlat(paths, toStringPath, this.treePrinter);
+                        break;
+                    case TREE:
+                        printTree(paths, toStringPath, this.treePrinter);
+                        break;
+                    default:
+                        NeverError.unhandledEnum(format, J2clLinePrinterFormat.values());
+                }
             }
             this.outdent();
             this.printLine(paths.size() + " file(s)");
@@ -119,9 +135,24 @@ final class J2clLinePrinter {
         this.outdent();
     }
 
-    private static <T> void printIndentedStringPath0(final Collection<T> paths,
-                                                     final Function<T, StringPath> toStringPath,
-                                                     final IndentingPrinter printer) {
+    /**
+     * Prints a flat listing of paths.
+     */
+    static <T> void printFlat(final Collection<T> paths,
+                              final Function<T, StringPath> toStringPath,
+                              final IndentingPrinter printer) {
+        paths.stream()
+            .map(toStringPath)
+            .map(StringPath::toString)
+            .forEach(s -> {
+                J2clLinePrinter.printLine0(s, printer);
+            });
+        printer.lineStart();
+        printer.flush();
+    }
+    static <T> void printTree(final Collection<T> paths,
+                              final Function<T, StringPath> toStringPath,
+                              final IndentingPrinter printer) {
         new TreePrinting<StringPath, StringName>() {
 
             @Override

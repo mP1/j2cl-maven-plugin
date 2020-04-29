@@ -66,7 +66,7 @@ final class GwtIncompatibleStripPreprocessor {
             result = processStripAnnotationsFiles(javaFiles, output, logger);
 
             copyJavascriptFiles(sourceRoots, output, logger);
-            logger.printIndented("Output file(s)", output.gatherFiles(J2clPath.ALL_FILES));
+            logger.printIndented("Output file(s)", output.gatherFiles(J2clPath.ALL_FILES), J2clLinePrinterFormat.TREE);
 
         } else {
             logger.printIndentedLine("No files found");
@@ -119,7 +119,7 @@ final class GwtIncompatibleStripPreprocessor {
         {
             logger.indent();
             {
-                logger.printIndentedFileInfo("Source(s)", javaFilesInput);
+                logger.printIndentedFileInfo("Source(s)", javaFilesInput, J2clLinePrinterFormat.TREE);
                 logger.printIndented("Output", output);
 
                 final Problems problems = new Problems();
