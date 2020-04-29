@@ -602,6 +602,16 @@ will be useful if anything goes wrong.
 Every single step for every single artifact will have its own log file under its own step directory under the directory
 for that artifact named according to the scheme mentioned above.
 
+Note that the directory for each step will only include an empty directory indicating the status or outcome of that particular
+step. Possible outcomes include
+
+- !ABORTED
+- !FAILED
+- !SKIPPED
+- !SUCCESSFUL
+
+These are useful as a quick mechanism to find the individual failing step, with the `log.txt` containing further details.
+
 
 
 ## Step 0 Hashing
