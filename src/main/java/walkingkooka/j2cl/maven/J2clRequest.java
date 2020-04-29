@@ -206,25 +206,61 @@ abstract class J2clRequest {
      * Returns a sha1 hash in hex digits that uniquely identifies this request using components.
      * Requests should cache the hash for performance reasons.
      */
-    abstract HashBuilder computeHash();
+    abstract HashBuilder computeHash(final Set<String> hashItemsNames);
 
     /**
      * Creates a {@link HashBuilder} and hashes most of the properties of a request.
      */
-    final HashBuilder computeHash0() {
-        final HashBuilder hash = HashBuilder.empty()
-                .append(this.scope.toString())
-                .append(this.level.toString());
-        hash.append(this.sourcesKind().name());
+    final HashBuilder computeHash0(final Set<String> hashItemNames) {
+        final HashBuilder hash = HashBuilder.empty();
 
-        hash.append(this.classpathRequired.toString());
-        hash.append(this.ignoredDependencies.toString());
-        hash.append(this.javascriptSourceRequired.toString());
+        final J2clClasspathScope scope = this.scope();
+        hashItemNames.add("scope: " + scope);
+        hash.append(scope);
 
-        this.defines.forEach((k, v) -> hash.append(k).append(v));
-        this.externs.forEach(hash::append);
-        this.formatting.forEach(hash::append);
-        return hash.append(this.languageOut);
+        final CompilationLevel level = this.level;
+        hashItemNames.add("level: " + level);
+        hash.append(scope);
+
+        final J2clSourcesKind sourcesKind = this.sourcesKind();
+        hashItemNames.add("sources-kind: " + sourcesKind);
+        hash.append(sourcesKind);
+
+        this.defines.forEach((k, v) -> {
+            hashItemNames.add("define: " + k + "=" + v);
+            hash.append(k).append(v);
+        });
+
+        this.externs.forEach(e -> {
+            hashItemNames.add("extern: " + e);
+            hash.append(e);
+        });
+
+        this.formatting.forEach(f -> {
+            hashItemNames.add("formatting: " + f);
+            hash.append(f);
+        });
+
+        final LanguageMode languageOut = this.languageOut();
+        hashItemNames.add("language-out: " + languageOut);
+        hash.append(languageOut);
+
+        this.classpathRequired.forEach(c -> {
+            hashItemNames.add("classpath-required: " + c);
+            hash.append(c.toString());
+        });
+
+        this.ignoredDependencies.forEach(i -> {
+            hashItemNames.add("ignored-dependency: " + i);
+            hash.append(i.toString());
+        });
+
+        this.javascriptSourceRequired.forEach(j -> {
+            hashItemNames.add("javascript-source-required: " + j);
+            hash.append(j.toString());
+        });
+
+        return hash;
     }
 
     // verify...........................................................................................................

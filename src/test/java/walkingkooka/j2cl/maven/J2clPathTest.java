@@ -110,6 +110,12 @@ public final class J2clPathTest implements ComparableTesting2<J2clPath>, HashCod
     }
 
     @Test
+    public void testHashFile() {
+        final J2clPath path = this.createObject();
+        this.checkPath(path.hashFile(), path + File.separator + "hash.txt");
+    }
+
+    @Test
     public void testIgnoredFiles() {
         final J2clPath path = this.createObject();
         this.checkPath(path.ignoredFiles(), path + File.separator + ".walkingkooka-j2cl-maven-plugin-ignored-files.txt");

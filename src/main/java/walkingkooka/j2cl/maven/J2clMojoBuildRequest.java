@@ -122,10 +122,19 @@ final class J2clMojoBuildRequest extends J2clRequest {
     private final J2clPath initialScriptFilename;
 
     @Override
-    HashBuilder computeHash() {
-        final HashBuilder hash = this.computeHash0();
-        this.entryPoints.forEach(hash::append);
-        return hash.append(this.initialScriptFilename.toString());
+    HashBuilder computeHash(final Set<String> hashItemNames) {
+        final HashBuilder hash = this.computeHash0(hashItemNames);
+
+        this.entryPoints.forEach(e -> {
+            hashItemNames.add("entry-points: " + e);
+            hash.append(e);
+        });
+
+        final String initialScriptFilename = this.initialScriptFilename.toString();
+        hashItemNames.add("initial-script-filename: " + hashItemNames);
+        hash.append(initialScriptFilename);
+
+        return hash;
     }
 
     /**

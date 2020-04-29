@@ -284,6 +284,15 @@ final class J2clPath implements Comparable<J2clPath> {
     }
 
     /**
+     * The file that will capture the components of a hashing.
+     */
+    J2clPath hashFile() {
+        return this.append(HASH_FILE);
+    }
+
+    private final static String HASH_FILE = "hash.txt";
+
+    /**
      * Builds a new path holding the output directory within this directory.
      */
     J2clPath output() {
