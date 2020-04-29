@@ -611,6 +611,44 @@ coordinates and used to create a directory if one did not previously exist.
 
 
 
+### hash.txt
+
+The hash step directory will also include a `hash.txt` file which contains all the items used to produce the hash.
+The contents are also useful as a reference to discover which other dependencies were required by this particular dependency,
+note the order of this listing matches the order dependencies declared in the POM in a depth first ordering.
+
+```txt
+compile-source-root: annotations
+compile-source-root: java
+compile-source-root: test-annotations
+define: gwt.cspCompatModeEnabled=true
+define: gwt.enableDebugId=true
+define: gwt.strictCspTestingEnabled=true
+define: jre.checkedMode=DISABLED
+define: jre.checks.checkLevel=MINIMAL
+define: jsinterop.checks=DISABLED
+dependencies-0: jsinterop-annotations-2.0.0.jar
+dependencies-1: j2cl-bootstrap-javascript-1.0-SNAPSHOT-jszip.jar
+dependencies-2: j2cl-closure-test-1.0-SNAPSHOT-jszip.zip
+dependencies-3: j2cl-gwt-internal-annotations-1.0-SNAPSHOT.jar
+dependencies-4: j2cl-javac-bootstrap-classpath-1.0-SNAPSHOT.jar
+dependencies-5: j2cl-jre-java-1.0-SNAPSHOT.jar
+dependencies-6: j2cl-jre-javascript-1.0-SNAPSHOT.jar
+dependencies-7: j2cl-junit-annotations-1.0-SNAPSHOT.jar
+dependencies-8: j2cl-junit-java-1.0-SNAPSHOT.jar
+dependencies-9: j2cl-junit-javascript-1.0-SNAPSHOT.jar
+dependencies-10: j2cl-junit-processor-1.0-SNAPSHOT.jar
+dependencies-11: j2cl-uber-test-1.0-SNAPSHOT.jar
+dependencies-12: jsinterop-base-1.0-SNAPSHOT.jar
+language-out: ECMASCRIPT_2016
+level: ADVANCED_OPTIMIZATIONS
+scope: TEST
+sources-kind: TEST
+test-classname: test.JunitTest
+```
+
+
+
 ## Step 1 Unpack
 
 An attempt will be made to locate the sources jar and unpack if found. If no java source files (`*.java`) are found the
@@ -671,79 +709,91 @@ This is the final step and only run for the project, it uses the Closure compile
 
 # Troubleshooting
 
-As previously mentioned sub directories are created in the directory set in `output` parameter for each and every dependency
-and the project itself. All the steps for each artifact are also given a directory and log with all debug statements. Each
-log file will only contain output for the owning step, concurrent steps produce independent log files. All these logs are
-also printed to the console but with multiple threads running concurrently it might be confusing with interleved messages.
-It might be useful to change the `thread-pool-size` parameter to 1 to simplify console printing.
+A build results in all required dependencies as necessary creating a directory under the cache directory formed from
+the artifact coords along with a hash of various attributes and dependencies. The content that appears in each of these
+logs are is also printed to the console but with multiple threads running concurrently it might be confusing with interleved messages.
+It might also be useful to set the `threadpool-size=1` so messages are not mixed up with multiple threads writing output.
 
-To aide readability and faster location of a parameter or file, everything is sorted alphabetically, along with nesting
-and tree views for a file listing such as a classpath.
+`../walkingkooka-j2cl-maven-plugin-cache/walkingkooka--j2cl-maven-plugin-it-junit-test--jar--1.0-db1ecd80f01db349f97454549ba798c71e4283fb`
+
+All the steps for each artifact are also given a directory and log with all debug statements. Each log file will only
+contain output for the owning step, concurrent steps produce independent log files. 
+
+
+
+## log.txt
+
+Each component will include several of the steps mentioned in the previous section, and a log file will be present
+with messages and other output concerning that particular step.
 
 ```txt
-walkingkooka:example-hello-world-single:war:1.0-TRANSPILE
+walkingkooka:j2cl-maven-plugin-it-junit-test:jar:1.0-TRANSPILE
   Directory
-    /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-9f594ede2639492fdd88437f0d68a9321b56d898/7-transpiled-java-to-javascript
+    /Users/miroslav/repos-github/88j2cl-maven-plugin/target/it-tests/junit-test/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka--j2cl-maven-plugin-it-junit-test--jar--1.0-db1ecd80f01db349f97454549ba798c71e4283fb/7-transpiled-java-to-javascript
       Preparing...
       Source path(s)
-        /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-9f594ede2639492fdd88437f0d68a9321b56d898/3-gwt-incompatible-stripped-source/output
+        /Users/miroslav/repos-github/88j2cl-maven-plugin/target/it-tests/junit-test/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka--j2cl-maven-plugin-it-junit-test--jar--1.0-db1ecd80f01db349f97454549ba798c71e4283fb/3-gwt-incompatible-stripped-source/output
       J2clTranspiler
         Parameters
           Classpath(s)
-              Users/miroslav/repos-github/j2cl-maven-plugin/target
-                it-repo/com
-                  google/jsinterop/jsinterop-annotations/2.0.0
-                    jsinterop-annotations-2.0.0.jar
-                  vertispan/j2cl
-                    gwt-internal-annotations/0.7-SNAPSHOT
-                      gwt-internal-annotations-0.7-SNAPSHOT.jar
-                    javac-bootstrap-classpath/0.7-SNAPSHOT
-                      javac-bootstrap-classpath-0.7-SNAPSHOT.jar
-                    jre/0.7-SNAPSHOT
-                      jre-0.7-SNAPSHOT.jar
-                it-tests/example-hello-world-single/target/walkingkooka-j2cl-maven-plugin-cache/com.vertispan.jsinterop-base-jar-1.0.0-SNAPSHOT-6e7e7a5082a19339b19c93aa49bbc4d687955580/4-javac-compiled-gwt-incompatible-stripped
-                  output
-            5 file(s)
+              /Users/miroslav/repos-github/88j2cl-maven-plugin/target/it-repo/com/google/jsinterop/jsinterop-annotations/2.0.0/jsinterop-annotations-2.0.0.jar
+              /Users/miroslav/repos-github/88j2cl-maven-plugin/target/it-repo/walkingkooka/j2cl-bootstrap-javascript/1.0-SNAPSHOT/j2cl-bootstrap-javascript-1.0-SNAPSHOT-jszip.jar
+              /Users/miroslav/repos-github/88j2cl-maven-plugin/target/it-repo/walkingkooka/j2cl-gwt-internal-annotations/1.0-SNAPSHOT/j2cl-gwt-internal-annotations-1.0-SNAPSHOT.jar
+              /Users/miroslav/repos-github/88j2cl-maven-plugin/target/it-repo/walkingkooka/j2cl-javac-bootstrap-classpath/1.0-SNAPSHOT/j2cl-javac-bootstrap-classpath-1.0-SNAPSHOT.jar
+              /Users/miroslav/repos-github/88j2cl-maven-plugin/target/it-repo/walkingkooka/j2cl-jre-java/1.0-SNAPSHOT/j2cl-jre-java-1.0-SNAPSHOT.jar
+              /Users/miroslav/repos-github/88j2cl-maven-plugin/target/it-repo/walkingkooka/j2cl-jre-javascript/1.0-SNAPSHOT/j2cl-jre-javascript-1.0-SNAPSHOT.jar
+              /Users/miroslav/repos-github/88j2cl-maven-plugin/target/it-repo/walkingkooka/j2cl-junit-annotations/1.0-SNAPSHOT/j2cl-junit-annotations-1.0-SNAPSHOT.jar
+              /Users/miroslav/repos-github/88j2cl-maven-plugin/target/it-repo/walkingkooka/j2cl-junit-java/1.0-SNAPSHOT/j2cl-junit-java-1.0-SNAPSHOT.jar
+              /Users/miroslav/repos-github/88j2cl-maven-plugin/target/it-tests/junit-test/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka--j2cl-junit-javascript--jar--1.0-SNAPSHOT-69164038504dad959653fbc60320aade26f8e7a7/4-javac-gwt-incompatible-stripped-source/output
+              /Users/miroslav/repos-github/88j2cl-maven-plugin/target/it-repo/walkingkooka/j2cl-junit-processor/1.0-SNAPSHOT/j2cl-junit-processor-1.0-SNAPSHOT.jar
+              /Users/miroslav/repos-github/88j2cl-maven-plugin/target/it-tests/junit-test/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka--jsinterop-base--jar--1.0-SNAPSHOT-564fba3536a58e77c2eb8a64b36c82064c1711a8/4-javac-gwt-incompatible-stripped-source/output
+            11 file(s)
           *.java Source(s)
-              Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-9f594ede2639492fdd88437f0d68a9321b56d898/3-gwt-incompatible-stripped-source/output/example/helloworldlib
-                HelloWorld.java
-            1 file(s)
+              /Users/miroslav/repos-github/88j2cl-maven-plugin/target/it-tests/junit-test/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka--j2cl-maven-plugin-it-junit-test--jar--1.0-db1ecd80f01db349f97454549ba798c71e4283fb/3-gwt-incompatible-stripped-source/output
+                javatests/test
+                  JunitTest_Adapter.java
+                test
+                  JunitTest.java                                               StringValue.java
+            3 file(s)
           *.native.js source(s)
             0 file(s)
           *.js source(s)
-              Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-9f594ede2639492fdd88437f0d68a9321b56d898/3-gwt-incompatible-stripped-source/output/example
-                helloworld
-                  app.js
-                helloworldlib
-                  hello.js
-            2 file(s)
+              /Users/miroslav/repos-github/88j2cl-maven-plugin/target/it-tests/junit-test/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka--j2cl-maven-plugin-it-junit-test--jar--1.0-db1ecd80f01db349f97454549ba798c71e4283fb/3-gwt-incompatible-stripped-source/output/javatests/test
+                JunitTest_AdapterSuite.js
+            1 file(s)
           Output
-            /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-9f594ede2639492fdd88437f0d68a9321b56d898/7-transpiled-java-to-javascript/output
+            /Users/miroslav/repos-github/88j2cl-maven-plugin/target/it-tests/junit-test/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka--j2cl-maven-plugin-it-junit-test--jar--1.0-db1ecd80f01db349f97454549ba798c71e4283fb/7-transpiled-java-to-javascript/output
         J2clTranspiler
           0 Error(s)
           0 Warnings(s)
           0 Message(s)
           Copy js to output
-            Copying
-                Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-9f594ede2639492fdd88437f0d68a9321b56d898/7-transpiled-java-to-javascript/output/example
-                  helloworld
-                    app.js
-                  helloworldlib
-                    hello.js
-              2 file(s)
+              /Users/miroslav/repos-github/88j2cl-maven-plugin/target/it-tests/junit-test/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka--j2cl-maven-plugin-it-junit-test--jar--1.0-db1ecd80f01db349f97454549ba798c71e4283fb/7-transpiled-java-to-javascript/output/javatests/test
+                JunitTest_AdapterSuite.js
+            1 file(s)
           Output file(s) after copy
-              Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-9f594ede2639492fdd88437f0d68a9321b56d898/7-transpiled-java-to-javascript/output/example
-                helloworld
-                  app.js
-                helloworldlib
-                  HelloWorld.impl.java.js                                      HelloWorld.java
-                  HelloWorld.java.js                                           HelloWorld.js.map
-                  hello.js
-            6 file(s)
+              /Users/miroslav/repos-github/88j2cl-maven-plugin/target/it-tests/junit-test/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka--j2cl-maven-plugin-it-junit-test--jar--1.0-db1ecd80f01db349f97454549ba798c71e4283fb/7-transpiled-java-to-javascript/output
+                javatests/test
+                  JunitTest_Adapter$GoogTestCase$$Overlay.impl.java.js         JunitTest_Adapter$GoogTestCase$$Overlay.java.js
+                  JunitTest_Adapter$GoogTestCase$$Overlay.js.map               JunitTest_Adapter$IThenable$$Overlay.impl.java.js
+                  JunitTest_Adapter$IThenable$$Overlay.java.js                 JunitTest_Adapter$IThenable$$Overlay.js.map
+                  JunitTest_Adapter.impl.java.js                               JunitTest_Adapter.java
+                  JunitTest_Adapter.java.js                                    JunitTest_Adapter.js.map
+                  JunitTest_AdapterSuite.js
+                test
+                  JunitTest.impl.java.js                                       JunitTest.java
+                  JunitTest.java.js                                            JunitTest.js.map
+                  StringValue.impl.java.js                                     StringValue.java
+                  StringValue.java.js                                          StringValue.js.map
+            19 file(s)
     
     Log file
-      /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/example-hello-world-single/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka-example-hello-world-single-war-1.0-9f594ede2639492fdd88437f0d68a9321b56d898/7-transpiled-java-to-javascript/log.txt
+      /Users/miroslav/repos-github/88j2cl-maven-plugin/target/it-tests/junit-test/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka--j2cl-maven-plugin-it-junit-test--jar--1.0-db1ecd80f01db349f97454549ba798c71e4283fb/7-transpiled-java-to-javascript/log.txt
 ```
+
+
+
+# Cache directory tree structure view
 
 The image below contains two panel views, the left shows a directory tree showing the output directory showing all artifacts
 and some log files expanded, and the right shows a sample log file. The log shows a successful Closure compile build, with
