@@ -534,7 +534,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
                     break;
                 }
 
-                if (this.isJreBootstrapClassFiles() || this.isJreJavascriptFiles()) {
+                if (this.isJreJavascriptBootstrapFiles() || this.isJreJavascriptFiles()) {
                     required = true;
                     break;
                 }
