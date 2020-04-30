@@ -100,7 +100,7 @@ final class J2clStepWorkerHash extends J2clStepWorker {
             {
                 // leading zeroes added to keep keys in numeric order, so dependencies-0 is followed by dependencies-1 not dependencies-10
                 final J2clPath dependencyFile = dependency.artifactFileOrFail();
-                hashItemNames.add(DEPENDENCIES + CharSequences.padLeft("" + i, 10, '0') + ": " + dependencyFile.filename());
+                hashItemNames.add(DEPENDENCIES + CharSequences.padLeft("" + i, 10, '0') + ": " + dependency.coords());
                 hash.append(dependencyFile.path());
 
                 i++;

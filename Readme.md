@@ -633,36 +633,31 @@ coordinates and used to create a directory if one did not previously exist.
 
 The hash step directory will also include a `hash.txt` file which contains all the items used to produce the hash.
 The contents are also useful as a reference to discover which other dependencies were required by this particular dependency,
-note the order of this listing matches the order dependencies declared in the POM in a depth first ordering.
+note the order of this listing matches the order dependencies are declared in the POM in a depth first ordering.
 
 ```txt
-compile-source-root: annotations
 compile-source-root: java
-compile-source-root: test-annotations
-define: gwt.cspCompatModeEnabled=true
-define: gwt.enableDebugId=true
-define: gwt.strictCspTestingEnabled=true
 define: jre.checkedMode=DISABLED
 define: jre.checks.checkLevel=MINIMAL
 define: jsinterop.checks=DISABLED
-dependencies-0: jsinterop-annotations-2.0.0.jar
-dependencies-1: j2cl-bootstrap-javascript-1.0-SNAPSHOT-jszip.jar
-dependencies-2: j2cl-closure-test-1.0-SNAPSHOT-jszip.zip
-dependencies-3: j2cl-gwt-internal-annotations-1.0-SNAPSHOT.jar
-dependencies-4: j2cl-javac-bootstrap-classpath-1.0-SNAPSHOT.jar
-dependencies-5: j2cl-jre-java-1.0-SNAPSHOT.jar
-dependencies-6: j2cl-jre-javascript-1.0-SNAPSHOT.jar
-dependencies-7: j2cl-junit-annotations-1.0-SNAPSHOT.jar
-dependencies-8: j2cl-junit-java-1.0-SNAPSHOT.jar
-dependencies-9: j2cl-junit-javascript-1.0-SNAPSHOT.jar
-dependencies-10: j2cl-junit-processor-1.0-SNAPSHOT.jar
-dependencies-11: j2cl-uber-test-1.0-SNAPSHOT.jar
-dependencies-12: jsinterop-base-1.0-SNAPSHOT.jar
+dependencies-0: com.google.elemental2:elemental2-dom:jar:1.0.0-RC1
+dependencies-1: org.gwtproject.event:gwt-event:jar:HEAD-SNAPSHOT
+dependencies-2: walkingkooka:j2cl-uber:jar:1.0-SNAPSHOT
+dependencies-3: com.google.elemental2:elemental2-core:jar:1.0.0-RC1
+dependencies-4: com.google.elemental2:elemental2-promise:jar:1.0.0-RC1
+dependencies-5: walkingkooka:j2cl-jre-java:jar:1.0-SNAPSHOT
+dependencies-6: com.google.jsinterop:jsinterop-annotations:jar:2.0.0
+dependencies-7: walkingkooka:j2cl-gwt-internal-annotations:jar:1.0-SNAPSHOT
+dependencies-8: walkingkooka:jsinterop-base:jar:1.0-SNAPSHOT
+dependencies-9: walkingkooka:j2cl-javac-bootstrap-classpath:jar:1.0-SNAPSHOT
+dependencies-10: walkingkooka:j2cl-jre-javascript:jar:1.0-SNAPSHOT
+dependencies-11: walkingkooka:j2cl-bootstrap-javascript:jar:jszip:1.0-SNAPSHOT
+entry-points: com.vertispan.draw.connected.client.FlowChartEntryPoint
+initial-script-filename: [define: jre.checkedMode=DISABLED, define: jre.checks.checkLevel=MINIMAL, define: jsinterop.checks=DISABLED, entry-points: com.vertispan.draw.connected.client.FlowChartEntryPoint, language-out: ECMASCRIPT_2016, level: ADVANCED_OPTIMIZATIONS, scope: RUNTIME, sources-kind: SRC]
 language-out: ECMASCRIPT_2016
 level: ADVANCED_OPTIMIZATIONS
-scope: TEST
-sources-kind: TEST
-test-classname: test.JunitTest
+scope: RUNTIME
+sources-kind: SRC
 ```
 
 
