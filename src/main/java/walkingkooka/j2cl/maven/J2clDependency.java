@@ -526,16 +526,50 @@ final class J2clDependency implements Comparable<J2clDependency> {
         if (null == this.javascriptSourceRequired) {
             this.testArchive();
 
-            final J2clRequest request = this.request();
-            final J2clArtifactCoords coords = this.coords();
+            final boolean required;
 
-            this.javascriptSourceRequired = (this.javascriptSourceRequiredFile || request.isJavascriptSourceRequired(coords) || false == (this.classpathRequiredFile || request.isClasspathRequired(coords))) &&
-                    false == this.isAnnotationClassFiles() &&
-                    false == this.isAnnotationProcessor() &&
-                    this.isJreJavascriptBootstrapFiles() ||
-                    this.isJreJavascriptFiles() ||
-                    false == this.isJreBootstrapClassFiles() &&
-                            false == this.isJreClassFiles();
+            do {
+                if (this.isAnnotationClassFiles() || this.isAnnotationProcessor() || this.isJreBootstrapClassFiles() || this.isJreClassFiles()) {
+                    required = false;
+                    break;
+                }
+
+                if (this.isJreBootstrapClassFiles() || this.isJreJavascriptFiles()) {
+                    required = true;
+                    break;
+                }
+
+                // javascript-source-required present
+                if (this.javascriptSourceRequiredFile) {
+                    required = true;
+                    break;
+                }
+
+                // was included in POM javascript-source-required
+                final J2clRequest request = this.request();
+                final J2clArtifactCoords coords = this.coords();
+                if (request.isJavascriptSourceRequired(coords)) {
+                    required = true;
+                    break;
+                }
+
+                // not explicitly required and ignored so false
+                if (this.ignoredFile) {
+                    required = false;
+                    break;
+                }
+
+                // cp required but js missing so false
+                if (this.classpathRequiredFile || request.isClasspathRequired(coords)) {
+                    required = false;
+                    break;
+                }
+
+                // both js and cp required missing default to required
+                required = true;
+            } while (false);
+
+            this.javascriptSourceRequired = required;
         }
 
         return this.javascriptSourceRequired;
