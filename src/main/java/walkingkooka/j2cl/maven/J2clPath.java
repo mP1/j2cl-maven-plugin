@@ -63,16 +63,41 @@ final class J2clPath implements Comparable<J2clPath> {
      */
     static final Predicate<Path> ALL_FILES = Files::isRegularFile;
 
-    static final Predicate<Path> CLASS_FILES = fileEndsWith(".class");
-    static final Predicate<Path> JAVA_FILES = fileEndsWith(".java");
-    static final Predicate<Path> JAVASCRIPT_FILES = fileEndsWith(".js");
-    static final Predicate<Path> NATIVE_JAVASCRIPT_FILES = fileEndsWith(".native.js");
+    /**
+     * Matches paths with a class file extension.
+     */
+    static final Predicate<Path> CLASS_FILEEXTENSION = fileEndsWith(".class");
+
+    /**
+     * Matches existing class files.
+     */
+    static final Predicate<Path> CLASS_FILES = ALL_FILES.and(CLASS_FILEEXTENSION);
+
+    /**
+     * Matches paths with a java file extension.
+     */
+    static final Predicate<Path> JAVA_FILEEXTENSION = fileEndsWith(".java");
+
+    /**
+     * Matches existing java files.
+     */
+    static final Predicate<Path> JAVA_FILES = ALL_FILES.and(JAVA_FILEEXTENSION);
+
+    /**
+     * Matches existing js files.
+     */
+    static final Predicate<Path> JAVASCRIPT_FILES = ALL_FILES.and(fileEndsWith(".js"));
+
+    /**
+     * Matches existing native.js files.
+     */
+    static final Predicate<Path> NATIVE_JAVASCRIPT_FILES = ALL_FILES.and(fileEndsWith(".native.js"));
 
     /**
      * Matches all files that end with the given extension, assumes the extension includes a leading dot.
      */
     private static Predicate<Path> fileEndsWith(final String extension) {
-        return ALL_FILES.and((p) -> p.getFileName().toString().endsWith(extension));
+        return (p) -> p.getFileName().toString().endsWith(extension);
     }
 
     /**
@@ -83,7 +108,7 @@ final class J2clPath implements Comparable<J2clPath> {
     /**
      * Matches all files except for java source.
      */
-    static final Predicate<Path> ALL_FILES_EXCEPT_JAVA = ALL_FILES.and((p) -> false == p.getFileName().toString().endsWith(".java"));
+    static final Predicate<Path> ALL_FILES_EXCEPT_JAVA = ALL_FILES.and((p) -> ! JAVA_FILEEXTENSION.test(p));
 
     static List<File> toFiles(final Collection<J2clPath> paths) {
         return paths.stream().map(J2clPath::file).collect(Collectors.toList());

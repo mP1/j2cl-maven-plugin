@@ -23,7 +23,12 @@ import org.junit.Test;
 public class JunitTest {
 
     @Test
-    public void testJreJavaUtilLocaleWasShaded() {
-        Assert.assertEquals("Shaded", java.util.Locale.ROOT.toString());
+    public void testJreJavaUtilLocaleGetCountryWasShaded() {
+        Assert.assertEquals("getCountry.Shaded", java.util.Locale.ROOT.getCountry());
+    }
+
+    @Test
+    public void testJreJavaUtilLocaleToStringWasShaded() {
+        Assert.assertEquals("toString.Shaded", java.util.Locale.ROOT.toString());
     }
 }
