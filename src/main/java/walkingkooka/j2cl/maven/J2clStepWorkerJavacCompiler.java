@@ -50,6 +50,8 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
             if (javaSourceFiles.isEmpty()) {
                 source = null;
             } else {
+                final boolean shouldRunAnnotationProcessors = this.shouldRunAnnotationProcessors();
+
                 final Set<J2clPath> bootstrap = Sets.ordered();
                 final Set<J2clPath> classpath = Sets.ordered();
 
@@ -58,6 +60,11 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
                 for (final J2clDependency dependency : artifact.dependencies()) {
                     if (dependency.isJreBootstrapClassFiles()) {
                         addIfAbsent(dependency.artifactFileOrFail(), bootstrap);
+                        continue;
+                    }
+
+                    // not running ap dont add to cp
+                    if (dependency.isAnnotationProcessor() && false == shouldRunAnnotationProcessors) {
                         continue;
                     }
 
@@ -80,7 +87,7 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
                             javaSourceFiles,
                             directory.output().absentOrFail(),
                             artifact.request().javaCompilerArguments(),
-                            this.shouldRunAnnotationProcessors(),
+                            shouldRunAnnotationProcessors,
                             logger) ?
                             J2clStepResult.SUCCESS :
                             J2clStepResult.FAILED;
