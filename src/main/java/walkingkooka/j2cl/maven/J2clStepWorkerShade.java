@@ -89,7 +89,8 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
                               final Map<String, String> shade,
                               final J2clPath output,
                               final J2clLinePrinter logger) throws Exception {
-        final Set<J2clPath> files = root.gatherFiles(this.fileFilter());
+        final Predicate<Path> filter = this.fileExtensionFilter();
+        final Set<J2clPath> files = root.gatherFiles(J2clPath.ALL_FILES.and(filter));
         final Set<J2clPath> nonShadedFiles = Sets.sorted();
         nonShadedFiles.addAll(files);
 
@@ -120,7 +121,7 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
                     shadeDirectory.copyFiles(shadedRoot,
                             shadedFiles,
                             (content, path) -> {
-                                return path.isJava() ?
+                                return filter.test(path.path()) ?
                                         shade(content, shade) :
                                         content;
                             },
@@ -149,7 +150,10 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
         logger.outdent();
     }
 
-    abstract Predicate<Path> fileFilter();
+    /**
+     * A filter that only tests the file extension. It does not test if the file actually exists.
+     */
+    abstract Predicate<Path> fileExtensionFilter();
 
     /**
      * Reads the file and shades the source text or class file type references.

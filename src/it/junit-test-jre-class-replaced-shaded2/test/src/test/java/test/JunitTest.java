@@ -23,8 +23,14 @@ import org.junit.Test;
 public class JunitTest {
 
     @Test
-    public void testJreJavaUtilLocaleWasShadedAndReplaced() {
-        // if the supplied JRE is used this will fail, if our replaced Locale is actually used this test will pass.
-        Assert.assertEquals("Shaded", java.util.Locale.ROOT.toString());
+    public void testJreJavaUtilLocaleGetCountry() {
+        // if shading failed this wont compile
+        Assert.assertEquals("getCountry.Shaded", java.util.Locale.ROOT.getCountry());
+    }
+
+    @Test
+    public void testJreJavaUtilLocaleToStringWasShadedAndReplaced() {
+        // if the supplied JRE Locale is used this will fail, if our replaced Locale is actually used this test will pass.
+        Assert.assertEquals("toString.Shaded", java.util.Locale.ROOT.toString());
     }
 }

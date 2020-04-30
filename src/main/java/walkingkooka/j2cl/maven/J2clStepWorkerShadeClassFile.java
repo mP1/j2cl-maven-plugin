@@ -52,8 +52,8 @@ final class J2clStepWorkerShadeClassFile extends J2clStepWorkerShade {
     }
 
     @Override
-    Predicate<Path> fileFilter() {
-        return J2clPath.CLASS_FILES;
+    Predicate<Path> fileExtensionFilter() {
+        return J2clPath.CLASS_FILEEXTENSION;
     }
 
     @Override

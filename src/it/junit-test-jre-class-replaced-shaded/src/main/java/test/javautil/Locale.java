@@ -21,8 +21,12 @@ public class Locale {
 
     public final static Locale ROOT = new Locale();
 
+    public String getCountry() {
+        return "getCountry.Shaded";
+    }
+
     @Override
     public String toString() {
-        return "Shaded";
+        return "toString.Shaded";
     }
 }
