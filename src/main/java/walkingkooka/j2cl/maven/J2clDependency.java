@@ -47,7 +47,6 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -65,7 +64,7 @@ import java.util.stream.Stream;
 final class J2clDependency implements Comparable<J2clDependency> {
 
     static Set<J2clDependency> set() {
-        return Sets.sorted();
+        return Sets.ordered();
     }
 
     /**
@@ -77,19 +76,13 @@ final class J2clDependency implements Comparable<J2clDependency> {
                 project,
                 Optional.empty(),
                 request);
-        root.gather(request.scope().scopeFilter(), Predicates.never(), Function.identity());
+        root.gatherDependencies(request.scope().scopeFilter(), Predicates.never(), Function.identity());
         root.verify();
         root.addBootstrapClasspath();
         root.print(true);
 
         return root;
     }
-
-    /**
-     * Holds all dependencies discovered during the gathering process. This will be used to verify that lists like
-     * classpathRequired actually match at least one real dependency.
-     */
-    private final static List<J2clDependency> all = Lists.array();
 
     // ctor.............................................................................................................
 
@@ -102,14 +95,12 @@ final class J2clDependency implements Comparable<J2clDependency> {
         this.project = project;
         this.artifactFile = artifactFile;
         this.request = request;
-
-        J2clDependency.all.add(this);
     }
 
-    private void gather(final Predicate<String> scopeFilter,
-                        final Predicate<J2clArtifactCoords> parentExclusions,
-                        final Function<J2clArtifactCoords, J2clArtifactCoords> dependencyManagement) {
-        this.gather0(scopeFilter, parentExclusions, this.dependencyManagement(dependencyManagement));
+    private void gatherDependencies(final Predicate<String> scopeFilter,
+                                    final Predicate<J2clArtifactCoords> parentExclusions,
+                                    final Function<J2clArtifactCoords, J2clArtifactCoords> dependencyManagement) {
+        this.gatherDependencies0(scopeFilter, parentExclusions, this.dependencyManagement(dependencyManagement));
     }
 
     private Function<J2clArtifactCoords, J2clArtifactCoords> dependencyManagement(final Function<J2clArtifactCoords, J2clArtifactCoords> transformer) {
@@ -137,21 +128,10 @@ final class J2clDependency implements Comparable<J2clDependency> {
         return result;
     }
 
-    private void gather0(final Predicate<String> scopeFilter,
-                            final Predicate<J2clArtifactCoords> parentExclusions,
-                            final Function<J2clArtifactCoords, J2clArtifactCoords> dependencyManagement) {
-        final List<Predicate<J2clArtifactCoords>> childExclusions = Lists.array();
-
-        this.gatherChildrenDependencies(scopeFilter, parentExclusions, dependencyManagement, childExclusions);
-        this.gatherDescendants(scopeFilter, childExclusions, dependencyManagement);
-        this.addChildrenDependencies();
-    }
-
-    private void gatherChildrenDependencies(final Predicate<String> scopeFilter,
-                                            final Predicate<J2clArtifactCoords> parentExclusions,
-                                            final Function<J2clArtifactCoords, J2clArtifactCoords> dependencyManagement,
-                                            final List<Predicate<J2clArtifactCoords>> childExclusions) {
-        J2clRequest request = this.request();
+    private void gatherDependencies0(final Predicate<String> scopeFilter,
+                                     final Predicate<J2clArtifactCoords> parentExclusions,
+                                     final Function<J2clArtifactCoords, J2clArtifactCoords> dependencyManagement) {
+        final J2clRequest request = this.request();
         final J2clClasspathScope scope = request.scope();
         final MavenProject project = this.project();
         final J2clMavenMiddleware middleware = request.mavenMiddleware();
@@ -176,24 +156,18 @@ final class J2clDependency implements Comparable<J2clDependency> {
             final J2clArtifactCoords corrected = dependencyManagement.apply(coords);
             final MavenProject childProject = middleware.mavenProject(corrected.mavenArtifact(scope, middleware.artifactHandler(coords.typeOrDefault())));
 
-            this.dependencies.add(new J2clDependency(corrected,
+            final J2clDependency child = new J2clDependency(corrected,
                     childProject,
                     Optional.of(middleware.mavenFile(corrected.toString()).orElseThrow(() -> new IllegalArgumentException("Archive file missing for " + CharSequences.quote(corrected.toString())))),
-                    request));
+                    request);
+            this.dependencies.add(child);
 
-            childExclusions.add(exclusions(parentExclusions, dependency));
-        }
-    }
-
-    private void gatherDescendants(final Predicate<String> scopeFilter,
-                                   final List<Predicate<J2clArtifactCoords>> childExclusions,
-                                   final Function<J2clArtifactCoords, J2clArtifactCoords> dependencyManagement) {
-        final Iterator<Predicate<J2clArtifactCoords>> exclusionsIterator = childExclusions.iterator();
-        for (final J2clDependency child : this.dependencies) {
-            child.gather(scopeFilter,
-                    exclusionsIterator.next(),
+            child.gatherDependencies(scopeFilter,
+                    exclusions(parentExclusions, dependency),
                     dependencyManagement);
         }
+
+        this.addChildrenDependencies();
     }
 
     /**
@@ -233,22 +207,24 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * required and ignored dependency declarations.
      */
     private void verify() {
-        this.verifyWithoutConflictsOrDuplicates();
-        this.request().verifyClasspathRequiredJavascriptSourceRequiredIgnoredDependencies(J2clDependency.all
-                .stream()
-                .map(J2clDependency::coords)
-                .collect(Collectors.toCollection(Sets::sorted)),
+        final Collection<J2clDependency> all = this.dependencies();
+        this.verifyWithoutConflictsOrDuplicates(all);
+
+        this.request().verifyClasspathRequiredJavascriptSourceRequiredIgnoredDependencies(all
+                        .stream()
+                        .map(J2clDependency::coords)
+                        .collect(Collectors.toCollection(Sets::sorted)),
                 this);
     }
 
     /**
      * Verifies there are not dependencies that share the same group and artifact id but differ in other components.
      */
-    private void verifyWithoutConflictsOrDuplicates() {
+    private void verifyWithoutConflictsOrDuplicates(final Collection<J2clDependency> all) {
         final Set<J2clArtifactCoords> duplicateCoords = J2clArtifactCoords.set();
         final List<String> duplicatesText = Lists.array();
 
-        for (final J2clDependency dependency : J2clDependency.all) {
+        for (final J2clDependency dependency : all) {
             final J2clArtifactCoords coords = dependency.coords();
 
             // must have been the duplicate of another coord.
@@ -256,7 +232,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
                 continue;
             }
 
-            final List<J2clArtifactCoords> duplicates = J2clDependency.all.stream()
+            final List<J2clArtifactCoords> duplicates = all.stream()
                     .map(J2clDependency::coords)
                     .filter(possible -> coords.isSameGroupArtifactDifferentVersion(possible))
                     .collect(Collectors.toList());
@@ -282,8 +258,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Add the bootstrap and classpath dependencies to all other dependencies............................................
      */
     private void addBootstrapClasspath() {
-        final Map<J2clArtifactCoords, J2clDependency> coordToDependency = gatherCoordToDependency();
-        this.reduceDuplicateDependencies(coordToDependency, MISSING_FAILS);
+        final Map<J2clArtifactCoords, J2clDependency> coordToDependency = this.gatherCoordToDependency();
+        this.reduce(coordToDependency);
 
         final Collection<J2clDependency> bootstrapAndJreDependencies = collectBootstrapAndJreWithDependencies(coordToDependency.values());
         addIfAbsent(coordToDependency.values(), bootstrapAndJreDependencies);
@@ -295,40 +271,44 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     private Map<J2clArtifactCoords, J2clDependency> gatherCoordToDependency() {
         final Map<J2clArtifactCoords, J2clDependency> coordToDependency = Maps.sorted(J2clArtifactCoords.IGNORE_VERSION_COMPARATOR);
-        coordToDependency.put(this.coords(), this);
-
-        for (final J2clDependency dependency : this.dependencies) {
-            coordToDependency.put(dependency.coords(), dependency);
-        }
-
+        this.gatherCoordToDependency0(coordToDependency);
         return coordToDependency;
     }
 
-    private final static boolean MISSING_FAILS = true;
-    private final static boolean MISSING_SKIP = !MISSING_FAILS;
+    private void gatherCoordToDependency0(final Map<J2clArtifactCoords, J2clDependency> coordToDependency) {
+        coordToDependency.put(this.coords(), this);
 
-    private void reduceDuplicateDependencies(final Map<J2clArtifactCoords, J2clDependency> coordToDependency,
-                                             final boolean missingFails) {
-        // some coords will have multiple J2clDependency instances replace them all.
-        final Set<J2clDependency> dependencies = set();
-        for (final J2clDependency dependency : coordToDependency.values()) {
-            final Set<J2clDependency> singletons = set();
-            for (final J2clDependency child : dependency.dependencies) {
-                final J2clDependency childSingleton = coordToDependency.get(child.coords());
+        for (final J2clDependency dependency : this.dependencies) {
+            final J2clArtifactCoords coords = dependency.coords();
 
-                if (null == childSingleton) {
-                    if (missingFails) {
-                        throw new NullPointerException("Missing " + child.coords() + "\n" + coordToDependency.values());
-                    }
-                    continue;
+            final J2clDependency less;
+            final J2clDependency other = coordToDependency.get(coords);
+            if(null == other) {
+                less = dependency;
+            } else {
+                final Set<J2clDependency> otherDependencies = other.dependencies;
+                if (this.dependencies.size() < otherDependencies.size()) {
+                    less = this;
+                } else {
+                    less = other;
                 }
-
-                singletons.add(childSingleton);
-                dependencies.add(childSingleton);
             }
-            dependency.dependencies2 = singletons;
-            dependency.dependencies = null; // no longer needed
+
+            less.gatherCoordToDependency0(coordToDependency);
         }
+    }
+
+    private void reduce(final Map<J2clArtifactCoords, J2clDependency> coordToDependency) {
+        final Set<J2clDependency> dependencies = set();
+
+        // some coords will have multiple J2clDependency instances replace with a single instance.
+        for (final J2clDependency child : this.dependencies) {
+            final J2clDependency child2 = coordToDependency.get(child.coords());
+            child2.reduce(coordToDependency);
+            dependencies.add(child2);
+        }
+
+        this.dependencies = dependencies; // make readonly later.
     }
 
     /**
@@ -340,7 +320,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
                 .collect(Collectors.toCollection(J2clDependency::set));
 
         final Collection<J2clDependency> dependencies = bootstrapAndJre.stream()
-                .flatMap(d -> d.dependencies2.stream())
+                .flatMap(d -> d.dependencies.stream())
                 .filter(d -> false == d.isIgnored())
                 .collect(Collectors.toCollection(J2clDependency::set));
         addIfAbsent(dependencies, bootstrapAndJre);
@@ -363,8 +343,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     private void addIfAbsent(final Collection<J2clDependency> ifAbsent) {
         for (final J2clDependency maybe : ifAbsent) {
-            if (false == this.dependencies2.contains(maybe)) {
-                this.dependencies2.add(maybe);
+            if (false == this.dependencies.contains(maybe)) {
+                this.dependencies.add(maybe);
             }
         }
     }
@@ -374,7 +354,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     private static void makeDependenciesGetterReadOnly(final Collection<J2clDependency> all) {
         all.forEach(d -> {
-            d.dependencies2 = Sets.readOnly(d.dependencies2);
+            d.dependencies = Sets.readOnly(d.dependencies);
         });
     }
 
@@ -390,9 +370,6 @@ final class J2clDependency implements Comparable<J2clDependency> {
         printer.printLine("Dependencies");
         printer.indent();
         {
-            if (false == printMetadata) {
-                this.expandDependencies(); // @see #expandDepenencies
-            }
             this.prettyPrintDependencies(printer);
 
             if (printMetadata) {
@@ -401,13 +378,6 @@ final class J2clDependency implements Comparable<J2clDependency> {
         }
         printer.outdent();
         printer.flush();
-    }
-
-    /**
-     * This is necessary so {@link #prettyPrintDependencies(J2clLinePrinter)} will not fail because {@link #dependencies2} will be null.
-     */
-    private void expandDependencies() {
-        this.reduceDuplicateDependencies(this.gatherCoordToDependency(), MISSING_SKIP);
     }
 
     /**
@@ -515,14 +485,10 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Retrieves all dependencies including transients, and will include any required artifacts.
      */
     Set<J2clDependency> dependencies() {
-        return this.dependencies2;
+        return this.dependencies;
     }
 
-    // may contain duplicates...
-    private List<J2clDependency> dependencies = Lists.array();
-
-    // without duplicates
-    private Set<J2clDependency> dependencies2;
+    private Set<J2clDependency> dependencies = set();
 
     // isDependency.....................................................................................................
 
@@ -984,6 +950,21 @@ final class J2clDependency implements Comparable<J2clDependency> {
         }
 
         return Lists.readOnly(sources);
+    }
+
+    // Object.........................................................................................................
+
+    @Override
+    public int hashCode() {
+        return this.coords().hashCode();
+    }
+
+    public boolean equals(final Object other) {
+        return this == other || other instanceof J2clDependency && this.equals0((J2clDependency)other);
+    }
+
+    private boolean equals0(final J2clDependency other) {
+        return this.coords().equals(other.coords());
     }
 
     // toString.........................................................................................................

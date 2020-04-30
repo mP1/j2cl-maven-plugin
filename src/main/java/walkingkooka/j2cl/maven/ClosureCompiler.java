@@ -37,7 +37,6 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -53,7 +52,7 @@ class ClosureCompiler {
                            final Set<ClosureFormattingOption> formatting,
                            final LanguageMode languageOut,
                            final boolean exportTestFunctions,
-                           final Map<J2clPath, J2clPathTargetFile> sources,
+                           final Set<J2clPath> sources,
                            final J2clPath output,
                            final String initialScriptFilename,
                            final J2clLinePrinter logger) throws Exception {
@@ -77,7 +76,7 @@ class ClosureCompiler {
                                     final Set<ClosureFormattingOption> formatting,
                                     final LanguageMode languageOut,
                                     final boolean exportTestFunctions,
-                                    final Map<J2clPath, J2clPathTargetFile> sources,
+                                    final Set<J2clPath> sources,
                                     final J2clPath output,
                                     final String initialScriptFilename,
                                     final J2clLinePrinter logger) throws Exception {
@@ -87,9 +86,7 @@ class ClosureCompiler {
         logger.printLine(sources.size() + " Source(s)");
         logger.indent();
         {
-            for (final Entry<J2clPath, J2clPathTargetFile> sourceRootAndTargetFile : sources.entrySet()) {
-                final J2clPath sourceRoot = sourceRootAndTargetFile.getKey();
-                final J2clPathTargetFile targetFile = sourceRootAndTargetFile.getValue();
+            for (final J2clPath sourceRoot : sources) {
                 logger.printLine(sourceRoot.toString());
                 logger.indent();
                 {
@@ -97,7 +94,6 @@ class ClosureCompiler {
                     if (sourceRoot.isFile()) {
                         copied = sourceRoot.extractArchiveFiles(J2clPath.WITHOUT_META_INF,
                                 unitedSourceRoot,
-                                targetFile,
                                 logger);
                     } else {
                         // if unpack/output dont want to copy java source.
@@ -107,7 +103,6 @@ class ClosureCompiler {
 
                         copied = unitedSourceRoot.copyFiles(sourceRoot,
                                 sourceRoot.gatherFiles(filter),
-                                targetFile,
                                 J2clPath.COPY_FILE_CONTENT_VERBATIM,
                                 logger);
                     }

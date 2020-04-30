@@ -93,7 +93,6 @@ final class GwtIncompatibleStripPreprocessor {
                     // find then copy from unpack to $output
                     final Collection<J2clPath> files = output.copyFiles(sourceRoot,
                             copied,
-                            J2clPathTargetFile.REPLACE,
                             J2clPath.COPY_FILE_CONTENT_VERBATIM,
                             logger);
 
@@ -156,7 +155,6 @@ final class GwtIncompatibleStripPreprocessor {
                 final Set<J2clPath> copy = gatherFiles(sourceRoot, J2clPath.JAVASCRIPT_FILES);
                 output.copyFiles(sourceRoot,
                         copy,
-                        J2clPathTargetFile.REPLACE,
                         J2clPath.COPY_FILE_CONTENT_VERBATIM,
                         logger);
             }

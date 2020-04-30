@@ -17,9 +17,9 @@
 
 package walkingkooka.j2cl.maven;
 
-import walkingkooka.collect.list.Lists;
+import walkingkooka.collect.set.Sets;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Compiles the java source from sources and the given target.
@@ -42,7 +42,7 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
 
         J2clPath source = artifact.step(sourceStep).output().exists().orElse(null);
         if (null != source) {
-            final List<J2clPath> javaSourceFiles = Lists.array();
+            final Set<J2clPath> javaSourceFiles = Sets.ordered();
 
             final J2clPath output = artifact.step(sourceStep).output();
             
@@ -50,19 +50,19 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
             if (javaSourceFiles.isEmpty()) {
                 source = null;
             } else {
-                final List<J2clPath> bootstrap = Lists.array();
-                final List<J2clPath> classpath = Lists.array();
+                final Set<J2clPath> bootstrap = Sets.ordered();
+                final Set<J2clPath> classpath = Sets.ordered();
 
                 final J2clStep compiledStep = this.compiledStep();
 
                 for (final J2clDependency dependency : artifact.dependencies()) {
                     if (dependency.isJreBootstrapClassFiles()) {
-                        bootstrap.add(dependency.artifactFileOrFail());
+                        addIfAbsent(dependency.artifactFileOrFail(), bootstrap);
                         continue;
                     }
 
                     if (dependency.isClasspathRequired()) {
-                        classpath.add(dependency.artifactFileOrFail());
+                        addIfAbsent(dependency.artifactFileOrFail(), classpath);
                         continue;
                     }
 
@@ -97,6 +97,12 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
         }
 
         return result;
+    }
+
+    private static void addIfAbsent(final J2clPath ifAbsent, final Set<J2clPath> target) {
+        if (false == target.contains(ifAbsent)) {
+            target.add(ifAbsent);
+        }
     }
 
     /**

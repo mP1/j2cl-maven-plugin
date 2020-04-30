@@ -132,7 +132,6 @@ final class J2clPath implements Comparable<J2clPath> {
      */
     Collection<J2clPath> copyFiles(final J2clPath src,
                                    final Collection<J2clPath> files,
-                                   final J2clPathTargetFile targetFile,
                                    final BiFunction<byte[], J2clPath, byte[]> contentTransformer,
                                    final J2clLinePrinter logger) throws IOException {
         final Path srcPath = src.path();
@@ -146,7 +145,7 @@ final class J2clPath implements Comparable<J2clPath> {
             final String relative = srcPath.relativize(filePath).toString();
             final Path copyTarget = destPath.resolve(relative);
 
-            if (J2clPathTargetFile.SKIP == targetFile && Files.exists(copyTarget)) {
+            if (Files.exists(copyTarget)) {
                 skipped.add(file);
                 continue;
             }
@@ -194,14 +193,12 @@ final class J2clPath implements Comparable<J2clPath> {
      */
     Set<J2clPath> extractArchiveFiles(final Predicate<Path> filter,
                                       final J2clPath target,
-                                      final J2clPathTargetFile copy,
                                       final J2clLinePrinter logger) throws IOException {
         final URI uri = URI.create("jar:" + this.path().toAbsolutePath().toUri());
         try (final FileSystem zip = FileSystems.newFileSystem(uri, Maps.empty())) {
             return this.extractArchiveFiles0(zip.getPath("/"),
                     filter,
                     target,
-                    copy,
                     logger);
         } catch (final FileSystemAlreadyExistsException cause) {
             throw new IOException("File " + uri + " exists", cause);
@@ -215,13 +212,12 @@ final class J2clPath implements Comparable<J2clPath> {
     private Set<J2clPath> extractArchiveFiles0(final Path source,
                                                final Predicate<Path> filter,
                                                final J2clPath target,
-                                               final J2clPathTargetFile copy,
                                                final J2clLinePrinter logger) throws IOException {
         final Set<J2clPath> files = J2clPath.with(source).gatherFiles(filter.and(J2clPath.ALL_FILES));
         if (files.isEmpty()) {
             logger.printIndentedLine("No files");
         } else {
-            this.extractArchivesFiles1(source, target, files, copy, logger);
+            this.extractArchivesFiles1(source, target, files, logger);
         }
 
         return Sets.readOnly(files);
@@ -233,13 +229,12 @@ final class J2clPath implements Comparable<J2clPath> {
     private void extractArchivesFiles1(final Path root,
                                        final J2clPath target,
                                        final Set<J2clPath> files,
-                                       final J2clPathTargetFile targetFiles,
                                        final J2clLinePrinter logger) throws IOException {
         for (final J2clPath file : files) {
             final Path filePath = file.path();
             final Path pathInZip = root.relativize(filePath);
             final Path copyTarget = Paths.get(target.toString()).resolve(pathInZip.toString());
-            if (J2clPathTargetFile.SKIP == targetFiles && Files.exists(copyTarget)) {
+            if (Files.exists(copyTarget)) {
                 continue;
             }
 

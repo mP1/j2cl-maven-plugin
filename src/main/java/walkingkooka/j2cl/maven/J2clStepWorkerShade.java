@@ -119,7 +119,6 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
                     // copy and shade java source and copy other files to output.
                     shadeDirectory.copyFiles(shadedRoot,
                             shadedFiles,
-                            J2clPathTargetFile.REPLACE,
                             (content, path) -> {
                                 return path.isJava() ?
                                         shade(content, shade) :
@@ -137,7 +136,6 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
                 // copy all other files verbatim.
                 output.copyFiles(root,
                         nonShadedFiles,
-                        J2clPathTargetFile.REPLACE,
                         J2clPath.COPY_FILE_CONTENT_VERBATIM,
                         logger);
 
