@@ -224,7 +224,9 @@ final class J2clLinePrinter {
                 }
             }
         }.biConsumer()
-                .accept(paths.stream().map(toStringPath).collect(Collectors.toCollection(Sets::sorted)),
+                .accept(paths.stream()
+                                .map(toStringPath)
+                                .collect(Collectors.toCollection(Sets::ordered)),
                         printer);
         printer.lineStart();
         printer.flush();
