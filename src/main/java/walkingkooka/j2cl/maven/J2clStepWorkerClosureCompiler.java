@@ -19,6 +19,7 @@ package walkingkooka.j2cl.maven;
 
 import walkingkooka.collect.set.Sets;
 
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -37,37 +38,51 @@ final class J2clStepWorkerClosureCompiler extends J2clStepWorker2 {
         super();
     }
 
-    @Override
-    final J2clStepResult execute1(final J2clDependency artifact,
-                                  final J2clStepDirectory directory,
-                                  final J2clLinePrinter logger) throws Exception {
+    @Override final J2clStepResult execute1(final J2clDependency artifact,
+                                            final J2clStepDirectory directory,
+                                            final J2clLinePrinter logger) throws Exception {
         final J2clRequest request = artifact.request();
-        final Set<J2clPath> sources;
+        final Set<J2clPath> sources = Sets.ordered();
 
-        logger.printLine("Discovering source roots");
-        logger.indent();
+        this.addSources(artifact, sources);
         {
-            sources = this.addSources(artifact, logger);
-            logger.indent();
-            {
-                for (final J2clDependency dependency : artifact.dependencies()) {
-                    if (dependency.isAnnotationProcessor()) {
-                        continue;
-                    }
+            for (final J2clDependency dependency : artifact.dependencies()) {
+                if (dependency.isAnnotationClassFiles()) {
+                    continue;
+                }
 
-                    if (false == dependency.isJavascriptSourceRequired()) {
-                        continue;
-                    }
-                    sources.addAll(this.addSources(dependency, logger));
+                if (dependency.isAnnotationProcessor()) {
+                    continue;
+                }
+
+                if (dependency.isIgnored()) {
+                    continue;
+                }
+
+                if (dependency.isJreBootstrapClassFiles()) {
+                    continue;
+                }
+
+                if (dependency.isJreClassFiles()) {
+                    continue;
+                }
+
+                if (dependency.isJreJavascriptBootstrapFiles()) {
+                    addIfAbsent(dependency.artifactFileOrFail(), sources);
+                    continue;
+                }
+
+                if (dependency.isJreJavascriptFiles()) {
+                    addIfAbsent(dependency.artifactFileOrFail(), sources);
+                    continue;
+                }
+
+                if (dependency.isJavascriptSourceRequired()) {
+                    this.addSources(dependency, sources);
+                    continue;
                 }
             }
-            logger.outdent();
-            logger.printEndOfList();
         }
-        logger.outdent();
-
-        final J2clPath output = directory.output().createIfNecessary();
-        logger.printIndented("Output", output);
 
         return ClosureCompiler.compile(request.level(),
                 request.defines(),
@@ -77,40 +92,29 @@ final class J2clStepWorkerClosureCompiler extends J2clStepWorker2 {
                 request.languageOut(),
                 request.sourcesKind() == J2clSourcesKind.TEST,
                 sources,
-                output,
+                directory.output().createIfNecessary(),
                 request.initialScriptFilename().filename(),
                 logger) ?
                 J2clStepResult.SUCCESS :
                 J2clStepResult.FAILED;
     }
 
-    private Set<J2clPath> addSources(final J2clDependency artifact,
-                                     final J2clLinePrinter logger) {
-        final Set<J2clPath> sources = Sets.ordered();
+    private void addSources(final J2clDependency artifact,
+                            final Set<J2clPath> sources) {
+        final J2clPath transpiled = artifact.step(J2clStep.TRANSPILE).output();
+        if (transpiled.exists().isPresent()) {
+            addIfAbsent(transpiled, sources);
+        }
 
-        logger.printLine(artifact.toString());
-        logger.indent();
-        {
-            if (artifact.isIgnored()) {
-                sources.add(artifact.artifactFileOrFail());
-            } else {
-                final J2clPath transpiled = artifact.step(J2clStep.TRANSPILE).output();
-                if (transpiled.exists().isPresent()) {
-                    sources.add(transpiled);
-                }
-
-                // add unpack anyway as it might contain js originally accompanying java source.
-                final J2clPath unpack = artifact.step(J2clStep.UNPACK).output();
-                if (unpack.exists().isPresent()) {
-                    sources.add(unpack);
-                }
-
-                if (sources.isEmpty()) {
-                    logger.printLine("No transpiled or unpacked output");
-                }
+        // add unpack anyway as it might contain js originally accompanying java source.
+        final J2clPath unpack = artifact.step(J2clStep.UNPACK).output();
+        if (unpack.exists().isPresent()) {
+            addIfAbsent(unpack, sources);
+        } else {
+            final Optional<J2clPath> file = artifact.artifactFile();
+            if (file.isPresent()) {
+                addIfAbsent(file.get(), sources);
             }
         }
-        logger.outdent();
-        return sources;
     }
 }

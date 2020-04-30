@@ -58,8 +58,8 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
                 final J2clStep compiledStep = this.compiledStep();
 
                 for (final J2clDependency dependency : artifact.dependencies()) {
-                    if (dependency.isJreBootstrapClassFiles()) {
-                        addIfAbsent(dependency.artifactFileOrFail(), bootstrap);
+                    if (dependency.isAnnotationClassFiles()) {
+                        addIfAbsent(dependency.artifactFileOrFail(), classpath);
                         continue;
                     }
 
@@ -69,6 +69,24 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
                     }
 
                     if (dependency.isClasspathRequired()) {
+                        addIfAbsent(dependency.artifactFileOrFail(), classpath);
+                        continue;
+                    }
+
+                    if (dependency.isIgnored()) {
+                        continue;
+                    }
+
+                    if (dependency.isJavascriptSourceRequired()) {
+                        continue;
+                    }
+
+                    if (dependency.isJreBootstrapClassFiles()) {
+                        addIfAbsent(dependency.artifactFileOrFail(), bootstrap);
+                        continue;
+                    }
+
+                    if (dependency.isJreClassFiles()) {
                         addIfAbsent(dependency.artifactFileOrFail(), classpath);
                         continue;
                     }
@@ -104,12 +122,6 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
         }
 
         return result;
-    }
-
-    private static void addIfAbsent(final J2clPath ifAbsent, final Set<J2clPath> target) {
-        if (false == target.contains(ifAbsent)) {
-            target.add(ifAbsent);
-        }
     }
 
     /**

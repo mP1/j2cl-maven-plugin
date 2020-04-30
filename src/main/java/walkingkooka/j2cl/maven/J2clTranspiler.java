@@ -24,12 +24,13 @@ import walkingkooka.collect.list.Lists;
 import walkingkooka.text.CharSequences;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 final class J2clTranspiler {
 
-    static boolean execute(final List<J2clPath> classpath,
+    static boolean execute(final Collection<J2clPath> classpath,
                            final J2clPath sourcePath,
                            final J2clPath output,
                            final J2clLinePrinter logger) throws IOException {

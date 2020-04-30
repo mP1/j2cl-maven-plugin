@@ -504,14 +504,50 @@ final class J2clDependency implements Comparable<J2clDependency> {
         if (null == this.classpathRequired) {
             this.testArchive();
 
-            final J2clRequest request = this.request();
-            final J2clArtifactCoords coords = this.coords();
+            final boolean required;
 
-            this.classpathRequired = (this.classpathRequiredFile || request.isClasspathRequired(coords) || false == (this.javascriptSourceRequiredFile || request.isJavascriptSourceRequired(coords))) ||
-                    this.isAnnotationClassFiles() ||
-                    this.isAnnotationProcessor() ||
-                    this.isJreBootstrapClassFiles() ||
-                    this.isJreClassFiles();
+            do {
+                if (this.isAnnotationClassFiles() || this.isAnnotationProcessor() || this.isJreBootstrapClassFiles() || this.isJreClassFiles()) {
+                    required = true;
+                    break;
+                }
+
+                if (this.isJreJavascriptBootstrapFiles() || this.isJreJavascriptFiles()) {
+                    required = false;
+                    break;
+                }
+
+                // classpath-required present
+                if (this.classpathRequiredFile) {
+                    required = true;
+                    break;
+                }
+
+                // was included in POM javascript-source-required
+                final J2clRequest request = this.request();
+                final J2clArtifactCoords coords = this.coords();
+                if (request.isClasspathRequired(coords)) {
+                    required = true;
+                    break;
+                }
+
+                // not explicitly required and ignored so false
+                if (this.ignoredFile) {
+                    required = false;
+                    break;
+                }
+
+                // cp required but js missing so false
+                if (this.javascriptSourceRequiredFile || request.isJavascriptSourceRequired(coords)) {
+                    required = false;
+                    break;
+                }
+
+                // both js and cp required missing default to required
+                required = true;
+            } while (false);
+
+            this.classpathRequired = required;
         }
         return this.classpathRequired;
     }
@@ -579,20 +615,13 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private boolean javascriptSourceRequiredFile;
 
     /**
-     * Used to test if a dependency should be ignored and the archive files used as they are, such as class files
-     * which should appear on the classpath, or javascript source that should appear in javascript processing.
+     * Only files marked with an ignore file or in the POM under the ignored-dependencies will return true.
      */
     boolean isIgnored() {
         if (null == this.ignored) {
             this.testArchive();
 
-            this.ignored = this.ignoredFile || this.request().isIgnored(this.coords) ||
-                    this.isAnnotationClassFiles() ||
-                    this.isAnnotationProcessor() ||
-                    this.isJreJavascriptBootstrapFiles() ||
-                    this.isJreJavascriptFiles() ||
-                    this.isJreBootstrapClassFiles() ||
-                    this.isJreClassFiles();
+            this.ignored = this.ignoredFile || this.request().isIgnored(this.coords());
         }
         return this.ignored;
     }

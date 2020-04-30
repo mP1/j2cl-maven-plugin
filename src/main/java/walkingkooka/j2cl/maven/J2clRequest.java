@@ -329,21 +329,55 @@ abstract class J2clRequest {
     }
 
     private void prepareJobs(final J2clDependency artifact) {
-        if (false == artifact.isIgnored() && false == this.jobs.containsKey(artifact)) {
+        if (false == skipJobs(artifact) && false == this.jobs.containsKey(artifact)) {
+
             // keep transitive dependencies alphabetical sorted for better readability when trySubmitJob pretty prints queue processing.
             final Set<J2clDependency> required = Sets.sorted();
 
-            if(false == artifact.isIgnored()) {
-                this.jobs.put(artifact, required);
-            }
+            this.jobs.put(artifact, required);
 
             for (final J2clDependency dependency : artifact.dependencies()) {
-                if (false == dependency.isIgnored()) {
-                    required.add(dependency);
-                    this.prepareJobs(dependency);
+                if (skipJobs(dependency)) {
+                    continue;
                 }
+
+                required.add(dependency);
+                this.prepareJobs(dependency);
             }
         }
+    }
+
+    /**
+     * Tests if the dependency should not have a job submitted.
+     */
+    private boolean skipJobs(final J2clDependency dependency) {
+        final boolean skip;
+
+        do {
+            if (dependency.isAnnotationProcessor() || dependency.isAnnotationClassFiles()) {
+                skip = true;
+                continue;
+            }
+
+            if (dependency.isJreBootstrapClassFiles() || dependency.isJreClassFiles()) {
+                skip = true;
+                continue;
+            }
+
+            if (dependency.isJreJavascriptBootstrapFiles() || dependency.isJreJavascriptFiles()) {
+                skip = true;
+                continue;
+            }
+
+            if (dependency.isIgnored()) {
+                skip = true;
+                continue;
+            }
+
+            skip = false;
+        } while (false);
+
+        return skip;
     }
 
     /**
