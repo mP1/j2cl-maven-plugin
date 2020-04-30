@@ -120,6 +120,8 @@ class ClosureCompiler {
 
             success = false;
         } else {
+            logger.printIndented("Output", output);
+
             final J2clPath initialScriptFilenamePath = output.append(initialScriptFilename);
 
             final Map<String, Collection<String>> arguments = prepareArguments(compilationLevel,
