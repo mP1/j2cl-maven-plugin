@@ -53,6 +53,7 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
 
         final List<J2clPath> classpath = artifact.dependencies()
                 .stream()
+                .filter(d -> false == d.isAnnotationProcessor())
                 .map(d -> d.isIgnored() ?
                         d.artifactFileOrFail() :
                         shadeOrCompileGwtIncompatibleStripped(d, J2clStep.SHADE_CLASS_FILES, J2clStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED))

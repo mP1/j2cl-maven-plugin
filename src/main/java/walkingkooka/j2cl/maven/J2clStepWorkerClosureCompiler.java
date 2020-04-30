@@ -51,6 +51,10 @@ final class J2clStepWorkerClosureCompiler extends J2clStepWorker2 {
             logger.indent();
             {
                 for (final J2clDependency dependency : artifact.dependencies()) {
+                    if (dependency.isAnnotationProcessor()) {
+                        continue;
+                    }
+
                     if (false == dependency.isJavascriptSourceRequired()) {
                         continue;
                     }
