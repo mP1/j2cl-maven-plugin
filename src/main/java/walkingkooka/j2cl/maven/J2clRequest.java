@@ -356,22 +356,22 @@ abstract class J2clRequest {
         do {
             if (dependency.isAnnotationProcessor() || dependency.isAnnotationClassFiles()) {
                 skip = true;
-                continue;
+                break;
             }
 
             if (dependency.isJreBootstrapClassFiles() || dependency.isJreClassFiles()) {
                 skip = true;
-                continue;
+                break;
             }
 
             if (dependency.isJreJavascriptBootstrapFiles() || dependency.isJreJavascriptFiles()) {
                 skip = true;
-                continue;
+                break;
             }
 
             if (dependency.isIgnored()) {
                 skip = true;
-                continue;
+                break;
             }
 
             skip = false;
