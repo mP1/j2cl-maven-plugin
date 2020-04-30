@@ -55,6 +55,14 @@ Some pieces of the `vertispan/j2clmavenplugin` are currently missing:
 
 
 
+# Annotation processors
+
+Dependencies with an annotation processor are automatically detected as annotation processors and "run". Note these
+archives must not have any java source or javascript as it will always be ignored and never transpiled. The annotation
+and additional source must be in a separate archive and should be a dependency.
+
+
+
 # Super sourcing
 
 The Google Web Tookit (GWT) provides a feature to allow two definitions of a java file to exist. One will be a compiled
