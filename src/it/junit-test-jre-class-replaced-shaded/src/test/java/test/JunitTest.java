@@ -31,4 +31,14 @@ public class JunitTest {
     public void testJreJavaUtilLocaleToStringWasShaded() {
         Assert.assertEquals("toString.Shaded", java.util.Locale.ROOT.toString());
     }
+
+    @Test
+    public void testUnchanged() {
+        Assert.assertEquals("Unchanged", test.Unchanged.value());
+    }
+
+    @Test
+    public void testUnchanged2() {
+        Assert.assertEquals("Unchanged2", test.javautil.unchanged2.Unchanged2.value());
+    }
 }

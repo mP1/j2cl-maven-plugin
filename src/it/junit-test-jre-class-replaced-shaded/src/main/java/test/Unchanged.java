@@ -15,9 +15,9 @@
  */
 package test;
 
-public class StringValue {
+public class Unchanged {
 
-    public String value() {
-        return "StringValue=2";
+    public static String value() {
+        return "Unchanged";
     }
 }
