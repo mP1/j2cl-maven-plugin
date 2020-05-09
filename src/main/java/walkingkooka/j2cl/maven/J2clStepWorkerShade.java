@@ -90,7 +90,12 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
                               final J2clPath output,
                               final J2clLinePrinter logger) throws Exception {
         final Predicate<Path> filter = this.fileExtensionFilter();
+
         final Set<J2clPath> files = root.gatherFiles(J2clPath.ALL_FILES.and(filter));
+
+        final Set<J2clPath> possibleFiles = Sets.sorted();
+        possibleFiles.addAll(files);
+
         final Set<J2clPath> nonShadedFiles = Sets.sorted();
         nonShadedFiles.addAll(files);
 
@@ -104,30 +109,36 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
                         output :
                         output.append(replace.replace('.', File.separatorChar));
 
-                logger.printLine("Shading package from " + CharSequences.quote(find) + " to " + CharSequences.quote(replace));
-                logger.indent();
-                {
-                    final Set<J2clPath> shadedFiles = Sets.sorted();
-                    final J2clPath shadedRoot = root.append(find.replace('.', File.separatorChar));
+                final Set<J2clPath> shadedFiles = Sets.sorted();
+                final J2clPath shadedRoot = root.append(find.replace('.', File.separatorChar));
 
-                    // filter only files belonging to shade source root
-                    files.stream()
-                            .filter(f -> f.path().startsWith(shadedRoot.path()))
-                            .forEach(shadedFiles::add);
+                // filter only files belonging to and under shade source root
+                possibleFiles.stream()
+                        .filter(f -> f.path().startsWith(shadedRoot.path()))
+                        .forEach(shadedFiles::add);
 
-                    nonShadedFiles.removeAll(shadedFiles);
+                possibleFiles.removeAll(shadedFiles);
 
-                    // copy and shade java source and copy other files to output.
-                    shadeDirectory.copyFiles(shadedRoot,
-                            shadedFiles,
-                            (content, path) -> {
-                                return filter.test(path.path()) ?
-                                        shade(content, shade) :
-                                        content;
-                            },
-                            logger);
+                // else files will be copied below
+                if (find.equals(replace)) {
+                    logger.printLine("Skipping shade package " + CharSequences.quote(find));
+                } else {
+                    logger.printLine("Shading package from " + CharSequences.quote(find) + " to " + CharSequences.quote(replace));
+                    logger.indent();
+                    {
+                        // copy and shade java source and copy other files to output.
+                        shadeDirectory.copyFiles(shadedRoot,
+                                shadedFiles,
+                                (content, path) -> {
+                                    return filter.test(path.path()) ?
+                                            shade(content, shade) :
+                                            content;
+                                },
+                                logger);
+                        nonShadedFiles.removeAll(shadedFiles);
+                    }
+                    logger.outdent();
                 }
-                logger.outdent();
             }
 
             logger.printLine("Copying other files");
