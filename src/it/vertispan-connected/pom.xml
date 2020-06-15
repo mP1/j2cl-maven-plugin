@@ -75,7 +75,7 @@
         <dependency>
             <groupId>com.google.elemental2</groupId>
             <artifactId>elemental2-dom</artifactId>
-            <version>1.0.0-RC1</version>
+            <version>1.0.0</version>
 
             <exclusions>
                 <exclusion>

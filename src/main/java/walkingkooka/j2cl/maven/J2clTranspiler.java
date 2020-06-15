@@ -83,7 +83,6 @@ final class J2clTranspiler {
                                 .collect(Collectors.toList())
                         )
                         .setOutput(output.path())
-                        .setDeclareLegacyNamespace(false)//TODO parameterize these? copied straight from vertispan/j2clmavenplugin
                         .setEmitReadableLibraryInfo(false)
                         .setEmitReadableSourceMap(false)
                         .setFrontend(Frontend.JDT)

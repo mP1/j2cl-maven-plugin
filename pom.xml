@@ -314,7 +314,7 @@
         <dependency>
             <groupId>com.vertispan.j2cl</groupId>
             <artifactId>transpiler</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.7-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.javascript</groupId>
@@ -334,7 +334,7 @@
         <dependency>
             <groupId>com.vertispan.j2cl</groupId>
             <artifactId>gwt-incompatible-stripper</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.7-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.jsinterop</groupId>
@@ -440,7 +440,7 @@
         <dependency>
             <groupId>com.vertispan.javascript</groupId>
             <artifactId>closure-compiler-unshaded</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>0.2-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.jsinterop</groupId>
