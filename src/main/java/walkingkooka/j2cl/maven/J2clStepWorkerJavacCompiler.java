@@ -55,6 +55,11 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
                 final Set<J2clPath> bootstrap = Sets.ordered();
                 final Set<J2clPath> classpath = Sets.ordered();
 
+                // add source to classpath, might be useful as it may contain non java files that are needed by annotation processors.
+                if(shouldRunAnnotationProcessors) {
+                    classpath.add(output);
+                }
+
                 final J2clStep compiledStep = this.compiledStep();
 
                 for (final J2clDependency dependency : artifact.dependencies()) {
