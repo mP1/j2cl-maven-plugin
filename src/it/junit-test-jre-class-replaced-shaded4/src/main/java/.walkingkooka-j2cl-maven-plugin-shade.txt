@@ -1,0 +1,6 @@
+#
+# Order is important
+#
+test.javautil.helper=test.javautil.helper
+test.javautil=java.util
+
