@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 /**
@@ -89,6 +90,7 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
                               final Map<String, String> shade,
                               final J2clPath output,
                               final J2clLinePrinter logger) throws Exception {
+        final BiFunction<byte[], J2clPath, byte[]> contentShader = (content, path) -> shade(content, shade);
         final Predicate<Path> filter = this.fileExtensionFilter();
 
         final Set<J2clPath> files = root.gatherFiles(J2clPath.ALL_FILES.and(filter));
@@ -129,11 +131,7 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
                         // copy and shade java source and copy other files to output.
                         shadeDirectory.copyFiles(shadedRoot,
                                 shadedFiles,
-                                (content, path) -> {
-                                    return filter.test(path.path()) ?
-                                            shade(content, shade) :
-                                            content;
-                                },
+                                contentShader,
                                 logger);
                         nonShadedFiles.removeAll(shadedFiles);
                     }
@@ -148,7 +146,7 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
                 // copy all other files verbatim.
                 output.copyFiles(root,
                         nonShadedFiles,
-                        J2clPath.COPY_FILE_CONTENT_VERBATIM,
+                        contentShader,
                         logger);
 
                 this.postCopyAndShade(artifact,
