@@ -17,28 +17,16 @@
 
 package walkingkooka.j2cl.maven;
 
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.QualifiedName;
-import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.SimpleType;
 import walkingkooka.collect.list.Lists;
-import walkingkooka.collect.map.Maps;
+import walkingkooka.javashader.JavaShaders;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * If the dependency source has a shade file, create an output directory with selected shaded class files combined
@@ -73,84 +61,8 @@ final class J2clStepWorkerShadeJavaSource extends J2clStepWorkerShade {
     @Override
     byte[] shade(final byte[] content,
                  final Map<String, String> shadings) {
-        final Charset charset = Charset.defaultCharset();
-        return shade(new String(content, charset), shadings).getBytes(charset);
-    }
-
-    static String shade(final String content,
-                        final Map<String, String> shadings) {
-        ASTParser parser = ASTParser.newParser(AST.JLS3);
-        parser.setSource(content.toCharArray());
-        parser.setKind(ASTParser.K_COMPILATION_UNIT);
-
-        final CompilationUnit unit = (CompilationUnit) parser.createAST(null);
-        final List<Name> qualifieds = collectNames(unit);
-        return collectText(reverseSort(qualifieds), content, shadings);
-    }
-
-    private static List<Name> collectNames(final ASTNode root) {
-        final List<Name> names = Lists.array();
-
-        root.accept(new ASTVisitor() {
-
-            @Override
-            public boolean visit(final QualifiedName node) {
-                names.add(node);
-                return false;
-            }
-
-            @Override
-            public boolean visit(final SimpleName node) {
-                names.add(node);
-                return false;
-            }
-
-            @Override
-            public boolean visit(final SimpleType node) {
-                final Name name = node.getName();
-                if (name instanceof QualifiedName) {
-                    names.add(name);
-                }
-
-                return false; // dont want to update simple type names.
-            }
-        });
-        return names;
-    }
-
-    private static List<Name> reverseSort(final List<Name> nodes) {
-        final Map<Integer, Name> offsetToQualified = Maps.sorted(Comparator.reverseOrder());
-
-        nodes.forEach(q -> offsetToQualified.put(q.getStartPosition(), q));
-
-        return offsetToQualified.values().stream().collect(Collectors.toList());
-    }
-
-    private static String collectText(final List<Name> names,
-                                      final String file,
-                                      final Map<String, String> shadings) {
-        final StringBuilder text = new StringBuilder();
-        text.append(file);
-
-        for (final Name node : names) {
-            final int start = node.getStartPosition();
-            final int end = start + node.getLength();
-
-            final String typeName = text.substring(start, end);
-
-            for (final Entry<String, String> oldAndNew : shadings.entrySet()) {
-                final String old = oldAndNew.getKey();
-                final String neww = oldAndNew.getValue();
-
-                if (typeName.equals(old) || typeName.startsWith(old)) {
-                    text.delete(start, start + old.length());
-                    text.insert(start, neww);
-                    break;
-                }
-            }
-        }
-
-        return text.toString();
+        return JavaShaders.javaFilePackageShader(Charset.defaultCharset())
+                .apply(content, shadings);
     }
 
     /**
