@@ -17,14 +17,10 @@
 
 package walkingkooka.j2cl.maven;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.commons.ClassRemapper;
-import org.objectweb.asm.commons.Remapper;
+import walkingkooka.javashader.JavaShaders;
 
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Predicate;
 
 /**
@@ -62,38 +58,9 @@ final class J2clStepWorkerShadeClassFile extends J2clStepWorkerShade {
         return shadeClassFile(content, mappings);
     }
 
-    // @VisibleForTesting
-    static byte[] shadeClassFile(final byte[] content,
-                                 final Map<String, String> mappings) {
-        final ClassReader reader = new ClassReader(content);
-        final ClassWriter writer = new ClassWriter(0);
-        final ClassRemapper adapter = new ClassRemapper(writer, new Remapper() {
-            @Override
-            public String map(final String typeName) {
-                String result = null;
-
-                for (final Entry<String, String> possible : mappings.entrySet()) {
-                    final String from = possible.getKey();
-                    if (typeName.startsWith(binaryTypeName(from))) {
-                        result = typeName.replace(binaryTypeName(from), binaryTypeName(possible.getValue()));
-                        break;
-                    }
-                }
-
-                return null != result ?
-                        result :
-                        super.map(typeName);
-            }
-        });
-        reader.accept(adapter, ClassReader.EXPAND_FRAMES);
-
-        writer.visitEnd();
-
-        return writer.toByteArray();
-    }
-
-    private static String binaryTypeName(final String typeName) {
-        return typeName.replace('.', '/');
+    private static byte[] shadeClassFile(final byte[] content,
+                                         final Map<String, String> mappings) {
+        return JavaShaders.classFilePackageShader().apply(content, mappings);
     }
 
     @Override
