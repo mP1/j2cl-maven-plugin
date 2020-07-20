@@ -45,6 +45,8 @@ import java.nio.file.Paths;
 import java.nio.file.ProviderNotFoundException;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -930,11 +932,14 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     private J2clDependency job0() throws Exception {
         final J2clLogger logger = this.request().logger();
-        logger.info(this.coords() + " begin");
+        final String coords = this.coords().toString();
+        final Instant start = Instant.now();
 
-        this.executeStep(J2clStep.FIRST);
-
-        logger.info(this.coords() + " end");
+        logger.info(coords);
+        {
+            this.executeStep(J2clStep.FIRST);
+        }
+        logger.info(coords + " completed, " + Duration.between(start, Instant.now()).toSeconds() + " second(s) taken");
 
         this.request()
                 .taskCompleted(this);
