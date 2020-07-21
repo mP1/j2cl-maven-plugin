@@ -22,6 +22,7 @@ import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
@@ -44,6 +45,7 @@ final class J2clMojoBuildRequest extends J2clRequest {
                             final J2clPath initialScriptFilename,
                             final Set<String> javaCompilerArguments,
                             final LanguageMode languageOut,
+                            final Optional<String> sourceMaps,
                             final J2clMavenMiddleware middleware,
                             final ExecutorService executor,
                             final J2clLogger logger) {
@@ -61,6 +63,7 @@ final class J2clMojoBuildRequest extends J2clRequest {
                 initialScriptFilename,
                 javaCompilerArguments,
                 languageOut,
+                sourceMaps,
                 middleware,
                 executor,
                 logger);
@@ -80,6 +83,7 @@ final class J2clMojoBuildRequest extends J2clRequest {
                                  final J2clPath initialScriptFilename,
                                  final Set<String> javaCompilerArguments,
                                  final LanguageMode languageOut,
+                                 final Optional<String> sourceMaps,
                                  final J2clMavenMiddleware middleware,
                                  final ExecutorService executor,
                                  final J2clLogger logger) {
@@ -95,6 +99,7 @@ final class J2clMojoBuildRequest extends J2clRequest {
                 formatting,
                 javaCompilerArguments,
                 languageOut,
+                sourceMaps,
                 middleware,
                 executor,
                 logger);

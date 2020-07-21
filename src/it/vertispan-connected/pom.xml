@@ -150,7 +150,7 @@
                         </goals>
                         <configuration>
                             <classpath-scope>runtime</classpath-scope>
-                            <compilation-level>ADVANCED</compilation-level>
+                            <compilation-level>SIMPLE</compilation-level>
                             <defines>
                                 <jre.checkedMode>DISABLED</jre.checkedMode>
                                 <jre.checks.checkLevel>MINIMAL</jre.checks.checkLevel>
@@ -158,9 +158,12 @@
                             </defines>
                             <entry-points>com.vertispan.draw.connected.client.FlowChartEntryPoint</entry-points>
                             <externs></externs>
-                            <formatting/>
+                            <formatting>
+                                <param>PRETTY_PRINT</param>
+                            </formatting>
                             <java-compiler-arguments/>
                             <language-out>ECMASCRIPT_2016</language-out>
+                            <source-maps>sources/</source-maps>
                             <thread-pool-size>0</thread-pool-size>
 
                             <classpath-required/>

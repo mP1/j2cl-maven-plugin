@@ -64,6 +64,7 @@ public final class J2clMojoBuild extends J2clMojoBuildTest {
                 initialScriptFilename,
                 this.javaCompilerArguments(),
                 this.languageOut(),
+                this.sourceMaps(),
                 this.mavenMiddleware(),
                 this.executor(),
                 this.logger());

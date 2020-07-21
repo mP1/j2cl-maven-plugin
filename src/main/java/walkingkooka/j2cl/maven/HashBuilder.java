@@ -46,6 +46,10 @@ final class HashBuilder {
         }
     }
 
+    HashBuilder append(final boolean flag) {
+        return this.append(flag ? "1" : "0");
+    }
+
     HashBuilder append(final Enum<?> e) {
         return this.append(e.name());
     }

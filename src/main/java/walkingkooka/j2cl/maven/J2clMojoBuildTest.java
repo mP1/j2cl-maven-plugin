@@ -33,11 +33,13 @@ import walkingkooka.collect.set.Sets;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.ExecutorService;
@@ -230,6 +232,19 @@ abstract class J2clMojoBuildTest extends J2clMojo {
             required = true)
     private LanguageMode languageOut;
 
+    // source-maps......................................................................................................
+
+    final Optional<String> sourceMaps() {
+        final String sourceMaps = this.sourceMaps;
+        return Optional.ofNullable(
+                CharSequences.isNullOrEmpty(sourceMaps) ?
+                        null :
+                        sourceMaps);
+    }
+
+    @Parameter(alias = "source-maps")
+    private String sourceMaps;
+    
     // project..........................................................................................................
 
     final MavenProject project() {

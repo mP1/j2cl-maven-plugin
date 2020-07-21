@@ -37,6 +37,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -52,6 +53,7 @@ class ClosureCompiler {
                            final Set<ClosureFormattingOption> formatting,
                            final LanguageMode languageOut,
                            final boolean exportTestFunctions,
+                           final Optional<String> sourceMaps,
                            final Set<J2clPath> sources,
                            final J2clPath output,
                            final String initialScriptFilename,
@@ -63,6 +65,7 @@ class ClosureCompiler {
                 formatting,
                 languageOut,
                 exportTestFunctions,
+                sourceMaps,
                 sources,
                 output,
                 initialScriptFilename,
@@ -76,13 +79,17 @@ class ClosureCompiler {
                                     final Set<ClosureFormattingOption> formatting,
                                     final LanguageMode languageOut,
                                     final boolean exportTestFunctions,
+                                    final Optional<String> sourceMaps,
                                     final Set<J2clPath> sources,
                                     final J2clPath output,
                                     final String initialScriptFilename,
                                     final J2clLinePrinter logger) throws Exception {
         int fileCount = 0;
 
-        final J2clPath unitedSourceRoot = output.append("sources");
+        final J2clPath unitedSourceRoot = sourceMaps
+                .map(s -> output.append(s))
+                .orElse(output.parent().append("sources"));
+
         logger.printLine(sources.size() + " Source(s)");
         logger.indent();
         {
@@ -130,6 +137,7 @@ class ClosureCompiler {
                     externs,
                     formatting.stream().map(ClosureFormattingOption::name).collect(Collectors.toCollection(Sets::sorted)),
                     languageOut,
+                    sourceMaps,
                     unitedSourceRoot,
                     initialScriptFilenamePath,
                     logger);
@@ -186,6 +194,7 @@ class ClosureCompiler {
                                                                     final SortedSet<String> externs,
                                                                     final Set<String> formatting,
                                                                     final LanguageMode languageOut,
+                                                                    final Optional<String> sourceMaps,
                                                                     final J2clPath sourceRoot,
                                                                     final J2clPath initialScriptFilename,
                                                                     final J2clLinePrinter logger) throws IOException {
@@ -223,6 +232,12 @@ class ClosureCompiler {
 
             arguments.put("--language_out", Sets.of(languageOut.name()));
 
+            if (sourceMaps.isPresent()) {
+                arguments.put("--create_source_map", Sets.of(initialScriptFilenamePath + ".map"));
+                arguments.put("--source_map_location_mapping", Sets.of(initialScriptFilename.append(sourceMaps.get()) + "|."));
+                arguments.put("--output_wrapper", Sets.of("(function(){%output%}).call(this);\n//# sourceMappingURL=" + initialScriptFilename.filename() + ".map"));
+                arguments.put("--assume_function_wrapper", Sets.of("true"));
+            }
 
             logCommandLineArguments(arguments, logger);
         }
