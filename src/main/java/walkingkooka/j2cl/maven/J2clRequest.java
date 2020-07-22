@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.Callable;
@@ -59,6 +60,7 @@ abstract class J2clRequest {
                         final Set<ClosureFormattingOption> formatting,
                         final Set<String> javaCompilerArguments,
                         final LanguageMode languageOut,
+                        final Optional<String> sourceMaps,
                         final J2clMavenMiddleware middleware,
                         final ExecutorService executor,
                         final J2clLogger logger) {
@@ -78,6 +80,7 @@ abstract class J2clRequest {
         this.formatting = formatting;
         this.javaCompilerArguments = javaCompilerArguments;
         this.languageOut = languageOut;
+        this.sourceMaps = sourceMaps;
 
         this.middleware = middleware;
         this.executor = executor;
@@ -183,6 +186,12 @@ abstract class J2clRequest {
     }
 
     private final LanguageMode languageOut;
+    
+    final Optional<String> sourceMaps() {
+        return this.sourceMaps;
+    }
+    
+    private final Optional<String> sourceMaps;
 
     // browsers.........................................................................................................
 
@@ -244,6 +253,13 @@ abstract class J2clRequest {
         final LanguageMode languageOut = this.languageOut();
         hashItemNames.add("language-out: " + languageOut);
         hash.append(languageOut);
+
+        final Optional<String> sourceMaps = this.sourceMaps();
+        if(sourceMaps.isPresent()) {
+            final String path = sourceMaps.get();
+            hashItemNames.add("source-maps: " + path);
+            hash.append(path);
+        }
 
         this.classpathRequired.forEach(c -> {
             hashItemNames.add("classpath-required: " + c);
@@ -549,6 +565,7 @@ abstract class J2clRequest {
                 this.formatting + " " +
                 this.initialScriptFilename() + " " +
                 this.languageOut + " " +
+                this.sourceMaps + " " +
                 this.level;
     }
 }

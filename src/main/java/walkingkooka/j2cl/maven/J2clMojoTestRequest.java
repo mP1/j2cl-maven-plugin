@@ -23,6 +23,7 @@ import walkingkooka.collect.list.Lists;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
@@ -44,6 +45,7 @@ final class J2clMojoTestRequest extends J2clRequest {
                                     final Set<ClosureFormattingOption> formatting,
                                     final Set<String> javaCompilerArguments,
                                     final LanguageMode languageOut,
+                                    final Optional<String> sourceMaps,
                                     final List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers,
                                     final String testClassName,
                                     final int testTimeout,
@@ -62,6 +64,7 @@ final class J2clMojoTestRequest extends J2clRequest {
                 formatting,
                 javaCompilerArguments,
                 languageOut,
+                sourceMaps,
                 browsers,
                 testClassName,
                 testTimeout,
@@ -82,6 +85,7 @@ final class J2clMojoTestRequest extends J2clRequest {
                                 final Set<ClosureFormattingOption> formatting,
                                 final Set<String> javaCompilerArguments,
                                 final LanguageMode languageOut,
+                                final Optional<String> sourceMaps,
                                 final List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers,
                                 final String testClassName,
                                 final int testTimeout,
@@ -100,6 +104,7 @@ final class J2clMojoTestRequest extends J2clRequest {
                 formatting,
                 javaCompilerArguments,
                 languageOut,
+                sourceMaps,
                 middleware,
                 executor,
                 logger);

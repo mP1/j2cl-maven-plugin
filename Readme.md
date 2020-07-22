@@ -209,6 +209,8 @@ Plugin definition
                     STABLE
                 -->
                 <language-out>ECMASCRIPT_2016</language-out>
+                <!-- when true a sources sub directory will appear below the main javascript -->
+                <sourceMaps>sources/</sourceMaps>
                 <thread-pool-size>0</thread-pool-size>
 
                 <classpath-required>
@@ -451,6 +453,17 @@ The xml snippet below includes all currently available options, only one may be 
 ## output (build)
 This path is the final location of the final javascript.
 
+
+
+## source-maps
+Accepts a relative path to the target of directory `initial-script-filename` where source files will be copied. This will
+typically be a sub directory perhaps called `sources` under the same directory receiving the main javascript output file.
+Click [here](https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Use_a_source_map) for more details about `.map`
+files and how source maps work.
+
+```xml
+<source-maps>sources/</source-maps>
+```
 
 
 ## skip-tests (test)

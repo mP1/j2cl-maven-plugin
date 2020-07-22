@@ -108,6 +108,7 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
                 this.formatting(),
                 this.javaCompilerArguments(),
                 this.languageOut(),
+                this.sourceMaps(),
                 this.browsers(),
                 testClassName,
                 this.testTimeout(),

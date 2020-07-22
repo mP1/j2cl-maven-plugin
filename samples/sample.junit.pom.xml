@@ -158,6 +158,7 @@
                                 <param>-Aannotation-processor-argument=value</param>
                             </java-compiler-arguments>
                             <language-out>ECMASCRIPT_2016</language-out>
+                            <source-maps/>
                             <thread-pool-size>0</thread-pool-size>
 
                             <classpath-required>

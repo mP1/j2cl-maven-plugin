@@ -91,6 +91,7 @@ final class J2clStepWorkerClosureCompiler extends J2clStepWorker2 {
                 request.formatting(),
                 request.languageOut(),
                 request.sourcesKind() == J2clSourcesKind.TEST,
+                request.sourceMaps(),
                 sources,
                 directory.output().createIfNecessary(),
                 request.initialScriptFilename().filename(),
