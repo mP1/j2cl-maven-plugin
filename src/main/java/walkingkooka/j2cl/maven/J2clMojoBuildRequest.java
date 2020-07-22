@@ -136,7 +136,7 @@ final class J2clMojoBuildRequest extends J2clRequest {
         });
 
         final String initialScriptFilename = this.initialScriptFilename.toString();
-        hashItemNames.add("initial-script-filename: " + hashItemNames);
+        hashItemNames.add("initial-script-filename: " + initialScriptFilename);
         hash.append(initialScriptFilename);
 
         return hash;
