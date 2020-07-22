@@ -142,11 +142,6 @@ final class J2clMojoBuildRequest extends J2clRequest {
         return hash;
     }
 
-    /**
-     * Lazily computed and cached hash.
-     */
-    private String hash;
-
     @Override
     List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers() {
         throw new UnsupportedOperationException();
