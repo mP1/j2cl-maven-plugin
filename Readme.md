@@ -650,25 +650,23 @@ The contents are also useful as a reference to discover which other dependencies
 note the order of this listing matches the order dependencies are declared in the POM in a depth first ordering.
 
 ```txt
+compile-source-root: annotations
 compile-source-root: java
 define: jre.checkedMode=DISABLED
 define: jre.checks.checkLevel=MINIMAL
 define: jsinterop.checks=DISABLED
-dependencies-0: com.google.elemental2:elemental2-dom:jar:1.0.0-RC1
-dependencies-1: org.gwtproject.event:gwt-event:jar:HEAD-SNAPSHOT
-dependencies-2: walkingkooka:j2cl-uber:jar:1.0-SNAPSHOT
-dependencies-3: com.google.elemental2:elemental2-core:jar:1.0.0-RC1
-dependencies-4: com.google.elemental2:elemental2-promise:jar:1.0.0-RC1
-dependencies-5: walkingkooka:j2cl-jre-java:jar:1.0-SNAPSHOT
-dependencies-6: com.google.jsinterop:jsinterop-annotations:jar:2.0.0
-dependencies-7: walkingkooka:j2cl-gwt-internal-annotations:jar:1.0-SNAPSHOT
-dependencies-8: walkingkooka:jsinterop-base:jar:1.0-SNAPSHOT
-dependencies-9: walkingkooka:j2cl-javac-bootstrap-classpath:jar:1.0-SNAPSHOT
-dependencies-10: walkingkooka:j2cl-jre-javascript:jar:1.0-SNAPSHOT
-dependencies-11: walkingkooka:j2cl-bootstrap-javascript:jar:jszip:1.0-SNAPSHOT
-entry-points: com.vertispan.draw.connected.client.FlowChartEntryPoint
-initial-script-filename: [define: jre.checkedMode=DISABLED, define: jre.checks.checkLevel=MINIMAL, define: jsinterop.checks=DISABLED, entry-points: com.vertispan.draw.connected.client.FlowChartEntryPoint, language-out: ECMASCRIPT_2016, level: ADVANCED_OPTIMIZATIONS, scope: RUNTIME, sources-kind: SRC]
-language-out: ECMASCRIPT_2016
+dependencies-0: walkingkooka:j2cl-uber:jar:1.0-SNAPSHOT
+dependencies-1: walkingkooka:j2cl-jre-java:jar:1.0-SNAPSHOT
+dependencies-2: com.google.jsinterop:jsinterop-annotations:jar:2.0.0
+dependencies-3: walkingkooka:j2cl-gwt-internal-annotations:jar:1.0-SNAPSHOT
+dependencies-4: walkingkooka:jsinterop-base:jar:1.0-SNAPSHOT
+dependencies-5: walkingkooka:j2cl-javac-bootstrap-classpath:jar:1.0-SNAPSHOT
+dependencies-6: walkingkooka:j2cl-jre-javascript:jar:1.0-SNAPSHOT
+dependencies-7: walkingkooka:j2cl-bootstrap-javascript:jar:jszip:1.0-SNAPSHOT
+entry-points: app.app
+formatting: PRETTY_PRINT
+initial-script-filename: /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/formatting-pretty-print/target/j2cl-maven-plugin-it-formatting-pretty-print-1.0/walkingkooka-j2cl-maven-plugin-it-formatting-pretty-print.js
+language-out: ECMASCRIPT5
 level: ADVANCED_OPTIMIZATIONS
 scope: RUNTIME
 sources-kind: SRC
