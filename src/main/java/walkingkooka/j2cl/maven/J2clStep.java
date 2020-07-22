@@ -375,6 +375,9 @@ enum J2clStep {
             logger.print(new String(bytes.toByteArray(), charset));
 
             final J2clStepDirectory directory = artifact.step(this);
+            directory.failed()
+                    .createIfNecessary();
+
             if (directory.path().exists().isPresent()) {
                 directory.writeLog(lines, logger);
             } else {
