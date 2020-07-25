@@ -57,6 +57,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -160,7 +161,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
             final J2clDependency child = new J2clDependency(corrected,
                     childProject,
-                    Optional.of(middleware.mavenFile(corrected.toString()).orElseThrow(() -> new IllegalArgumentException("Archive file missing for " + CharSequences.quote(corrected.toString())))),
+                    //Optional.of(middleware.mavenFile(corrected.toString()).orElseThrow(() -> new IllegalArgumentException("Archive file missing for " + CharSequences.quote(corrected.toString())))),
+                    null,
                     request);
             this.dependencies.add(child);
 
@@ -449,18 +451,33 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Returns the archive file attached to this archive.
      */
-    Optional<J2clPath> artifactFile() {
+    synchronized Optional<J2clPath> artifactFile() {
+        if (null == this.artifactFile) {
+            final J2clArtifactCoords coords = this.coords();
+            this.artifactFile = Optional.of(this.request()
+                    .mavenMiddleware()
+                    .mavenFile(coords.toString())
+                    .orElseThrow(this.archiveFileMissing()));
+        }
+
         return this.artifactFile;
     }
+
+    /**
+     * Lazily load artifact file. This will be {@link Optional#empty()} for the project and will eventually resolve to a file for all dependencies.
+     */
+    private Optional<J2clPath> artifactFile;
 
     /**
      * Returns the archive file or fails if absent.
      */
     J2clPath artifactFileOrFail() {
-        return this.artifactFile().orElseThrow(() -> new IllegalArgumentException("Archive file missing for " + CharSequences.quote(this.coords().toString())));
+        return this.artifactFile().orElseThrow(this.archiveFileMissing());
     }
 
-    private final Optional<J2clPath> artifactFile;
+    private Supplier<IllegalArgumentException> archiveFileMissing() {
+        return () -> new IllegalArgumentException("Archive file missing for " + CharSequences.quote(this.coords().toString()));
+    }
 
     // coords...........................................................................................................
 
