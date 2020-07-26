@@ -135,11 +135,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
                                      final Predicate<J2clArtifactCoords> parentExclusions,
                                      final Function<J2clArtifactCoords, J2clArtifactCoords> dependencyManagement) {
         final J2clRequest request = this.request();
-        final J2clClasspathScope scope = request.scope();
-        final MavenProject project = this.project();
-        final J2clMavenMiddleware middleware = request.mavenMiddleware();
 
-        for (final Dependency dependency : project.getDependencies()) {
+        for (final Dependency dependency : this.project().getDependencies()) {
             // filter if wrong scope
             if (false == scopeFilter.test(dependency.getScope())) {
                 continue;
