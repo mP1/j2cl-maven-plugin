@@ -156,12 +156,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
             }
 
             // transform the coords to the corrected version if any dependencyManagement entries exist.
-            final J2clArtifactCoords corrected = dependencyManagement.apply(coords);
-            final MavenProject childProject = middleware.mavenProject(corrected.mavenArtifact(scope, middleware.artifactHandler(coords.typeOrDefault())));
-
-            final J2clDependency child = new J2clDependency(corrected,
-                    childProject,
-                    //Optional.of(middleware.mavenFile(corrected.toString()).orElseThrow(() -> new IllegalArgumentException("Archive file missing for " + CharSequences.quote(corrected.toString())))),
+            final J2clDependency child = new J2clDependency(dependencyManagement.apply(coords),
+                    null,
                     null,
                     request);
             this.dependencies.add(child);
@@ -493,6 +489,11 @@ final class J2clDependency implements Comparable<J2clDependency> {
     // project...........................................................................................................
 
     MavenProject project() {
+        if(null == this.project) {
+            final J2clRequest request = this.request();
+            this.project = request.mavenMiddleware()
+                    .mavenProject(this.coords(), request.scope());
+        }
         return this.project;
     }
 

@@ -33,9 +33,11 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
+import walkingkooka.collect.map.Maps;
 import walkingkooka.text.CharSequences;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 final class J2clMavenMiddlewareImpl implements J2clMavenMiddleware {
@@ -76,14 +78,29 @@ final class J2clMavenMiddlewareImpl implements J2clMavenMiddleware {
      * Fetches the {@link ArtifactHandler} for the given type.
      */
     @Override
-    public ArtifactHandler artifactHandler(final String type) {
+    public MavenProject mavenProject(final J2clArtifactCoords coords,
+                                     final J2clClasspathScope scope) {
+        MavenProject mavenProject = this.coordToMavenProject.get(coords);
+        if (null == mavenProject) {
+            mavenProject = this.mavenProject0(coords.mavenArtifact(scope, this.artifactHandler(coords.typeOrDefault())));
+            this.coordToMavenProject.put(coords, mavenProject);
+        }
+
+        return mavenProject;
+    }
+
+    /**
+     * Cache of coords to project.
+     */
+    private final Map<J2clArtifactCoords, MavenProject> coordToMavenProject = Maps.concurrent();
+
+    private ArtifactHandler artifactHandler(final String type) {
         return this.artifactHandlerManager.getArtifactHandler(type);
     }
 
     private ArtifactHandlerManager artifactHandlerManager;
 
-    @Override
-    public MavenProject mavenProject(final Artifact artifact) {
+    private MavenProject mavenProject0(final Artifact artifact) {
         final ProjectBuildingRequest request = new DefaultProjectBuildingRequest(this.mavenSession.getProjectBuildingRequest());
         request.setProject(null);
         request.setResolveDependencies(true);
