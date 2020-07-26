@@ -964,6 +964,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private void executeStep(final J2clStep step) throws Exception {
+        Thread.currentThread().setName(this.coords() + "-" + step);
         final Optional<J2clStep> next = step.execute(this);
         if (next.isPresent()) {
             this.executeStep(next.get());
