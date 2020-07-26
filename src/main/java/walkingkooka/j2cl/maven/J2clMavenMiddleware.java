@@ -17,8 +17,6 @@
 
 package walkingkooka.j2cl.maven;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
@@ -50,14 +48,12 @@ public interface J2clMavenMiddleware {
     }
 
     /**
-     * Fetches the {@link ArtifactHandler} for the given type.
+     * Returns a {@link MavenProject} given an {@J2clArtifactCoords coords}.
      */
-    ArtifactHandler artifactHandler(final String type);
+    MavenProject mavenProject(final J2clArtifactCoords coords, final J2clClasspathScope scope);
 
     /**
-     * Returns a {@link MavenProject} given an {@link Artifact}.
+     * Fetches the file for the given coords
      */
-    MavenProject mavenProject(final Artifact artifact);
-
     Optional<J2clPath> mavenFile(final String coords);
 }
