@@ -492,10 +492,6 @@
                     <groupId>org.junit.jupiter</groupId>
                     <artifactId>junit-jupiter-engine</artifactId>
                 </exclusion>
-                <exclusion>
-                    <groupId>com.vertispan.j2cl.external</groupId>
-                    <artifactId>org.eclipse.jdt.core</artifactId>
-                </exclusion>
             </exclusions>
         </dependency>
 
