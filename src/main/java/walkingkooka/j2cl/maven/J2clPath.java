@@ -386,7 +386,9 @@ final class J2clPath implements Comparable<J2clPath> {
      * Used to read the {@link #SHADE_FILE} properties file. Note the {@link Map} keeps entries in the file order.
      */
     Map<String, String> readShadeFile() throws IOException {
-        try (final InputStream file = new FileInputStream(this.file())) {
+        final File file = this.file();
+
+        try (final InputStream content = new FileInputStream(file)) {
             final Map<String, String> map = Maps.ordered();
             final Properties properties = new Properties() {
 
@@ -405,7 +407,7 @@ final class J2clPath implements Comparable<J2clPath> {
                     try {
                         PackageName.with(value);
                     } catch (final Exception cause) {
-                        throw new J2clException("Invalid property " + label + " (type) " + CharSequences.quoteAndEscape(value) + " in " + this);
+                        throw new J2clException("Invalid property " + label + " (package name) " + CharSequences.quoteAndEscape(value) + " in " + file.getAbsolutePath());
                     }
                 }
 
@@ -414,7 +416,7 @@ final class J2clPath implements Comparable<J2clPath> {
                     return this.setProperty((String) key, (String) value);
                 }
             };
-            properties.load(file);
+            properties.load(content);
             return map;
         }
     }
