@@ -32,6 +32,10 @@
                     <groupId>walkingkooka</groupId>
                     <artifactId>j2cl-maven-plugin-it-junit-test-dependency-graph-excluded</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>walkingkooka-excluded</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
     </dependencies>

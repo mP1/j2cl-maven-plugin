@@ -132,6 +132,11 @@ public final class J2clArtifactCoordsTest implements ClassTesting2<J2clArtifactC
     }
 
     @Test
+    public void testWildcardArtifactId() {
+        this.checkEquals(J2clArtifactCoords.with(GROUP, "*", TYPE, CLASSIFIER, VERSION));
+    }
+
+    @Test
     public void testLessArtifactId() {
         this.checkNotEquals(J2clArtifactCoords.with(GROUP, "a", TYPE, CLASSIFIER, VERSION));
     }
@@ -139,6 +144,11 @@ public final class J2clArtifactCoordsTest implements ClassTesting2<J2clArtifactC
     @Test
     public void testLessVersion() {
         this.checkNotEquals(J2clArtifactCoords.with(GROUP, ARTIFACT, TYPE, CLASSIFIER, "0"));
+    }
+
+    @Test
+    public void testWildcardVersion() {
+        this.checkEquals(J2clArtifactCoords.with(GROUP, ARTIFACT, TYPE, CLASSIFIER, "*"));
     }
 
     // equals...........................................................................................................
