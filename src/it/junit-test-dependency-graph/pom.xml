@@ -9,6 +9,7 @@
 
     <modules>
         <module>excluded2</module>
+        <module>excluded3</module>
         <module>transitive</module>
         <module>transitive2</module>
         <module>excluded</module>

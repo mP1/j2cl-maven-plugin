@@ -176,19 +176,23 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
 
     @Override
     public int compareTo(final J2clArtifactCoords other) {
-        int result = this.groupId.compareTo(other.groupId);
+        int result = this.groupId().compareTo(other.groupId());
         if (0 == result) {
-            result = this.artifactId.compareTo(other.artifactId);
+            result = compareWildSupported(this.artifactId(), other.artifactId());
             if (0 == result) {
-                result = this.isWildcardVersion() || other.isWildcardVersion() ?
-                        0 :
-                        this.version.compareTo(other.version);
+                result = compareWildSupported(this.version(), other.version());
                 if (0 == result) {
                     result = this.compareToClassifier().compareTo(other.compareToClassifier());
                 }
             }
         }
         return result;
+    }
+
+    private static int compareWildSupported(final String value, final String other) {
+        return value.equals("*") || other.equals("*") ?
+                0 :
+                value.compareTo(other);
     }
 
     String compareToClassifier() {
@@ -206,6 +210,10 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
     }
 
     private final String artifactId;
+
+    boolean isWildcardArtifactId() {
+        return this.artifactId().equals("*");
+    }
 
     String type() {
         return this.type;

@@ -75,6 +75,17 @@
             <groupId>walkingkooka</groupId>
             <artifactId>j2cl-uber</artifactId>
             <version>1.0-SNAPSHOT</version>
+
+            <exclusions>
+                <exclusion>
+                    <groupId>group-id-123</groupId>
+                    <artifactId>artifact-id-456</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>group-id-789</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
     </dependencies>
