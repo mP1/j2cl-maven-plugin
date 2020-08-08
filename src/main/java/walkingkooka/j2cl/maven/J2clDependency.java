@@ -55,6 +55,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -80,8 +81,13 @@ final class J2clDependency implements Comparable<J2clDependency> {
                 Optional.empty(),
                 request);
         root.gatherDependencies(request.scope().scopeFilter(), Predicates.never(), Function.identity());
-        root.verify();
+        root.discoverAndMarkIgnoredDependenciesDescendants();
+        root.expandDependencies();
         root.addBootstrapClasspath();
+        root.verify();
+
+        makeDependenciesGetterReadOnly(root.dependencies);
+
         root.print(true);
 
         return root;
@@ -163,8 +169,6 @@ final class J2clDependency implements Comparable<J2clDependency> {
                     exclusions(parentExclusions, dependency),
                     dependencyManagement);
         }
-
-        this.addChildrenDependencies();
     }
 
     /**
@@ -190,14 +194,74 @@ final class J2clDependency implements Comparable<J2clDependency> {
         return child;
     }
 
-    private void addChildrenDependencies() {
-        // temp copy to avoid ConcurrentModificationException
-        final List<J2clDependency> dependencies = Lists.array();
-        for (final J2clDependency child : this.dependencies) {
-            dependencies.addAll(child.dependencies);
-        }
-        this.dependencies.addAll(dependencies);
+    // discoverAndMarkIgnoredDependenciesDescendants....................................................................
+
+    /**
+     * Walks the entire graph of dependencies and marks dependencies as ignorable if they are only descendants of an ignorable.
+     */
+    private void discoverAndMarkIgnoredDependenciesDescendants() {
+        final Set<J2clArtifactCoords> nonIgnorables = J2clArtifactCoords.set();
+
+        int count;
+        do {
+            count = nonIgnorables.size();
+
+            this.discoverNonIgnoredDependencies(nonIgnorables);
+
+        } while (count != nonIgnorables.size());
+
+        this.markIgnorableDependenciesDescendants(nonIgnorables, this.isIgnored());
     }
+
+    private void discoverNonIgnoredDependencies(final Set<J2clArtifactCoords> nonIgnorables) {
+        if (false == this.isIgnored()) {
+            this.dependencies()
+                    .stream()
+                    .forEach(d -> d.discoverNonIgnoredDependencies(nonIgnorables));
+        }
+    }
+
+    private void markIgnorableDependenciesDescendants(final Set<J2clArtifactCoords> nonIgnorables,
+                                                      final boolean parentIgnored) {
+        final boolean childIgnore = (this.isIgnored() || parentIgnored) && false == nonIgnorables.contains(this.coords());
+        if (childIgnore) {
+            this.ignored = true; // overwrite
+        }
+
+        this.dependencies().stream()
+                .filter(d -> false == d.isBootstrapOrJreFiles())
+                .forEach(d -> {
+                    d.markIgnorableDependenciesDescendants(nonIgnorables, childIgnore);
+                });
+    }
+
+    // expand dependencies..............................................................................................
+
+    /**
+     * Before this is called, all {@link J2clDependency#dependencies} ony contain their children, after this method
+     * finishes it will all descendants
+     */
+    private void expandDependencies() {
+        this.expandDependencies0((d) -> {
+        });
+    }
+
+    private void expandDependencies0(final Consumer<J2clDependency> dependencies) {
+        final Set<J2clDependency> deep = set();
+        final Consumer<J2clDependency> all = (d) -> {
+            dependencies.accept(d);
+            deep.add(d);
+        };
+
+        for (final J2clDependency child : this.dependencies()) {
+            all.accept(child);
+            child.expandDependencies0(all);
+        }
+
+        this.dependencies = deep;
+    }
+
+    // verify...........................................................................................................
 
     /**
      * Checks that dependency coords do not have version conflicts, duplicates, and classpath required, javascript source

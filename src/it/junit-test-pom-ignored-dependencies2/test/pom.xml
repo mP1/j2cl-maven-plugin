@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>walkingkooka</groupId>
-    <artifactId>j2cl-maven-plugin-it-junit-test-jre-class-replaced-shaded2-test</artifactId>
+    <artifactId>j2cl-maven-plugin-it-junit-test-pom-ignored-dependencies2-test</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -18,13 +18,13 @@
     <dependencies>
         <dependency>
             <groupId>walkingkooka</groupId>
-            <artifactId>j2cl-maven-plugin-it-junit-test-jre-class-replaced-shaded2-dependency</artifactId>
+            <artifactId>j2cl-uber-test</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>walkingkooka</groupId>
-            <artifactId>j2cl-uber-test</artifactId>
+            <artifactId>j2cl-maven-plugin-it-junit-test-pom-ignored-dependencies2-dependency</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
@@ -98,7 +98,9 @@
                             <thread-pool-size>0</thread-pool-size>
 
                             <classpath-required/>
-                            <ignored-dependencies/>
+                            <ignored-dependencies>
+                                <param>walkingkooka:j2cl-maven-plugin-it-junit-test-pom-ignored-dependencies2-ignored:*</param>
+                            </ignored-dependencies>
                             <javascript-source-required/>
 
                             <skip-tests>false</skip-tests>
