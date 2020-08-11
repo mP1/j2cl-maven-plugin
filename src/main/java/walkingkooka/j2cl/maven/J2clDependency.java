@@ -337,25 +337,19 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private void gatherCoordToDependency0(final Map<J2clArtifactCoords, J2clDependency> coordToDependency) {
-        coordToDependency.put(this.coords(), this);
+        final J2clArtifactCoords coords = this.coords();
 
-        for (final J2clDependency dependency : this.dependencies) {
-            final J2clArtifactCoords coords = dependency.coords();
+        final J2clDependency other = coordToDependency.get(coords);
 
-            final J2clDependency less;
-            final J2clDependency other = coordToDependency.get(coords);
-            if(null == other) {
-                less = dependency;
-            } else {
-                final Set<J2clDependency> otherDependencies = other.dependencies;
-                if (this.dependencies.size() < otherDependencies.size()) {
-                    less = this;
-                } else {
-                    less = other;
-                }
+        // different dependency instance might have different child dependencies due to "different" exclusions.
+        if(false == this.equals(other)){
+            final Set<J2clDependency> dependencies = this.dependencies;
+            if(null == other || dependencies.size() < other.dependencies.size()) {
+                coordToDependency.put(coords, this);
             }
-
-            less.gatherCoordToDependency0(coordToDependency);
+            for (final J2clDependency dependency : dependencies) {
+                dependency.gatherCoordToDependency0(coordToDependency);
+            }
         }
     }
 
