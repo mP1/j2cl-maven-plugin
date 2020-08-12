@@ -43,6 +43,13 @@ final class JavacCompiler {
                            final Set<String>  javaCompilerArguments,
                            final boolean runAnnotationProcessors,
                            final J2clLinePrinter logger) throws Exception {
+        if (bootstrap.isEmpty()) {
+            throw new IllegalArgumentException("bootstrap must not be empty");
+        }
+        if (classpath.isEmpty()) {
+            throw new IllegalArgumentException("classpath must not be empty");
+        }
+
         // try and add options in alpha order...
         final List<String> options = Lists.array();
         options.add("-bootclasspath");

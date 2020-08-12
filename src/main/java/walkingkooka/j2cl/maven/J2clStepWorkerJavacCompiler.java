@@ -73,6 +73,11 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
                         continue;
                     }
 
+                    if (dependency.isJreBootstrapClassFiles()) {
+                        addIfAbsent(dependency.artifactFileOrFail(), bootstrap);
+                        continue;
+                    }
+
                     if (dependency.isClasspathRequired()) {
                         addIfAbsent(dependency.artifactFileOrFail(), classpath);
                         continue;
@@ -83,11 +88,6 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
                     }
 
                     if (dependency.isJavascriptSourceRequired()) {
-                        continue;
-                    }
-
-                    if (dependency.isJreBootstrapClassFiles()) {
-                        addIfAbsent(dependency.artifactFileOrFail(), bootstrap);
                         continue;
                     }
 
