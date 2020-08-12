@@ -140,7 +140,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
                     result = run.get();
                 }
                 logger.outdent();
-                logger.println(taskName + " took " + Duration.ofSeconds(System.currentTimeMillis() - start).toSeconds() + " second(s)");
+                logger.println(taskName + " took " + (System.currentTimeMillis() - start) + " mills(s)");
             }
             logger.outdent();
         } finally {
