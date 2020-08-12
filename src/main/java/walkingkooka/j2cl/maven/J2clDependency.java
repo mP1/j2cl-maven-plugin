@@ -31,6 +31,8 @@ import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.predicate.Predicates;
 import walkingkooka.text.CharSequences;
+import walkingkooka.text.Indentation;
+import walkingkooka.text.printer.IndentingPrinter;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,21 +78,75 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     static J2clDependency gather(final MavenProject project,
                                  final J2clRequest request) {
-        final J2clDependency root = new J2clDependency(J2clArtifactCoords.with(project.getArtifact()),
-                project,
-                Optional.empty(),
-                request);
-        root.gatherDependencies(request.scope().scopeFilter(), Predicates.never(), Function.identity());
-        root.discoverAndMarkIgnoredDependenciesDescendants();
-        root.expandDependencies();
-        root.addBootstrapClasspath();
-        root.verify();
+        final IndentingPrinter logger = request.logger()
+                .printer(request.logger()::debug)
+                .indenting(Indentation.with("  "));
+        final J2clDependency root;
+        {
+            root = timeTask("Gather dependencies",
+                    () -> {
+                        final J2clDependency r = new J2clDependency(J2clArtifactCoords.with(project.getArtifact()),
+                                project,
+                                Optional.empty(),
+                                request);
+                        r.gatherDependencies(request.scope().scopeFilter(), Predicates.never(), Function.identity());
+                        return r;
+                    }, logger);
 
-        makeDependenciesGetterReadOnly(root.dependencies);
+            timeTask("Discover and mark IgnoredDependencies descendants",
+                    () -> {
+                        root.discoverAndMarkIgnoredDependenciesDescendants();
+                        return null;
+                    }, logger);
 
+            timeTask("Expand dependencies",
+                    () -> {
+                        root.expandDependencies();
+                        return null;
+                    }, logger);
+            timeTask("Add Bootstrap Classpath to all dependencies",
+                    () -> {
+                        root.addBootstrapClasspath();
+                        return null;
+                    }, logger);
+            timeTask("Verify dependencies maven coordinates",
+                    () -> {
+                        root.verify();
+                        return null;
+                    }, logger);
+
+            makeDependenciesGetterReadOnly(root.dependencies);
+        }
         root.print(true);
 
         return root;
+    }
+
+    private static <T> T timeTask(final String taskName,
+                                  final Supplier<T> run,
+                                  final IndentingPrinter logger) {
+        final T result;
+
+        final Thread thread = Thread.currentThread();
+        final String threadNameBackup = thread.getName();
+        thread.setName(taskName);
+        try {
+            logger.println(taskName);
+            logger.indent();
+            {
+                final long start = System.currentTimeMillis();
+                logger.indent();
+                {
+                    result = run.get();
+                }
+                logger.outdent();
+                logger.println(taskName + " took " + Duration.ofSeconds(System.currentTimeMillis() - start).toSeconds() + " second(s)");
+            }
+            logger.outdent();
+        } finally {
+            thread.setName(threadNameBackup);
+        }
+        return result;
     }
 
     // ctor.............................................................................................................
