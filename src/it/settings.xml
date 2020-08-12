@@ -11,9 +11,11 @@
                     <url>@localRepositoryUrl@</url>
                     <releases>
                         <enabled>true</enabled>
+                        <updatePolicy>daily</updatePolicy>
                     </releases>
                     <snapshots>
                         <enabled>true</enabled>
+                        <updatePolicy>daily</updatePolicy>
                     </snapshots>
                 </repository>
                 <repository>
@@ -26,29 +28,35 @@
                     <url>https://repo.vertispan.com/j2cl</url>
                     <releases>
                         <enabled>true</enabled>
+                        <updatePolicy>daily</updatePolicy>
                     </releases>
                     <snapshots>
                         <enabled>true</enabled>
+                        <updatePolicy>daily</updatePolicy>
                     </snapshots>
                 </repository>
                 <repository>
                     <id>vertispan-gwt-snapshots</id>
                     <url>https://repo.vertispan.com/gwt-snapshot/</url>
                     <releases>
-                        <enabled>false</enabled>
+                        <enabled>true</enabled>
+                        <updatePolicy>daily</updatePolicy>
                     </releases>
                     <snapshots>
                         <enabled>true</enabled>
+                        <updatePolicy>daily</updatePolicy>
                     </snapshots>
                 </repository>
                 <repository>
                     <id>google-sonatype-snapshots</id>
                     <url>https://oss.sonatype.org/content/repositories/google-snapshots/</url>
                     <releases>
-                        <enabled>false</enabled>
+                        <enabled>true</enabled>
+                        <updatePolicy>daily</updatePolicy>
                     </releases>
                     <snapshots>
                         <enabled>true</enabled>
+                        <updatePolicy>daily</updatePolicy>
                     </snapshots>
                 </repository>
 
@@ -58,10 +66,10 @@
                     <id>local.repo</id>
                     <url>@localRepositoryUrl@</url>
                     <releases>
-                        <enabled>true</enabled>
+                        <enabled>false</enabled>
                     </releases>
                     <snapshots>
-                        <enabled>true</enabled>
+                        <enabled>false</enabled>
                     </snapshots>
                 </pluginRepository>
             </pluginRepositories>
