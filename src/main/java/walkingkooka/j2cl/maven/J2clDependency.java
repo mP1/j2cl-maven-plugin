@@ -266,11 +266,16 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
         } while (count != nonIgnorables.size());
 
+        if(nonIgnorables.isEmpty()) {
+            throw new IllegalStateException("Discovering non ignored dependencies found nothing");
+        }
+
         this.markIgnorableDependenciesDescendants(nonIgnorables, this.isIgnored());
     }
 
     private void discoverNonIgnoredDependencies(final Set<J2clArtifactCoords> nonIgnorables) {
         if (false == this.isIgnored()) {
+            nonIgnorables.add(this.coords());
             this.dependencies()
                     .stream()
                     .forEach(d -> d.discoverNonIgnoredDependencies(nonIgnorables));
