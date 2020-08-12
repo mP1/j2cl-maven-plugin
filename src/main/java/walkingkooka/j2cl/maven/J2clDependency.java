@@ -79,7 +79,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     static J2clDependency gather(final MavenProject project,
                                  final J2clRequest request) {
         final IndentingPrinter logger = request.logger()
-                .printer(request.logger()::debug)
+                .printer(request.logger()::info)
                 .indenting(Indentation.with("  "));
         final J2clDependency root;
         {
