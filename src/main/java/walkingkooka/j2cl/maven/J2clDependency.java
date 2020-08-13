@@ -57,7 +57,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -93,15 +92,21 @@ final class J2clDependency implements Comparable<J2clDependency> {
                         return r;
                     }, logger);
 
-            timeTask("Discover and mark IgnoredDependencies descendants",
+            timeTask("Reduce duplicate dependencies",
                     () -> {
-                        root.discoverAndMarkIgnoredDependenciesDescendants();
+                        root.reduce();
+                        return null;
+                    }, logger);
+
+            timeTask("Discover and mark ignored transitive dependencies",
+                    () -> {
+                        root.discoverAndMarkIgnoredTransitiveDependencies();
                         return null;
                     }, logger);
 
             timeTask("Expand dependencies",
                     () -> {
-                        root.expandDependencies();
+                        root.addTransitiveDependencies();
                         return null;
                     }, logger);
             timeTask("Add Bootstrap Classpath to all dependencies",
@@ -250,76 +255,247 @@ final class J2clDependency implements Comparable<J2clDependency> {
         return child;
     }
 
-    // discoverAndMarkIgnoredDependenciesDescendants....................................................................
+    // reduce...........................................................................................................
 
     /**
-     * Walks the entire graph of dependencies and marks dependencies as ignorable if they are only descendants of an ignorable.
+     * This is required because a dependency may appear in multiple places within a graph of dependencies from the project
+     * being built. Because of this the same artifact coordinates may have different dependencies due to exclusions. The
+     * one with less will be kept.
      */
-    private void discoverAndMarkIgnoredDependenciesDescendants() {
-        final Set<J2clArtifactCoords> nonIgnorables = J2clArtifactCoords.set();
-
-        int count;
-        do {
-            count = nonIgnorables.size();
-
-            this.discoverNonIgnoredDependencies(nonIgnorables);
-
-        } while (count != nonIgnorables.size());
-
-        if(nonIgnorables.isEmpty()) {
-            throw new IllegalStateException("Discovering non ignored dependencies found nothing");
-        }
-
-        this.markIgnorableDependenciesDescendants(nonIgnorables, this.isIgnored());
+    private J2clDependency reduce() {
+        final Map<J2clArtifactCoords, J2clDependency> coordToDependency = Maps.sorted(J2clArtifactCoords.IGNORE_VERSION_COMPARATOR);
+        this.gatherCoordToDependency(coordToDependency);
+        return this.reduce0(coordToDependency);
     }
 
-    private void discoverNonIgnoredDependencies(final Set<J2clArtifactCoords> nonIgnorables) {
-        if (false == this.isIgnored()) {
-            nonIgnorables.add(this.coords());
-            this.dependencies()
-                    .stream()
-                    .forEach(d -> d.discoverNonIgnoredDependencies(nonIgnorables));
+    private void gatherCoordToDependency(final Map<J2clArtifactCoords, J2clDependency> coordToDependency) {
+        final J2clArtifactCoords coords = this.coords();
+
+        final J2clDependency other = coordToDependency.get(coords);
+
+        // different dependency instance might have different child dependencies due to "different" exclusions.
+        if(false == this.equals(other)){
+            final Set<J2clDependency> dependencies = this.dependencies;
+            if(null == other || dependencies.size() < other.dependencies.size()) {
+                coordToDependency.put(coords, this);
+            }
+            for (final J2clDependency dependency : dependencies) {
+                dependency.gatherCoordToDependency(coordToDependency);
+            }
         }
     }
 
-    private void markIgnorableDependenciesDescendants(final Set<J2clArtifactCoords> nonIgnorables,
-                                                      final boolean parentIgnored) {
-        final boolean childIgnore = (this.isIgnored() || parentIgnored) && false == nonIgnorables.contains(this.coords());
-        if (childIgnore) {
-            this.ignored = true; // overwrite
-        }
+    private J2clDependency reduce0(final Map<J2clArtifactCoords, J2clDependency> coordToDependency) {
+        this.dependencies = this.dependencies.stream()
+                .map(d -> coordToDependency.get(d.coords()).reduce0(coordToDependency))
+                .collect(Collectors.toCollection(J2clDependency::set));
+        return this;
+    }
 
-        this.dependencies().stream()
-                .filter(d -> false == d.isBootstrapOrJreFiles())
-                .forEach(d -> {
-                    d.markIgnorableDependenciesDescendants(nonIgnorables, childIgnore);
+    // discoverAndMarkIgnoredTransitiveDependencies....................................................................
+
+    /**
+     * Builds a graph of dependency to parents recursively until the project being built. All artifacts parent graphs are
+     * then walked until a non ignored ancestor or the project itself is found, otherwise that is marked as ignored.
+     * <p>
+     * In the graph below transitive (both paths) and transitive2 will be found to only have ancestors that are ignored
+     * and therefore will also be marked as ignored.
+     * <pre>
+     * transitive
+     *   -> dependency (ignored)
+     *     -> project
+     *   -> transitive2
+     *     -> dependency (ignored)
+     *       -> project
+     * </pre>
+     */
+    private void discoverAndMarkIgnoredTransitiveDependencies() {
+        final Map<J2clDependency, Set<J2clDependency>> childToParents = Maps.sorted();
+
+        this.discoverAndRecordParents(childToParents);
+        this.markIgnoredTransitiveDependencies(childToParents);
+    }
+
+    /**
+     * Builds a {@link Map} of child to parent.
+     */
+    private void discoverAndRecordParents(final Map<J2clDependency, Set<J2clDependency>> childToParents) {
+        this.dependencies.stream()
+                .filter(c -> false == c.isAnnotationsBootstrapOrJreFiles())
+                .forEach(c -> {
+                    Set<J2clDependency> parents = childToParents.get(c);
+                    if (null == parents) {
+                        parents = set();
+                        childToParents.put(c, parents);
+                    }
+                    parents.add(this);
+
+                    c.discoverAndRecordParents(childToParents);
                 });
+    }
+
+    private void markIgnoredTransitiveDependencies(final Map<J2clDependency, Set<J2clDependency>> childToParents) {
+        final IndentingPrinter logger = request.logger()
+                .printer(request.logger()::info)
+                .indenting(Indentation.with("  "));
+        logger.println("Marking ignored transitive dependencies");
+        logger.indent();
+        {
+            childToParents.entrySet()
+                    .forEach(e -> {
+                        final Set<J2clDependency> parents = e.getValue();
+                        if (null != parents) {
+                            e.getKey().markIgnoredTransitiveDependencies0(parents, childToParents, logger);
+                        }
+                    });
+        }
+        logger.outdent();
+    }
+
+    /**
+     * <pre>
+     * child >
+     *      parent1 >
+     *              grand1 >
+     *      parent2 >
+     *              grand2 >
+     *                       root
+     * </pre>
+     * // stop walking if parent is ignored
+     */
+    private void markIgnoredTransitiveDependencies0(final Set<J2clDependency> parents,
+                                                    final Map<J2clDependency, Set<J2clDependency>> childToParents,
+                                                    final IndentingPrinter logger) {
+        final boolean nonIgnored = this.findNonIgnoredParentDependencies(parents, childToParents);
+        if (false == nonIgnored) {
+            this.ignored = true;
+
+            this.printParents(childToParents, logger);
+        }
+    }
+
+    private boolean findNonIgnoredParentDependencies(final Set<J2clDependency> parents,
+                                                     final Map<J2clDependency, Set<J2clDependency>> childToParents) {
+        boolean nonIgnored = false;
+
+        if (false == this.isIgnored()) {
+            for (final J2clDependency parent : parents) {
+                final Set<J2clDependency> childParents = childToParents.get(parent);
+                if (null == childParents) {
+                    nonIgnored = true;
+                    break;
+                }
+                if (parent.findNonIgnoredParentDependencies(childParents, childToParents)) {
+                    nonIgnored = true;
+                    break;
+                }
+            }
+        }
+
+        return nonIgnored;
+    }
+
+    /**
+     * Used to print a tree of ignored dependency to all its parents, which may be useful in debugging transpile failures
+     * due to ignored dependencies.
+     */
+    private void printParents(final Map<J2clDependency, Set<J2clDependency>> childToParents,
+                              final IndentingPrinter logger) {
+        final Set<J2clDependency> parents = childToParents.get(this);
+        if (null != parents) {
+            logger.indent();
+            {
+                parents.forEach(p -> {
+                    if (p.isIgnored()) {
+                        logger.println(p.coords().toString());
+                        p.printParents(childToParents, logger);
+                    }
+                });
+            }
+            logger.outdent();
+        }
     }
 
     // expand dependencies..............................................................................................
 
     /**
-     * Before this is called, all {@link J2clDependency#dependencies} ony contain their children, after this method
+     * Before this is called, all {@link J2clDependency#dependencies} only contain their children, when this method
      * finishes it will all descendants
      */
-    private void expandDependencies() {
-        this.expandDependencies0((d) -> {
-        });
-    }
-
-    private void expandDependencies0(final Consumer<J2clDependency> dependencies) {
+    private Set<J2clDependency> addTransitiveDependencies() {
         final Set<J2clDependency> deep = set();
-        final Consumer<J2clDependency> all = (d) -> {
-            dependencies.accept(d);
-            deep.add(d);
-        };
 
         for (final J2clDependency child : this.dependencies()) {
-            all.accept(child);
-            child.expandDependencies0(all);
+            if (false == deep.contains(child)) {
+                deep.add(child);
+                child.addTransitiveDependencies()
+                        .stream()
+                        .filter(d -> false == deep.contains(d))
+                        .forEach(deep::add);
+            }
         }
 
         this.dependencies = deep;
+        return deep;
+    }
+
+    // addBootstrapClasspath............................................................................................
+
+    /**
+     * Add the bootstrap and classpath dependencies to all other dependencies............................................
+     */
+    private void addBootstrapClasspath() {
+        final Collection<J2clDependency> bootstrapAndJreDependencies = this.collectBootstrapAndJreWithDependencies();
+
+        this.dependencies()
+                .stream()
+                .filter(d -> false == d.isJreBootstrapClassFiles())
+                .forEach(d -> {
+                    d.addIfAbsent(bootstrapAndJreDependencies);
+                });
+    }
+
+    /**
+     * Returns all bootstrap and JRE and their dependencies.
+     */
+    private Collection<J2clDependency> collectBootstrapAndJreWithDependencies() {
+        final Collection<J2clDependency> bootstrapAndJre = this.dependencies()
+                .stream()
+                .filter(J2clDependency::isAnnotationsBootstrapOrJreFiles)
+                .collect(Collectors.toCollection(J2clDependency::set));
+
+        final Collection<J2clDependency> dependencies = bootstrapAndJre.stream()
+                .flatMap(d -> d.dependencies.stream())
+                .filter(d -> false == d.isIgnored())
+                .collect(Collectors.toCollection(J2clDependency::set));
+        addIfAbsent(dependencies, bootstrapAndJre);
+
+        bootstrapAndJre.addAll(dependencies);
+        return bootstrapAndJre;
+    }
+
+    /**
+     * Adds all the ifAbsents if they are absent from the all
+     */
+    private static void addIfAbsent(final Collection<J2clDependency> all, final Collection<J2clDependency> ifAbsent) {
+        all.stream()
+                .filter(d -> false == d.isIgnored() && false == ifAbsent.contains(d))
+                .forEach(d -> d.addIfAbsent(ifAbsent));
+    }
+
+    /**
+     * Adds any of the ifAbsent dependencies if they are new and not present in this.
+     */
+    private void addIfAbsent(final Collection<J2clDependency> ifAbsent) {
+        for (final J2clDependency maybe : ifAbsent) {
+            if(this.equals(maybe)) {
+                continue;
+            }
+            if (this.dependencies.contains(maybe)) {
+                continue;
+            }
+            this.dependencies.add(maybe);
+        }
     }
 
     // verify...........................................................................................................
@@ -373,95 +549,6 @@ final class J2clDependency implements Comparable<J2clDependency> {
             this.print(false);
 
             throw new IllegalStateException(duplicateCoords.size() + " duplicate(s)\n" + duplicatesText.stream().collect(Collectors.joining("\n")));
-        }
-    }
-
-    /**
-     * Add the bootstrap and classpath dependencies to all other dependencies............................................
-     */
-    private void addBootstrapClasspath() {
-        final Map<J2clArtifactCoords, J2clDependency> coordToDependency = this.gatherCoordToDependency();
-        this.reduce(coordToDependency);
-
-        final Collection<J2clDependency> bootstrapAndJreDependencies = collectBootstrapAndJreWithDependencies(coordToDependency.values());
-        addIfAbsent(coordToDependency.values(), bootstrapAndJreDependencies);
-        makeDependenciesGetterReadOnly(coordToDependency.values());
-    }
-
-    /**
-     * Build a {@link Map} holding a mapping of coordinates to dependency. This assumes that all dependencies with the same coords are equivalent.
-     */
-    private Map<J2clArtifactCoords, J2clDependency> gatherCoordToDependency() {
-        final Map<J2clArtifactCoords, J2clDependency> coordToDependency = Maps.sorted(J2clArtifactCoords.IGNORE_VERSION_COMPARATOR);
-        this.gatherCoordToDependency0(coordToDependency);
-        return coordToDependency;
-    }
-
-    private void gatherCoordToDependency0(final Map<J2clArtifactCoords, J2clDependency> coordToDependency) {
-        final J2clArtifactCoords coords = this.coords();
-
-        final J2clDependency other = coordToDependency.get(coords);
-
-        // different dependency instance might have different child dependencies due to "different" exclusions.
-        if(false == this.equals(other)){
-            final Set<J2clDependency> dependencies = this.dependencies;
-            if(null == other || dependencies.size() < other.dependencies.size()) {
-                coordToDependency.put(coords, this);
-            }
-            for (final J2clDependency dependency : dependencies) {
-                dependency.gatherCoordToDependency0(coordToDependency);
-            }
-        }
-    }
-
-    private void reduce(final Map<J2clArtifactCoords, J2clDependency> coordToDependency) {
-        final Set<J2clDependency> dependencies = set();
-
-        // some coords will have multiple J2clDependency instances replace with a single instance.
-        for (final J2clDependency child : this.dependencies) {
-            final J2clDependency child2 = coordToDependency.get(child.coords());
-            child2.reduce(coordToDependency);
-            dependencies.add(child2);
-        }
-
-        this.dependencies = dependencies; // make readonly later.
-    }
-
-    /**
-     * Returns all bootstrap and JRE and their dependencies.
-     */
-    private static Collection<J2clDependency> collectBootstrapAndJreWithDependencies(final Collection<J2clDependency> all) {
-        final Collection<J2clDependency> bootstrapAndJre = all.stream()
-                .filter(J2clDependency::isAnnotationsBootstrapOrJreFiles)
-                .collect(Collectors.toCollection(J2clDependency::set));
-
-        final Collection<J2clDependency> dependencies = bootstrapAndJre.stream()
-                .flatMap(d -> d.dependencies.stream())
-                .filter(d -> false == d.isIgnored())
-                .collect(Collectors.toCollection(J2clDependency::set));
-        addIfAbsent(dependencies, bootstrapAndJre);
-
-        bootstrapAndJre.addAll(dependencies);
-        return bootstrapAndJre;
-    }
-
-    /**
-     * Adds all the ifAbsents if they are absent from the all
-     */
-    private static void addIfAbsent(final Collection<J2clDependency> all, final Collection<J2clDependency> ifAbsent) {
-        all.stream()
-                .filter(d -> false == d.isIgnored() && false == ifAbsent.contains(d))
-                .forEach(d -> d.addIfAbsent(ifAbsent));
-    }
-
-    /**
-     * Adds any of the ifAbsent dependencies if they are new and not present in this.
-     */
-    private void addIfAbsent(final Collection<J2clDependency> ifAbsent) {
-        for (final J2clDependency maybe : ifAbsent) {
-            if (false == this.dependencies.contains(maybe)) {
-                this.dependencies.add(maybe);
-            }
         }
     }
 
@@ -667,12 +754,6 @@ final class J2clDependency implements Comparable<J2clDependency> {
                     break;
                 }
 
-                // not explicitly required and ignored so false
-                if (this.ignoredFile) {
-                    required = false;
-                    break;
-                }
-
                 // cp required but js missing so false
                 if (this.javascriptSourceRequiredFile || request.isJavascriptSourceRequired(coords)) {
                     required = false;
@@ -722,12 +803,6 @@ final class J2clDependency implements Comparable<J2clDependency> {
                 final J2clArtifactCoords coords = this.coords();
                 if (request.isJavascriptSourceRequired(coords)) {
                     required = true;
-                    break;
-                }
-
-                // not explicitly required and ignored so false
-                if (this.ignoredFile) {
-                    required = false;
                     break;
                 }
 
