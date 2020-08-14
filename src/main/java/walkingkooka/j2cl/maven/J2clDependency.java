@@ -607,12 +607,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     /**
-     * Prints all the plan metadata such as:
-     * <ul>
-     *  <li>classpath required dependencies</li>
-     *  <li>ignoredDependencies dependencies</li>
-     *  <li>javascript source required dependencies</li>
-     * </ul>
+     * Prints all groupings of artifact in alphabetical order.
      */
     private void printPlanMetadata(final J2clLinePrinter printer) {
         printer.printLine("Metadata");
@@ -637,12 +632,10 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private void print(final String label,
                        final Predicate<J2clDependency> filter,
                        final J2clLinePrinter printer) {
-
-        printer.printIndentedString(label,
-                this.dependencies().stream()
-                        .filter(filter)
-                        .map(J2clDependency::toString)
-                        .collect(Collectors.toList()));
+        printer.printIndentedString(label, this.dependencies().stream()
+                .filter(filter)
+                .map(J2clDependency::toString)
+                .collect(Collectors.toCollection(Sets::sorted)));
     }
 
     // artifactFile......................................................................................................
