@@ -88,7 +88,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
                                 project,
                                 Optional.empty(),
                                 request);
-                        r.gatherDependencies(request.scope().scopeFilter(), Predicates.never(), Function.identity());
+                        r.gatherDependencies(request.scope(), Predicates.never(), Function.identity());
                         return r;
                     }, logger);
 
@@ -167,10 +167,10 @@ final class J2clDependency implements Comparable<J2clDependency> {
         this.request = request;
     }
 
-    private void gatherDependencies(final Predicate<String> scopeFilter,
+    private void gatherDependencies(final J2clClasspathScope scope,
                                     final Predicate<J2clArtifactCoords> parentExclusions,
                                     final Function<J2clArtifactCoords, J2clArtifactCoords> dependencyManagement) {
-        this.gatherDependencies0(scopeFilter, parentExclusions, this.dependencyManagement(dependencyManagement));
+        this.gatherDependencies0(scope, parentExclusions, this.dependencyManagement(dependencyManagement));
     }
 
     private Function<J2clArtifactCoords, J2clArtifactCoords> dependencyManagement(final Function<J2clArtifactCoords, J2clArtifactCoords> transformer) {
@@ -198,11 +198,12 @@ final class J2clDependency implements Comparable<J2clDependency> {
         return result;
     }
 
-    private void gatherDependencies0(final Predicate<String> scopeFilter,
+    private void gatherDependencies0(final J2clClasspathScope scope,
                                      final Predicate<J2clArtifactCoords> parentExclusions,
                                      final Function<J2clArtifactCoords, J2clArtifactCoords> dependencyManagement) {
         final J2clRequest request = this.request();
 
+        final Predicate<String> scopeFilter = scope.scopeFilter();
         for (final Dependency dependency : this.project().getDependencies()) {
             // filter if wrong scope
             if (false == scopeFilter.test(dependency.getScope())) {
@@ -226,7 +227,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
                     request);
             this.dependencies.add(child);
 
-            child.gatherDependencies(scopeFilter,
+            child.gatherDependencies(J2clClasspathScope.COMPILE,
                     exclusions(parentExclusions, dependency),
                     dependencyManagement);
         }
@@ -686,9 +687,10 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     MavenProject project() {
         if(null == this.project) {
+            // all requests with a null project must be dependencies of the project being built and their COMPILE dependencies should be fetched.
             final J2clRequest request = this.request();
             this.project = request.mavenMiddleware()
-                    .mavenProject(this.coords(), request.scope());
+                    .mavenProject(this.coords(), J2clClasspathScope.COMPILE);
         }
         return this.project;
     }
