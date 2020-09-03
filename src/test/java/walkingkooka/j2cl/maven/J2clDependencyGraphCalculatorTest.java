@@ -20,6 +20,8 @@ package walkingkooka.j2cl.maven;
 import org.junit.jupiter.api.Test;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.reflect.ClassTesting2;
+import walkingkooka.reflect.JavaVisibility;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -30,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class J2ClDependencyGraphCalculatorTest {
+public final class J2clDependencyGraphCalculatorTest implements ClassTesting2<J2clDependencyGraphCalculator> {
 
     private final static String A1 = "group:a1:1.0";
     private final static String B2 = "group:b2:1.0";
@@ -191,5 +193,17 @@ public final class J2ClDependencyGraphCalculatorTest {
 
     private String format(final Map<J2clArtifactCoords, Set<J2clArtifactCoords>> map) {
         return map.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue()).collect(Collectors.joining("\n"));
+    }
+
+    // ClassTesting.....................................................................................................
+
+    @Override
+    public Class<J2clDependencyGraphCalculator> type() {
+        return J2clDependencyGraphCalculator.class;
+    }
+
+    @Override
+    public JavaVisibility typeVisibility() {
+        return JavaVisibility.PACKAGE_PRIVATE;
     }
 }
