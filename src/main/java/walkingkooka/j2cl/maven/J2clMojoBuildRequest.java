@@ -148,6 +148,11 @@ final class J2clMojoBuildRequest extends J2clRequest {
     }
 
     @Override
+    BrowserLogLevel browserLogLevel() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     int testTimeout() {
         throw new UnsupportedOperationException();
     }

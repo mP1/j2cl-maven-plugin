@@ -142,6 +142,10 @@
                                 <param>FIREFOX</param>
                                 <param>HTML_UNIT</param>
                             </browsers>
+                            <!--
+                            ALL, ERROR, WARN, INFO, DEBUG, NONE
+                            -->
+                            <browser-log-level>ERROR</browser-log-level>
                             <classpath-scope>test</classpath-scope>
                             <compilation-level>BUNDLE</compilation-level>
                             <defines>

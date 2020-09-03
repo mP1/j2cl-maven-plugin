@@ -257,6 +257,43 @@ Many parameters are actually used to tweak and configure the Closure compiler. R
 more information.
 
 
+## browser-log-level
+
+This option is only available within tests, and controls which browser console messages are printed after each individual test.
+
+- NONE
+- DEBUG
+- INFO
+- WARN
+- ERROR
+- ALL
+
+```xml
+<browser-log-level>ALL</browser-log-level>
+```
+
+Sample log
+```
+INFO: Detected dialect: W3C
+[INFO]           CHROME
+[INFO]               Test Report
+[INFO]                 j2cl-maven-plugin test runner [PASSED]
+[INFO]                 /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/junit-test-browser-log-level/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka--j2cl-maven-plugin-it-junit-test-browser-log-level--jar--1.0-810114ee72641960e5b4c1b3aa2841a9797586f3/8-closure-compile/output/test.JunitTest.html
+[INFO]                 4 of 4 tests run in 3.7200000369921327ms.
+[INFO]                 4 passed, 0 failed.
+[INFO]                 1 ms/test. 1 files loaded.
+[INFO]                  
+[INFO]               Browser log
+[INFO]                 SEVERE file:///Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/junit-test-browser-log-level/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka--j2cl-maven-plugin-it-junit-test-browser-log-level--jar--1.0-810114ee72641960e5b4c1b3aa2841a9797586f3/8-closure-compile/output/test.JunitTest.js 76:341 "Error message 4!!"
+[INFO]                 WARNING file:///Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/junit-test-browser-log-level/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka--j2cl-maven-plugin-it-junit-test-browser-log-level--jar--1.0-810114ee72641960e5b4c1b3aa2841a9797586f3/8-closure-compile/output/test.JunitTest.js 76:448 "Warn message 3!!"
+[INFO]             All test(s) successful!
+[INFO]   
+[INFO]   Log file
+[INFO]     /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/junit-test-browser-log-level/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka--j2cl-maven-plugin-it-junit-test-browser-log-level--jar--1.0-810114ee72641960e5b4c1b3aa2841a9797586f3/9-junit-tests/log.txt
+[INFO] 
+```
+
+
 
 ## browsers (test)
 A list of browsers that are used by webdriver to execute transpiled unit tests. At least one must be selected out of
