@@ -20,6 +20,8 @@ package walkingkooka.j2cl.maven;
 import com.google.common.io.CharStreams;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.support.ui.FluentWait;
 import walkingkooka.text.CharSequences;
 
@@ -46,16 +48,16 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
         super();
     }
 
-    @Override
-    final J2clStepResult execute1(final J2clDependency artifact,
-                                  final J2clStepDirectory directory,
-                                  final J2clLinePrinter logger) throws Exception {
+    @Override final J2clStepResult execute1(final J2clDependency artifact,
+                                            final J2clStepDirectory directory,
+                                            final J2clLinePrinter logger) throws Exception {
         logger.printLine("Junit Tests");
         logger.indent();
         {
             final J2clRequest request = artifact.request();
             this.executeTestSuite(this.prepareJunitHostFileScriptPath(request, logger),
                     request.browsers(),
+                    request.browserLogLevel(),
                     request.testTimeout(),
                     logger);
         }
@@ -100,6 +102,7 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
      */
     private void executeTestSuite(final J2clPath startupHostFile,
                                   final List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers,
+                                  final BrowserLogLevel logLevel,
                                   final int timeout,
                                   final J2clLinePrinter logger) throws Exception {
 
@@ -112,7 +115,7 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
                 {
                     WebDriver driver = null;
                     try {
-                        driver = browser.webDriver();
+                        driver = browser.webDriver(logLevel);
                         driver.get("file://" + startupHostFile);
 
                         // loop and poll if tests are done
@@ -123,11 +126,11 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
                                 .until(d -> isFinished(d));
 
                         logger.indent();
-                        try {
-                            logger.printLine(executeScript(driver, "return window.G_testRunner.getReport()"));
-                        } finally {
-                            logger.outdent();
+                        {
+                            printTestReport(logger, driver);
+                            printBrowserLogs(driver, logLevel, logger);
                         }
+                        logger.outdent();
 
                         // check for success
                         if (!isSuccess(driver)) {
@@ -141,7 +144,7 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
                         logger.printLine("Test(s) failed!");
                         throw cause;
                     } finally {
-                        if(null != driver) {
+                        if (null != driver) {
                             driver.quit();
                         }
                     }
@@ -162,6 +165,40 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
 
     private static <T> T executeScript(final WebDriver driver,
                                        final String script) {
-        return (T)((JavascriptExecutor) driver).executeScript(script);
+        return (T) ((JavascriptExecutor) driver).executeScript(script);
+    }
+
+    private void printTestReport(J2clLinePrinter logger, WebDriver driver) {
+        try {
+            logger.printLine("Test Report");
+            logger.indent();
+            logger.printLine(executeScript(driver, "return window.G_testRunner.getReport()"));
+        } finally {
+            logger.outdent();
+        }
+    }
+
+    /**
+     * Prints all the log messages from the browser, doing nothing when {@link BrowserLogLevel#NONE}.
+     */
+    private static void printBrowserLogs(final WebDriver driver,
+                                         final BrowserLogLevel logLevel,
+                                         final J2clLinePrinter logger) {
+        switch (logLevel) {
+            case NONE:
+                break;
+            default: {
+                logger.printLine("Browser log");
+                logger.indent();
+                {
+                    for (final LogEntry entry : driver.manage()
+                            .logs()
+                            .get(LogType.BROWSER)) {
+                        logger.printLine(entry.getLevel() + " " + entry.getMessage());
+                    }
+                }
+                logger.outdent();
+            }
+        }
     }
 }

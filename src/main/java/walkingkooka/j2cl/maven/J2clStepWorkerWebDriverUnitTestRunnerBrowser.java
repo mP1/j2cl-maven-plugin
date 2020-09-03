@@ -37,28 +37,38 @@ import java.util.stream.Collectors;
 enum J2clStepWorkerWebDriverUnitTestRunnerBrowser {
     CHROME {
         @Override
-        WebDriver webDriver() {
+        WebDriver webDriver(final BrowserLogLevel logLevel) {
             WebDriverManager.chromedriver().setup();
-            return new ChromeDriver(new ChromeOptions().setHeadless(true));
+
+            final ChromeOptions options = new ChromeOptions()
+                    .setHeadless(true);
+            logLevel.addCapability(options);
+
+            return new ChromeDriver(options);
         }
 
     },
     FIREFOX {
         @Override
-        WebDriver webDriver() {
+        WebDriver webDriver(final BrowserLogLevel logLevel) {
             WebDriverManager.firefoxdriver().setup();
-            return new FirefoxDriver(new FirefoxOptions().setHeadless(true));
+
+            final FirefoxOptions options = new FirefoxOptions()
+                    .setHeadless(true);
+            logLevel.addCapability(options);
+
+            return new FirefoxDriver(options);
         }
 
     },
     HTML_UNIT {
         @Override
-        WebDriver webDriver() {
+        WebDriver webDriver(final BrowserLogLevel ignored) {
             return new HtmlUnitDriver(BrowserVersion.BEST_SUPPORTED, true);
         }
     };
 
-    abstract WebDriver webDriver() throws Exception;
+    abstract WebDriver webDriver(final BrowserLogLevel logLevel) throws Exception;
 
     static J2clStepWorkerWebDriverUnitTestRunnerBrowser fromCommandLine(final String option) {
         return Arrays.stream(values())

@@ -47,6 +47,7 @@ final class J2clMojoTestRequest extends J2clRequest {
                                     final LanguageMode languageOut,
                                     final Optional<String> sourceMaps,
                                     final List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers,
+                                    final BrowserLogLevel browserLogLevel,
                                     final String testClassName,
                                     final int testTimeout,
                                     final J2clMavenMiddleware middleware,
@@ -66,6 +67,7 @@ final class J2clMojoTestRequest extends J2clRequest {
                 languageOut,
                 sourceMaps,
                 browsers,
+                browserLogLevel,
                 testClassName,
                 testTimeout,
                 middleware,
@@ -87,6 +89,7 @@ final class J2clMojoTestRequest extends J2clRequest {
                                 final LanguageMode languageOut,
                                 final Optional<String> sourceMaps,
                                 final List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers,
+                                final BrowserLogLevel browserLogLevel,
                                 final String testClassName,
                                 final int testTimeout,
                                 final J2clMavenMiddleware middleware,
@@ -109,6 +112,7 @@ final class J2clMojoTestRequest extends J2clRequest {
                 executor,
                 logger);
         this.browsers = browsers;
+        this.browserLogLevel = browserLogLevel;
         this.testClassName = testClassName;
         this.testTimeout = testTimeout;
     }
@@ -157,6 +161,13 @@ final class J2clMojoTestRequest extends J2clRequest {
     }
 
     private final List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers;
+
+    @Override
+    BrowserLogLevel browserLogLevel() {
+        return this.browserLogLevel;
+    }
+
+    private final BrowserLogLevel browserLogLevel;
 
     private final String testClassName;
 

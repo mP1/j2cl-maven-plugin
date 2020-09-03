@@ -192,6 +192,9 @@ abstract class J2clRequest {
     }
     
     private final Optional<String> sourceMaps;
+    // browserLogLevel..................................................................................................
+
+    abstract BrowserLogLevel browserLogLevel();
 
     // browsers.........................................................................................................
 

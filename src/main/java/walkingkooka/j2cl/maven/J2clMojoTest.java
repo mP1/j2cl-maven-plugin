@@ -110,6 +110,7 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
                 this.languageOut(),
                 this.sourceMaps(),
                 this.browsers(),
+                this.browserLogLevel(),
                 testClassName,
                 this.testTimeout(),
                 this.mavenMiddleware(),
@@ -167,6 +168,15 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
     private boolean skipTests() {
         return this.skipTests;
     }
+
+    // browserLogLevel...................................................................................................
+
+    final BrowserLogLevel browserLogLevel() {
+        return BrowserLogLevel.fromCommandLine(this.browserLogLevel);
+    }
+
+    @Parameter(alias = "browser-log-level", required = true)
+    private String browserLogLevel;
 
     // browser..........................................................................................................
 
