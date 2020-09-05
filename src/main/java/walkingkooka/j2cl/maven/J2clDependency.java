@@ -452,7 +452,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
                 .stream()
                 .filter(d -> false == d.isJreBootstrapClassFiles())
                 .forEach(d -> {
-                    d.addIfAbsent(bootstrapAndJreDependencies);
+                    d.add(bootstrapAndJreDependencies);
                 });
     }
 
@@ -469,25 +469,25 @@ final class J2clDependency implements Comparable<J2clDependency> {
                 .flatMap(d -> d.dependencies.stream())
                 .filter(d -> false == d.isIgnored())
                 .collect(Collectors.toCollection(J2clDependency::set));
-        addIfAbsent(dependencies, bootstrapAndJre);
+        add(dependencies, bootstrapAndJre);
 
         bootstrapAndJre.addAll(dependencies);
         return bootstrapAndJre;
     }
 
     /**
-     * Adds all the ifAbsents if they are absent from the all
+     * Adds all the ifAbsents if they are absent from the all and includes sarts to avoid adding a dependency to itself.
      */
-    private static void addIfAbsent(final Collection<J2clDependency> all, final Collection<J2clDependency> ifAbsent) {
+    private static void add(final Collection<J2clDependency> all, final Collection<J2clDependency> ifAbsent) {
         all.stream()
                 .filter(d -> false == d.isIgnored() && false == ifAbsent.contains(d))
-                .forEach(d -> d.addIfAbsent(ifAbsent));
+                .forEach(d -> d.add(ifAbsent));
     }
 
     /**
-     * Adds any of the ifAbsent dependencies if they are new and not present in this.
+     * Adds any of the ifAbsent dependencies if they are new and not present in this, making a special case not to add itself.
      */
-    private void addIfAbsent(final Collection<J2clDependency> ifAbsent) {
+    private void add(final Collection<J2clDependency> ifAbsent) {
         for (final J2clDependency maybe : ifAbsent) {
             if(this.equals(maybe)) {
                 continue;

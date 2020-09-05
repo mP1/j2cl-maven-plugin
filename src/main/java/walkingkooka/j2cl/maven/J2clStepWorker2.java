@@ -95,10 +95,4 @@ abstract class J2clStepWorker2 extends J2clStepWorker {
     abstract J2clStepResult execute1(final J2clDependency artifact,
                                      final J2clStepDirectory directory,
                                      final J2clLinePrinter logger) throws Exception;
-
-    static void addIfAbsent(final J2clPath ifAbsent, final Set<J2clPath> target) {
-        if (false == target.contains(ifAbsent)) {
-            target.add(ifAbsent);
-        }
-    }
 }
