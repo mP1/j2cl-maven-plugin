@@ -91,7 +91,7 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
 
         for (final J2clDependency dependency : artifact.dependencies()) {
             if (dependency.isAnnotationClassFiles()) {
-                addIfAbsent(dependency.artifactFileOrFail(), classpath);
+                classpath.add(dependency.artifactFileOrFail());
                 continue;
             }
 
@@ -104,26 +104,23 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
             }
 
             if (dependency.isJreBootstrapClassFiles()) {
-                addIfAbsent(dependency.artifactFileOrFail(), classpath);
+                classpath.add(dependency.artifactFileOrFail());
                 continue;
             }
 
             if (dependency.isJreClassFiles()) {
-                addIfAbsent(dependency.artifactFileOrFail(), classpath);
+                classpath.add(dependency.artifactFileOrFail());
                 continue;
             }
 
             if (dependency.isClasspathRequired()) {
                 final Optional<J2clPath> shadeClassFiles = output(dependency, J2clStep.SHADE_CLASS_FILES);
                 if (shadeClassFiles.isPresent()) {
-                    addIfAbsent(shadeClassFiles.get(), classpath);
+                    classpath.add(shadeClassFiles.get());
                     continue;
                 }
                 final Optional<J2clPath> compileGwtIncompatibleStripped = output(dependency, J2clStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED);
-                if (compileGwtIncompatibleStripped.isPresent()) {
-                    addIfAbsent(compileGwtIncompatibleStripped.get(), classpath);
-                    continue;
-                }
+                compileGwtIncompatibleStripped.map(classpath::add);
             }
 
             // shouldnt happen

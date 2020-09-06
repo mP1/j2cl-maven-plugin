@@ -68,12 +68,12 @@ final class J2clStepWorkerClosureCompiler extends J2clStepWorker2 {
                 }
 
                 if (dependency.isJreJavascriptBootstrapFiles()) {
-                    addIfAbsent(dependency.artifactFileOrFail(), sources);
+                    sources.add(dependency.artifactFileOrFail());
                     continue;
                 }
 
                 if (dependency.isJreJavascriptFiles()) {
-                    addIfAbsent(dependency.artifactFileOrFail(), sources);
+                    sources.add(dependency.artifactFileOrFail());
                     continue;
                 }
 
@@ -104,18 +104,15 @@ final class J2clStepWorkerClosureCompiler extends J2clStepWorker2 {
                             final Set<J2clPath> sources) {
         final J2clPath transpiled = artifact.step(J2clStep.TRANSPILE).output();
         if (transpiled.exists().isPresent()) {
-            addIfAbsent(transpiled, sources);
+            sources.add(transpiled);
         }
 
         // add unpack anyway as it might contain js originally accompanying java source.
         final J2clPath unpack = artifact.step(J2clStep.UNPACK).output();
         if (unpack.exists().isPresent()) {
-            addIfAbsent(unpack, sources);
+            sources.add(unpack);
         } else {
-            final Optional<J2clPath> file = artifact.artifactFile();
-            if (file.isPresent()) {
-                addIfAbsent(file.get(), sources);
-            }
+            artifact.artifactFile().map(sources::add);
         }
     }
 }
