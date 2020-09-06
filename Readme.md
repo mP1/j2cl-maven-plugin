@@ -259,7 +259,8 @@ more information.
 
 ## browser-log-level
 
-This option is only available within tests, and controls which browser console messages are printed after each individual test.
+This option is only available within tests, and controls which browser console messages are printed after each individual test
+(`classpathscope=test`).
 
 - NONE
 - DEBUG
@@ -295,9 +296,10 @@ INFO: Detected dialect: W3C
 
 
 
-## browsers (test)
-A list of browsers that are used by webdriver to execute transpiled unit tests. At least one must be selected out of
-the supported browsers listed below.
+## browsers
+
+A list of browsers that are used by webdriver to execute transpiled unit tests,(`classpathscope=test`). At least
+one must be selected out of the supported browsers listed below.
 
 ```xml
 <browsers>
@@ -312,6 +314,7 @@ are not supported by the html unit javascript engine.
 
 
 ## classpath-required
+
 A list of artifacts that will be added to all classpaths. The first entry will be used as the bootstrap archive. If a
 dependency is present here but absent in `javascript-source-required` then it will never appear when js files are required.
 
@@ -339,15 +342,17 @@ Archives with the following conditions will automatically marked as equivalent t
 
 
 ## classpath-scope
-The suggested value is typically `runtime`, for more info click [here](https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html)
+
+The suggested value is typically `compile`, for more info click [here](https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html)
 
 ```xml
-<classpath-scope>runtime</classpath-scope>
+<classpath-scope>compile</classpath-scope>
 ```
 
 
 
 ## compilation-level
+
 A closure compiler parameter that controls how the compilation, for more info click [here](https://developers.google.com/closure/compiler/docs/compilation_levels#enable-app). 
 The Closure Compiler lets you choose from three levels of compilation, ranging from simple removal of whitespace and comments to aggressive code transformations.
 
@@ -358,6 +363,7 @@ The Closure Compiler lets you choose from three levels of compilation, ranging f
 
 
 ## defines
+
 These key value pairs are arguments given only to the Closure compiler. The fragment below is the recommended.
 
 ```xml
@@ -370,8 +376,9 @@ These key value pairs are arguments given only to the Closure compiler. The frag
 
 
 
-## entry-points (build)
-A Closure compiler argument containing one or more entry point(s).
+## entry-points
+
+A Closure compiler argument containing one or more entry point(s) (`classpathscope=compile`).
 
 ```xml
 <entrypoint>helloworld.app</entrypoint>
@@ -380,11 +387,13 @@ A Closure compiler argument containing one or more entry point(s).
 
 
 ## externs
+
 Key value pairs that define externs for the Closure compiler. For more info click [here](https://developers.google.com/closure/compiler/docs/api-tutorial3#externs).
 
 
 
 ## formatting
+
 Zero or many formatting options that may be used to aide troubleshooting, or simply to produce pretty printed output.
 The sample below shows all available formatting options, some or all may be removed as necessary.
 
@@ -399,7 +408,8 @@ For more info click [here](http://googleclosure.blogspot.com/2010/10/pretty-prin
 ```
 
 
-# ignored-dependencies
+## ignored-dependencies
+
 A list of artifacts that will not be processed. This is used to avoid processing any bootstrap and jre artifacts, 
 as they come pre-processed, or only contain annotations that are not required during transpiling (j2cl) but necessary
 for compiling (javac).
@@ -424,13 +434,14 @@ Archives with the following conditions will automatically marked as equivalent t
 - Only annotation class files.
 - If the file `.walkingkooka-j2cl-maven-plugin-ignored-dependency.txt` is present.
 
-## initial-script-filename (build)
+## initial-script-filename
 
-The path to the initial script filename.
+The path to the initial script filename (`classpathscope=compile`).
 
 
 
 ## javascript-source-required
+
 A list of artifacts that will be added to when javascript sources are being processed. If a dependency is present here
 but absent in `classpath-required` then it will never appear on a classpath.
 
@@ -468,6 +479,7 @@ This may be used to pass additional arguments to javac such as an annotation pro
 
 
 ## language-out
+
 The output language of the resulting javascript.
 
 For a detailed list of available language out options click [here](https://github.com/google/closure-compiler/wiki/Flags-and-Options).
@@ -487,12 +499,13 @@ The xml snippet below includes all currently available options, only one may be 
 
 
 
-## output (build)
-This path is the final location of the final javascript.
+## output
+This path is the final location of the final javascript (`classpathscope=compile`).
 
 
 
 ## source-maps
+
 Accepts a relative path to the target of directory `initial-script-filename` where source files will be copied. This will
 typically be a sub directory perhaps called `sources` under the same directory receiving the main javascript output file.
 Click [here](https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Use_a_source_map) for more details about `.map`
@@ -503,18 +516,18 @@ files and how source maps work.
 ```
 
 
-## skip-tests (test)
+## skip-tests
 
-This is only available when executing tests, and provides an easy switch to turn tests on.off.
+This is only available when executing tests, and provides an easy switch to turn tests on/off (`classpathscope=test`).
 ```xml
 <skip-tests>false</skip-tests>
 ```
 
 
 
-## tests (test)
+## tests
 
-A block of multiple `test` entries each defining a GLOB pattern to match test suites class names.
+A block of multiple `test` entries each defining a GLOB pattern to match test suites class names (`classpathscope=test`).
 
 ```xml
 <tests>
@@ -525,9 +538,9 @@ A block of multiple `test` entries each defining a GLOB pattern to match test su
 
 
 
-## test-timeout (test)
+## test-timeout
 
-The timeout for each test not the entire suite in seconds.
+The timeout for each test not the entire suite in seconds (`classpathscope=test`).
 
 ```xml
 <test-timeout>60</test-timeout>
@@ -536,6 +549,7 @@ The timeout for each test not the entire suite in seconds.
 
 
 ## thread-pool-size
+
 This parameter controls size of the thread pool used to execute parallel dependency processing. A value of 0, uses the
 CPU core * 2, a value of 1 is useful to limit a single task at a time which makes for uninterrupted console messages at the
 cost of longer build times.
