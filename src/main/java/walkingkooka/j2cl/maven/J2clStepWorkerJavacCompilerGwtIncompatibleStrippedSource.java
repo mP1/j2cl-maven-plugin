@@ -17,6 +17,10 @@
 
 package walkingkooka.j2cl.maven;
 
+import walkingkooka.collect.list.Lists;
+
+import java.util.List;
+
 /**
  * Compiles the java source to the target {@link J2clStepDirectory#output()}.
  */
@@ -42,13 +46,21 @@ final class J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource extends J2c
     }
 
     @Override
-    J2clStep compiledStep() {
-        return J2clStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED;
+    List<J2clStep> compiledStep() {
+        return Lists.of(J2clStep.SHADE_CLASS_FILES, J2clStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED);
     }
 
     @Override
     boolean shouldRunAnnotationProcessors() {
         return false; // dont need to generate annotation processor classes again.
+    }
+
+    /**
+     * Try adding the SHADED_CLASS_FILES then COMPILE_GWT_INCOMPATIBLE_STRIPPED then default to the original archive file.
+     */
+    @Override
+    J2clPath selectClassFiles(final J2clDependency dependency) {
+        return dependency.stepSourcesOrArchiveFile(this.compiledStep());
     }
 
     @Override
