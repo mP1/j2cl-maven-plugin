@@ -19,6 +19,7 @@ package walkingkooka.j2cl.maven;
 
 import walkingkooka.collect.set.Sets;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -60,47 +61,7 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
                     classpath.add(output);
                 }
 
-                final J2clStep compiledStep = this.compiledStep();
-
-                for (final J2clDependency dependency : artifact.dependencies()) {
-                    if (dependency.isAnnotationClassFiles()) {
-                        classpath.add(dependency.artifactFileOrFail());
-                        continue;
-                    }
-
-                    // not running ap dont add to cp
-                    if (dependency.isAnnotationProcessor() && false == shouldRunAnnotationProcessors) {
-                        continue;
-                    }
-
-                    if (dependency.isJreBootstrapClassFiles()) {
-                        bootstrap.add(dependency.artifactFileOrFail());
-                        continue;
-                    }
-
-                    if (dependency.isClasspathRequired()) {
-                        classpath.add(dependency.artifactFileOrFail());
-                        continue;
-                    }
-
-                    if (dependency.isIgnored()) {
-                        continue;
-                    }
-
-                    if (dependency.isJavascriptSourceRequired()) {
-                        continue;
-                    }
-
-                    if (dependency.isJreClassFiles()) {
-                        classpath.add(dependency.artifactFileOrFail());
-                        continue;
-                    }
-
-                    dependency.step(compiledStep)
-                            .output()
-                            .exists()
-                            .ifPresent(classpath::add);
-                }
+                this.buildBootstrapAndClasspath(artifact, shouldRunAnnotationProcessors, bootstrap, classpath);
 
                 if (classpath.isEmpty()) {
                     result = J2clStepResult.SKIPPED; // project could have no source files.
@@ -137,12 +98,64 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
     /**
      * This step this is used to build the classpath for the java compiler.
      */
-    abstract J2clStep compiledStep();
+    abstract List<J2clStep> compiledStep();
 
     /**
      * Returns whether annotations processors should be run.
      */
     abstract boolean shouldRunAnnotationProcessors();
+
+    /**
+     * Adds entries to either the bootstrap or classpath
+     */
+    final void buildBootstrapAndClasspath(final J2clDependency artifact,
+                                          final boolean shouldRunAnnotationProcessors,
+                                          final Set<J2clPath> bootstrap,
+                                          final Set<J2clPath> classpath) {
+        //final J2clStep compiledStep = this.compiledStep();
+
+        for (final J2clDependency dependency : artifact.dependencies()) {
+            if (dependency.isAnnotationClassFiles()) {
+                classpath.add(dependency.artifactFileOrFail());
+                continue;
+            }
+
+            // not running ap dont add to cp
+            if (dependency.isAnnotationProcessor() && false == shouldRunAnnotationProcessors) {
+                continue;
+            }
+
+            if (dependency.isJreBootstrapClassFiles()) {
+                bootstrap.add(dependency.artifactFileOrFail());
+                continue;
+            }
+
+            if (dependency.isClasspathRequired()) {
+                classpath.add(this.selectClassFiles(dependency));
+                continue;
+            }
+
+            if (dependency.isIgnored()) {
+                continue;
+            }
+
+            if (dependency.isJavascriptSourceRequired()) {
+                continue;
+            }
+
+            if (dependency.isJreClassFiles()) {
+                classpath.add(dependency.artifactFileOrFail());
+                continue;
+            }
+
+            classpath.add(this.selectClassFiles(dependency));
+        }
+    }
+
+    /**
+     * Sub classes implement two different ways of finding the right class files for the given {@link J2clDependency}.
+     */
+    abstract J2clPath selectClassFiles(final J2clDependency dependency);
 
     /**
      * This is called after the compile

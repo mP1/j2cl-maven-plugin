@@ -17,9 +17,11 @@
 
 package walkingkooka.j2cl.maven;
 
+import walkingkooka.collect.list.Lists;
 import walkingkooka.text.CharSequences;
 
 import java.nio.file.Files;
+import java.util.List;
 
 /**
  * Compiles the java source to the target {@link J2clStepDirectory#output()}, with annotation processors enabled.
@@ -46,13 +48,21 @@ final class J2clStepWorkerJavacCompilerUnpackedSource extends J2clStepWorkerJava
     }
 
     @Override
-    J2clStep compiledStep() {
-        return J2clStep.COMPILE;
+    List<J2clStep> compiledStep() {
+        return Lists.of(J2clStep.COMPILE);
     }
 
     @Override
     boolean shouldRunAnnotationProcessors() {
         return true;
+    }
+
+    /**
+     * Always add the dependency jar file.
+     */
+    @Override
+    J2clPath selectClassFiles(final J2clDependency dependency) {
+        return dependency.artifactFileOrFail();
     }
 
     /**

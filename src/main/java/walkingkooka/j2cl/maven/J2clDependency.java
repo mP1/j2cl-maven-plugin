@@ -53,6 +53,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -1192,6 +1193,28 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     J2clStepDirectory step(final J2clStep step) {
         return J2clStepDirectory.with(Paths.get(this.directory().toString(), step.directoryName()));
+    }
+
+    /**
+     * Tries to find the output directory for the given {@link J2clStep} stopping when one is found or returns
+     * the archive file for this dependency.
+     */
+    J2clPath stepSourcesOrArchiveFile(final List<J2clStep> steps) {
+        Objects.requireNonNull(steps, "steps");
+
+        J2clPath result = null;
+
+        final J2clPath directory = this.directory.get();
+        if (null != directory) {
+            result = steps.stream()
+                    .flatMap(s -> this.step(s).output().exists().stream())
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        return null != result ?
+                result :
+                this.artifactFileOrFail();
     }
 
     // maven ...........................................................................................................
