@@ -25,8 +25,10 @@ import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.support.ui.FluentWait;
 import walkingkooka.text.CharSequences;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.time.Duration;
 import java.util.List;
@@ -125,16 +127,17 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
                                 .pollingEvery(Duration.ofMillis(100))
                                 .until(d -> isFinished(d));
 
+                        final String testReport = testReport(driver);
                         logger.indent();
                         {
-                            printTestReport(logger, driver);
+                            printTestReport(logger, testReport);
                             printBrowserLogs(driver, logLevel, logger);
                         }
                         logger.outdent();
 
                         // check for success
                         if (!isSuccess(driver)) {
-                            throw new J2clException("One or more test(s) failed");
+                            throw new J2clException(testsFailedMessage(testReport));
                         }
                         logger.printLine("All test(s) successful!");
                     } catch (final J2clException rethrow) {
@@ -155,8 +158,40 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
         logger.outdent();
     }
 
+    private static String testReport(final WebDriver driver) {
+        return executeScript(driver, "return window.G_testRunner.getReport()");
+    }
+
     private static boolean isSuccess(final WebDriver driver) {
         return executeScript(driver, "return window.G_testRunner.isSuccess()");
+    }
+
+    /**
+     * <pre>
+     * 4 of 4 tests run in 5.874999973457307ms.
+     * 2 passed, 2 failed.
+     * 1 ms/test. 1 files loaded.
+     * ERROR in testSimple3
+     * </pre>
+     */
+    private static String testsFailedMessage(final String testReport) throws IOException {
+        String message = "One or more test(s) failed";
+
+        try (final BufferedReader reader = new BufferedReader(new StringReader(testReport))) {
+            for (; ; ) {
+                final String line = reader.readLine();
+                if (null == line) {
+                    break; // EOF
+                }
+
+                if (line.contains("failed")) {
+                    message = line.trim();
+                    break;
+                }
+            }
+        }
+
+        return message;
     }
 
     private static boolean isFinished(final WebDriver driver) {
@@ -168,11 +203,12 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
         return (T) ((JavascriptExecutor) driver).executeScript(script);
     }
 
-    private void printTestReport(J2clLinePrinter logger, WebDriver driver) {
+    private static void printTestReport(final J2clLinePrinter logger,
+                                        final String testReport) {
         try {
             logger.printLine("Test Report");
             logger.indent();
-            logger.printLine(executeScript(driver, "return window.G_testRunner.getReport()"));
+            logger.printLine(testReport);
         } finally {
             logger.outdent();
         }
