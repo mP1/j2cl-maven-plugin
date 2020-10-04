@@ -118,7 +118,7 @@ final class GwtIncompatibleStripPreprocessor {
                                                                final J2clLinePrinter logger) {
         J2clStepResult result;
 
-        logger.printLine("JavaPreprocessor");
+        logger.printLine("GwtIncompatibleStripper");
         {
             logger.indent();
             {

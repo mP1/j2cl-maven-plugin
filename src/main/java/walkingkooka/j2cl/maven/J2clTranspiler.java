@@ -67,7 +67,7 @@ final class J2clTranspiler {
             logger.indent();
             {
                 logger.printIndented("Classpath(s)", classpath, J2clLinePrinterFormat.FLAT);
-                logger.printIndented("*.java Source(s)", javaInput, J2clLinePrinterFormat.TREE);
+                logger.printIndented("*.java source(s)", javaInput, J2clLinePrinterFormat.TREE);
                 logger.printIndented("*.native.js source(s)", nativeJsInput, J2clLinePrinterFormat.TREE);
                 logger.printIndented("*.js source(s)", jsInput, J2clLinePrinterFormat.TREE);
                 logger.printIndented("Output", output);
@@ -109,7 +109,7 @@ final class J2clTranspiler {
                     }
                     logger.outdent();
 
-                    logger.printIndented("Output file(s) after copy",
+                    logger.printIndented("File(s)",
                         output.gatherFiles(J2clPath.ALL_FILES),
                         J2clLinePrinterFormat.TREE);
                 }
