@@ -12,7 +12,7 @@
     <name>J2CL Maven Plugin</name>
 
     <properties>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <!-- Plugin dependencies versions-->
         <maven.artifact.transfer.version>0.10.0</maven.artifact.transfer.version>
         <maven.dependency.tree.version>3.0.1</maven.dependency.tree.version>
