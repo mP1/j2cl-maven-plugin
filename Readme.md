@@ -273,8 +273,8 @@ This option is only available within tests, and controls which browser console m
 <browser-log-level>ALL</browser-log-level>
 ```
 
-Sample log
-```
+The sample log below includes some logging both of the report and other logging messages printed during test execution.
+```txt
 INFO: Detected dialect: W3C
 [INFO]           CHROME
 [INFO]               Test Report
@@ -353,7 +353,7 @@ The suggested value is typically `compile`, for more info click [here](https://m
 
 ## compilation-level
 
-A closure compiler parameter that controls how the compilation, for more info click [here](https://developers.google.com/closure/compiler/docs/compilation_levels#enable-app). 
+A closure compiler parameter that controls the compilation process, for more info click [here](https://developers.google.com/closure/compiler/docs/compilation_levels#enable-app). 
 The Closure Compiler lets you choose from three levels of compilation, ranging from simple removal of whitespace and comments to aggressive code transformations.
 
 ```xml
@@ -606,7 +606,7 @@ Files are ignored before the Google preprocessor attempts to remove classes and 
 # This is a comment and ignored. The two blank lines are also ignored.
 
 
-# The two patterns will ignore files in this and the sub directory.
+# The two patterns will ignore files in this and any sub directories.
 IgnoredFile1.*
 sub2/IgnoredFile2.*
 ``` 
@@ -632,11 +632,13 @@ the real `java.util.Base64` and a class with similar methods but under a differe
  
 ## Sample .walkingkooka-j2cl-maven-plugin-shade.txt
 
-The properties file content. This example will eventually change `example.java.util` to `java.util`.
+The properties file content. This example will eventually change packages starting with `example.java.util` to `java.util`.
 
 ```txt
 example.java.util=java.util
 ```
+
+Note that java source and their matching class files are both shaded using the same rules.
 
 The sample below shows an example of the source before step 5, after that completes, the package and type references
 will have the example removed.
@@ -655,6 +657,20 @@ class Base64 {
 }
 ```
 
+The source after step 5 processing.
+```java
+package java.util;
+
+class Base64 {
+  class Decoder {
+    
+  }
+
+  class Encoder {
+  
+  }
+}
+```
 
 
 # Building steps or phases.
