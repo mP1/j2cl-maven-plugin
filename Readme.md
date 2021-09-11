@@ -38,7 +38,7 @@ mvn clean install
 
 ## Maven
 
-Note this plugin does not work with [Maven 3.8.3](https://github.com/mP1/j2cl-maven-plugin/issues/444), the recommended
+Note this plugin has issues working with [Maven 3.8.3](https://github.com/mP1/j2cl-maven-plugin/issues/444), the recommended
 version to use is Maven 3.6.3.
 
 
