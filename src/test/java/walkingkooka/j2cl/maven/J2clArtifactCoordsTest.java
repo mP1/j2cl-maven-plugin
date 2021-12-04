@@ -28,7 +28,6 @@ import walkingkooka.text.CharSequences;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -47,7 +46,7 @@ public final class J2clArtifactCoordsTest implements ClassTesting2<J2clArtifactC
 
     @Test
     public void testWithArtifact() {
-        assertEquals(this.createObject(), J2clArtifactCoords.with(new DefaultArtifact(GROUP, ARTIFACT, VERSION, "compile", TYPE, CLASSIFIER.get(), null)));
+        this.checkEquals(this.createObject(), J2clArtifactCoords.with(new DefaultArtifact(GROUP, ARTIFACT, VERSION, "compile", TYPE, CLASSIFIER.get(), null)));
     }
 
     // parse............................................................................................................
@@ -84,7 +83,7 @@ public final class J2clArtifactCoordsTest implements ClassTesting2<J2clArtifactC
 
     private void parseAndCheck(final String text,
                                final J2clArtifactCoords expected) {
-        assertEquals(expected,
+        this.checkEquals(expected,
                 J2clArtifactCoords.parse(text),
                 () -> "parse " + CharSequences.quoteAndEscape(text));
     }
@@ -121,7 +120,7 @@ public final class J2clArtifactCoordsTest implements ClassTesting2<J2clArtifactC
     }
 
     private void typeOrDefaultAndCheck(final J2clArtifactCoords coords, final String type) {
-        assertEquals(type, coords.typeOrDefault(), () -> coords + "  typeOrDefault");
+        this.checkEquals(type, coords.typeOrDefault(), () -> coords + "  typeOrDefault");
     }
 
     // comparable........................................................................................................
@@ -257,7 +256,7 @@ public final class J2clArtifactCoordsTest implements ClassTesting2<J2clArtifactC
                                                          final J2clArtifactCoords coords,
                                                          final J2clArtifactCoords expected) {
 
-        assertEquals(expected,
+        this.checkEquals(expected,
                 dependencyManagement.dependencyManagementTransformer().apply(coords),
                 () -> "dependenecyManagement" + dependencyManagement + " transform " + coords);
     }
@@ -269,7 +268,7 @@ public final class J2clArtifactCoordsTest implements ClassTesting2<J2clArtifactC
         final J2clArtifactCoords notSources = J2clArtifactCoords.with(GROUP, ARTIFACT, TYPE, CLASSIFIER, VERSION);
         final J2clArtifactCoords sources = notSources.source();
 
-        assertEquals(J2clArtifactCoords.with(GROUP, ARTIFACT, TYPE, Optional.of("sources"), VERSION),
+        this.checkEquals(J2clArtifactCoords.with(GROUP, ARTIFACT, TYPE, Optional.of("sources"), VERSION),
                 sources);
         this.isSourcesAndCheck(sources, true);
         this.isSourcesAndCheck(notSources, false);
@@ -307,7 +306,7 @@ public final class J2clArtifactCoordsTest implements ClassTesting2<J2clArtifactC
     }
 
     private void isSourcesAndCheck(final J2clArtifactCoords sources, final boolean expected) {
-        assertEquals(expected,
+        this.checkEquals(expected,
                 sources.isSources(),
                 () -> sources + " .isSources");
     }
@@ -350,7 +349,7 @@ public final class J2clArtifactCoordsTest implements ClassTesting2<J2clArtifactC
     private void isSameGroupArtifactsAndDifferentVersionAndCheck(final J2clArtifactCoords coords,
                                                                  final J2clArtifactCoords other,
                                                                  final boolean expected) {
-        assertEquals(expected,
+        this.checkEquals(expected,
                 coords.isSameGroupArtifactDifferentVersion(other),
                 () -> coords + ".isSameGroupArtifactDifferentVersion " + other);
     }
@@ -391,11 +390,11 @@ public final class J2clArtifactCoordsTest implements ClassTesting2<J2clArtifactC
                                                 final J2clArtifactCoords other,
                                                 final boolean expected) {
 
-        assertEquals(expected,
+        this.checkEquals(expected,
                 coords.isGroupArtifactSources(other),
                 () -> coords + " .isGroupArtifactSources " + other);
 
-        assertEquals(expected,
+        this.checkEquals(expected,
                 other.isGroupArtifactSources(coords),
                 () -> other + " .isGroupArtifactSources " + coords);
     }
@@ -418,7 +417,7 @@ public final class J2clArtifactCoordsTest implements ClassTesting2<J2clArtifactC
     }
 
     private void directorySafeNameAndCheck(final String coords, final String directoryName) {
-        assertEquals(directoryName, J2clArtifactCoords.parse(coords).directorySafeName(), () -> "Coords: " + CharSequences.quoteAndEscape(coords));
+        this.checkEquals(directoryName, J2clArtifactCoords.parse(coords).directorySafeName(), () -> "Coords: " + CharSequences.quoteAndEscape(coords));
     }
 
     // ToString.........................................................................................................

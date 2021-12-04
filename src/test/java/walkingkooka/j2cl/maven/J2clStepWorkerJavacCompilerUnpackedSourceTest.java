@@ -18,16 +18,15 @@
 package walkingkooka.j2cl.maven;
 
 import org.junit.Test;
+import walkingkooka.test.Testing;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public final class J2clStepWorkerJavacCompilerUnpackedSourceTest {
+public final class J2clStepWorkerJavacCompilerUnpackedSourceTest implements Testing {
 
     // // 'javatests.org.gwtproject.timer.client.TimerJ2clTest_AdapterSuite' -> org.gwtproject.timer.client.TimerJ2clTest
     @Test
     public void testExtractTestClassName() {
         final String testClassName = "javatests.org.gwtproject.timer.client.TimerJ2clTest_AdapterSuite";
-        assertEquals("org.gwtproject.timer.client.TimerJ2clTest",
+        this.checkEquals("org.gwtproject.timer.client.TimerJ2clTest",
                 J2clStepWorkerJavacCompilerUnpackedSource.extractTestClassName(testClassName),
                 () -> "J2clStepWorkerJavacCompilerUnpackedSource.extractTestClassName " + testClassName);
     }

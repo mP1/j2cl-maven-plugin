@@ -32,9 +32,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-
 public final class HashBuilderTest implements ClassTesting2<HashBuilder>, ToStringTesting<HashBuilder> {
 
     @Rule
@@ -52,7 +49,7 @@ public final class HashBuilderTest implements ClassTesting2<HashBuilder>, ToStri
 
     @Test
     public void testHashBytes() {
-        assertNotEquals(HashBuilder.empty()
+        this.checkNotEquals(HashBuilder.empty()
                         .append(new byte[1])
                         .append(new byte[]{2, 3})
                         .toString(),
@@ -64,7 +61,7 @@ public final class HashBuilderTest implements ClassTesting2<HashBuilder>, ToStri
 
     @Test
     public void testHashBytesRepeated() {
-        assertEquals(HashBuilder.empty()
+        this.checkEquals(HashBuilder.empty()
                         .append(new byte[]{1, 2})
                         .append(new byte[]{3, 4})
                         .toString(),
@@ -76,7 +73,7 @@ public final class HashBuilderTest implements ClassTesting2<HashBuilder>, ToStri
 
     @Test
     public void testHashEnum() {
-        assertNotEquals(HashBuilder.empty()
+        this.checkNotEquals(HashBuilder.empty()
                         .append(RoundingMode.CEILING)
                         .append(RoundingMode.FLOOR)
                         .toString(),
@@ -88,7 +85,7 @@ public final class HashBuilderTest implements ClassTesting2<HashBuilder>, ToStri
 
     @Test
     public void testHashEnumRepeated() {
-        assertEquals(HashBuilder.empty()
+        this.checkEquals(HashBuilder.empty()
                         .append(RoundingMode.CEILING)
                         .append(RoundingMode.FLOOR)
                         .toString(),
@@ -108,7 +105,7 @@ public final class HashBuilderTest implements ClassTesting2<HashBuilder>, ToStri
         final byte[] content2 = "def".getBytes(Charset.defaultCharset());
         Files.write(path2, content2);
 
-        assertNotEquals(HashBuilder.empty()
+        this.checkNotEquals(HashBuilder.empty()
                         .append(path1)
                         .append(path2)
                         .toString(),
@@ -128,7 +125,7 @@ public final class HashBuilderTest implements ClassTesting2<HashBuilder>, ToStri
         final byte[] content2 = "def".getBytes(Charset.defaultCharset());
         Files.write(path2, content2);
 
-        assertEquals(HashBuilder.empty()
+        this.checkEquals(HashBuilder.empty()
                         .append(path1)
                         .append(path2)
                         .toString(),
@@ -144,7 +141,7 @@ public final class HashBuilderTest implements ClassTesting2<HashBuilder>, ToStri
         final byte[] content = "abc".getBytes(Charset.defaultCharset());
         Files.write(path, content);
 
-        assertEquals(HashBuilder.empty()
+        this.checkEquals(HashBuilder.empty()
                         .append(path)
                         .toString(),
                 HashBuilder.empty()
@@ -154,7 +151,7 @@ public final class HashBuilderTest implements ClassTesting2<HashBuilder>, ToStri
 
     @Test
     public void testHashString() {
-        assertNotEquals(HashBuilder.empty()
+        this.checkNotEquals(HashBuilder.empty()
                         .append("A")
                         .append("BC")
                         .toString(),
@@ -166,7 +163,7 @@ public final class HashBuilderTest implements ClassTesting2<HashBuilder>, ToStri
 
     @Test
     public void testHashStringRepeated() {
-        assertEquals(HashBuilder.empty()
+        this.checkEquals(HashBuilder.empty()
                         .append("A")
                         .append("BC")
                         .toString(),

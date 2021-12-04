@@ -24,8 +24,6 @@ import walkingkooka.reflect.JavaVisibility;
 import java.io.IOException;
 import java.util.Collection;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 public final class J2clDependencyTest implements ClassTesting2<J2clDependency> {
 
     @Test
@@ -52,7 +50,7 @@ public final class J2clDependencyTest implements ClassTesting2<J2clDependency> {
         final byte[] classFile = this.getClass()
                 .getResourceAsStream("/" + type.getName().replace('.', '/') + ".class")
                 .readAllBytes();
-        assertEquals(expected,
+        this.checkEquals(expected,
                 J2clDependency.isAnnotationOrInterface(classFile),
                 () -> "isAnnotationOrInterface " + type.getName());
     }
