@@ -28,8 +28,6 @@ import walkingkooka.text.printer.Printers;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 public final class J2clLinePrinterTest implements ClassTesting2<J2clLinePrinter>, ToStringTesting<J2clLinePrinter> {
 
     private final static LineEnding EOL = LineEnding.NL;
@@ -229,7 +227,7 @@ public final class J2clLinePrinterTest implements ClassTesting2<J2clLinePrinter>
     }
 
     private void check(final CharSequence expected, final StringBuilder b) {
-        assertEquals(expected.toString(), b.toString());
+        this.checkEquals(expected.toString(), b.toString());
     }
 
     private J2clPath path(final String path) {

@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import walkingkooka.reflect.ClassTesting2;
 import walkingkooka.reflect.JavaVisibility;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -30,7 +29,7 @@ public final class BrowserLogLevelTest implements ClassTesting2<BrowserLogLevel>
     @Test
     public void testFromCommandInvalidFails() {
         final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> BrowserLogLevel.fromCommandLine("Unknown!"));
-        assertEquals("Unknown browser-log-level \"Unknown!\" expected one of ALL, ERROR, WARN, INFO, DEBUG, NONE\n" +
+        this.checkEquals("Unknown browser-log-level \"Unknown!\" expected one of ALL, ERROR, WARN, INFO, DEBUG, NONE\n" +
                         "http://github.com/mP1/README#browser-log-level",
                 thrown.getMessage());
     }
@@ -45,7 +44,7 @@ public final class BrowserLogLevelTest implements ClassTesting2<BrowserLogLevel>
     @Test
     public void testToLevel() {
         for (final BrowserLogLevel level : BrowserLogLevel.values()) {
-            assertEquals(level.name(),
+            this.checkEquals(level.name(),
                     level.toLevel().getName(),
                     () -> "Level " + level);
         }

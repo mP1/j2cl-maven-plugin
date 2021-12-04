@@ -34,7 +34,6 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 import static org.junit.Assert.assertSame;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public final class J2clPathTest implements ComparableTesting2<J2clPath>, HashCodeEqualsDefinedTesting2<J2clPath> {
@@ -100,13 +99,13 @@ public final class J2clPathTest implements ComparableTesting2<J2clPath>, HashCod
     public void testFilename() throws IOException {
         final J2clPath path = this.createObject();
         final String filename = "file1";
-        assertEquals(filename, path.append(filename).writeFile(new byte[0]).filename());
+        this.checkEquals(filename, path.append(filename).writeFile(new byte[0]).filename());
     }
 
     @Test
     public void testFile() throws IOException {
         final File file = this.base.newFile();
-        assertEquals(file, J2clPath.with(file.toPath()).file());
+        this.checkEquals(file, J2clPath.with(file.toPath()).file());
     }
 
     @Test
@@ -144,7 +143,7 @@ public final class J2clPathTest implements ComparableTesting2<J2clPath>, HashCod
     }
 
     private void isFileAndCheck(final J2clPath path, final boolean expected) {
-        assertEquals(expected, path.isFile(), () -> path.toString());
+        this.checkEquals(expected, path.isFile(), () -> path.toString());
     }
 
     @Test
@@ -178,7 +177,7 @@ public final class J2clPathTest implements ComparableTesting2<J2clPath>, HashCod
     }
 
     private void isJavaAndCheck(final J2clPath path, final boolean expected) {
-        assertEquals(expected, path.isJava(), () -> path.toString());
+        this.checkEquals(expected, path.isJava(), () -> path.toString());
     }
 
     @Test
@@ -212,12 +211,12 @@ public final class J2clPathTest implements ComparableTesting2<J2clPath>, HashCod
 
     @Test
     public void testShadeFileRead() throws Exception {
-        assertEquals(Maps.of("package1", "package2"), this.writeShadeFile("package1=package2").readShadeFile());
+        this.checkEquals(Maps.of("package1", "package2"), this.writeShadeFile("package1=package2").readShadeFile());
     }
 
     @Test
     public void testShadeFileRead2() throws Exception {
-        assertEquals(Maps.of("package1", "package2", "package3", "package4"), this.writeShadeFile("package1=package2\npackage3=package4").readShadeFile());
+        this.checkEquals(Maps.of("package1", "package2", "package3", "package4"), this.writeShadeFile("package1=package2\npackage3=package4").readShadeFile());
     }
 
     @Test
@@ -249,7 +248,7 @@ public final class J2clPathTest implements ComparableTesting2<J2clPath>, HashCod
     public void testTestAdapterSuiteGeneratedFilename() {
         final J2clPath output = this.output();
         final String testClassName = "org.gwtproject.timer.client.TimerJ2clTest";
-        assertEquals(output.append("/org/gwtproject/timer/client/TimerJ2clTest.testsuite"),
+        this.checkEquals(output.append("/org/gwtproject/timer/client/TimerJ2clTest.testsuite"),
                 output.testAdapterSuiteGeneratedFilename(testClassName),
                 () -> output + ".testAdapterSuiteGeneratedFilename " + CharSequences.quote(testClassName));
     }
@@ -258,22 +257,22 @@ public final class J2clPathTest implements ComparableTesting2<J2clPath>, HashCod
     public void testTestAdapterSuiteCorrectFilename() {
         final J2clPath output = this.output();
         final String testClassName = "org.gwtproject.timer.client.TimerJ2clTest";
-        assertEquals(output.append("/javatests/org/gwtproject/timer/client/TimerJ2clTest_AdapterSuite.js"),
+        this.checkEquals(output.append("/javatests/org/gwtproject/timer/client/TimerJ2clTest_AdapterSuite.js"),
                 output.testAdapterSuiteCorrectFilename(testClassName),
                 () -> output + ".testAdapterSuiteCorrectFilename " + CharSequences.quote(testClassName));
     }
 
     private void existsCheck(final J2clPath path) {
-        assertEquals(Optional.of(path), path.exists(), "path " + path);
+        this.checkEquals(Optional.of(path), path.exists(), "path " + path);
     }
 
     private void absentCheck(final J2clPath path) {
-        assertEquals(Optional.empty(), path.exists(), "path " + path);
+        this.checkEquals(Optional.empty(), path.exists(), "path " + path);
     }
 
     private void checkPath(final J2clPath j2clPath, final String path) {
-        assertEquals(path, j2clPath.path().toString());
-        assertEquals(path, j2clPath.toString());
+        this.checkEquals(path, j2clPath.path().toString());
+        this.checkEquals(path, j2clPath.toString());
     }
 
     // equals...........................................................................................................

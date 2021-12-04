@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -181,12 +180,12 @@ public final class J2clDependencyGraphCalculatorTest implements ClassTesting2<J2
         final Set<J2clArtifactCoords> unknownRequireds = J2clArtifactCoords.set();
         unknownRequireds.addAll(required);
         unknownRequireds.removeAll(flat.keySet());
-        assertEquals(Sets.empty(), unknownRequireds, "Required contains dependencies not found in flat: " + flat);
+        this.checkEquals(Sets.empty(), unknownRequireds, "Required contains dependencies not found in flat: " + flat);
 
-        assertEquals(flat.keySet(), tree.keySet(), "flat and tree keys must be the same");
+        this.checkEquals(flat.keySet(), tree.keySet(), "flat and tree keys must be the same");
 
         final J2clDependencyGraphCalculator calculator = J2clDependencyGraphCalculator.with(flat, required);
-        assertEquals(format(tree),
+        this.checkEquals(format(tree),
                 format(calculator.run()),
                 () -> "flat: " + flat + " required: " + required);
     }
