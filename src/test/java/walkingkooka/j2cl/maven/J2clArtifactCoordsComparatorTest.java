@@ -20,11 +20,11 @@ package walkingkooka.j2cl.maven;
 import org.junit.Test;
 import walkingkooka.Cast;
 import walkingkooka.ToStringTesting;
-import walkingkooka.compare.ComparatorTesting;
+import walkingkooka.compare.ComparatorTesting2;
 
 import java.util.Comparator;
 
-public final class J2clArtifactCoordsComparatorTest implements ComparatorTesting<Comparator<J2clArtifactCoords>, J2clArtifactCoords>,
+public final class J2clArtifactCoordsComparatorTest implements ComparatorTesting2<Comparator<J2clArtifactCoords>, J2clArtifactCoords>,
         ToStringTesting<Comparator<J2clArtifactCoords>> {
 
     @Test
