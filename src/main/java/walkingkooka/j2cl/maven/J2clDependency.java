@@ -80,7 +80,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
                                  final J2clRequest request) {
         final IndentingPrinter logger = request.logger()
                 .printer(request.logger()::info)
-                .indenting(Indentation.with("  "));
+                .indenting(Indentation.SPACES2);
         final J2clDependency root;
         {
             root = timeTask("Gather dependencies",
@@ -339,7 +339,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private void markIgnoredTransitiveDependencies(final Map<J2clDependency, Set<J2clDependency>> childToParents) {
         final IndentingPrinter logger = request.logger()
                 .printer(request.logger()::info)
-                .indenting(Indentation.with("  "));
+                .indenting(Indentation.SPACES2);
         logger.println("Marking ignored transitive dependencies");
         logger.indent();
         {
