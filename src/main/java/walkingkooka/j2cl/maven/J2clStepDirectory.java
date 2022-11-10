@@ -97,10 +97,6 @@ final class J2clStepDirectory {
         logger.printLine(logFile.toString());
         logger.outdent();
 
-        logger.emptyLine();
-        logger.emptyLine();
-        logger.flush();
-
         Files.write(logFile.path(), lines);
         return this;
     }
