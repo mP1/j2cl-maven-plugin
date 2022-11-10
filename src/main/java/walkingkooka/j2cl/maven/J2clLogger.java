@@ -34,7 +34,7 @@ public interface J2clLogger {
     /**
      * Default {@link Indentation} shared so all indented printing can have a common indent.
      */
-    Indentation INDENTATION = Indentation.with("  ");
+    Indentation INDENTATION = Indentation.SPACES2;
 
     /**
      * Creates a MAVEN {@link J2clLogger}.
