@@ -26,6 +26,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -327,6 +329,8 @@ enum J2clStep {
      * throwing) or logs as errors to the output anything printed during execution.
      */
     final Optional<J2clStep> execute(final J2clDependency artifact) throws Exception {
+        final Instant start = Instant.now();
+
         final J2clRequest request = artifact.request();
         final J2clLogger j2clLogger = request.logger();
         final List<CharSequence> lines = Lists.array(); // these lines will be written to a log file.
@@ -357,6 +361,16 @@ enum J2clStep {
                 directory.writeLog(lines, logger);
 
                 result.path(directory).createIfNecessary();
+
+                final Duration timeTaken = Duration.between(
+                        start,
+                        Instant.now()
+                );
+
+                logger.printLine("Time taken");
+                logger.printIndentedLine(timeTaken.getSeconds() + "." + timeTaken.getNano() + " seconds");
+                logger.emptyLine();
+                logger.flush();
 
                 result.reportIfFailure(artifact, this);
             }
