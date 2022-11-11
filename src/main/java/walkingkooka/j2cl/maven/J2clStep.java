@@ -83,14 +83,14 @@ enum J2clStep {
 
         @Override
         Optional<J2clStep> next(final J2clRequest request) {
-            return Optional.of(COMPILE);
+            return Optional.of(JAVAC_COMPILE);
         }
     },
 
     /**
      * Calls javac on the unpack directory along with its dependencies on the classpath into /compile
      */
-    COMPILE {
+    JAVAC_COMPILE {
         @Override
         String directoryName() {
             return "2-javac-enabled-annotation-processors-source";

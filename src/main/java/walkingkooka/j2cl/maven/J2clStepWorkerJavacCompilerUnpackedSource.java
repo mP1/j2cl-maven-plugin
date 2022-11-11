@@ -49,7 +49,7 @@ final class J2clStepWorkerJavacCompilerUnpackedSource extends J2clStepWorkerJava
 
     @Override
     List<J2clStep> compiledStep() {
-        return Lists.of(J2clStep.COMPILE);
+        return Lists.of(J2clStep.JAVAC_COMPILE);
     }
 
     @Override
