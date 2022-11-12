@@ -79,7 +79,7 @@ public final class J2clMojoBuild extends J2clMojoBuildTest {
     }
 
     @Parameter(alias = "entry-points", required = true)
-    private List<String> entrypoints = new ArrayList<>();
+    private final List<String> entrypoints = new ArrayList<>();
 
     // initial-script-filename..........................................................................................
 
