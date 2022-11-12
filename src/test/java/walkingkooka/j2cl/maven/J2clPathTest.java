@@ -240,7 +240,7 @@ public final class J2clPathTest implements ComparableTesting2<J2clPath>, HashCod
         return shade;
     }
 
-    private void readShadeFileFails(final String content) throws Exception {
+    private void readShadeFileFails(final String content) {
         assertThrows(J2clException.class, () -> this.writeShadeFile(content).readShadeFile());
     }
 
