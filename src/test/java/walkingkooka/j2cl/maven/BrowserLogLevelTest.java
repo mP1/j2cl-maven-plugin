@@ -30,7 +30,7 @@ public final class BrowserLogLevelTest implements ClassTesting2<BrowserLogLevel>
     public void testFromCommandInvalidFails() {
         final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> BrowserLogLevel.fromCommandLine("Unknown!"));
         this.checkEquals("Unknown browser-log-level \"Unknown!\" expected one of ALL, ERROR, WARN, INFO, DEBUG, NONE\n" +
-                        "http://github.com/mP1/README#browser-log-level",
+                        "https://github.com/mP1/README#browser-log-level",
                 thrown.getMessage());
     }
 
