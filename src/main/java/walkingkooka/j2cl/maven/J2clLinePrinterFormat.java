@@ -36,7 +36,7 @@ enum J2clLinePrinterFormat {
 //                       final IndentingPrinter printer) {
 //            J2clLinePrinter.printTree(paths, toStringPath, printer);
 //        }
-    };
+    }
 
 //    abstract <T> void print(final Collection<T> paths,
 //                            final Function<T, StringPath> toStringPath,
