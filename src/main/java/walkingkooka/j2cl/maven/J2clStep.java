@@ -88,12 +88,12 @@ enum J2clStep {
     },
 
     /**
-     * Calls javac on the unpack directory along with its dependencies on the classpath into /compile
+     * Calls javac on the unpack directory along with its dependencies on the classpath.
      */
     JAVAC_COMPILE {
         @Override
         String directoryName() {
-            return "2-javac-enabled-annotation-processors-source";
+            return "2-javac-compile";
         }
 
         @Override
