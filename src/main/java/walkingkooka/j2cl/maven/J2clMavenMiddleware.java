@@ -48,7 +48,7 @@ public interface J2clMavenMiddleware {
     }
 
     /**
-     * Returns a {@link MavenProject} given an {@J2clArtifactCoords coords}.
+     * Returns a {@link MavenProject} given an {@link J2clArtifactCoords coords}.
      */
     MavenProject mavenProject(final J2clArtifactCoords coords, final J2clClasspathScope scope);
 
