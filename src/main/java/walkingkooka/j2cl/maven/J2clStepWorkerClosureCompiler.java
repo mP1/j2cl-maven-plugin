@@ -19,7 +19,6 @@ package walkingkooka.j2cl.maven;
 
 import walkingkooka.collect.set.Sets;
 
-import java.util.Optional;
 import java.util.Set;
 
 /**

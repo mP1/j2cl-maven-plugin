@@ -16,12 +16,6 @@
  */
 package walkingkooka.j2cl.maven;
 
-import walkingkooka.naming.StringPath;
-import walkingkooka.text.printer.IndentingPrinter;
-
-import java.util.Collection;
-import java.util.function.Function;
-
 // maven-plugin-plugin fails build because of enum method with generics, while scanning classpath for javadoc annotations.
 enum J2clLinePrinterFormat {
     // Useful for printing a list of files where order is important such as a classpath.

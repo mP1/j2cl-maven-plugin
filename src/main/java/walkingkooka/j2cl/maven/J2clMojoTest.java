@@ -25,7 +25,6 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.text.CharSequences;
-import walkingkooka.text.printer.Printers;
 
 import java.io.File;
 import java.io.IOException;
