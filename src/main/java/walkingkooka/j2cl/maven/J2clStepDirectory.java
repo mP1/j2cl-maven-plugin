@@ -20,6 +20,7 @@ package walkingkooka.j2cl.maven;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -86,6 +87,7 @@ final class J2clStepDirectory {
      * Each step is given its own directory and will also have its own local log file showing the output for a particular single step.
      */
     J2clStepDirectory writeLog(final List<CharSequence> lines,
+                               final Duration timeTaken,
                                final J2clLinePrinter logger) throws IOException {
         logger.emptyLine();
 
@@ -96,6 +98,11 @@ final class J2clStepDirectory {
         logger.indent();
         logger.printLine(logFile.toString());
         logger.outdent();
+
+        logger.printLine("Time taken");
+        logger.printIndentedLine(timeTaken.getSeconds() + "." + timeTaken.getNano() + " seconds");
+        logger.emptyLine();
+        logger.flush();
 
         Files.write(logFile.path(), lines);
         return this;

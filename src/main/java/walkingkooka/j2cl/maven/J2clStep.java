@@ -357,20 +357,16 @@ enum J2clStep {
                         .execute(artifact,
                                 this,
                                 logger);
+
                 final J2clStepDirectory directory = artifact.step(this);
-                directory.writeLog(lines, logger);
 
-                result.path(directory).createIfNecessary();
-
-                final Duration timeTaken = Duration.between(
-                        start,
-                        Instant.now()
+                directory.writeLog(
+                        lines,
+                        timeTaken(start),
+                        logger
                 );
 
-                logger.printLine("Time taken");
-                logger.printIndentedLine(timeTaken.getSeconds() + "." + timeTaken.getNano() + " seconds");
-                logger.emptyLine();
-                logger.flush();
+                result.path(directory).createIfNecessary();
 
                 result.reportIfFailure(artifact, this);
             }
@@ -393,7 +389,11 @@ enum J2clStep {
                     .createIfNecessary();
 
             if (directory.path().exists().isPresent()) {
-                directory.writeLog(lines, logger);
+                directory.writeLog(
+                        lines,
+                        timeTaken(start),
+                        logger
+                );
             } else {
                 // HASH step probably failed so create a unique file and write it to the base directory.
                 final Path base = Paths.get(request.base().path().toString(), artifact.coords() + "-" + DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"));
@@ -407,6 +407,13 @@ enum J2clStep {
 
             throw cause;
         }
+    }
+
+    private Duration timeTaken(final Instant start) {
+        return Duration.between(
+                start,
+                Instant.now()
+        );
     }
 
     /**
