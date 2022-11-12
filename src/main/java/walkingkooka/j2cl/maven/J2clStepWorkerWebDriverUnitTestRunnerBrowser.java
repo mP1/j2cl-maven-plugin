@@ -68,7 +68,7 @@ enum J2clStepWorkerWebDriverUnitTestRunnerBrowser {
         }
     };
 
-    abstract WebDriver webDriver(final BrowserLogLevel logLevel) throws Exception;
+    abstract WebDriver webDriver(final BrowserLogLevel logLevel);
 
     static J2clStepWorkerWebDriverUnitTestRunnerBrowser fromCommandLine(final String option) {
         return Arrays.stream(values())

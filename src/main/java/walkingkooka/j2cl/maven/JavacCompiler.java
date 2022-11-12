@@ -106,7 +106,7 @@ final class JavacCompiler {
     /**
      * Returns the {@link JavaCompiler} and includes a hacked attempt to locate the javacompiler for OSX or fails.
      */
-    private static JavaCompiler javaCompiler() throws Exception {
+    private static JavaCompiler javaCompiler() {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         if (null == compiler) {
             throw new J2clException("JavaCompiler missing, require JDK not JRE.");

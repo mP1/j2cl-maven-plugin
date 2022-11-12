@@ -43,7 +43,7 @@ public final class HashBuilderTest implements ClassTesting2<HashBuilder>, ToStri
     }
 
     @AfterEach
-    public void afterEach() throws IOException {
+    public void afterEach() {
         this.base.delete();
     }
 
