@@ -170,7 +170,7 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
 
     // browserLogLevel...................................................................................................
 
-    final BrowserLogLevel browserLogLevel() {
+    BrowserLogLevel browserLogLevel() {
         return BrowserLogLevel.fromCommandLine(this.browserLogLevel);
     }
 

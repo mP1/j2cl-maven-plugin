@@ -37,9 +37,9 @@ final class J2clStepWorkerClosureCompiler extends J2clStepWorker2 {
         super();
     }
 
-    @Override final J2clStepResult execute1(final J2clDependency artifact,
-                                            final J2clStepDirectory directory,
-                                            final J2clLinePrinter logger) throws Exception {
+    @Override J2clStepResult execute1(final J2clDependency artifact,
+                                      final J2clStepDirectory directory,
+                                      final J2clLinePrinter logger) throws Exception {
         final J2clRequest request = artifact.request();
         final Set<J2clPath> sources = Sets.ordered();
 

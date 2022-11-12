@@ -38,10 +38,9 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
         super();
     }
 
-    @Override
-    final J2clStepResult execute1(final J2clDependency artifact,
-                                  final J2clStepDirectory directory,
-                                  final J2clLinePrinter logger) throws Exception {
+    @Override J2clStepResult execute1(final J2clDependency artifact,
+                                      final J2clStepDirectory directory,
+                                      final J2clLinePrinter logger) throws Exception {
         logger.printLine("Preparing...");
 
         final J2clPath sourceRoot = this.sourceRoot(artifact);
