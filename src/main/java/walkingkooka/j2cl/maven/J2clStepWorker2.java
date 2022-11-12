@@ -17,8 +17,6 @@
 
 package walkingkooka.j2cl.maven;
 
-import java.util.Set;
-
 /**
  * Any step that requires its working directory to be created before it can work.
  */
