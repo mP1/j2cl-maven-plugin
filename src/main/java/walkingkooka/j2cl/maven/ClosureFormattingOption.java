@@ -36,6 +36,6 @@ enum ClosureFormattingOption {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unknown formatting option " + CharSequences.quote(option) + " expected one of " +
                         Arrays.stream(ClosureFormattingOption.values()).map(Enum::name).collect(Collectors.joining(", ")) +
-                        "\nhttp://googleclosure.blogspot.com/2010/10/pretty-print-javascript-with-closure.html"));
+                        "\nhttps:///googleclosure.blogspot.com/2010/10/pretty-print-javascript-with-closure.html"));
     }
 }

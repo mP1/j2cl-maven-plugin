@@ -65,6 +65,6 @@ enum BrowserLogLevel {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unknown browser-log-level " + CharSequences.quote(level) + " expected one of " +
                         Arrays.stream(values()).map(Enum::name).collect(Collectors.joining(", ")) +
-                        "\nhttp://github.com/mP1/README#browser-log-level"));
+                        "\nhttps://github.com/mP1/README#browser-log-level"));
     }
 }
