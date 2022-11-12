@@ -98,7 +98,7 @@ abstract class J2clRequest {
     /**
      * Classpath scope used to filter artifacts.
      */
-    private J2clClasspathScope scope;
+    private final J2clClasspathScope scope;
 
     /**
      * The base or cache directory.
@@ -151,7 +151,7 @@ abstract class J2clRequest {
         return this.level;
     }
 
-    private CompilationLevel level;
+    private final CompilationLevel level;
 
     final Map<String, String> defines() {
         return this.defines;

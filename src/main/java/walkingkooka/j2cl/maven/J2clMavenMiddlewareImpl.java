@@ -98,7 +98,7 @@ final class J2clMavenMiddlewareImpl implements J2clMavenMiddleware {
         return this.artifactHandlerManager.getArtifactHandler(type);
     }
 
-    private ArtifactHandlerManager artifactHandlerManager;
+    private final ArtifactHandlerManager artifactHandlerManager;
 
     private MavenProject mavenProject0(final Artifact artifact) {
         final ProjectBuildingRequest request = new DefaultProjectBuildingRequest(this.mavenSession.getProjectBuildingRequest());

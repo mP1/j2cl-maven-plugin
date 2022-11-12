@@ -174,7 +174,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
     }
 
     @Parameter(required = true)
-    private Map<String, String> defines = new HashMap<>();
+    private final Map<String, String> defines = new HashMap<>();
 
     // externs..........................................................................................................
 
@@ -187,7 +187,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     @Parameter(required = true)
-    private List<String> externs = new ArrayList<>();
+    private final List<String> externs = new ArrayList<>();
 
 
     // formatting..........................................................................................................
@@ -204,7 +204,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     @Parameter(required = true)
-    private List<String> formatting = new ArrayList<>();
+    private final List<String> formatting = new ArrayList<>();
 
     // javaCompilerArguments.............................................................................................
 
@@ -219,7 +219,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     @Parameter(alias = "java-compiler-arguments", required = true)
-    private List<String> javaCompilerArguments = new ArrayList<>();
+    private final List<String> javaCompilerArguments = new ArrayList<>();
     
     // language-out.....................................................................................................
 
