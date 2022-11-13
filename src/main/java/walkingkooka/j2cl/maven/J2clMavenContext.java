@@ -19,6 +19,7 @@ package walkingkooka.j2cl.maven;
 
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
+import walkingkooka.Context;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
@@ -48,24 +49,24 @@ import java.util.stream.Collectors;
  * Context about a build/test request. It contains common properties shared by different phases of the build/test process,
  * including classpaths, closure compiler parameters and maven scoping which is used to select dependencies/artifacts.
  */
-abstract class J2clRequest {
+abstract class J2clMavenContext implements Context {
 
-    J2clRequest(final J2clPath base,
-                        final J2clPath target,
-                        final J2clClasspathScope scope,
-                        final List<J2clArtifactCoords> classpathRequired,
-                        final List<J2clArtifactCoords> ignoredDependencies,
-                        final List<J2clArtifactCoords> javascriptSourceRequired,
-                        final CompilationLevel level,
-                        final Map<String, String> defines,
-                        final Set<String> externs,
-                        final Set<ClosureFormattingOption> formatting,
-                        final Set<String> javaCompilerArguments,
-                        final LanguageMode languageOut,
-                        final Optional<String> sourceMaps,
-                        final J2clMavenMiddleware middleware,
-                        final ExecutorService executor,
-                        final J2clLogger logger) {
+    J2clMavenContext(final J2clPath base,
+                     final J2clPath target,
+                     final J2clClasspathScope scope,
+                     final List<J2clArtifactCoords> classpathRequired,
+                     final List<J2clArtifactCoords> ignoredDependencies,
+                     final List<J2clArtifactCoords> javascriptSourceRequired,
+                     final CompilationLevel level,
+                     final Map<String, String> defines,
+                     final Set<String> externs,
+                     final Set<ClosureFormattingOption> formatting,
+                     final Set<String> javaCompilerArguments,
+                     final LanguageMode languageOut,
+                     final Optional<String> sourceMaps,
+                     final J2clMavenMiddleware middleware,
+                     final ExecutorService executor,
+                     final J2clLogger logger) {
         super();
 
         this.base = base;
@@ -477,7 +478,7 @@ abstract class J2clRequest {
     /**
      * Finds all jobs that have the given artifact as a dependency and remove that dependency from the waiting list.
      */
-    final J2clRequest taskCompleted(final J2clDependency completed) {
+    final J2clMavenContext taskCompleted(final J2clDependency completed) {
         this.executeWithLock(() -> {
             this.jobs.remove(completed);
 

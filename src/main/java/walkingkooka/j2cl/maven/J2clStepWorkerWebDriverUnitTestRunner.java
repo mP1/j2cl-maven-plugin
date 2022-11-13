@@ -51,17 +51,18 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
         super();
     }
 
-    @Override J2clStepResult execute1(final J2clDependency artifact,
-                                      final J2clStepDirectory directory,
-                                      final J2clLinePrinter logger) throws Exception {
+    @Override
+    J2clStepResult execute1(final J2clDependency artifact,
+                            final J2clStepDirectory directory,
+                            final J2clLinePrinter logger) throws Exception {
         logger.printLine("Junit Tests");
         logger.indent();
         {
-            final J2clRequest request = artifact.request();
-            this.executeTestSuite(this.prepareJunitHostFileScriptPath(request, logger),
-                    request.browsers(),
-                    request.browserLogLevel(),
-                    request.testTimeout(),
+            final J2clMavenContext context = artifact.context();
+            this.executeTestSuite(this.prepareJunitHostFileScriptPath(context, logger),
+                    context.browsers(),
+                    context.browserLogLevel(),
+                    context.testTimeout(),
                     logger);
         }
         logger.outdent();
@@ -72,14 +73,14 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
     /**
      * Loads the html file and replaces the script file with the closure compiled test file.
      */
-    private J2clPath prepareJunitHostFileScriptPath(final J2clRequest request,
+    private J2clPath prepareJunitHostFileScriptPath(final J2clMavenContext context,
                                                     final J2clLinePrinter logger) throws IOException {
         final J2clPath hostHtml;
 
         logger.printLine("Prepare host file");
         logger.indent();
         {
-            final J2clPath file = request.initialScriptFilename();
+            final J2clPath file = context.initialScriptFilename();
             hostHtml = file.parent()
                     .append(CharSequences.subSequence(file.file().getName(), 0, -2) + "html");
 

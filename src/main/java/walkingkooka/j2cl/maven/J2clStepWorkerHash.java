@@ -60,7 +60,7 @@ final class J2clStepWorkerHash extends J2clStepWorker {
                            final J2clStep step,
                            final J2clLinePrinter logger) throws Exception {
         final Set<String> hashItemNames = Sets.sorted();
-        final HashBuilder hash = artifact.request()
+        final HashBuilder hash = artifact.context()
                 .computeHash(hashItemNames);
 
         this.hashDependencies(artifact, hash, hashItemNames, logger);

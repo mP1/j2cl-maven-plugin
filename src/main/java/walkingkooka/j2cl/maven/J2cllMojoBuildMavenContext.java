@@ -29,29 +29,29 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 /**
- * A {@link J2clRequest} that accompanies a build. The entry points and initial-script-filename are taken from the pom.
+ * A {@link J2clMavenContext} that accompanies a build. The entry points and initial-script-filename are taken from the pom.
  */
-final class J2clMojoBuildRequest extends J2clRequest {
+final class J2cllMojoBuildMavenContext extends J2clMavenContext {
 
-    static J2clRequest with(final J2clPath base,
-                            final J2clPath target,
-                            final J2clClasspathScope scope,
-                            final List<J2clArtifactCoords> classpathRequired,
-                            final List<J2clArtifactCoords> ignoredDependencies,
-                            final List<J2clArtifactCoords> javascriptSourceRequired,
-                            final CompilationLevel level,
-                            final Map<String, String> defines,
-                            final Set<String> externs,
-                            final List<String> entryPoints,
-                            final Set<ClosureFormattingOption> formatting,
-                            final J2clPath initialScriptFilename,
-                            final Set<String> javaCompilerArguments,
-                            final LanguageMode languageOut,
-                            final Optional<String> sourceMaps,
-                            final J2clMavenMiddleware middleware,
-                            final ExecutorService executor,
-                            final J2clLogger logger) {
-        return new J2clMojoBuildRequest(base,
+    static J2clMavenContext with(final J2clPath base,
+                                 final J2clPath target,
+                                 final J2clClasspathScope scope,
+                                 final List<J2clArtifactCoords> classpathRequired,
+                                 final List<J2clArtifactCoords> ignoredDependencies,
+                                 final List<J2clArtifactCoords> javascriptSourceRequired,
+                                 final CompilationLevel level,
+                                 final Map<String, String> defines,
+                                 final Set<String> externs,
+                                 final List<String> entryPoints,
+                                 final Set<ClosureFormattingOption> formatting,
+                                 final J2clPath initialScriptFilename,
+                                 final Set<String> javaCompilerArguments,
+                                 final LanguageMode languageOut,
+                                 final Optional<String> sourceMaps,
+                                 final J2clMavenMiddleware middleware,
+                                 final ExecutorService executor,
+                                 final J2clLogger logger) {
+        return new J2cllMojoBuildMavenContext(base,
                 target,
                 scope,
                 classpathRequired,
@@ -71,24 +71,24 @@ final class J2clMojoBuildRequest extends J2clRequest {
                 logger);
     }
 
-    private J2clMojoBuildRequest(final J2clPath base,
-                                 final J2clPath target,
-                                 final J2clClasspathScope scope,
-                                 final List<J2clArtifactCoords> classpathRequired,
-                                 final List<J2clArtifactCoords> ignoredDependencies,
-                                 final List<J2clArtifactCoords> javascriptSourceRequired,
-                                 final CompilationLevel level,
-                                 final Map<String, String> defines,
-                                 final Set<String> externs,
-                                 final List<String> entryPoints,
-                                 final Set<ClosureFormattingOption> formatting,
-                                 final J2clPath initialScriptFilename,
-                                 final Set<String> javaCompilerArguments,
-                                 final LanguageMode languageOut,
-                                 final Optional<String> sourceMaps,
-                                 final J2clMavenMiddleware middleware,
-                                 final ExecutorService executor,
-                                 final J2clLogger logger) {
+    private J2cllMojoBuildMavenContext(final J2clPath base,
+                                       final J2clPath target,
+                                       final J2clClasspathScope scope,
+                                       final List<J2clArtifactCoords> classpathRequired,
+                                       final List<J2clArtifactCoords> ignoredDependencies,
+                                       final List<J2clArtifactCoords> javascriptSourceRequired,
+                                       final CompilationLevel level,
+                                       final Map<String, String> defines,
+                                       final Set<String> externs,
+                                       final List<String> entryPoints,
+                                       final Set<ClosureFormattingOption> formatting,
+                                       final J2clPath initialScriptFilename,
+                                       final Set<String> javaCompilerArguments,
+                                       final LanguageMode languageOut,
+                                       final Optional<String> sourceMaps,
+                                       final J2clMavenMiddleware middleware,
+                                       final ExecutorService executor,
+                                       final J2clLogger logger) {
         super(base,
                 target,
                 scope,

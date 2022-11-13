@@ -37,20 +37,23 @@ public final class J2clMojoBuild extends J2clMojoBuildTest {
     @Override
     public void execute() throws MojoExecutionException {
         try {
-            final J2clRequest request = this.request(this.entryPoints(), this.initialScriptFilename());
-            final J2clDependency project = this.gatherDependencies(request);
-            request.execute(project);
+            final J2clMavenContext context = this.context(
+                    this.entryPoints(),
+                    this.initialScriptFilename()
+            );
+            final J2clDependency project = this.gatherDependencies(context);
+            context.execute(project);
         } catch (final Throwable e) {
             throw new MojoExecutionException("Failed to build project, check logs above", e);
         }
     }
 
     /**
-     * The {@link J2clRequest} accompanying the build.
+     * The {@link J2clMavenContext} accompanying the build.
      */
-    final J2clRequest request(final List<String> entryPoints,
-                              final J2clPath initialScriptFilename) {
-        return J2clMojoBuildRequest.with(this.cache(),
+    J2clMavenContext context(final List<String> entryPoints,
+                             final J2clPath initialScriptFilename) {
+        return J2cllMojoBuildMavenContext.with(this.cache(),
                 this.output(),
                 this.classpathScope(),
                 this.classpathRequired(),

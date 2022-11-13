@@ -41,7 +41,7 @@ final class J2clStepWorkerOutputAssembler extends J2clStepWorker2 {
         final J2clPath source = artifact.step(J2clStep.CLOSURE_COMPILER).output();
         logger.printIndented("Source", source);
 
-        final J2clPath target = artifact.request().target();
+        final J2clPath target = artifact.context().target();
         logger.printIndented("Destination", target);
         target.createIfNecessary();
 
