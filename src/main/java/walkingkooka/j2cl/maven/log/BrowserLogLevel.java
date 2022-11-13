@@ -15,7 +15,7 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.log;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.logging.LogType;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 /**
  * Controls whether which browser console log entries are printed after each test.
  */
-enum BrowserLogLevel {
+public enum BrowserLogLevel {
     /**
      * Matches all browser console log entries.
      */
@@ -44,8 +44,8 @@ enum BrowserLogLevel {
     /**
      * Used to update the capabilities of the provided Driver.
      */
-    final void addCapability(final MutableCapabilities capabilities) {
-        if(this != NONE) {
+    public void addCapability(final MutableCapabilities capabilities) {
+        if (this != NONE) {
             final LoggingPreferences prefs = new LoggingPreferences();
             prefs.enable(LogType.BROWSER, this.toLevel());
 
@@ -59,12 +59,12 @@ enum BrowserLogLevel {
         };
     }
 
-    static BrowserLogLevel fromCommandLine(final String level) {
+    public static BrowserLogLevel fromCommandLine(final String level) {
         return Arrays.stream(values())
                 .filter(e -> e.name().equals(level))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unknown browser-log-level " + CharSequences.quote(level) + " expected one of " +
                         Arrays.stream(values()).map(Enum::name).collect(Collectors.joining(", ")) +
-                        "\nhttps://github.com/mP1/README#browser-log-level"));
+                        "\nhttps://github.com/mP1/j2cl-maven-plugin/README#browser-log-level"));
     }
 }

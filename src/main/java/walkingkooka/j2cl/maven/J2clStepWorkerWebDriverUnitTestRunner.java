@@ -23,6 +23,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.support.ui.FluentWait;
+import walkingkooka.j2cl.maven.log.BrowserLogLevel;
 import walkingkooka.text.CharSequences;
 
 import java.io.BufferedReader;

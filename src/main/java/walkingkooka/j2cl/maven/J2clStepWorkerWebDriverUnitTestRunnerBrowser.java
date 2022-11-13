@@ -25,6 +25,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import walkingkooka.j2cl.maven.log.BrowserLogLevel;
 import walkingkooka.text.CharSequences;
 
 import java.util.Arrays;

@@ -19,6 +19,7 @@ package walkingkooka.j2cl.maven;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import walkingkooka.j2cl.maven.log.J2clLogger;
 
 import java.io.File;
 

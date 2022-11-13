@@ -15,7 +15,7 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.log;
 
 import org.junit.jupiter.api.Test;
 import walkingkooka.reflect.ClassTesting2;
@@ -28,10 +28,15 @@ public final class BrowserLogLevelTest implements ClassTesting2<BrowserLogLevel>
 
     @Test
     public void testFromCommandInvalidFails() {
-        final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> BrowserLogLevel.fromCommandLine("Unknown!"));
-        this.checkEquals("Unknown browser-log-level \"Unknown!\" expected one of ALL, ERROR, WARN, INFO, DEBUG, NONE\n" +
-                        "https://github.com/mP1/README#browser-log-level",
-                thrown.getMessage());
+        final IllegalArgumentException thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> BrowserLogLevel.fromCommandLine("Unknown!")
+        );
+        this.checkEquals(
+                "Unknown browser-log-level \"Unknown!\" expected one of ALL, ERROR, WARN, INFO, DEBUG, NONE\n" +
+                        "https://github.com/mP1/j2cl-maven-plugin/README#browser-log-level",
+                thrown.getMessage()
+        );
     }
 
     @Test
@@ -44,9 +49,11 @@ public final class BrowserLogLevelTest implements ClassTesting2<BrowserLogLevel>
     @Test
     public void testToLevel() {
         for (final BrowserLogLevel level : BrowserLogLevel.values()) {
-            this.checkEquals(level.name(),
+            this.checkEquals(
+                    level.name(),
                     level.toLevel().getName(),
-                    () -> "Level " + level);
+                    () -> "Level " + level
+            );
         }
     }
 
@@ -57,6 +64,6 @@ public final class BrowserLogLevelTest implements ClassTesting2<BrowserLogLevel>
 
     @Override
     public JavaVisibility typeVisibility() {
-        return JavaVisibility.PACKAGE_PRIVATE;
+        return JavaVisibility.PUBLIC;
     }
 }
