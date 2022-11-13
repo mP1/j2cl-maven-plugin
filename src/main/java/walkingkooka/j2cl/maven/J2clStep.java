@@ -35,7 +35,7 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 
 /**
- * The individual steps that are executed in series to complete the process or building.
+ * The individual steps that are executed in series to complete the process of building.
  */
 enum J2clStep {
     /**
@@ -190,8 +190,8 @@ enum J2clStep {
     },
 
     /**
-     * Attempts to find files called "j2cl-maven-plugin-shade.txt" in the root of the dependency files and uses that to
-     * shade class files.
+     * Attempts to find files called "j2cl-maven-plugin-shade.txt" in the root of the dependency files and if found
+     * shares matching files.
      */
     SHADE_CLASS_FILES {
         @Override
@@ -268,7 +268,7 @@ enum J2clStep {
         }
     },
     /**
-     * Assembles the output and copies files to the place.
+     * Assembles the output and copies files to that place.
      */
     OUTPUT_ASSEMBLER {
         @Override
@@ -321,7 +321,7 @@ enum J2clStep {
     // step directory naming............................................................................................
 
     /**
-     * Returns the actual sub directory name on disk. The directory will hold all the output files created by this step.
+     * Returns the actual sub directory name on disk of a directory where all files for a particular step are created.
      */
     abstract String directoryName();
 
@@ -427,14 +427,14 @@ enum J2clStep {
     }
 
     /**
-     * Returns the sub class of {@link J2clStepWorker} and then calls {@link J2clStepWorker#execute(J2clDependency, J2clStep, J2clLinePrinter)
+     * Returns the sub-class of {@link J2clStepWorker} and then calls {@link J2clStepWorker#execute(J2clDependency, J2clStep, J2clLinePrinter)
      */
     abstract J2clStepWorker execute1();
 
     // skipIfJre........................................................................................................
 
     /**
-     * Some steps should not be attemped by dependencies.
+     * Some steps should not be attempted by dependencies.
      */
     abstract boolean skipIfDependency();
 
