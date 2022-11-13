@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import walkingkooka.collect.list.Lists;
+import walkingkooka.j2cl.maven.log.J2clLogger;
 import walkingkooka.text.printer.PrintedLineHandler;
 
 import java.io.ByteArrayOutputStream;

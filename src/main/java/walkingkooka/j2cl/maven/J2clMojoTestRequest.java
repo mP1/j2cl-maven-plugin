@@ -20,6 +20,8 @@ package walkingkooka.j2cl.maven;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import walkingkooka.collect.list.Lists;
+import walkingkooka.j2cl.maven.log.BrowserLogLevel;
+import walkingkooka.j2cl.maven.log.J2clLogger;
 
 import java.util.List;
 import java.util.Map;

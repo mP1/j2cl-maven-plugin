@@ -22,6 +22,8 @@ import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.j2cl.maven.log.BrowserLogLevel;
+import walkingkooka.j2cl.maven.log.J2clLogger;
 
 import java.util.Collection;
 import java.util.List;

@@ -24,6 +24,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.j2cl.maven.log.BrowserLogLevel;
+import walkingkooka.j2cl.maven.log.J2clLogger;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;

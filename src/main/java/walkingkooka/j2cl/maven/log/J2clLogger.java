@@ -15,7 +15,7 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.log;
 
 import org.apache.maven.plugin.logging.Log;
 import walkingkooka.text.Indentation;

@@ -20,6 +20,7 @@ package walkingkooka.j2cl.maven;
 import com.google.j2cl.common.FrontendUtils.FileInfo;
 import walkingkooka.NeverError;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.j2cl.maven.log.J2clLogger;
 import walkingkooka.naming.StringName;
 import walkingkooka.naming.StringPath;
 import walkingkooka.text.LineEnding;
