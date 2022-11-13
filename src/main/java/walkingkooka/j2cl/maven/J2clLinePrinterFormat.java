@@ -19,26 +19,8 @@ package walkingkooka.j2cl.maven;
 // maven-plugin-plugin fails build because of enum method with generics, while scanning classpath for javadoc annotations.
 enum J2clLinePrinterFormat {
     // Useful for printing a list of files where order is important such as a classpath.
-    FLAT {
-//        @Override
-//        <T> void print(final Collection<T> paths,
-//                       final Function<T, StringPath> toStringPath,
-//                       final IndentingPrinter printer) {
-//            J2clLinePrinter.printFlat(paths, toStringPath, printer);
-//        }
-    },
+    FLAT,
 
     // Useful for printing a tree of files which will appear lexicagraphically(???) sorted
-    TREE {
-//        @Override
-//        <T> void print(final Collection<T> paths,
-//                       final Function<T, StringPath> toStringPath,
-//                       final IndentingPrinter printer) {
-//            J2clLinePrinter.printTree(paths, toStringPath, printer);
-//        }
-    }
-
-//    abstract <T> void print(final Collection<T> paths,
-//                            final Function<T, StringPath> toStringPath,
-//                            final IndentingPrinter printer);
+    TREE;
 }

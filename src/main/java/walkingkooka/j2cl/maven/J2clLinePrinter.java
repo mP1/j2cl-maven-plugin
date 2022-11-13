@@ -130,7 +130,6 @@ final class J2clLinePrinter {
                                               final J2clLinePrinterFormat format) {
         this.indent();
         {
-//                format.print(paths, toStringPath, this.treePrinter);
             switch (format) {
                 case FLAT:
                     printFlat(paths, toStringPath, this.treePrinter);
