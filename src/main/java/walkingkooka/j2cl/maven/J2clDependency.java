@@ -78,9 +78,9 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Gathers all dependencies honouring excludes and dependencyManagement entries in POMs.
      */
     static J2clDependency gather(final MavenProject project,
-                                 final J2clRequest request) {
-        final IndentingPrinter logger = request.logger()
-                .printer(request.logger()::info)
+                                 final J2clMavenContext context) {
+        final IndentingPrinter logger = context.logger()
+                .printer(context.logger()::info)
                 .indenting(Indentation.SPACES2);
         final J2clDependency root;
         {
@@ -89,8 +89,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
                         final J2clDependency r = new J2clDependency(J2clArtifactCoords.with(project.getArtifact()),
                                 project,
                                 Optional.empty(),
-                                request);
-                        r.gatherDependencies(request.scope(), Predicates.never(), Function.identity());
+                                context);
+                        r.gatherDependencies(context.scope(), Predicates.never(), Function.identity());
                         return r;
                     }, logger);
 
@@ -161,12 +161,12 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private J2clDependency(final J2clArtifactCoords coords,
                            final MavenProject project,
                            final Optional<J2clPath> artifactFile,
-                           final J2clRequest request) {
+                           final J2clMavenContext context) {
         super();
         this.coords = coords;
         this.project = project;
         this.artifactFile = artifactFile;
-        this.request = request;
+        this.context = context;
     }
 
     private void gatherDependencies(final J2clClasspathScope scope,
@@ -203,7 +203,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     private void gatherDependencies0(final J2clClasspathScope scope,
                                      final Predicate<J2clArtifactCoords> parentExclusions,
                                      final Function<J2clArtifactCoords, J2clArtifactCoords> dependencyManagement) {
-        final J2clRequest request = this.request();
+        final J2clMavenContext context = this.context();
 
         final Predicate<String> scopeFilter = scope.scopeFilter();
         for (final Dependency dependency : this.project().getDependencies()) {
@@ -226,7 +226,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
             final J2clDependency child = new J2clDependency(dependencyManagement.apply(coords),
                     null,
                     null,
-                    request);
+                    context);
             this.dependencies.add(child);
 
             child.gatherDependencies(J2clClasspathScope.COMPILE,
@@ -338,8 +338,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private void markIgnoredTransitiveDependencies(final Map<J2clDependency, Set<J2clDependency>> childToParents) {
-        final IndentingPrinter logger = request.logger()
-                .printer(request.logger()::info)
+        final IndentingPrinter logger = context.logger()
+                .printer(context.logger()::info)
                 .indenting(Indentation.SPACES2);
         logger.println("Marking ignored transitive dependencies");
         logger.indent();
@@ -511,7 +511,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
         final Collection<J2clDependency> all = this.dependencies();
         this.verifyWithoutConflictsOrDuplicates(all);
 
-        this.request().verifyClasspathRequiredJavascriptSourceRequiredIgnoredDependencies(all
+        this.context().verifyClasspathRequiredJavascriptSourceRequiredIgnoredDependencies(all
                         .stream()
                         .map(J2clDependency::coords)
                         .collect(Collectors.toCollection(Sets::sorted)),
@@ -571,7 +571,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * The printMetadata flag will be false when printing dependencies before a verify exception is thrown.
      */
     void print(final boolean printMetadata) {
-        final J2clLogger logger = this.request.logger();
+        final J2clLogger logger = this.context.logger();
         final J2clLinePrinter printer = J2clLinePrinter.with(logger.printer(logger::info), null);
         printer.printLine("Dependencies");
         printer.indent();
@@ -649,7 +649,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     synchronized Optional<J2clPath> artifactFile() {
         if (null == this.artifactFile) {
             final J2clArtifactCoords coords = this.coords();
-            this.artifactFile = Optional.of(this.request()
+            this.artifactFile = Optional.of(this.context()
                     .mavenMiddleware()
                     .mavenFile(coords.toString())
                     .orElseThrow(this.archiveFileMissing()));
@@ -690,9 +690,12 @@ final class J2clDependency implements Comparable<J2clDependency> {
     MavenProject project() {
         if(null == this.project) {
             // all requests with a null project must be dependencies of the project being built and their COMPILE dependencies should be fetched.
-            final J2clRequest request = this.request();
-            this.project = request.mavenMiddleware()
-                    .mavenProject(this.coords(), J2clClasspathScope.COMPILE);
+            final J2clMavenContext context = this.context();
+            this.project = context.mavenMiddleware()
+                    .mavenProject(
+                            this.coords(),
+                            J2clClasspathScope.COMPILE
+                    );
         }
         return this.project;
     }
@@ -744,15 +747,15 @@ final class J2clDependency implements Comparable<J2clDependency> {
                 }
 
                 // was included in POM javascript-source-required
-                final J2clRequest request = this.request();
+                final J2clMavenContext context = this.context();
                 final J2clArtifactCoords coords = this.coords();
-                if (request.isClasspathRequired(coords)) {
+                if (context.isClasspathRequired(coords)) {
                     required = true;
                     break;
                 }
 
                 // cp required but js missing so false
-                if (this.javascriptSourceRequiredFile || request.isJavascriptSourceRequired(coords)) {
+                if (this.javascriptSourceRequiredFile || context.isJavascriptSourceRequired(coords)) {
                     required = false;
                     break;
                 }
@@ -796,15 +799,15 @@ final class J2clDependency implements Comparable<J2clDependency> {
                 }
 
                 // was included in POM javascript-source-required
-                final J2clRequest request = this.request();
+                final J2clMavenContext context = this.context();
                 final J2clArtifactCoords coords = this.coords();
-                if (request.isJavascriptSourceRequired(coords)) {
+                if (context.isJavascriptSourceRequired(coords)) {
                     required = true;
                     break;
                 }
 
                 // cp required but js missing so false
-                if (this.classpathRequiredFile || request.isClasspathRequired(coords)) {
+                if (this.classpathRequiredFile || context.isClasspathRequired(coords)) {
                     required = false;
                     break;
                 }
@@ -829,7 +832,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
         if (null == this.ignored) {
             this.testArchive();
 
-            this.ignored = this.ignoredFile || this.request().isIgnored(this.coords());
+            this.ignored = this.ignoredFile || this.context().isIgnored(this.coords());
         }
         return this.ignored;
     }
@@ -1118,11 +1121,11 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     // tasks............................................................................................................
 
-    J2clRequest request() {
-        return this.request;
+    J2clMavenContext context() {
+        return this.context;
     }
 
-    private final J2clRequest request;
+    private final J2clMavenContext context;
 
     // job..............................................................................................................
 
@@ -1137,7 +1140,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Executes all steps in order for this artifact. This assumes that all dependencies have already completed successfully.
      */
     private J2clDependency job0() throws Exception {
-        final J2clLogger logger = this.request().logger();
+        final J2clLogger logger = this.context().logger();
         final String coords = this.coords().toString();
         final Instant start = Instant.now();
 
@@ -1147,7 +1150,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
         }
         logger.info(coords + " completed, " + Duration.between(start, Instant.now()).toSeconds() + " second(s) taken");
 
-        this.request()
+        this.context()
                 .taskCompleted(this);
         return this;
     }
@@ -1166,7 +1169,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Sets the directory for this dependency, assumes the hash has been computed
      */
     J2clDependency setDirectory(final String hash) throws IOException {
-        final J2clPath create = this.request.base().append(this.coords.directorySafeName() + "-" + hash);
+        final J2clPath create = this.context.base().append(this.coords.directorySafeName() + "-" + hash);
         final J2clPath previous = this.directory.compareAndExchange(null, create);
         if (null != previous) {
             throw new IllegalStateException("Hash already set for this artifact: " + CharSequences.quote(create.toString()));
@@ -1182,7 +1185,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     J2clPath directory() {
         final J2clPath directory = this.directory.get();
         if (null == directory) {
-            throw new IllegalStateException("Directory under " + this.request().base() + " missing for " + CharSequences.quote(this.coords().toString()));
+            throw new IllegalStateException("Directory under " + this.context().base() + " missing for " + CharSequences.quote(this.coords().toString()));
         }
         return directory;
     }
@@ -1224,20 +1227,20 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Returns all source roots including resources which can be directories or archives.
      */
     List<J2clPath> sourcesRoot() {
-        final J2clRequest request = this.request();
+        final J2clMavenContext context = this.context();
         final List<J2clPath> sources = Lists.array();
 
         final MavenProject project = this.project();
         final File projectBase = project.getFile();
         if(null != projectBase) {
-            sources.addAll(request
+            sources.addAll(context
                     .sourcesKind()
                     .compileSourceRoots(project, J2clPath.with(projectBase.toPath())));
         }
         // no project source try and sources archive and then jar file itself
         if(sources.isEmpty()) {
             final J2clArtifactCoords coords = this.coords();
-            final J2clMavenMiddleware middleware = request.mavenMiddleware();
+            final J2clMavenMiddleware middleware = context.mavenMiddleware();
 
             middleware.mavenFile(coords.source().toString()).map(sources::add);
 

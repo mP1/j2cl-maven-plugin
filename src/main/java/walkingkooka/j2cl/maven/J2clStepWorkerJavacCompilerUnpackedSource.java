@@ -72,8 +72,8 @@ final class J2clStepWorkerJavacCompilerUnpackedSource extends J2clStepWorkerJava
     void postCompile(final J2clDependency artifact,
                      final J2clStepDirectory directory,
                      final J2clLinePrinter logger) throws Exception {
-        final J2clRequest request = artifact.request();
-        if (false == artifact.isDependency() && J2clSourcesKind.TEST == request.sourcesKind()) {
+        final J2clMavenContext context = artifact.context();
+        if (false == artifact.isDependency() && J2clSourcesKind.TEST == context.sourcesKind()) {
             this.junitProcessorPostFix(artifact, directory, logger);
         }
     }
@@ -86,11 +86,11 @@ final class J2clStepWorkerJavacCompilerUnpackedSource extends J2clStepWorkerJava
             logger.printLine("Junit processor post fixup");
             logger.indent();
             {
-                final J2clRequest request = artifact.request();
+                final J2clMavenContext context = artifact.context();
                 final J2clPath output = directory.output();
 
-                for (final String testSuiteClassName : request.entryPoints()) {
-                    logger.printLine(testSuiteClassName );
+                for (final String testSuiteClassName : context.entryPoints()) {
+                    logger.printLine(testSuiteClassName);
 
                     final String testClassName = extractTestClassName(testSuiteClassName);
                     final J2clPath generatedFilename = output.testAdapterSuiteGeneratedFilename(testClassName);

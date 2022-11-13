@@ -77,12 +77,12 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
                 logger.printLine(test);
                 logger.indent();
                 {
-                    final J2clMojoTestRequest request = this.request(test);
-                    final J2clDependency project = this.gatherDependencies(request);
+                    final J2clMojoTestMavenContext context = this.context(test);
+                    final J2clDependency project = this.gatherDependencies(context);
 
                     try {
-                        request.setProject(project);
-                        request.execute(project);
+                        context.setProject(project);
+                        context.execute(project);
                     } catch (final Throwable cause) {
                         throw new MojoExecutionException("Failed to build project, check logs above", cause);
                     }
@@ -94,10 +94,10 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
     }
 
     /**
-     * The {@link J2clRequest} accompanying the build.
+     * The {@link J2clMavenContext} accompanying the build.
      */
-    private J2clMojoTestRequest request(final String testClassName) {
-        return J2clMojoTestRequest.with(this.cache(),
+    private J2clMojoTestMavenContext context(final String testClassName) {
+        return J2clMojoTestMavenContext.with(this.cache(),
                 this.output(),
                 this.classpathScope(),
                 this.classpathRequired(),

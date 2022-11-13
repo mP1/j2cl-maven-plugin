@@ -58,7 +58,7 @@ enum J2clStep {
         }
 
         @Override
-        Optional<J2clStep> next(final J2clRequest request) {
+        Optional<J2clStep> next(final J2clMavenContext context) {
             return Optional.of(UNPACK);
         }
     },
@@ -83,7 +83,7 @@ enum J2clStep {
         }
 
         @Override
-        Optional<J2clStep> next(final J2clRequest request) {
+        Optional<J2clStep> next(final J2clMavenContext context) {
             return Optional.of(JAVAC_COMPILE);
         }
     },
@@ -108,7 +108,7 @@ enum J2clStep {
         }
 
         @Override
-        Optional<J2clStep> next(final J2clRequest request) {
+        Optional<J2clStep> next(final J2clMavenContext context) {
             return Optional.of(GWT_INCOMPATIBLE_STRIP);
         }
     },
@@ -133,7 +133,7 @@ enum J2clStep {
         }
 
         @Override
-        Optional<J2clStep> next(final J2clRequest request) {
+        Optional<J2clStep> next(final J2clMavenContext context) {
             return Optional.of(COMPILE_GWT_INCOMPATIBLE_STRIPPED);
         }
     },
@@ -158,7 +158,7 @@ enum J2clStep {
         }
 
         @Override
-        Optional<J2clStep> next(final J2clRequest request) {
+        Optional<J2clStep> next(final J2clMavenContext context) {
             return Optional.of(SHADE_JAVA_SOURCE);
         }
     },
@@ -184,7 +184,7 @@ enum J2clStep {
         }
 
         @Override
-        Optional<J2clStep> next(final J2clRequest request) {
+        Optional<J2clStep> next(final J2clMavenContext context) {
             return Optional.of(SHADE_CLASS_FILES);
         }
     },
@@ -210,7 +210,7 @@ enum J2clStep {
         }
 
         @Override
-        Optional<J2clStep> next(final J2clRequest request) {
+        Optional<J2clStep> next(final J2clMavenContext context) {
             return Optional.of(TRANSPILE);
         }
     },
@@ -235,7 +235,7 @@ enum J2clStep {
         }
 
         @Override
-        Optional<J2clStep> next(final J2clRequest request) {
+        Optional<J2clStep> next(final J2clMavenContext context) {
             return Optional.of(CLOSURE_COMPILER);
         }
     },
@@ -259,10 +259,12 @@ enum J2clStep {
         }
 
         @Override
-        Optional<J2clStep> next(final J2clRequest request) {
-            return Optional.of(J2clClasspathScope.TEST == request.scope() ?
-                    JUNIT_WEBDRIVER_TESTS :
-                    OUTPUT_ASSEMBLER);
+        Optional<J2clStep> next(final J2clMavenContext context) {
+            return Optional.of(
+                    J2clClasspathScope.TEST == context.scope() ?
+                            JUNIT_WEBDRIVER_TESTS :
+                            OUTPUT_ASSEMBLER
+            );
         }
     },
     /**
@@ -285,7 +287,7 @@ enum J2clStep {
         }
 
         @Override
-        Optional<J2clStep> next(final J2clRequest request) {
+        Optional<J2clStep> next(final J2clMavenContext context) {
             return Optional.empty();
         }
     },
@@ -309,7 +311,7 @@ enum J2clStep {
         }
 
         @Override
-        Optional<J2clStep> next(final J2clRequest request) {
+        Optional<J2clStep> next(final J2clMavenContext context) {
             return Optional.empty();
         }
     };
@@ -332,8 +334,8 @@ enum J2clStep {
     final Optional<J2clStep> execute(final J2clDependency artifact) throws Exception {
         final Instant start = Instant.now();
 
-        final J2clRequest request = artifact.request();
-        final J2clLogger j2clLogger = request.logger();
+        final J2clMavenContext context = artifact.context();
+        final J2clLogger j2clLogger = context.logger();
         final List<CharSequence> lines = Lists.array(); // these lines will be written to a log file.
         final String prefix = artifact.coords() + "-" + this;
 
@@ -371,7 +373,7 @@ enum J2clStep {
 
                 result.reportIfFailure(artifact, this);
             }
-            return result.next(this.next(request));
+            return result.next(this.next(context));
         } catch (final Exception cause) {
             logger.flush();
 
@@ -397,14 +399,21 @@ enum J2clStep {
                 );
             } else {
                 // HASH step probably failed so create a unique file and write it to the base directory.
-                final Path base = Paths.get(request.base().path().toString(), artifact.coords() + "-" + DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"));
+                final Path base = Paths.get(
+                        context.base()
+                                .path()
+                                .toString(),
+                        artifact.coords() +
+                                "-" +
+                                DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
+                );
 
                 j2clLogger.error("Log file");
                 j2clLogger.error(J2clLogger.INDENTATION + base.toString());
 
                 Files.write(base, lines);
             }
-            artifact.request().cancel(cause);
+            artifact.context().cancel(cause);
 
             throw cause;
         }
@@ -434,5 +443,5 @@ enum J2clStep {
     /**
      * Returns the next step if one is present.
      */
-    abstract Optional<J2clStep> next(final J2clRequest request);
+    abstract Optional<J2clStep> next(final J2clMavenContext context);
 }

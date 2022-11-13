@@ -37,10 +37,11 @@ final class J2clStepWorkerClosureCompiler extends J2clStepWorker2 {
         super();
     }
 
-    @Override J2clStepResult execute1(final J2clDependency artifact,
-                                      final J2clStepDirectory directory,
-                                      final J2clLinePrinter logger) throws Exception {
-        final J2clRequest request = artifact.request();
+    @Override
+    J2clStepResult execute1(final J2clDependency artifact,
+                            final J2clStepDirectory directory,
+                            final J2clLinePrinter logger) throws Exception {
+        final J2clMavenContext context = artifact.context();
         final Set<J2clPath> sources = Sets.ordered();
 
         this.addSources(artifact, sources);
@@ -83,17 +84,17 @@ final class J2clStepWorkerClosureCompiler extends J2clStepWorker2 {
             }
         }
 
-        return ClosureCompiler.compile(request.level(),
-                request.defines(),
-                request.entryPoints(),
-                request.externs(),
-                request.formatting(),
-                request.languageOut(),
-                request.sourcesKind() == J2clSourcesKind.TEST,
-                request.sourceMaps(),
+        return ClosureCompiler.compile(context.level(),
+                context.defines(),
+                context.entryPoints(),
+                context.externs(),
+                context.formatting(),
+                context.languageOut(),
+                context.sourcesKind() == J2clSourcesKind.TEST,
+                context.sourceMaps(),
                 sources,
                 directory.output().createIfNecessary(),
-                request.initialScriptFilename().filename(),
+                context.initialScriptFilename().filename(),
                 logger) ?
                 J2clStepResult.SUCCESS :
                 J2clStepResult.FAILED;

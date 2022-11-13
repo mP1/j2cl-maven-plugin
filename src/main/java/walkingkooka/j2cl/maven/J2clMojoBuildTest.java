@@ -129,8 +129,11 @@ abstract class J2clMojoBuildTest extends J2clMojo {
     /**
      * Gathers the all the dependencies.
      */
-    final J2clDependency gatherDependencies(final J2clRequest request) {
-        return J2clDependency.gather(this.project(), request);
+    final J2clDependency gatherDependencies(final J2clMavenContext context) {
+        return J2clDependency.gather(
+                this.project(),
+                context
+        );
     }
 
     // JAVA.............................................................................................................
