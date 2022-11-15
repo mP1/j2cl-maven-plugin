@@ -187,6 +187,16 @@ final class J2clMojoTestMavenContext extends J2clMavenContext {
         return step.directoryName(STEPS.indexOf(step));
     }
 
+    @Override
+    Optional<J2clStep> next(final J2clStep current) {
+        final int index = STEPS.indexOf(current);
+        return Optional.ofNullable(
+                index + 1 < STEPS.size() ?
+                        STEPS.get(index + 1) :
+                        null
+        );
+    }
+
     private final List<J2clStep> STEPS = Lists.of(
             J2clStep.HASH,
             J2clStep.UNPACK,
