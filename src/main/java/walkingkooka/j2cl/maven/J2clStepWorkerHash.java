@@ -19,6 +19,7 @@ package walkingkooka.j2cl.maven;
 
 import com.google.common.collect.Lists;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.CharSequences;
 
 import java.io.IOException;
@@ -58,7 +59,7 @@ final class J2clStepWorkerHash extends J2clStepWorker {
     @Override
     J2clStepResult execute(final J2clDependency artifact,
                            final J2clStep step,
-                           final J2clLinePrinter logger) throws Exception {
+                           final TreeLogger logger) throws Exception {
         final Set<String> hashItemNames = Sets.sorted();
         final HashBuilder hash = artifact.context()
                 .computeHash(hashItemNames);
@@ -88,14 +89,14 @@ final class J2clStepWorkerHash extends J2clStepWorker {
     private void hashDependencies(final J2clDependency artifact,
                                   final HashBuilder hash,
                                   final Set<String> hashItemNames,
-                                  final J2clLinePrinter logger) throws IOException {
+                                  final TreeLogger logger) throws IOException {
         final Set<J2clDependency> dependencies = artifact.dependencies(); // dependencies();
-        logger.printLine(dependencies.size() + " Dependencies");
+        logger.line(dependencies.size() + " Dependencies");
         logger.indent();
 
         int i = 0;
         for (final J2clDependency dependency : dependencies) {
-            logger.printLine(dependency.toString());
+            logger.line(dependency.toString());
             logger.indent();
             {
                 // leading zeroes added to keep keys in numeric order, so dependencies-0 is followed by dependencies-1 not dependencies-10
@@ -108,7 +109,7 @@ final class J2clStepWorkerHash extends J2clStepWorker {
             logger.outdent();
         }
 
-        logger.printEndOfList();
+        logger.endOfList();
         logger.outdent();
         logger.emptyLine();
     }
@@ -118,7 +119,7 @@ final class J2clStepWorkerHash extends J2clStepWorker {
     private void hashArtifactSources(final J2clDependency artifact,
                                      final HashBuilder hash,
                                      final Set<String> hashItemNames,
-                                     final J2clLinePrinter logger) throws IOException {
+                                     final TreeLogger logger) throws IOException {
         final List<J2clPath> compileSourcesRoot = artifact.sourcesRoot();
 
         if (compileSourcesRoot.isEmpty()) {
@@ -134,7 +135,7 @@ final class J2clStepWorkerHash extends J2clStepWorker {
     private void hashArchiveFile(final J2clDependency artifact,
                                  final HashBuilder hash,
                                  final Set<String> hashItemNames,
-                                 final J2clLinePrinter logger) throws IOException {
+                                 final TreeLogger logger) throws IOException {
         final J2clPath file = artifact.artifactFileOrFail();
         try (final FileSystem zip = FileSystems.newFileSystem(URI.create("jar:" + file.file().toURI()), Collections.emptyMap())) {
             this.hashCompileSourceRoots(zip.getRootDirectories(),
@@ -148,8 +149,8 @@ final class J2clStepWorkerHash extends J2clStepWorker {
     private void hashCompileSourceRoots(final Iterable<Path> roots,
                                         final HashBuilder hash,
                                         final Set<String> hashItemNames,
-                                        final J2clLinePrinter logger) throws IOException {
-        logger.printLine(Lists.newArrayList(roots).size() + " Source root(s)");
+                                        final TreeLogger logger) throws IOException {
+        logger.line(Lists.newArrayList(roots).size() + " Source root(s)");
         logger.indent();
 
         for (final Path root : roots) {
@@ -157,21 +158,21 @@ final class J2clStepWorkerHash extends J2clStepWorker {
             this.hashDirectoryTree(root, hash, logger);
         }
 
-        logger.printEndOfList();
+        logger.endOfList();
         logger.outdent();
     }
 
     private void hashDirectoryTree(final Path root,
                                    final HashBuilder hash,
-                                   final J2clLinePrinter logger) throws IOException {
-        logger.printLine(root.toString());
+                                   final TreeLogger logger) throws IOException {
+        logger.line(root.toString());
         logger.indent();
 
         Files.walkFileTree(root, new FileVisitor<>() {
             @Override
             public FileVisitResult preVisitDirectory(final Path path,
                                                      final BasicFileAttributes basicFileAttributes) {
-                logger.printLine(path.getFileName() + " (dir)");
+                logger.line(path.getFileName() + " (dir)");
                 logger.indent();
                 return FileVisitResult.CONTINUE;
             }

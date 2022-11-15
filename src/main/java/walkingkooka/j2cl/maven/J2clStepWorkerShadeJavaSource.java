@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import walkingkooka.collect.list.Lists;
+import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.javashader.JavaShaders;
 
 import java.io.IOException;
@@ -72,7 +73,7 @@ final class J2clStepWorkerShadeJavaSource extends J2clStepWorkerShade {
     @Override
     void postCopyAndShade(final J2clDependency artifact,
                           final J2clPath output,
-                          final J2clLinePrinter logger) throws Exception {
+                          final TreeLogger logger) throws Exception {
         copyJavascriptFiles(Lists.of(artifact.step(J2clStep.GWT_INCOMPATIBLE_STRIP).output(), artifact.step(J2clStep.UNPACK).output()),
                 output,
                 logger);
@@ -80,12 +81,12 @@ final class J2clStepWorkerShadeJavaSource extends J2clStepWorkerShade {
 
     private static void copyJavascriptFiles(final List<J2clPath> sourceRoots,
                                             final J2clPath output,
-                                            final J2clLinePrinter logger) throws IOException {
-        logger.printLine("Copying *.js");
+                                            final TreeLogger logger) throws IOException {
+        logger.line("Copying *.js");
         logger.indent();
         {
             for (final J2clPath sourceRoot : sourceRoots) {
-                logger.printLine(sourceRoot.toString());
+                logger.line(sourceRoot.toString());
                 logger.indent();
                 {
                     final Set<J2clPath> copy = sourceRoot.gatherFiles(J2clPath.JAVASCRIPT_FILES);

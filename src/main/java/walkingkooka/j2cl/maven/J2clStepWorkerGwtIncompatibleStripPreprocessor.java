@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import walkingkooka.collect.list.Lists;
+import walkingkooka.j2cl.maven.log.TreeLogger;
 
 /**
  * Compiles the java source to the target {@link J2clStepDirectory#output()}.
@@ -41,7 +42,7 @@ final class J2clStepWorkerGwtIncompatibleStripPreprocessor extends J2clStepWorke
     @Override
     J2clStepResult execute1(final J2clDependency artifact,
                             final J2clStepDirectory directory,
-                            final J2clLinePrinter logger) throws Exception {
+                            final TreeLogger logger) throws Exception {
         return GwtIncompatibleStripPreprocessor.execute(Lists.of(artifact.step(J2clStep.JAVAC_COMPILE).output(), artifact.step(J2clStep.UNPACK).output()),
                 directory.output().absentOrFail(),
                 logger);

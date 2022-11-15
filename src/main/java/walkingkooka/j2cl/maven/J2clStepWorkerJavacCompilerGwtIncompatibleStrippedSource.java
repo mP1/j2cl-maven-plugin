@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import walkingkooka.collect.list.Lists;
+import walkingkooka.j2cl.maven.log.TreeLogger;
 
 import java.util.List;
 
@@ -66,7 +67,7 @@ final class J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource extends J2c
     @Override
     void postCompile(final J2clDependency artifact,
                      final J2clStepDirectory directory,
-                     final J2clLinePrinter logger) {
+                     final TreeLogger logger) {
         // nop
     }
 }

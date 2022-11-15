@@ -29,11 +29,10 @@ import org.objectweb.asm.Opcodes;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
-import walkingkooka.j2cl.maven.log.J2clLogger;
+import walkingkooka.j2cl.maven.log.MavenLogger;
+import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.predicate.Predicates;
 import walkingkooka.text.CharSequences;
-import walkingkooka.text.Indentation;
-import walkingkooka.text.printer.IndentingPrinter;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,12 +78,12 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     static J2clDependency gather(final MavenProject project,
                                  final J2clMavenContext context) {
-        final IndentingPrinter logger = context.logger()
-                .printer(context.logger()::info)
-                .indenting(Indentation.SPACES2);
+        final TreeLogger logger = context.mavenLogger()
+                .output();
         final J2clDependency root;
         {
-            root = timeTask("Gather dependencies",
+            root = timeTask(
+                    "Gather dependencies",
                     () -> {
                         final J2clDependency r = new J2clDependency(J2clArtifactCoords.with(project.getArtifact()),
                                 project,
@@ -92,35 +91,54 @@ final class J2clDependency implements Comparable<J2clDependency> {
                                 context);
                         r.gatherDependencies(context.scope(), Predicates.never(), Function.identity());
                         return r;
-                    }, logger);
+                    },
+                    logger
+            );
 
-            timeTask("Reduce duplicate dependencies",
+            timeTask(
+                    "Reduce duplicate dependencies",
                     () -> {
                         root.reduce();
                         return null;
-                    }, logger);
+                    },
+                    logger
+            );
 
-            timeTask("Discover and mark ignored transitive dependencies",
+            timeTask(
+                    "Discover and mark ignored transitive dependencies",
                     () -> {
                         root.discoverAndMarkIgnoredTransitiveDependencies();
                         return null;
-                    }, logger);
+                    },
+                    logger
+            );
 
-            timeTask("Expand dependencies",
+            timeTask(
+                    "Expand dependencies",
                     () -> {
                         root.addTransitiveDependencies();
                         return null;
-                    }, logger);
-            timeTask("Add Bootstrap Classpath to all dependencies",
+                    },
+                    logger
+            );
+
+            timeTask(
+                    "Add Bootstrap Classpath to all dependencies",
                     () -> {
                         root.addBootstrapClasspath();
                         return null;
-                    }, logger);
-            timeTask("Verify dependencies maven coordinates",
+                    },
+                    logger
+            );
+
+            timeTask(
+                    "Verify dependencies maven coordinates",
                     () -> {
                         root.verify();
                         return null;
-                    }, logger);
+                    },
+                    logger
+            );
 
             makeDependenciesGetterReadOnly(root.dependencies);
         }
@@ -131,14 +149,14 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     private static <T> T timeTask(final String taskName,
                                   final Supplier<T> run,
-                                  final IndentingPrinter logger) {
+                                  final TreeLogger logger) {
         final T result;
 
         final Thread thread = Thread.currentThread();
         final String threadNameBackup = thread.getName();
         thread.setName(taskName);
         try {
-            logger.println(taskName);
+            logger.line(taskName);
             logger.indent();
             {
                 final long start = System.currentTimeMillis();
@@ -147,7 +165,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
                     result = run.get();
                 }
                 logger.outdent();
-                logger.println(taskName + " took " + (System.currentTimeMillis() - start) + " mills(s)");
+                logger.line(taskName + " took " + (System.currentTimeMillis() - start) + " mills(s)");
             }
             logger.outdent();
         } finally {
@@ -338,19 +356,22 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private void markIgnoredTransitiveDependencies(final Map<J2clDependency, Set<J2clDependency>> childToParents) {
-        final J2clLogger j2clLogger = this.context.logger();
+        final TreeLogger logger = this.context.mavenLogger()
+                .output();
 
-        final IndentingPrinter logger = j2clLogger
-                .printer(j2clLogger::info)
-                .indenting(Indentation.SPACES2);
-        logger.println("Marking ignored transitive dependencies");
+        logger.line("Marking ignored transitive dependencies");
         logger.indent();
         {
             childToParents.entrySet()
                     .forEach(e -> {
                         final Set<J2clDependency> parents = e.getValue();
                         if (null != parents) {
-                            e.getKey().markIgnoredTransitiveDependencies0(parents, childToParents, logger);
+                            e.getKey()
+                                    .markIgnoredTransitiveDependencies0(
+                                            parents,
+                                            childToParents,
+                                            logger
+                                    );
                         }
                     });
         }
@@ -370,12 +391,15 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     private void markIgnoredTransitiveDependencies0(final Set<J2clDependency> parents,
                                                     final Map<J2clDependency, Set<J2clDependency>> childToParents,
-                                                    final IndentingPrinter logger) {
+                                                    final TreeLogger logger) {
         final boolean nonIgnored = this.findNonIgnoredParentDependencies(parents, childToParents);
         if (false == nonIgnored) {
             this.ignored = true;
 
-            this.printParents(childToParents, logger);
+            this.printParents(
+                    childToParents,
+                    logger
+            );
         }
     }
 
@@ -405,14 +429,14 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * due to ignored dependencies.
      */
     private void printParents(final Map<J2clDependency, Set<J2clDependency>> childToParents,
-                              final IndentingPrinter logger) {
+                              final TreeLogger logger) {
         final Set<J2clDependency> parents = childToParents.get(this);
         if (null != parents) {
             logger.indent();
             {
                 parents.forEach(p -> {
                     if (p.isIgnored()) {
-                        logger.println(p.coords().toString());
+                        logger.line(p.coords().toString());
                         p.printParents(childToParents, logger);
                     }
                 });
@@ -573,39 +597,35 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * The printMetadata flag will be false when printing dependencies before a verify exception is thrown.
      */
     void print(final boolean printMetadata) {
-        final J2clLogger logger = this.context.logger();
-
-        final J2clLinePrinter printer = J2clLinePrinter.with(
-                logger.printer(logger::info),
-                null
-        );
-        printer.printLine("Dependencies");
-        printer.indent();
+        final TreeLogger logger = this.context.mavenLogger()
+                .output();
+        logger.line("Dependencies");
+        logger.indent();
         {
-            this.prettyPrintDependencies(printer);
+            this.prettyPrintDependencies(logger);
 
             if (printMetadata) {
-                this.printPlanMetadata(printer);
+                this.printPlanMetadata(logger);
             }
         }
-        printer.outdent();
-        printer.flush();
+        logger.outdent();
+        logger.flush();
     }
 
     /**
      * Pretty prints all dependencies with indentation.
      */
-    private void prettyPrintDependencies(final J2clLinePrinter printer) {
-        printer.printLine("Graph");
+    private void prettyPrintDependencies(final TreeLogger printer) {
+        printer.line("Graph");
         printer.indent();
         {
 
             for (final J2clDependency artifact : this.dependencies()) {
-                printer.printLine(artifact.toString());
+                printer.line(artifact.toString());
                 printer.indent();
                 {
                     for (final J2clDependency dependency : artifact.dependencies()) {
-                        printer.printLine(dependency.toString());
+                        printer.line(dependency.toString());
                     }
                 }
                 printer.outdent();
@@ -618,8 +638,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Prints all groupings of artifact in alphabetical order.
      */
-    private void printPlanMetadata(final J2clLinePrinter printer) {
-        printer.printLine("Metadata");
+    private void printPlanMetadata(final TreeLogger printer) {
+        printer.line("Metadata");
         printer.indent();
         {
             this.print("Annotation processor", J2clDependency::isAnnotationProcessor, printer);
@@ -640,11 +660,14 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     private void print(final String label,
                        final Predicate<J2clDependency> filter,
-                       final J2clLinePrinter printer) {
-        printer.printIndentedString(label, this.dependencies().stream()
-                .filter(filter)
-                .map(J2clDependency::toString)
-                .collect(Collectors.toCollection(Sets::sorted)));
+                       final TreeLogger printer) {
+        printer.strings(
+                label,
+                this.dependencies().stream()
+                        .filter(filter)
+                        .map(J2clDependency::toString)
+                        .collect(Collectors.toCollection(Sets::sorted))
+        );
     }
 
     // artifactFile......................................................................................................
@@ -1146,7 +1169,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Executes all steps in order for this artifact. This assumes that all dependencies have already completed successfully.
      */
     private J2clDependency job0() throws Exception {
-        final J2clLogger logger = this.context().logger();
+        final MavenLogger logger = this.context().mavenLogger();
         final String coords = this.coords().toString();
         final Instant start = Instant.now();
 

@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import walkingkooka.collect.list.Lists;
+import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.CharSequences;
 
 import java.nio.file.Files;
@@ -71,7 +72,7 @@ final class J2clStepWorkerJavacCompilerUnpackedSource extends J2clStepWorkerJava
     @Override
     void postCompile(final J2clDependency artifact,
                      final J2clStepDirectory directory,
-                     final J2clLinePrinter logger) throws Exception {
+                     final TreeLogger logger) throws Exception {
         final J2clMavenContext context = artifact.context();
         if (false == artifact.isDependency() && J2clSourcesKind.TEST == context.sourcesKind()) {
             this.junitProcessorPostFix(artifact, directory, logger);
@@ -80,17 +81,17 @@ final class J2clStepWorkerJavacCompilerUnpackedSource extends J2clStepWorkerJava
 
     private void junitProcessorPostFix(final J2clDependency artifact,
                                        final J2clStepDirectory directory,
-                                       final J2clLinePrinter logger) throws Exception {
+                                       final TreeLogger logger) throws Exception {
         logger.indent();
         {
-            logger.printLine("Junit processor post fixup");
+            logger.line("Junit processor post fixup");
             logger.indent();
             {
                 final J2clMavenContext context = artifact.context();
                 final J2clPath output = directory.output();
 
                 for (final String testSuiteClassName : context.entryPoints()) {
-                    logger.printLine(testSuiteClassName);
+                    logger.line(testSuiteClassName);
 
                     final String testClassName = extractTestClassName(testSuiteClassName);
                     final J2clPath generatedFilename = output.testAdapterSuiteGeneratedFilename(testClassName);

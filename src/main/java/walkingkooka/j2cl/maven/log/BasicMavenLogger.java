@@ -20,18 +20,18 @@ package walkingkooka.j2cl.maven.log;
 import org.apache.maven.plugin.logging.Log;
 
 /**
- * A {@link J2clLogger} that adapts to a Maven {@link Log}.
+ * A {@link MavenLogger} that adapts to a Maven {@link Log}.
  */
-final class J2clLoggerMavenLog implements J2clLogger {
+final class BasicMavenLogger implements MavenLogger {
 
     /**
-     * {@see J2clLoggerMavenLog}
+     * {@see BasicMavenLogger}
      */
-    static J2clLogger with(final Log log) {
-        return new J2clLoggerMavenLog(log);
+    static MavenLogger with(final Log log) {
+        return new BasicMavenLogger(log);
     }
 
-    private J2clLoggerMavenLog(final Log log) {
+    private BasicMavenLogger(final Log log) {
         this.log = log;
     }
 

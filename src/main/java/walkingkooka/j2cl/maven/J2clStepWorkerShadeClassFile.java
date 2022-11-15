@@ -17,6 +17,7 @@
 
 package walkingkooka.j2cl.maven;
 
+import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.javashader.JavaShaders;
 
 import java.nio.file.Path;
@@ -66,7 +67,7 @@ final class J2clStepWorkerShadeClassFile extends J2clStepWorkerShade {
     @Override
     void postCopyAndShade(final J2clDependency artifact,
                           final J2clPath output,
-                          final J2clLinePrinter logger) {
+                          final TreeLogger logger) {
         // do nothing
     }
 }

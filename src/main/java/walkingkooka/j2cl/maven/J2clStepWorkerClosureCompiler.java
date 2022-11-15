@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import walkingkooka.collect.set.Sets;
+import walkingkooka.j2cl.maven.log.TreeLogger;
 
 import java.util.Set;
 
@@ -40,7 +41,7 @@ final class J2clStepWorkerClosureCompiler extends J2clStepWorker2 {
     @Override
     J2clStepResult execute1(final J2clDependency artifact,
                             final J2clStepDirectory directory,
-                            final J2clLinePrinter logger) throws Exception {
+                            final TreeLogger logger) throws Exception {
         final J2clMavenContext context = artifact.context();
         final Set<J2clPath> sources = Sets.ordered();
 

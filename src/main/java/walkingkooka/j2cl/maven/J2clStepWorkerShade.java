@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import walkingkooka.collect.set.Sets;
+import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;
@@ -41,10 +42,9 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
         super();
     }
 
-    @Override
-    final J2clStepResult execute1(final J2clDependency artifact,
-                                  final J2clStepDirectory directory,
-                                  final J2clLinePrinter logger) throws Exception {
+    @Override final J2clStepResult execute1(final J2clDependency artifact,
+                                            final J2clStepDirectory directory,
+                                            final TreeLogger logger) throws Exception {
         J2clStepResult result = null;
 
         if (artifact.isIgnored()) {
@@ -52,7 +52,7 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
         } else {
             logger.indent();
             {
-                logger.printLine(J2clPath.SHADE_FILE);
+                logger.line(J2clPath.SHADE_FILE);
                 logger.indent();
                 {
                     final Map<String, String> shadeMappings = artifact.shadeMappings();
@@ -65,7 +65,7 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
                                 logger);
                         result = J2clStepResult.SUCCESS;
                     } else {
-                        logger.printLine("Not found");
+                        logger.line("Not found");
                         result = J2clStepResult.SKIPPED;
                     }
 
@@ -89,7 +89,7 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
                               final J2clPath root,
                               final Map<String, String> shade,
                               final J2clPath output,
-                              final J2clLinePrinter logger) throws Exception {
+                              final TreeLogger logger) throws Exception {
         final BiFunction<byte[], J2clPath, byte[]> contentShader = (content, path) -> shade(content, shade);
         final Predicate<Path> filter = this.fileExtensionFilter();
 
@@ -123,9 +123,9 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
 
                 // else files will be copied below
                 if (find.equals(replace)) {
-                    logger.printLine("Skipping shade package " + CharSequences.quote(find));
+                    logger.line("Skipping shade package " + CharSequences.quote(find));
                 } else {
-                    logger.printLine("Shading package from " + CharSequences.quote(find) + " to " + CharSequences.quote(replace));
+                    logger.line("Shading package from " + CharSequences.quote(find) + " to " + CharSequences.quote(replace));
                     logger.indent();
                     {
                         // copy and shade java source and copy other files to output.
@@ -139,7 +139,7 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
                 }
             }
 
-            logger.printLine("Copying other files");
+            logger.line("Copying other files");
             logger.indent();
             {
 
@@ -176,5 +176,5 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
      */
     abstract void postCopyAndShade(final J2clDependency artifact,
                                    final J2clPath output,
-                                   final J2clLinePrinter logger) throws Exception;
+                                   final TreeLogger logger) throws Exception;
 }

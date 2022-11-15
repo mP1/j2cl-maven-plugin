@@ -24,6 +24,7 @@ import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.support.ui.FluentWait;
 import walkingkooka.j2cl.maven.log.BrowserLogLevel;
+import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.CharSequences;
 
 import java.io.BufferedReader;
@@ -54,8 +55,8 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
     @Override
     J2clStepResult execute1(final J2clDependency artifact,
                             final J2clStepDirectory directory,
-                            final J2clLinePrinter logger) throws Exception {
-        logger.printLine("Junit Tests");
+                            final TreeLogger logger) throws Exception {
+        logger.line("Junit Tests");
         logger.indent();
         {
             final J2clMavenContext context = artifact.context();
@@ -74,18 +75,18 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
      * Loads the html file and replaces the script file with the closure compiled test file.
      */
     private J2clPath prepareJunitHostFileScriptPath(final J2clMavenContext context,
-                                                    final J2clLinePrinter logger) throws IOException {
+                                                    final TreeLogger logger) throws IOException {
         final J2clPath hostHtml;
 
-        logger.printLine("Prepare host file");
+        logger.line("Prepare host file");
         logger.indent();
         {
             final J2clPath file = context.initialScriptFilename();
             hostHtml = file.parent()
                     .append(CharSequences.subSequence(file.file().getName(), 0, -2) + "html");
 
-            logger.printIndented("Compiled tests file", file);
-            logger.printIndented("JUnit html host file", hostHtml);
+            logger.path("Compiled tests file", file);
+            logger.path("JUnit html host file", hostHtml);
 
             try (final InputStreamReader reader = new InputStreamReader(this.getClass().getResourceAsStream("junit.html"), DEFAULT_CHARSET)) {
                 final String junitHtml = CharStreams.toString(reader)
@@ -108,13 +109,13 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
                                   final List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers,
                                   final BrowserLogLevel logLevel,
                                   final int timeout,
-                                  final J2clLinePrinter logger) throws Exception {
+                                  final TreeLogger logger) throws Exception {
 
-        logger.printLine("Test " + startupHostFile);
+        logger.line("Test " + startupHostFile);
         logger.indent();
         {
             for (final J2clStepWorkerWebDriverUnitTestRunnerBrowser browser : browsers) {
-                logger.printLine(browser.name());
+                logger.line(browser.name());
                 logger.indent();
                 {
                     WebDriver driver = null;
@@ -141,12 +142,12 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
                         if (!isSuccess(driver)) {
                             throw new J2clException(testsFailedMessage(testReport));
                         }
-                        logger.printLine("All test(s) successful!");
+                        logger.line("All test(s) successful!");
                     } catch (final J2clException rethrow) {
                         throw rethrow;
                     } catch (final Exception cause) {
                         cause.printStackTrace();
-                        logger.printLine("Test(s) failed!");
+                        logger.line("Test(s) failed!");
                         throw cause;
                     } finally {
                         if (null != driver) {
@@ -205,12 +206,12 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
         return (T) ((JavascriptExecutor) driver).executeScript(script);
     }
 
-    private static void printTestReport(final J2clLinePrinter logger,
+    private static void printTestReport(final TreeLogger logger,
                                         final String testReport) {
         try {
-            logger.printLine("Test Report");
+            logger.line("Test Report");
             logger.indent();
-            logger.printLine(testReport);
+            logger.line(testReport);
         } finally {
             logger.outdent();
         }
@@ -221,18 +222,18 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
      */
     private static void printBrowserLogs(final WebDriver driver,
                                          final BrowserLogLevel logLevel,
-                                         final J2clLinePrinter logger) {
+                                         final TreeLogger logger) {
         switch (logLevel) {
             case NONE:
                 break;
             default: {
-                logger.printLine("Browser log");
+                logger.line("Browser log");
                 logger.indent();
                 {
                     for (final LogEntry entry : driver.manage()
                             .logs()
                             .get(LogType.BROWSER)) {
-                        logger.printLine(entry.getLevel() + " " + entry.getMessage());
+                        logger.line(entry.getLevel() + " " + entry.getMessage());
                     }
                 }
                 logger.outdent();

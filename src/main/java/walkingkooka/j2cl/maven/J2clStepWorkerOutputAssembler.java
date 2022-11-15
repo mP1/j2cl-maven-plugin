@@ -17,6 +17,8 @@
 
 package walkingkooka.j2cl.maven;
 
+import walkingkooka.j2cl.maven.log.TreeLogger;
+
 import java.util.Collection;
 
 /**
@@ -37,12 +39,12 @@ final class J2clStepWorkerOutputAssembler extends J2clStepWorker2 {
 
     @Override J2clStepResult execute1(final J2clDependency artifact,
                                       final J2clStepDirectory directory,
-                                      final J2clLinePrinter logger) throws Exception {
+                                      final TreeLogger logger) throws Exception {
         final J2clPath source = artifact.step(J2clStep.CLOSURE_COMPILER).output();
-        logger.printIndented("Source", source);
+        logger.path("Source", source);
 
         final J2clPath target = artifact.context().target();
-        logger.printIndented("Destination", target);
+        logger.path("Destination", target);
         target.createIfNecessary();
 
         final Collection<J2clPath> files = source.gatherFiles(J2clPath.ALL_FILES);
@@ -53,7 +55,7 @@ final class J2clStepWorkerOutputAssembler extends J2clStepWorker2 {
                 files,
                 J2clPath.COPY_FILE_CONTENT_VERBATIM,
                 logger).isEmpty()) {
-            logger.printLine("No files copied, transpile step likely failed with warnings that are actually errors.");
+            logger.line("No files copied, transpile step likely failed with warnings that are actually errors.");
             result = J2clStepResult.FAILED;
         } else {
             result = J2clStepResult.SUCCESS;

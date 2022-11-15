@@ -26,6 +26,7 @@ import com.google.javascript.jscomp.DependencyOptions;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.LineEnding;
 
 import java.io.ByteArrayOutputStream;
@@ -57,7 +58,7 @@ class ClosureCompiler {
                            final Set<J2clPath> sources,
                            final J2clPath output,
                            final String initialScriptFilename,
-                           final J2clLinePrinter logger) throws Exception {
+                           final TreeLogger logger) throws Exception {
         return compile0(compilationLevel,
                 defines,
                 entryPoints,
@@ -83,18 +84,18 @@ class ClosureCompiler {
                                     final Set<J2clPath> sources,
                                     final J2clPath output,
                                     final String initialScriptFilename,
-                                    final J2clLinePrinter logger) throws Exception {
+                                    final TreeLogger logger) throws Exception {
         int fileCount = 0;
 
         final J2clPath unitedSourceRoot = sourceMaps
                 .map(s -> output.append(s))
                 .orElse(output.parent().append("sources"));
 
-        logger.printLine(sources.size() + " Source(s)");
+        logger.line(sources.size() + " Source(s)");
         logger.indent();
         {
             for (final J2clPath sourceRoot : sources) {
-                logger.printLine(sourceRoot.toString());
+                logger.line(sourceRoot.toString());
                 logger.indent();
                 {
                     final Collection<J2clPath> copied;
@@ -117,17 +118,17 @@ class ClosureCompiler {
                 }
                 logger.outdent();
             }
-            logger.printEndOfList();
+            logger.endOfList();
         }
         logger.outdent();
 
         final boolean success;
         if (0 == fileCount) {
-            logger.printLine("No js files found, Closure compile aborted!");
+            logger.line("No js files found, Closure compile aborted!");
 
             success = false;
         } else {
-            logger.printIndented("Output", output);
+            logger.path("Output", output);
 
             final J2clPath initialScriptFilenamePath = output.append(initialScriptFilename);
 
@@ -142,7 +143,7 @@ class ClosureCompiler {
                     initialScriptFilenamePath,
                     logger);
 
-            logger.printLine("Closure compiler");
+            logger.line("Closure compiler");
             logger.indent();
             {
                 final String charset = Charset.defaultCharset().name();
@@ -166,14 +167,18 @@ class ClosureCompiler {
 
                     final int exitCode = runner.exitCode;
 
-                    logger.printLine("Exit code");
-                    logger.printIndentedLine("" + exitCode);
+                    logger.line("Exit code");
+                    logger.indentedLine("" + exitCode);
 
-                    logger.printLine("Messages");
+                    logger.line("Messages");
                     logger.indent();
                     {
                         logger.lineStart(); // https://github.com/mP1/j2cl-maven-plugin/issues/254
-                        logger.print(removeEmptyLines(new String(outputBytes.toByteArray(), charset))); // the captured output will already have line endings.
+                        logger.log(
+                                removeEmptyLines(
+                                        new String(outputBytes.toByteArray(), charset)
+                                )
+                        ); // the captured output will already have line endings.
                     }
                     logger.outdent();
 
@@ -197,10 +202,10 @@ class ClosureCompiler {
                                                                     final Optional<String> sourceMaps,
                                                                     final J2clPath sourceRoot,
                                                                     final J2clPath initialScriptFilename,
-                                                                    final J2clLinePrinter logger) throws IOException {
+                                                                    final TreeLogger logger) throws IOException {
         final Map<String, Collection<String>> arguments;
 
-        logger.printLine("Parameter(s)");
+        logger.line("Parameter(s)");
         logger.indent();
         {
             final Path initialScriptFilenamePath = initialScriptFilename.path();
@@ -246,25 +251,25 @@ class ClosureCompiler {
     }
 
     private static void logCommandLineArguments(final Map<String, Collection<String>> arguments,
-                                                final J2clLinePrinter logger) {
-        logger.printLine("Command line argument(s)");
+                                                final TreeLogger logger) {
+        logger.line("Command line argument(s)");
         logger.indent();
         {
             for (final Map.Entry<String, Collection<String>> keyAndValue : arguments.entrySet()) {
                 logger.indent();
                 {
                     final String key = keyAndValue.getKey();
-                    logger.printLine(key);
+                    logger.line(key);
                     logger.indent();
 
                     for (final String value : keyAndValue.getValue()) {
-                        logger.printLine(value);
+                        logger.line(value);
                     }
                     logger.outdent();
                 }
                 logger.outdent();
             }
-            logger.printEndOfList();
+            logger.endOfList();
         }
         logger.outdent();
     }

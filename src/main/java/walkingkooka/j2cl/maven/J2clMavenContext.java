@@ -24,7 +24,8 @@ import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.log.BrowserLogLevel;
-import walkingkooka.j2cl.maven.log.J2clLogger;
+import walkingkooka.j2cl.maven.log.MavenLogger;
+import walkingkooka.j2cl.maven.log.TreeLogger;
 
 import java.util.Collection;
 import java.util.List;
@@ -66,7 +67,7 @@ abstract class J2clMavenContext implements Context {
                      final Optional<String> sourceMaps,
                      final J2clMavenMiddleware middleware,
                      final ExecutorService executor,
-                     final J2clLogger logger) {
+                     final MavenLogger logger) {
         super();
 
         this.base = base;
@@ -395,18 +396,18 @@ abstract class J2clMavenContext implements Context {
      * Loops over all {@link #jobs} submitting a job for each that has no required artifacts aka the value is an empty {@link Set}.
      */
     private int trySubmitJobs() {
-        final J2clLogger j2clLogger = this.logger();
-        final J2clLinePrinter logger = J2clLinePrinter.with(j2clLogger.printer(j2clLogger::info), null);
+        final TreeLogger logger = this.mavenLogger()
+                .output();
 
         final List<Callable<J2clDependency>> submit = Lists.array();
 
         this.executeWithLock(() -> {
             final String message;
 
-            logger.printLine("Submitting jobs");
+            logger.line("Submitting jobs");
             logger.indent();
             {
-                logger.printLine("Queue");
+                logger.line("Queue");
                 logger.indent();
 
                 //for readability sort jobs alphabetically as they will be printed and possibly submitted.....................
@@ -417,18 +418,18 @@ abstract class J2clMavenContext implements Context {
                     final J2clDependency artifact = artifactAndDependencies.getKey();
                     final Set<J2clDependency> required = artifactAndDependencies.getValue();
 
-                    logger.printLine(artifact.toString());
+                    logger.line(artifact.toString());
                     logger.indent();
                     {
                         if (required.isEmpty()) {
                             this.jobs.remove(artifact);
                             submit.add(artifact.job());
-                            logger.printLine("Queued " + artifact + " for submission " + submit.size());
+                            logger.line("Queued " + artifact + " for submission " + submit.size());
                         } else {
-                            logger.printLine("Waiting for " + required.size() + " dependencies");
+                            logger.line("Waiting for " + required.size() + " dependencies");
                             logger.indent();
 
-                            required.forEach(r -> logger.printLine(r.toString()));
+                            required.forEach(r -> logger.line(r.toString()));
 
                             logger.outdent();
                         }
@@ -448,7 +449,7 @@ abstract class J2clMavenContext implements Context {
             }
             logger.outdent();
 
-            logger.printLine(message);
+            logger.line(message);
             logger.flush();
 
             submit.forEach(this::submitTask);
@@ -533,12 +534,12 @@ abstract class J2clMavenContext implements Context {
     final void cancel(final Throwable cause) {
         this.cause.compareAndSet(null, cause);
 
-        final J2clLogger logger = this.logger();
+        final MavenLogger logger = this.mavenLogger();
         logger.warn("Killing all running tasks");
 
         // TODO might be able to give Callable#toString and hope that is used by Runnable returned.
         this.executor.shutdownNow()
-                .forEach(task -> logger.warn("" + J2clLogger.INDENTATION + task));
+                .forEach(task -> logger.warn("" + MavenLogger.INDENTATION + task));
     }
 
     private final ExecutorService executor;
@@ -548,13 +549,13 @@ abstract class J2clMavenContext implements Context {
     // logger...........................................................................................................
 
     /**
-     * Returns a {@link J2clLogger}
+     * Returns a {@link MavenLogger}
      */
-    final J2clLogger logger() {
+    final MavenLogger mavenLogger() {
         return this.logger;
     }
 
-    private final J2clLogger logger;
+    private final MavenLogger logger;
 
     // toString.........................................................................................................
 

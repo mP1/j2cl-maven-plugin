@@ -18,6 +18,8 @@
 package walkingkooka.j2cl.maven;
 
 import walkingkooka.collect.list.Lists;
+import walkingkooka.j2cl.maven.log.TreeFormat;
+import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.util.SystemProperty;
 
 import javax.tools.JavaCompiler;
@@ -40,9 +42,9 @@ final class JavacCompiler {
                            final Set<J2clPath> classpath,
                            final Set<J2clPath> newSourceFiles, // files being compiled
                            final J2clPath newClassFilesOutput,
-                           final Set<String>  javaCompilerArguments,
+                           final Set<String> javaCompilerArguments,
                            final boolean runAnnotationProcessors,
-                           final J2clLinePrinter logger) throws Exception {
+                           final TreeLogger logger) throws Exception {
         if (bootstrap.isEmpty()) {
             throw new IllegalArgumentException("bootstrap must not be empty");
         }
@@ -65,18 +67,18 @@ final class JavacCompiler {
 
         final boolean success;
         {
-            logger.printLine("Parameters");
+            logger.line("Parameters");
             logger.indent();
             {
-                logger.printIndented("Bootstrap", bootstrap, J2clLinePrinterFormat.FLAT);
-                logger.printIndented("Classpath(s)", classpath, J2clLinePrinterFormat.FLAT);
-                logger.printIndented("New java file(s)", newSourceFiles, J2clLinePrinterFormat.TREE); // order should not be important so tree
-                logger.printIndented("Output", newClassFilesOutput);
-                logger.printIndentedString("Option(s)", options);
+                logger.paths("Bootstrap", bootstrap, TreeFormat.FLAT);
+                logger.paths("Classpath(s)", classpath, TreeFormat.FLAT);
+                logger.paths("New java file(s)", newSourceFiles, TreeFormat.TREE); // order should not be important so tree
+                logger.path("Output", newClassFilesOutput);
+                logger.strings("Option(s)", options);
             }
             logger.outdent();
 
-            logger.printLine("Messages");
+            logger.line("Messages");
             logger.emptyLine();
             logger.indent();
             {
@@ -88,13 +90,13 @@ final class JavacCompiler {
 
                 try(final Writer output = output(logger)) {
                     success = compiler.getTask(output,
-                            fileManager,
-                            null,
-                            options,
-                            null,
-                            fileManager.getJavaFileObjectsFromFiles(J2clPath.toFiles(newSourceFiles)))
+                                    fileManager,
+                                    null,
+                                    options,
+                                    null,
+                                    fileManager.getJavaFileObjectsFromFiles(J2clPath.toFiles(newSourceFiles)))
                             .call();
-                    logger.printEndOfList();
+                    logger.endOfList();
                 }
             }
             logger.outdent();
@@ -121,16 +123,18 @@ final class JavacCompiler {
     }
 
     /**
-     * A {@link Writer} which will receive javac output and prints each line to the given {@link J2clLinePrinter}.
+     * A {@link Writer} which will receive javac output and prints each line to the given {@link TreeLogger}.
      */
-    private static Writer output(final J2clLinePrinter logger) {
+    private static Writer output(final TreeLogger logger) {
         return new Writer() {
             @SuppressWarnings("NullableProblems")
             @Override
             public void write(final char[] text,
                               final int offset,
                               final int length) {
-                logger.print(new String(text, offset, length));
+                logger.log(
+                        new String(text, offset, length)
+                );
             }
 
             @Override

@@ -17,6 +17,9 @@
 
 package walkingkooka.j2cl.maven;
 
+import walkingkooka.j2cl.maven.log.TreeFormat;
+import walkingkooka.j2cl.maven.log.TreeLogger;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -44,11 +47,11 @@ final class J2clStepWorkerUnpack extends J2clStepWorker2 {
     @Override
     J2clStepResult execute1(final J2clDependency artifact,
                             final J2clStepDirectory directory,
-                            final J2clLinePrinter logger) throws Exception {
+                            final TreeLogger logger) throws Exception {
         J2clStepResult result;
 
         final J2clPath dest = directory.output().absentOrFail();
-        logger.printIndented("Destination", dest);
+        logger.path("Destination", dest);
         {
             boolean filesFound = this.extractSourceRoots(artifact, dest, logger);
 
@@ -57,7 +60,7 @@ final class J2clStepWorkerUnpack extends J2clStepWorker2 {
                 final Optional<J2clPath> archive = artifact.artifactFile();
                 if (archive.isPresent()) {
                     final J2clPath path = archive.get();
-                    logger.printIndented("Archive", path);
+                    logger.path("Archive", path);
                     logger.indent();
                     {
                         filesFound = archive.get()
@@ -71,10 +74,10 @@ final class J2clStepWorkerUnpack extends J2clStepWorker2 {
             }
 
             if(filesFound) {
-                logger.printLine("Source files found, transpiling will happen");
+                logger.line("Source files found, transpiling will happen");
                 result = J2clStepResult.SUCCESS;
             } else {
-                logger.printLine("No source files found, transpiling will not be attempted");
+                logger.line("No source files found, transpiling will not be attempted");
                 result = J2clStepResult.ABORTED;
             }
         }
@@ -84,22 +87,22 @@ final class J2clStepWorkerUnpack extends J2clStepWorker2 {
 
     private boolean extractSourceRoots(final J2clDependency artifact,
                                        final J2clPath dest,
-                                       final J2clLinePrinter logger) throws Exception {
+                                       final TreeLogger logger) throws Exception {
         boolean filesFound = false;
 
         final List<J2clPath> sourceRoots = artifact.sourcesRoot();
-        logger.printIndented("Source root(s)", sourceRoots, J2clLinePrinterFormat.TREE);
+        logger.paths("Source root(s)", sourceRoots, TreeFormat.TREE);
 
-        logger.printLine("Unpacking...");
+        logger.line("Unpacking...");
         logger.indent();
         {
 
             for (final J2clPath source : sourceRoots) {
-                logger.printLine(source.toString());
+                logger.line(source.toString());
                 logger.indent();
                 {
                     if (source.isTestAnnotation()) {
-                        logger.printLine("// test annotations source skipped");
+                        logger.line("// test annotations source skipped");
                         continue;
                     }
 
@@ -118,7 +121,7 @@ final class J2clStepWorkerUnpack extends J2clStepWorker2 {
             }
         }
         logger.outdent();
-        logger.printEndOfList();
+        logger.endOfList();
 
         return filesFound;
     }

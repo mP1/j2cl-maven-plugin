@@ -25,7 +25,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.log.BrowserLogLevel;
-import walkingkooka.j2cl.maven.log.J2clLogger;
+import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;
@@ -54,8 +54,10 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
     public void execute() throws MojoExecutionException {
         if (false == this.skipTests()) {
             try {
-                final J2clLogger logger = this.logger();
-                this.executeTests(J2clLinePrinter.with(logger.printer(logger::info), null));
+                this.executeTests(
+                        this.logger()
+                                .output()
+                );
             } catch (final MojoExecutionException cause) {
                 throw cause;
             } catch (final Exception cause) {
@@ -67,14 +69,14 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
     /**
      * Finds all test classes, strips, compiles, transpiles and closure compiles for each and every test.
      */
-    private void executeTests(final J2clLinePrinter logger) throws Exception {
+    private void executeTests(final TreeLogger logger) throws Exception {
         final List<String> tests = this.findTestClassNames(logger);
 
-        logger.printLine("Tests");
+        logger.line("Tests");
         logger.indent();
         {
             for (final String test : tests) {
-                logger.printLine(test);
+                logger.line(test);
                 logger.indent();
                 {
                     final J2clMojoTestMavenContext context = this.context(test);
@@ -122,16 +124,16 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
     /**
      * Loops over all test compile source roots, using <tests> patterns to match files returning the class names.
      */
-    private List<String> findTestClassNames(final J2clLinePrinter logger) throws IOException {
+    private List<String> findTestClassNames(final TreeLogger logger) throws IOException {
         final List<String> allTests = Lists.array();
 
-        logger.print("Test sources");
+        logger.log("Test sources");
         logger.indent();
         {
             for (final String testSourceRoot : this.project().getTestCompileSourceRoots()) {
                 final Path testSourceRootPath = Paths.get(testSourceRoot);
 
-                logger.printLine(testSourceRootPath.toAbsolutePath().toString());
+                logger.line(testSourceRootPath.toAbsolutePath().toString());
                 logger.indent();
                 {
                     final Set<String> tests = Sets.sorted();
@@ -149,7 +151,7 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
                             return FileVisitResult.CONTINUE;
                         }
                     });
-                    tests.forEach(logger::printLine);
+                    tests.forEach(logger::line);
 
                     allTests.addAll(tests);
                 }

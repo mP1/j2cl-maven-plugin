@@ -23,6 +23,8 @@ import com.google.j2cl.tools.gwtincompatible.GwtIncompatibleStripper;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.j2cl.maven.log.TreeFormat;
+import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;
@@ -51,7 +53,7 @@ final class GwtIncompatibleStripPreprocessor {
 
     static J2clStepResult execute(final List<J2clPath> sourceRoots,
                                   final J2clPath output,
-                                  final J2clLinePrinter logger) throws IOException {
+                                  final TreeLogger logger) throws IOException {
         output.exists()
                 .orElseThrow(() -> new IllegalArgumentException("Output not a directory or does not exist: " + CharSequences.quote(output.toString())));
 
@@ -66,10 +68,10 @@ final class GwtIncompatibleStripPreprocessor {
             result = processStripAnnotationsFiles(javaFiles, output, logger);
 
             copyJavascriptFiles(sourceRoots, output, logger);
-            logger.printIndented("Output file(s)", output.gatherFiles(J2clPath.ALL_FILES), J2clLinePrinterFormat.TREE);
+            logger.paths("Output file(s)", output.gatherFiles(J2clPath.ALL_FILES), TreeFormat.TREE);
 
         } else {
-            logger.printIndentedLine("No files found");
+            logger.indentedLine("No files found");
 
             output.removeAll(); // dont want to leave empty output directory when its empty.
             result = J2clStepResult.ABORTED;
@@ -80,10 +82,10 @@ final class GwtIncompatibleStripPreprocessor {
 
     private static List<FileInfo> prepareJavaFiles(final List<J2clPath> sourceRoots,
                                                    final J2clPath output,
-                                                   final J2clLinePrinter logger) throws IOException {
+                                                   final TreeLogger logger) throws IOException {
         final List<FileInfo> javaFiles = Lists.array();
 
-        logger.printLine("Preparing java files");
+        logger.line("Preparing java files");
         logger.indent();
         {
             logger.indent();
@@ -101,7 +103,7 @@ final class GwtIncompatibleStripPreprocessor {
                 }
             }
             logger.outdent();
-            logger.printLine(javaFiles.size() + " file(s)");
+            logger.line(javaFiles.size() + " file(s)");
         }
         logger.outdent();
 
@@ -115,25 +117,25 @@ final class GwtIncompatibleStripPreprocessor {
      */
     private static J2clStepResult processStripAnnotationsFiles(final List<FileInfo> javaFilesInput,
                                                                final J2clPath output,
-                                                               final J2clLinePrinter logger) {
+                                                               final TreeLogger logger) {
         J2clStepResult result;
 
-        logger.printLine("GwtIncompatibleStripper");
+        logger.line("GwtIncompatibleStripper");
         {
             logger.indent();
             {
-                logger.printIndentedFileInfo("Source(s)", javaFilesInput, J2clLinePrinterFormat.TREE);
-                logger.printIndented("Output", output);
+                logger.fileInfos("Source(s)", javaFilesInput, TreeFormat.TREE);
+                logger.path("Output", output);
 
                 final Problems problems = new Problems();
                 GwtIncompatibleStripper.preprocessFiles(javaFilesInput,
                         output.path(),
                         problems);
-                logger.printIndentedString("Message(s)", problems.getMessages());
+                logger.strings("Message(s)", problems.getMessages());
 
                 final List<String> errors = problems.getErrors();
-                logger.printIndentedString("Error(s)", errors);
-                logger.printIndentedString("Warning(s)", problems.getWarnings());
+                logger.strings("Error(s)", errors);
+                logger.strings("Warning(s)", problems.getWarnings());
 
                 result = errors.isEmpty() ?
                         J2clStepResult.SUCCESS :
@@ -147,8 +149,8 @@ final class GwtIncompatibleStripPreprocessor {
 
     private static void copyJavascriptFiles(final List<J2clPath> sourceRoots,
                                             final J2clPath output,
-                                            final J2clLinePrinter logger) throws IOException {
-        logger.printLine("Copy *.js from source root(s) to output");
+                                            final TreeLogger logger) throws IOException {
+        logger.line("Copy *.js from source root(s) to output");
         logger.indent();
         {
             for (final J2clPath sourceRoot : sourceRoots) {
