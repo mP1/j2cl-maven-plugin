@@ -19,6 +19,7 @@ package walkingkooka.j2cl.maven;
 
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
+import walkingkooka.collect.list.Lists;
 import walkingkooka.j2cl.maven.log.BrowserLogLevel;
 import walkingkooka.j2cl.maven.log.MavenLogger;
 
@@ -158,4 +159,24 @@ final class J2cllMojoBuildMavenContext extends J2clMavenContext {
     int testTimeout() {
         throw new UnsupportedOperationException();
     }
+
+    // directoryName....................................................................................................
+
+    @Override
+    String directoryName(final J2clStep step) {
+        return step.directoryName(STEPS.indexOf(step));
+    }
+
+    private final List<J2clStep> STEPS = Lists.of(
+            J2clStep.HASH,
+            J2clStep.UNPACK,
+            J2clStep.JAVAC_COMPILE,
+            J2clStep.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE,
+            J2clStep.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE,
+            J2clStep.SHADE_JAVA_SOURCE,
+            J2clStep.SHADE_CLASS_FILES,
+            J2clStep.TRANSPILE_JAVA_TO_JAVASCRIPT,
+            J2clStep.CLOSURE_COMPILE,
+            J2clStep.OUTPUT_ASSEMBLE
+    );
 }

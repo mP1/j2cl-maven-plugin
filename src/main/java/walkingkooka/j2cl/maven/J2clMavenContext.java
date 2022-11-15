@@ -190,12 +190,17 @@ abstract class J2clMavenContext implements Context {
     }
 
     private final LanguageMode languageOut;
-    
+
     final Optional<String> sourceMaps() {
         return this.sourceMaps;
     }
-    
+
     private final Optional<String> sourceMaps;
+
+    // directoryName....................................................................................................
+
+    abstract String directoryName(final J2clStep step);
+
     // browserLogLevel..................................................................................................
 
     abstract BrowserLogLevel browserLogLevel();
