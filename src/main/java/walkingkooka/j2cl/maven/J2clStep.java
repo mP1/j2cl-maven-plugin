@@ -135,14 +135,14 @@ enum J2clStep {
 
         @Override
         Optional<J2clStep> next(final J2clMavenContext context) {
-            return Optional.of(COMPILE_GWT_INCOMPATIBLE_STRIPPED);
+            return Optional.of(JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED);
         }
     },
 
     /**
      * Compiles /gwt-incompatible-strip along with dependencies on the classpath into /gwt-incompatible-strip-compiled
      */
-    COMPILE_GWT_INCOMPATIBLE_STRIPPED {
+    JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED {
         @Override
         String directoryName() {
             return "4-javac-gwt-incompatible-stripped-source";

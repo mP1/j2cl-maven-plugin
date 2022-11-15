@@ -45,7 +45,7 @@ final class J2clStepWorkerShadeClassFile extends J2clStepWorkerShade {
 
     @Override
     J2clStep step() {
-        return J2clStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED;
+        return J2clStep.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED;
     }
 
     @Override

@@ -48,7 +48,7 @@ final class J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource extends J2c
 
     @Override
     List<J2clStep> compiledStep() {
-        return Lists.of(J2clStep.SHADE_CLASS_FILES, J2clStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED);
+        return Lists.of(J2clStep.SHADE_CLASS_FILES, J2clStep.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED);
     }
 
     @Override
