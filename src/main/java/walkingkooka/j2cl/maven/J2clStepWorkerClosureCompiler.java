@@ -85,7 +85,8 @@ final class J2clStepWorkerClosureCompiler extends J2clStepWorker2 {
             }
         }
 
-        return ClosureCompiler.compile(context.level(),
+        return ClosureCompiler.compile(
+                context.level(),
                 context.defines(),
                 context.entryPoints(),
                 context.externs(),
@@ -96,14 +97,16 @@ final class J2clStepWorkerClosureCompiler extends J2clStepWorker2 {
                 sources,
                 directory.output().createIfNecessary(),
                 context.initialScriptFilename().filename(),
-                logger) ?
+                context,
+                logger
+        ) ?
                 J2clStepResult.SUCCESS :
                 J2clStepResult.FAILED;
     }
 
     private void addSources(final J2clDependency artifact,
                             final Set<J2clPath> sources) {
-        final J2clPath transpiled = artifact.step(J2clStep.TRANSPILE).output();
+        final J2clPath transpiled = artifact.step(J2clStep.TRANSPILE_JAVA_TO_JAVASCRIPT).output();
         if (transpiled.exists().isPresent()) {
             sources.add(transpiled);
         }

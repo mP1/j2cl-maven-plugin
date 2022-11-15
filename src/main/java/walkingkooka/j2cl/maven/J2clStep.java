@@ -44,11 +44,6 @@ enum J2clStep {
      */
     HASH {
         @Override
-        String directoryName() {
-            return "0-hash";
-        }
-
-        @Override
         J2clStepWorker execute1() {
             return J2clStepWorker.HASH;
         }
@@ -68,11 +63,6 @@ enum J2clStep {
      * For archives (dependencies) unpack the accompanying sources.
      */
     UNPACK {
-        @Override
-        String directoryName() {
-            return "1-unpack";
-        }
-
         @Override
         J2clStepWorker execute1() {
             return J2clStepWorker.UNPACK;
@@ -94,11 +84,6 @@ enum J2clStep {
      */
     JAVAC_COMPILE {
         @Override
-        String directoryName() {
-            return "2-javac-compile";
-        }
-
-        @Override
         J2clStepWorker execute1() {
             return J2clStepWorker.COMPILE_SOURCE;
         }
@@ -110,19 +95,14 @@ enum J2clStep {
 
         @Override
         Optional<J2clStep> next(final J2clMavenContext context) {
-            return Optional.of(GWT_INCOMPATIBLE_STRIP);
+            return Optional.of(GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE);
         }
     },
 
     /**
      * Calls the @GwtIncompatible stripper on /compile saving into /gwt-incompatible-strip
      */
-    GWT_INCOMPATIBLE_STRIP {
-        @Override
-        String directoryName() {
-            return "3-gwt-incompatible-stripped-source";
-        }
-
+    GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE {
         @Override
         J2clStepWorker execute1() {
             return J2clStepWorker.STRIP_GWT_INCOMPAT;
@@ -135,19 +115,14 @@ enum J2clStep {
 
         @Override
         Optional<J2clStep> next(final J2clMavenContext context) {
-            return Optional.of(JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED);
+            return Optional.of(JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE);
         }
     },
 
     /**
      * Compiles /gwt-incompatible-strip along with dependencies on the classpath into /gwt-incompatible-strip-compiled
      */
-    JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED {
-        @Override
-        String directoryName() {
-            return "4-javac-gwt-incompatible-stripped-source";
-        }
-
+    JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE {
         @Override
         J2clStepWorker execute1() {
             return J2clStepWorker.COMPILE_STRIP_GWT_INCOMPAT;
@@ -170,11 +145,6 @@ enum J2clStep {
      */
     SHADE_JAVA_SOURCE {
         @Override
-        String directoryName() {
-            return "5-shaded-java-source";
-        }
-
-        @Override
         J2clStepWorker execute1() {
             return J2clStepWorker.SHADE_JAVA_SOURCE;
         }
@@ -196,11 +166,6 @@ enum J2clStep {
      */
     SHADE_CLASS_FILES {
         @Override
-        String directoryName() {
-            return "6-shaded-class-files";
-        }
-
-        @Override
         J2clStepWorker execute1() {
             return J2clStepWorker.SHADE_CLASS_FILE;
         }
@@ -212,19 +177,14 @@ enum J2clStep {
 
         @Override
         Optional<J2clStep> next(final J2clMavenContext context) {
-            return Optional.of(TRANSPILE);
+            return Optional.of(TRANSPILE_JAVA_TO_JAVASCRIPT);
         }
     },
 
     /**
      * Calls the transpiler on the output of previous steps.
      */
-    TRANSPILE {
-        @Override
-        String directoryName() {
-            return "7-transpiled-java-to-javascript";
-        }
-
+    TRANSPILE_JAVA_TO_JAVASCRIPT {
         @Override
         J2clStepWorker execute1() {
             return J2clStepWorker.TRANSPILER;
@@ -237,18 +197,13 @@ enum J2clStep {
 
         @Override
         Optional<J2clStep> next(final J2clMavenContext context) {
-            return Optional.of(CLOSURE_COMPILER);
+            return Optional.of(CLOSURE_COMPILE);
         }
     },
     /**
      * Calls the closure compiler on the /transpiler along with other "files" into /closure-compiled.
      */
-    CLOSURE_COMPILER {
-        @Override
-        String directoryName() {
-            return "8-closure-compile";
-        }
-
+    CLOSURE_COMPILE {
         @Override
         J2clStepWorker execute1() {
             return J2clStepWorker.CLOSURE;
@@ -263,20 +218,15 @@ enum J2clStep {
         Optional<J2clStep> next(final J2clMavenContext context) {
             return Optional.of(
                     J2clClasspathScope.TEST == context.scope() ?
-                            JUNIT_WEBDRIVER_TESTS :
-                            OUTPUT_ASSEMBLER
+                            JUNIT_TESTS :
+                            OUTPUT_ASSEMBLE
             );
         }
     },
     /**
      * Assembles the output and copies files to that place.
      */
-    OUTPUT_ASSEMBLER {
-        @Override
-        String directoryName() {
-            return "9-output-assembler";
-        }
-
+    OUTPUT_ASSEMBLE {
         @Override
         J2clStepWorker execute1() {
             return J2clStepWorker.OUTPUT_ASSEMBLER;
@@ -295,12 +245,7 @@ enum J2clStep {
     /**
      * Uses webdriver to execute a junit test.
      */
-    JUNIT_WEBDRIVER_TESTS {
-        @Override
-        String directoryName() {
-            return "9-junit-tests";
-        }
-
+    JUNIT_TESTS {
         @Override
         J2clStepWorker execute1() {
             return J2clStepWorker.JUNIT_WEBDRIVER_TESTS;
@@ -318,13 +263,6 @@ enum J2clStep {
     };
 
     public final static J2clStep FIRST = HASH;
-
-    // step directory naming............................................................................................
-
-    /**
-     * Returns the actual sub directory name on disk of a directory where all files for a particular step are created.
-     */
-    abstract String directoryName();
 
     // work methods.....................................................................................................
 
@@ -432,6 +370,14 @@ enum J2clStep {
                 start,
                 Instant.now()
         );
+    }
+
+    final String directoryName(final int number) {
+        return number +
+                "-" +
+                this.name()
+                        .toLowerCase()
+                        .replace('_', '-');
     }
 
     /**

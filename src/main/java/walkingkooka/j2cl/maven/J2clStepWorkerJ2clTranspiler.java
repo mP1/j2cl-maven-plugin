@@ -59,7 +59,7 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
 
     private J2clPath sourceRoot(final J2clDependency artifact) {
         final J2clStep first = J2clStep.SHADE_JAVA_SOURCE;
-        final J2clStep second = J2clStep.GWT_INCOMPATIBLE_STRIP;
+        final J2clStep second = J2clStep.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE;
         final J2clStep third = J2clStep.UNPACK;
 
         final J2clPath sourceRoot;
@@ -119,7 +119,7 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
                     classpath.add(shadeClassFiles.get());
                     continue;
                 }
-                final Optional<J2clPath> compileGwtIncompatibleStripped = output(dependency, J2clStep.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED);
+                final Optional<J2clPath> compileGwtIncompatibleStripped = output(dependency, J2clStep.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE);
                 compileGwtIncompatibleStripped.map(classpath::add);
             }
 

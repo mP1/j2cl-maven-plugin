@@ -58,8 +58,10 @@ class ClosureCompiler {
                            final Set<J2clPath> sources,
                            final J2clPath output,
                            final String initialScriptFilename,
+                           final J2clMavenContext context,
                            final TreeLogger logger) throws Exception {
-        return compile0(compilationLevel,
+        return compile0(
+                compilationLevel,
                 defines,
                 entryPoints,
                 new TreeSet<>(externs),
@@ -70,7 +72,9 @@ class ClosureCompiler {
                 sources,
                 output,
                 initialScriptFilename,
-                logger);
+                context,
+                logger
+        );
     }
 
     private static boolean compile0(final CompilationLevel compilationLevel,
@@ -84,6 +88,7 @@ class ClosureCompiler {
                                     final Set<J2clPath> sources,
                                     final J2clPath output,
                                     final String initialScriptFilename,
+                                    final J2clMavenContext context,
                                     final TreeLogger logger) throws Exception {
         int fileCount = 0;
 
@@ -105,7 +110,7 @@ class ClosureCompiler {
                                 logger);
                     } else {
                         // if unpack/output dont want to copy java source.
-                        final Predicate<Path> filter = sourceRoot.isUnpackOutput() ?
+                        final Predicate<Path> filter = sourceRoot.isUnpackOutput(context) ?
                                 J2clPath.ALL_FILES_EXCEPT_JAVA :
                                 J2clPath.ALL_FILES;
 

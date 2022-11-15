@@ -324,9 +324,13 @@ public final class J2clPath implements Comparable<J2clPath> {
     /**
      * Only returns true if this path is the output directory of an UNPACK.
      */
-    boolean isUnpackOutput() {
+    boolean isUnpackOutput(final J2clMavenContext context) {
         return this.filename().equals(OUTPUT) &&
-                this.path().getParent().getFileName().toString().equals(J2clStep.UNPACK.directoryName());
+                this.path()
+                        .getParent()
+                        .getFileName()
+                        .toString()
+                        .equals(context.directoryName(J2clStep.UNPACK));
     }
 
     private final static String OUTPUT = "output";

@@ -1204,7 +1204,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
             throw new IllegalStateException("Hash already set for this artifact: " + CharSequences.quote(create.toString()));
         }
 
-        create.append(J2clStep.HASH.directoryName()).createIfNecessary();
+        create.append(this.context.directoryName(J2clStep.HASH))
+                .createIfNecessary();
         return this;
     }
 
@@ -1225,7 +1226,12 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Returns a compile step directory, creating it if necessary.
      */
     J2clStepDirectory step(final J2clStep step) {
-        return J2clStepDirectory.with(Paths.get(this.directory().toString(), step.directoryName()));
+        return J2clStepDirectory.with(
+                Paths.get(
+                        this.directory().toString(),
+                        this.context.directoryName(step)
+                )
+        );
     }
 
     /**

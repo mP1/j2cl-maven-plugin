@@ -133,7 +133,7 @@ final class J2clMojoTestMavenContext extends J2clMavenContext {
     @Override
     J2clPath initialScriptFilename() {
         return this.project.directory()
-                .append(J2clStep.CLOSURE_COMPILER.directoryName())
+                .append(this.directoryName(J2clStep.CLOSURE_COMPILE))
                 .output()
                 .append(this.testClassName + ".js");
     }
@@ -179,4 +179,24 @@ final class J2clMojoTestMavenContext extends J2clMavenContext {
     }
 
     int testTimeout;
+
+    // directoryName....................................................................................................
+
+    @Override
+    String directoryName(final J2clStep step) {
+        return step.directoryName(STEPS.indexOf(step));
+    }
+
+    private final List<J2clStep> STEPS = Lists.of(
+            J2clStep.HASH,
+            J2clStep.UNPACK,
+            J2clStep.JAVAC_COMPILE,
+            J2clStep.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE,
+            J2clStep.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE,
+            J2clStep.SHADE_JAVA_SOURCE,
+            J2clStep.SHADE_CLASS_FILES,
+            J2clStep.TRANSPILE_JAVA_TO_JAVASCRIPT,
+            J2clStep.CLOSURE_COMPILE,
+            J2clStep.JUNIT_TESTS
+    );
 }
