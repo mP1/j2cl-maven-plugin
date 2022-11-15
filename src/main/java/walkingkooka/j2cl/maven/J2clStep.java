@@ -346,8 +346,10 @@ enum J2clStep {
         };
 
         // TODO would be nice to detect log level of Maven logger
-        final J2clLinePrinter logger = J2clLinePrinter.with(j2clLogger.printer(j2clLogger::info).printedLine(lineHandler),
-                j2clLogger.printer(j2clLogger::debug).printedLine(lineHandler));
+        final J2clLinePrinter logger = J2clLinePrinter.with(
+                j2clLogger.printer(j2clLogger::info).printedLine(lineHandler),
+                j2clLogger.printer(j2clLogger::debug).printedLine(lineHandler)
+        );
         try {
             final J2clStepResult result;
             if (artifact.isDependency() && this.skipIfDependency()) {

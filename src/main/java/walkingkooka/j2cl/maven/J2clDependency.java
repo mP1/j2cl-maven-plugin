@@ -338,8 +338,10 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private void markIgnoredTransitiveDependencies(final Map<J2clDependency, Set<J2clDependency>> childToParents) {
-        final IndentingPrinter logger = context.logger()
-                .printer(context.logger()::info)
+        final J2clLogger j2clLogger = this.context.logger();
+
+        final IndentingPrinter logger = j2clLogger
+                .printer(j2clLogger::info)
                 .indenting(Indentation.SPACES2);
         logger.println("Marking ignored transitive dependencies");
         logger.indent();
@@ -572,7 +574,11 @@ final class J2clDependency implements Comparable<J2clDependency> {
      */
     void print(final boolean printMetadata) {
         final J2clLogger logger = this.context.logger();
-        final J2clLinePrinter printer = J2clLinePrinter.with(logger.printer(logger::info), null);
+
+        final J2clLinePrinter printer = J2clLinePrinter.with(
+                logger.printer(logger::info),
+                null
+        );
         printer.printLine("Dependencies");
         printer.indent();
         {

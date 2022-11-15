@@ -319,17 +319,6 @@ abstract class J2clMavenContext implements Context {
                 .collect(Collectors.joining(", "));
     }
 
-    // logger...........................................................................................................
-
-    /**
-     * Returns a {@link J2clLogger}
-     */
-    final J2clLogger logger() {
-        return this.logger;
-    }
-
-    private final J2clLogger logger;
-
     // tasks............................................................................................................
 
     /**
@@ -555,6 +544,17 @@ abstract class J2clMavenContext implements Context {
     private final ExecutorService executor;
 
     private final AtomicReference<Throwable> cause = new AtomicReference<>();
+
+    // logger...........................................................................................................
+
+    /**
+     * Returns a {@link J2clLogger}
+     */
+    final J2clLogger logger() {
+        return this.logger;
+    }
+
+    private final J2clLogger logger;
 
     // toString.........................................................................................................
 
