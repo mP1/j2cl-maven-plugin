@@ -119,7 +119,7 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
                     classpath.add(shadeClassFiles.get());
                     continue;
                 }
-                final Optional<J2clPath> compileGwtIncompatibleStripped = output(dependency, J2clStep.COMPILE_GWT_INCOMPATIBLE_STRIPPED);
+                final Optional<J2clPath> compileGwtIncompatibleStripped = output(dependency, J2clStep.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED);
                 compileGwtIncompatibleStripped.map(classpath::add);
             }
 
