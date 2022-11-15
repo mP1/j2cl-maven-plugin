@@ -17,6 +17,8 @@
 
 package walkingkooka.j2cl.maven;
 
+import walkingkooka.j2cl.maven.log.TreeLogger;
+
 @SuppressWarnings("StaticInitializerReferencesSubClass")
 abstract class J2clStepWorker {
 
@@ -48,5 +50,5 @@ abstract class J2clStepWorker {
 
     abstract J2clStepResult execute(final J2clDependency artifact,
                                     final J2clStep step,
-                                    final J2clLinePrinter logger) throws Exception;
+                                    final TreeLogger logger) throws Exception;
 }

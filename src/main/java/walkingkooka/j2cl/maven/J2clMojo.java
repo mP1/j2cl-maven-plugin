@@ -19,7 +19,7 @@ package walkingkooka.j2cl.maven;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import walkingkooka.j2cl.maven.log.J2clLogger;
+import walkingkooka.j2cl.maven.log.MavenLogger;
 
 import java.io.File;
 
@@ -46,7 +46,7 @@ abstract class J2clMojo extends AbstractMojo {
     private File cache;
 
 
-    final J2clLogger logger() {
-        return J2clLogger.maven(this.getLog());
+    final MavenLogger logger() {
+        return MavenLogger.maven(this.getLog());
     }
 }

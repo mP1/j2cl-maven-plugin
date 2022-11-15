@@ -15,12 +15,12 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.log;
 
 import com.google.j2cl.common.FrontendUtils.FileInfo;
 import walkingkooka.NeverError;
 import walkingkooka.collect.set.Sets;
-import walkingkooka.j2cl.maven.log.J2clLogger;
+import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.naming.StringName;
 import walkingkooka.naming.StringPath;
 import walkingkooka.text.LineEnding;
@@ -41,18 +41,24 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
-final class J2clLinePrinter {
+/**
+ * A logger that contains many print methods to assist with printing lines of text and graphs or tree, with indentation
+ * support.
+ */
+final public class TreeLogger {
 
-    static J2clLinePrinter with(final Printer printer,
-                                final Printer treePrinter) {
-        return new J2clLinePrinter(printer.indenting(J2clLogger.INDENTATION),
-                null != treePrinter ? treePrinter.indenting(J2clLogger.INDENTATION) : null,
-                null != treePrinter && false == printer.equals(treePrinter));
+    static TreeLogger with(final Printer printer,
+                           final Printer treePrinter) {
+        return new TreeLogger(
+                printer.indenting(MavenLogger.INDENTATION),
+                null != treePrinter ? treePrinter.indenting(MavenLogger.INDENTATION) : null,
+                null != treePrinter && false == printer.equals(treePrinter)
+        );
     }
 
-    private J2clLinePrinter(final IndentingPrinter printer,
-                            final IndentingPrinter treePrinter,
-                            final boolean indentOutdentBothPrinters) {
+    private TreeLogger(final IndentingPrinter printer,
+                       final IndentingPrinter treePrinter,
+                       final boolean indentOutdentBothPrinters) {
         super();
 
         this.printer = printer;
@@ -60,42 +66,47 @@ final class J2clLinePrinter {
         this.indentOutdentBothPrinters = indentOutdentBothPrinters;
     }
 
-    void indent() {
+    public void indent() {
         this.printer.indent();
-        if(this.indentOutdentBothPrinters) {
+
+        if (this.indentOutdentBothPrinters) {
             this.treePrinter.indent();
         }
     }
 
-    void printIndented(final String label,
-                       final J2clPath file) {
-        this.printLine(label);
-        this.printIndentedLine(file.toString());
+    public void path(final String label,
+                     final J2clPath file) {
+        this.line(label);
+        this.indentedLine(file.toString());
     }
 
     /**
      * Note the file paths within the tree will be printed to the second printer.
      */
-    void printIndented(final String label,
-                       final Collection<J2clPath> paths,
-                       final J2clLinePrinterFormat format) {
-        this.printIndentedStringPath(label,
+    public void paths(final String label,
+                      final Collection<J2clPath> paths,
+                      final TreeFormat format) {
+        this.stringPath(label,
                 paths,
                 this::toStringPath,
                 format);
     }
 
     private StringPath toStringPath(final J2clPath path) {
-        return StringPath.parse(path.path().toString().replace(File.separatorChar, '/'));
+        return StringPath.parse(
+                path.path()
+                        .toString()
+                        .replace(File.separatorChar, '/')
+        );
     }
 
     /**
      * Note the file paths within the tree will be printed to the second printer.
      */
-    void printIndentedFileInfo(final String label,
-                               final Collection<FileInfo> paths,
-                               final J2clLinePrinterFormat format) {
-        this.printIndentedStringPath(label,
+    public void fileInfos(final String label,
+                          final Collection<FileInfo> paths,
+                          final TreeFormat format) {
+        this.stringPath(label,
                 paths,
                 this::toStringPath,
                 format);
@@ -107,62 +118,63 @@ final class J2clLinePrinter {
         return StringPath.parse(targetPath.startsWith("/") ? targetPath : "/" + targetPath);
     }
 
-    private <T> void printIndentedStringPath(final String label,
-                                             final Collection<T> paths,
-                                             final Function<T, StringPath> toStringPath,
-                                             final J2clLinePrinterFormat format) {
+    private <T> void stringPath(final String label,
+                                final Collection<T> paths,
+                                final Function<T, StringPath> toStringPath,
+                                final TreeFormat format) {
         this.lineStart();
         if (label.isEmpty()) {
-            this.printIndentedStringPath0(paths, toStringPath, format);
+            this.stringPath0(paths, toStringPath, format);
         } else {
-            this.printLine(label);
+            this.line(label);
             this.lineStart();
             this.indent();
             {
-                this.printIndentedStringPath0(paths, toStringPath, format);
+                this.stringPath0(paths, toStringPath, format);
             }
             this.outdent();
         }
     }
 
-    private <T> void printIndentedStringPath0(final Collection<T> paths,
-                                              final Function<T, StringPath> toStringPath,
-                                              final J2clLinePrinterFormat format) {
+    private <T> void stringPath0(final Collection<T> paths,
+                                 final Function<T, StringPath> toStringPath,
+                                 final TreeFormat format) {
         this.indent();
         {
             switch (format) {
                 case FLAT:
-                    printFlat(paths, toStringPath, this.treePrinter);
+                    flat(paths, toStringPath, this.treePrinter);
                     break;
                 case TREE:
-                    printTree(paths, toStringPath, this.treePrinter);
+                    tree(paths, toStringPath, this.treePrinter);
                     break;
                 default:
-                    NeverError.unhandledEnum(format, J2clLinePrinterFormat.values());
+                    NeverError.unhandledEnum(format, TreeFormat.values());
             }
         }
         this.outdent();
-        this.printLine(paths.size() + " file(s)");
+        this.line(paths.size() + " file(s)");
     }
 
     /**
      * Prints a flat listing of paths.
      */
-    static <T> void printFlat(final Collection<T> paths,
-                              final Function<T, StringPath> toStringPath,
-                              final IndentingPrinter printer) {
+    static <T> void flat(final Collection<T> paths,
+                         final Function<T, StringPath> toStringPath,
+                         final IndentingPrinter printer) {
         paths.stream()
-            .map(toStringPath)
-            .map(StringPath::toString)
-            .forEach(s -> {
-                J2clLinePrinter.printLine0(s, printer);
-            });
+                .map(toStringPath)
+                .map(StringPath::toString)
+                .forEach(s -> {
+                    TreeLogger.line0(s, printer);
+                });
         printer.lineStart();
         printer.flush();
     }
-    static <T> void printTree(final Collection<T> paths,
-                              final Function<T, StringPath> toStringPath,
-                              final IndentingPrinter printer) {
+
+    static <T> void tree(final Collection<T> paths,
+                         final Function<T, StringPath> toStringPath,
+                         final IndentingPrinter printer) {
         new TreePrinting<StringPath, StringName>() {
 
             @Override
@@ -174,7 +186,7 @@ final class J2clLinePrinter {
             public void branchBegin(final List<StringName> names, final IndentingPrinter printer) {
                 final String path = this.toPath(names);
                 if (false == path.isEmpty()) {
-                    J2clLinePrinter.printLine0(path, printer);
+                    TreeLogger.line0(path, printer);
                     printer.indent();
                 }
 
@@ -220,7 +232,7 @@ final class J2clLinePrinter {
                 table = TABLE_TRANSFORMER.apply(table);
 
                 for (int r = 0; r < table.maxRow(); r++) {
-                    J2clLinePrinter.printLine0(TextPretty.rowColumnsToLine((column -> 1), LineEnding.SYSTEM).apply(table.row(r)), printer);
+                    TreeLogger.line0(TextPretty.rowColumnsToLine((column -> 1), LineEnding.SYSTEM).apply(table.row(r)), printer);
                 }
             }
         }.biConsumer()
@@ -235,70 +247,74 @@ final class J2clLinePrinter {
     private final static int COLUMN_COUNT = 2;
     private final static int COLUMN_WIDTH = 60;
 
-    private final static UnaryOperator<Table> TABLE_TRANSFORMER = TextPretty.tableTransformer(Collections.nCopies(COLUMN_COUNT, TextPretty.columnConfig()
-            .minWidth(COLUMN_WIDTH)
-            .maxWidth(COLUMN_WIDTH)
-            .overflowMaxWidthBreak()
-            .leftAlign()));
+    private final static UnaryOperator<Table> TABLE_TRANSFORMER = TextPretty.tableTransformer(
+            Collections.nCopies(
+                    COLUMN_COUNT,
+                    TextPretty.columnConfig()
+                            .minWidth(COLUMN_WIDTH)
+                            .maxWidth(COLUMN_WIDTH)
+                            .overflowMaxWidthBreak()
+                            .leftAlign())
+    );
 
-    void printIndentedString(final String label,
-                             final Collection<String> values) {
+    public void strings(final String label,
+                        final Collection<String> values) {
         Objects.requireNonNull(values, "values");
-        this.printLine(values.size() + " " + label);
+        this.line(values.size() + " " + label);
 
         //noinspection ConstantConditions
         if (null != values) {
             this.indent();
             {
-                values.forEach(this::printLine);
+                values.forEach(this::line);
             }
             this.outdent();
         }
     }
 
-    void print(final CharSequence line) {
+    public void log(final CharSequence line) {
         this.printer.print(line);
     }
 
-    void printIndentedLine(final CharSequence line) {
+    public void indentedLine(final CharSequence line) {
         this.indent();
         {
-            this.printLine(line);
+            this.line(line);
         }
         this.outdent();
     }
 
-    void printLine(final CharSequence line) {
-        printLine0(line, this.printer);
+    public void line(final CharSequence line) {
+        line0(line, this.printer);
     }
 
-    static void printLine0(final CharSequence line, final IndentingPrinter printer) {
+    static void line0(final CharSequence line, final IndentingPrinter printer) {
         printer.lineStart();
         printer.print(line);
     }
 
-    void emptyLine() {
+    public void emptyLine() {
         this.printer.lineStart();
         this.printer.print(this.printer.lineEnding());
     }
 
-    void lineStart() {
+    public void lineStart() {
         this.printer.lineStart();
     }
 
-    void printEndOfList() {
-        this.printLine("*** END ***");
+    public void endOfList() {
+        this.line("*** END ***");
     }
 
-    void outdent() {
+    public void outdent() {
         this.printer.outdent();
 
-        if(this.indentOutdentBothPrinters) {
+        if (this.indentOutdentBothPrinters) {
             this.treePrinter.outdent();
         }
     }
 
-    void flush() {
+    public void flush() {
         this.printer.flush();
     }
 

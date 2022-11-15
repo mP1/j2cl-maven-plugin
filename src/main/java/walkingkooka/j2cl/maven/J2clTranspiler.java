@@ -21,6 +21,8 @@ import com.google.j2cl.common.Problems;
 import com.google.j2cl.frontend.Frontend;
 import com.google.j2cl.transpiler.J2clTranspilerOptions;
 import walkingkooka.collect.list.Lists;
+import walkingkooka.j2cl.maven.log.TreeFormat;
+import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.CharSequences;
 
 import java.io.IOException;
@@ -33,8 +35,8 @@ final class J2clTranspiler {
     static boolean execute(final Collection<J2clPath> classpath,
                            final J2clPath sourcePath,
                            final J2clPath output,
-                           final J2clLinePrinter logger) throws IOException {
-        logger.printLine("J2clTranspiler");
+                           final TreeLogger logger) throws IOException {
+        logger.line("J2clTranspiler");
         logger.indent();
 
         boolean success;
@@ -63,18 +65,18 @@ final class J2clTranspiler {
                         });
             }
 
-            logger.printLine("Parameters");
+            logger.line("Parameters");
             logger.indent();
             {
-                logger.printIndented("Classpath(s)", classpath, J2clLinePrinterFormat.FLAT);
-                logger.printIndented("*.java source(s)", javaInput, J2clLinePrinterFormat.TREE);
-                logger.printIndented("*.native.js source(s)", nativeJsInput, J2clLinePrinterFormat.TREE);
-                logger.printIndented("*.js source(s)", jsInput, J2clLinePrinterFormat.TREE);
-                logger.printIndented("Output", output);
+                logger.paths("Classpath(s)", classpath, TreeFormat.FLAT);
+                logger.paths("*.java source(s)", javaInput, TreeFormat.TREE);
+                logger.paths("*.native.js source(s)", nativeJsInput, TreeFormat.TREE);
+                logger.paths("*.js source(s)", jsInput, TreeFormat.TREE);
+                logger.path("Output", output);
             }
             logger.outdent();
 
-            logger.printLine("J2clTranspiler");
+            logger.line("J2clTranspiler");
             logger.indent();
             {
                 final J2clTranspilerOptions options = J2clTranspilerOptions.newBuilder()
@@ -94,12 +96,12 @@ final class J2clTranspiler {
                 final Problems problems = com.google.j2cl.transpiler.J2clTranspiler.transpile(options);
                 success = !problems.hasErrors();
 
-                logger.printIndentedString("Error(s)", problems.getErrors());
-                logger.printIndentedString("Warnings(s)", problems.getWarnings());
-                logger.printIndentedString("Message(s)", problems.getMessages());
+                logger.strings("Error(s)", problems.getErrors());
+                logger.strings("Warnings(s)", problems.getWarnings());
+                logger.strings("Message(s)", problems.getMessages());
 
                 if (success) {
-                    logger.printLine("Copy js to output");
+                    logger.line("Copy js to output");
                     logger.indent();
                     {
                         output.copyFiles(sourcePath,
@@ -109,9 +111,9 @@ final class J2clTranspiler {
                     }
                     logger.outdent();
 
-                    logger.printIndented("File(s)",
-                        output.gatherFiles(J2clPath.ALL_FILES),
-                        J2clLinePrinterFormat.TREE);
+                    logger.paths("File(s)",
+                            output.gatherFiles(J2clPath.ALL_FILES),
+                            TreeFormat.TREE);
                 }
             }
         }

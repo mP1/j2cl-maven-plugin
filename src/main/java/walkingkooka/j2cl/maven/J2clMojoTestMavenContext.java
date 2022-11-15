@@ -21,7 +21,7 @@ import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.j2cl.maven.log.BrowserLogLevel;
-import walkingkooka.j2cl.maven.log.J2clLogger;
+import walkingkooka.j2cl.maven.log.MavenLogger;
 
 import java.util.List;
 import java.util.Map;
@@ -54,7 +54,7 @@ final class J2clMojoTestMavenContext extends J2clMavenContext {
                                          final int testTimeout,
                                          final J2clMavenMiddleware middleware,
                                          final ExecutorService executor,
-                                         final J2clLogger logger) {
+                                         final MavenLogger logger) {
         return new J2clMojoTestMavenContext(base,
                 target,
                 scope,
@@ -96,7 +96,7 @@ final class J2clMojoTestMavenContext extends J2clMavenContext {
                                      final int testTimeout,
                                      final J2clMavenMiddleware middleware,
                                      final ExecutorService executor,
-                                     final J2clLogger logger) {
+                                     final MavenLogger logger) {
         super(base,
                 target,
                 scope,

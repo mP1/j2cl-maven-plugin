@@ -17,6 +17,8 @@
 
 package walkingkooka.j2cl.maven;
 
+import walkingkooka.j2cl.maven.log.TreeLogger;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -88,19 +90,19 @@ final class J2clStepDirectory {
      */
     J2clStepDirectory writeLog(final List<CharSequence> lines,
                                final Duration timeTaken,
-                               final J2clLinePrinter logger) throws IOException {
+                               final TreeLogger logger) throws IOException {
         logger.emptyLine();
 
         final J2clPath logFile = this.logFile();
 
-        logger.printLine("Log file");
+        logger.line("Log file");
 
         logger.indent();
-        logger.printLine(logFile.toString());
+        logger.line(logFile.toString());
         logger.outdent();
 
-        logger.printLine("Time taken");
-        logger.printIndentedLine(timeTaken.getSeconds() + "." + timeTaken.getNano() + " seconds");
+        logger.line("Time taken");
+        logger.indentedLine(timeTaken.getSeconds() + "." + timeTaken.getNano() + " seconds");
         logger.emptyLine();
         logger.flush();
 

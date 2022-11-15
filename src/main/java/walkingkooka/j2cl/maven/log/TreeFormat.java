@@ -14,10 +14,10 @@
  * limitations under the License.
  *
  */
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.log;
 
 // maven-plugin-plugin fails build because of enum method with generics, while scanning classpath for javadoc annotations.
-enum J2clLinePrinterFormat {
+public enum TreeFormat {
     // Useful for printing a list of files where order is important such as a classpath.
     FLAT,
 

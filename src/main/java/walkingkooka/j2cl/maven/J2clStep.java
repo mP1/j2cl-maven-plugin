@@ -18,7 +18,8 @@
 package walkingkooka.j2cl.maven;
 
 import walkingkooka.collect.list.Lists;
-import walkingkooka.j2cl.maven.log.J2clLogger;
+import walkingkooka.j2cl.maven.log.MavenLogger;
+import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.printer.PrintedLineHandler;
 
 import java.io.ByteArrayOutputStream;
@@ -335,7 +336,7 @@ enum J2clStep {
         final Instant start = Instant.now();
 
         final J2clMavenContext context = artifact.context();
-        final J2clLogger j2clLogger = context.logger();
+        final MavenLogger mavenLogger = context.mavenLogger();
         final List<CharSequence> lines = Lists.array(); // these lines will be written to a log file.
         final String prefix = artifact.coords() + "-" + this;
 
@@ -345,30 +346,30 @@ enum J2clStep {
             lines.add(line);
         };
 
-        // TODO would be nice to detect log level of Maven logger
-        final J2clLinePrinter logger = J2clLinePrinter.with(
-                j2clLogger.printer(j2clLogger::info).printedLine(lineHandler),
-                j2clLogger.printer(j2clLogger::debug).printedLine(lineHandler)
+        final TreeLogger output = mavenLogger.output(
+                lineHandler,
+                lineHandler
         );
+
         try {
             final J2clStepResult result;
             if (artifact.isDependency() && this.skipIfDependency()) {
                 result = J2clStepResult.SUCCESS;
             } else {
-                logger.printLine(prefix);
-                logger.indent();
+                output.line(prefix);
+                output.indent();
 
                 result = this.execute1()
                         .execute(artifact,
                                 this,
-                                logger);
+                                output);
 
                 final J2clStepDirectory directory = artifact.step(this);
 
                 directory.writeLog(
                         lines,
                         timeTaken(start),
-                        logger
+                        output
                 );
 
                 result.path(directory).createIfNecessary();
@@ -377,17 +378,22 @@ enum J2clStep {
             }
             return result.next(this.next(context));
         } catch (final Exception cause) {
-            logger.flush();
+            output.flush();
 
-            j2clLogger.error("Failed to execute " + prefix + " message: " + cause.getMessage(), cause);
-            lines.forEach(l -> j2clLogger.error(prefix + " " + l));
+            mavenLogger.error("Failed to execute " + prefix + " message: " + cause.getMessage(), cause);
+            lines.forEach(l -> mavenLogger.error(prefix + " " + l));
 
             // capture stack trace into $lines
             final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             final String charset = Charset.defaultCharset().name();
             cause.printStackTrace(new PrintStream(bytes, true, charset));
-            logger.emptyLine();
-            logger.print(new String(bytes.toByteArray(), charset));
+            output.emptyLine();
+            output.log(
+                    new String(
+                            bytes.toByteArray(),
+                            charset
+                    )
+            );
 
             final J2clStepDirectory directory = artifact.step(this);
             directory.failed()
@@ -397,7 +403,7 @@ enum J2clStep {
                 directory.writeLog(
                         lines,
                         timeTaken(start),
-                        logger
+                        output
                 );
             } else {
                 // HASH step probably failed so create a unique file and write it to the base directory.
@@ -410,8 +416,8 @@ enum J2clStep {
                                 DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
                 );
 
-                j2clLogger.error("Log file");
-                j2clLogger.error(J2clLogger.INDENTATION + base.toString());
+                mavenLogger.error("Log file");
+                mavenLogger.error(MavenLogger.INDENTATION + base.toString());
 
                 Files.write(base, lines);
             }
@@ -429,7 +435,7 @@ enum J2clStep {
     }
 
     /**
-     * Returns the sub-class of {@link J2clStepWorker} and then calls {@link J2clStepWorker#execute(J2clDependency, J2clStep, J2clLinePrinter)
+     * Returns the sub-class of {@link J2clStepWorker} and then calls {@link J2clStepWorker#execute(J2clDependency, J2clStep, TreeLogger)
      */
     abstract J2clStepWorker execute1();
 

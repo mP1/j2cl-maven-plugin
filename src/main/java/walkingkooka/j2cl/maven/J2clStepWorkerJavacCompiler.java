@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import walkingkooka.collect.set.Sets;
+import walkingkooka.j2cl.maven.log.TreeLogger;
 
 import java.util.List;
 import java.util.Set;
@@ -34,10 +35,9 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
         super();
     }
 
-    @Override
-    final J2clStepResult execute1(final J2clDependency artifact,
-                                  final J2clStepDirectory directory,
-                                  final J2clLinePrinter logger) throws Exception {
+    @Override final J2clStepResult execute1(final J2clDependency artifact,
+                                            final J2clStepDirectory directory,
+                                            final TreeLogger logger) throws Exception {
         J2clStepResult result = null;
         final J2clStep sourceStep = this.sourcesStep();
 
@@ -46,7 +46,7 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
             final Set<J2clPath> javaSourceFiles = Sets.ordered();
 
             final J2clPath output = artifact.step(sourceStep).output();
-            
+
             javaSourceFiles.addAll(output.gatherFiles((path) -> false == output.isSuperSource(path) && J2clPath.JAVA_FILES.test(path)));
             if (javaSourceFiles.isEmpty()) {
                 source = null;
@@ -83,7 +83,7 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
         }
 
         if (null == source) {
-            logger.printIndentedLine("No files found");
+            logger.indentedLine("No files found");
             result = J2clStepResult.ABORTED;
         }
 
@@ -162,5 +162,5 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
      */
     abstract void postCompile(final J2clDependency artifact,
                               final J2clStepDirectory directory,
-                              final J2clLinePrinter logger) throws Exception;
+                              final TreeLogger logger) throws Exception;
 }

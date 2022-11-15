@@ -15,10 +15,11 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.log;
 
 import org.junit.jupiter.api.Test;
 import walkingkooka.ToStringTesting;
+import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.reflect.ClassTesting2;
 import walkingkooka.reflect.JavaVisibility;
 import walkingkooka.text.LineEnding;
@@ -28,17 +29,17 @@ import walkingkooka.text.printer.Printers;
 import java.nio.file.Paths;
 import java.util.List;
 
-public final class J2clLinePrinterTest implements ClassTesting2<J2clLinePrinter>, ToStringTesting<J2clLinePrinter> {
+public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToStringTesting<TreeLogger> {
 
     private final static LineEnding EOL = LineEnding.NL;
 
     @Test
     public void testEmptyLine() {
         final StringBuilder b = new StringBuilder();
-        final J2clLinePrinter printer = this.printer(b);
+        final TreeLogger logger = this.logger(b);
 
-        printer.emptyLine();
-        printer.flush();
+        logger.emptyLine();
+        logger.flush();
 
         this.check(EOL, b);
     }
@@ -46,69 +47,69 @@ public final class J2clLinePrinterTest implements ClassTesting2<J2clLinePrinter>
     @Test
     public void testLineStart() {
         final StringBuilder b = new StringBuilder();
-        final J2clLinePrinter printer = this.printer(b);
+        final TreeLogger logger = this.logger(b);
 
-        printer.print("1");
-        printer.lineStart();
-        printer.print("2");
-        printer.flush();
+        logger.log("1");
+        logger.lineStart();
+        logger.log("2");
+        logger.flush();
 
         this.check("1" + EOL + "2", b);
     }
 
     @Test
-    public void testPrint() {
+    public void testLog() {
         final StringBuilder b = new StringBuilder();
-        final J2clLinePrinter printer = this.printer(b);
+        final TreeLogger logger = this.logger(b);
 
         final String text = "abc123";
-        printer.print(text);
+        logger.log(text);
 
         this.check(text, b);
     }
 
     @Test
-    public void testPrintLine() {
+    public void testLine() {
         final StringBuilder b = new StringBuilder();
-        final J2clLinePrinter printer = this.printer(b);
+        final TreeLogger logger = this.logger(b);
 
         final String text = "abc123";
-        printer.printLine(text);
+        logger.line(text);
 
         this.check(text, b);
     }
 
     @Test
-    public void testPrintLine2() {
+    public void testLine2() {
         final StringBuilder b = new StringBuilder();
-        final J2clLinePrinter printer = this.printer(b);
+        final TreeLogger logger = this.logger(b);
 
         final String text1 = "text1";
-        printer.printLine(text1);
+        logger.line(text1);
 
         final String text2 = "text2";
-        printer.printLine(text2);
+        logger.line(text2);
 
         this.check(text1 + EOL + text2, b);
     }
 
     @Test
-    public void testPrintEndOfLine() {
+    public void testEndOfLine() {
         final StringBuilder b = new StringBuilder();
-        final J2clLinePrinter printer = this.printer(b);
+        final TreeLogger logger = this.logger(b);
 
-        printer.printEndOfList();
+        logger.endOfList();
 
         this.check("*** END ***", b);
     }
 
     @Test
-    public void testPrintEndOfLine2() {
+    public void testEndOfLine2() {
         final StringBuilder b = new StringBuilder();
-        final J2clLinePrinter printer = this.printer(b);
+        final TreeLogger logger = this.logger(b);
 
-        printer.print("before1");
-        printer.printEndOfList();
+        logger.log("before1");
+        logger.endOfList();
 
         this.check("before1" + EOL + "*** END ***", b);
     }
@@ -116,12 +117,12 @@ public final class J2clLinePrinterTest implements ClassTesting2<J2clLinePrinter>
     @Test
     public void testIndentLineOutdent() {
         final StringBuilder b = new StringBuilder();
-        final J2clLinePrinter printer = this.printer(b);
+        final TreeLogger logger = this.logger(b);
 
-        printer.indent();
-        printer.printLine("line1");
-        printer.outdent();
-        printer.printLine("line2");
+        logger.indent();
+        logger.line("line1");
+        logger.outdent();
+        logger.line("line2");
 
         this.check("  line1" + EOL + "line2", b);
     }
@@ -129,31 +130,31 @@ public final class J2clLinePrinterTest implements ClassTesting2<J2clLinePrinter>
     @Test
     public void testIndentedLine() {
         final StringBuilder b = new StringBuilder();
-        final J2clLinePrinter printer = this.printer(b);
+        final TreeLogger logger = this.logger(b);
 
-        printer.printLine("line1");
-        printer.printIndentedLine("line2");
-        printer.printLine("line3");
+        logger.line("line1");
+        logger.indentedLine("line2");
+        logger.line("line3");
 
         this.check("line1" + EOL + "  line2" + EOL + "line3", b);
     }
 
     @Test
-    public void testPrintIndentedPath() {
+    public void testPath() {
         final StringBuilder b = new StringBuilder();
-        final J2clLinePrinter printer = this.printer(b);
+        final TreeLogger logger = this.logger(b);
 
-        printer.printIndented("label1", path("/path/to"));
+        logger.path("label1", path("/path/to"));
 
         this.check("label1" + EOL + "  /path/to", b);
     }
 
     @Test
-    public void testPrintIndentedPathCollectionFlat() {
+    public void testPathsFlat() {
         final StringBuilder b = new StringBuilder();
-        final J2clLinePrinter printer = this.printer2(b);
+        final TreeLogger logger = this.logger2(b);
 
-        printer.printIndented("label1", List.of(path("/path/2"), path("/path/1"), path("/path/3")), J2clLinePrinterFormat.FLAT);
+        logger.paths("label1", List.of(path("/path/2"), path("/path/1"), path("/path/3")), TreeFormat.FLAT);
 
         this.check("label1\n" +
                         "    /path/2<\n" +
@@ -164,11 +165,11 @@ public final class J2clLinePrinterTest implements ClassTesting2<J2clLinePrinter>
     }
 
     @Test
-    public void testPrintIndentedPathCollectionTree() {
+    public void testPathTree() {
         final StringBuilder b = new StringBuilder();
-        final J2clLinePrinter printer = this.printer2(b);
+        final TreeLogger logger = this.logger2(b);
 
-        printer.printIndented("label1", List.of(path("/path/to")), J2clLinePrinterFormat.TREE);
+        logger.paths("label1", List.of(path("/path/to")), TreeFormat.TREE);
 
         this.check("label1\n" +
                         "    /path<\n" +
@@ -178,11 +179,11 @@ public final class J2clLinePrinterTest implements ClassTesting2<J2clLinePrinter>
     }
 
     @Test
-    public void testPrintIndentedPathCollectionTree2() {
+    public void testPathsTree2() {
         final StringBuilder b = new StringBuilder();
-        final J2clLinePrinter printer = this.printer2(b);
+        final TreeLogger logger = this.logger2(b);
 
-        printer.printIndented("label1", List.of(path("/path/to"), path("/path/to2")), J2clLinePrinterFormat.TREE);
+        logger.paths("label1", List.of(path("/path/to"), path("/path/to2")), TreeFormat.TREE);
 
         this.check("label1\n" +
                         "    /path<\n" +
@@ -192,11 +193,11 @@ public final class J2clLinePrinterTest implements ClassTesting2<J2clLinePrinter>
     }
 
     @Test
-    public void testPrintIndentedStringCollection() {
+    public void testStrings() {
         final StringBuilder b = new StringBuilder();
-        final J2clLinePrinter printer = this.printer(b);
+        final TreeLogger logger = this.logger(b);
 
-        printer.printIndentedString("label1", List.of("a1"));
+        logger.strings("label1", List.of("a1"));
 
         this.check("1 label1\n" +
                         "  a1",
@@ -204,11 +205,11 @@ public final class J2clLinePrinterTest implements ClassTesting2<J2clLinePrinter>
     }
 
     @Test
-    public void testPrintIndentedStringCollection2() {
+    public void testStrings2() {
         final StringBuilder b = new StringBuilder();
-        final J2clLinePrinter printer = this.printer(b);
+        final TreeLogger logger = this.logger(b);
 
-        printer.printIndentedString("label1", List.of("a1", "b2", "c3"));
+        logger.strings("label1", List.of("a1", "b2", "c3"));
 
         this.check("3 label1\n" +
                         "  a1\n" +
@@ -217,40 +218,54 @@ public final class J2clLinePrinterTest implements ClassTesting2<J2clLinePrinter>
                 b);
     }
 
-    private J2clLinePrinter printer(final StringBuilder b) {
-        return J2clLinePrinter.with(Printers.stringBuilder(b, EOL), null);
+    private TreeLogger logger(final StringBuilder b) {
+        return TreeLogger.with(
+                Printers.stringBuilder(b, EOL),
+                null
+        );
     }
 
-    private J2clLinePrinter printer2(final StringBuilder b) {
-        return J2clLinePrinter.with(Printers.stringBuilder(b, EOL),
-            Printers.stringBuilder(b, EOL).printedLine((line, lineEnding, printer) -> b.append( line + "<" + lineEnding)));
+    private TreeLogger logger2(final StringBuilder b) {
+        return TreeLogger.with(
+                Printers.stringBuilder(b, EOL),
+                Printers.stringBuilder(b, EOL)
+                        .printedLine((line, lineEnding, logger) -> b.append(line + "<" + lineEnding))
+        );
     }
 
     private void check(final CharSequence expected, final StringBuilder b) {
-        this.checkEquals(expected.toString(), b.toString());
+        this.checkEquals(
+                expected.toString(),
+                b.toString()
+        );
     }
 
     private J2clPath path(final String path) {
-        return J2clPath.with(Paths.get(path));
+        return J2clPath.with(
+                Paths.get(path)
+        );
     }
 
     // toString.........................................................................................................
 
     @Test
     public void testToString() {
-        final Printer printer = Printers.fake();
-        this.toStringAndCheck(J2clLinePrinter.with(printer, Printers.fake()), printer.toString());
+        final Printer logger = Printers.fake();
+        this.toStringAndCheck(
+                TreeLogger.with(logger, Printers.fake()),
+                logger.toString()
+        );
     }
 
     // ClassTesting.....................................................................................................
 
     @Override
-    public Class<J2clLinePrinter> type() {
-        return J2clLinePrinter.class;
+    public Class<TreeLogger> type() {
+        return TreeLogger.class;
     }
 
     @Override
     public JavaVisibility typeVisibility() {
-        return JavaVisibility.PACKAGE_PRIVATE;
+        return JavaVisibility.PUBLIC;
     }
 }

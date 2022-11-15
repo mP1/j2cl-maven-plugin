@@ -21,6 +21,7 @@ import org.apache.maven.plugin.logging.Log;
 import walkingkooka.text.Indentation;
 import walkingkooka.text.LineEnding;
 import walkingkooka.text.printer.IndentingPrinter;
+import walkingkooka.text.printer.PrintedLineHandler;
 import walkingkooka.text.printer.Printer;
 import walkingkooka.text.printer.PrinterException;
 
@@ -29,7 +30,7 @@ import java.util.function.Consumer;
 /**
  * Logger interface used by tasks & steps.
  */
-public interface J2clLogger {
+public interface MavenLogger {
 
     /**
      * Default {@link Indentation} shared so all indented printing can have a common indent.
@@ -37,19 +38,29 @@ public interface J2clLogger {
     Indentation INDENTATION = Indentation.SPACES2;
 
     /**
-     * Creates a MAVEN {@link J2clLogger}.
+     * Creates a MAVEN {@link MavenLogger}.
      */
-    static J2clLogger maven(final Log log) {
-        return J2clLoggerMavenLog.with(log);
+    static MavenLogger maven(final Log log) {
+        return BasicMavenLogger.with(log);
     }
 
-    void debug(final CharSequence message);
+    default TreeLogger output(final PrintedLineHandler info,
+                              final PrintedLineHandler debug) {
+        return TreeLogger.with(
+                this.printer(this::info).printedLine(info),
+                this.printer(this::debug).printedLine(debug)
+        );
+    }
 
-    void debug(final CharSequence message,
-               final Throwable cause);
+    default TreeLogger output() {
+        return TreeLogger.with(
+                this.printer(this::info),
+                null
+        );
+    }
 
     /**
-     * Returns an {@link IndentingPrinter} which writes to the given {@link Consumer} which is assumed to be a {@link J2clLogger} method.
+     * Returns an {@link IndentingPrinter} which writes to the given {@link Consumer} which is assumed to be a {@link MavenLogger} method.
      */
     default Printer printer(final Consumer<CharSequence> log) {
         return new Printer() {
@@ -75,12 +86,17 @@ public interface J2clLogger {
 
             @Override
             public String toString() {
-                return J2clLogger.this.toString();
+                return MavenLogger.this.toString();
             }
         }.printedLine((final CharSequence line,
                        final LineEnding lineEnding,
                        final Printer printer) -> printer.print(line));
     }
+
+    void debug(final CharSequence message);
+
+    void debug(final CharSequence message,
+               final Throwable cause);
 
     void info(final CharSequence message);
 

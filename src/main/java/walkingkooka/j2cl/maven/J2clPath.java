@@ -21,6 +21,8 @@ import com.google.j2cl.common.FrontendUtils.FileInfo;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.j2cl.maven.log.TreeFormat;
+import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.reflect.PackageName;
 import walkingkooka.text.CharSequences;
 
@@ -54,7 +56,7 @@ import java.util.stream.Collectors;
 /**
  * A more object oriented path abstraction with numerous methods to do useful stuff.
  */
-final class J2clPath implements Comparable<J2clPath> {
+public final class J2clPath implements Comparable<J2clPath> {
 
     static final String FILE_PREFIX = ".walkingkooka-j2cl-maven-plugin";
 
@@ -124,7 +126,7 @@ final class J2clPath implements Comparable<J2clPath> {
                 .collect(Collectors.toList());
     }
 
-    static J2clPath with(final Path path) {
+    public static J2clPath with(final Path path) {
         return new J2clPath(path);
     }
 
@@ -158,7 +160,7 @@ final class J2clPath implements Comparable<J2clPath> {
     Collection<J2clPath> copyFiles(final J2clPath src,
                                    final Collection<J2clPath> files,
                                    final BiFunction<byte[], J2clPath, byte[]> contentTransformer,
-                                   final J2clLinePrinter logger) throws IOException {
+                                   final TreeLogger logger) throws IOException {
         final Path srcPath = src.path();
         final Path destPath = this.path();
 
@@ -185,16 +187,16 @@ final class J2clPath implements Comparable<J2clPath> {
         }
 
         if (copied.isEmpty()) {
-            logger.printIndentedLine(src.toString());
-            logger.printLine("0 file(s)");
+            logger.indentedLine(src.toString());
+            logger.line("0 file(s)");
         } else {
-            logger.printIndented("", copied, J2clLinePrinterFormat.TREE);
+            logger.paths("", copied, TreeFormat.TREE);
         }
 
         if (false == skipped.isEmpty()) {
             logger.indent();
             {
-                logger.printIndented("Skipped", skipped, J2clLinePrinterFormat.TREE);
+                logger.paths("Skipped", skipped, TreeFormat.TREE);
             }
             logger.outdent();
         }
@@ -218,7 +220,7 @@ final class J2clPath implements Comparable<J2clPath> {
      */
     Set<J2clPath> extractArchiveFiles(final Predicate<Path> filter,
                                       final J2clPath target,
-                                      final J2clLinePrinter logger) throws IOException {
+                                      final TreeLogger logger) throws IOException {
         final URI uri = URI.create("jar:" + this.path().toAbsolutePath().toUri());
         try (final FileSystem zip = FileSystems.newFileSystem(uri, Maps.empty())) {
             return this.extractArchiveFiles0(zip.getPath("/"),
@@ -237,10 +239,10 @@ final class J2clPath implements Comparable<J2clPath> {
     private Set<J2clPath> extractArchiveFiles0(final Path source,
                                                final Predicate<Path> filter,
                                                final J2clPath target,
-                                               final J2clLinePrinter logger) throws IOException {
+                                               final TreeLogger logger) throws IOException {
         final Set<J2clPath> files = J2clPath.with(source).gatherFiles(filter.and(J2clPath.ALL_FILES));
         if (files.isEmpty()) {
-            logger.printIndentedLine("No files");
+            logger.indentedLine("No files");
         } else {
             this.extractArchivesFiles1(source, target, files, logger);
         }
@@ -254,7 +256,7 @@ final class J2clPath implements Comparable<J2clPath> {
     private void extractArchivesFiles1(final Path root,
                                        final J2clPath target,
                                        final Set<J2clPath> files,
-                                       final J2clLinePrinter logger) throws IOException {
+                                       final TreeLogger logger) throws IOException {
         for (final J2clPath file : files) {
             final Path filePath = file.path();
             final Path pathInZip = root.relativize(filePath);
@@ -267,7 +269,7 @@ final class J2clPath implements Comparable<J2clPath> {
             Files.copy(filePath, copyTarget, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        logger.printIndented("Extracting", files, J2clLinePrinterFormat.TREE);
+        logger.paths("Extracting", files, TreeFormat.TREE);
     }
 
     /**
@@ -333,7 +335,7 @@ final class J2clPath implements Comparable<J2clPath> {
         return new J2clPath(this.path().getParent());
     }
 
-    Path path() {
+    public Path path() {
         return this.path;
     }
 

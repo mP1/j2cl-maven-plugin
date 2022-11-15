@@ -17,6 +17,8 @@
 
 package walkingkooka.j2cl.maven;
 
+import walkingkooka.j2cl.maven.log.TreeLogger;
+
 /**
  * Any step that requires its working directory to be created before it can work.
  */
@@ -29,32 +31,31 @@ abstract class J2clStepWorker2 extends J2clStepWorker {
         super();
     }
 
-    @Override
-    final J2clStepResult execute(final J2clDependency artifact,
-                                 final J2clStep step,
-                                 final J2clLinePrinter logger) throws Exception {
+    @Override final J2clStepResult execute(final J2clDependency artifact,
+                                           final J2clStep step,
+                                           final TreeLogger logger) throws Exception {
         final J2clStepResult result;
 
         final J2clStepDirectory directory = artifact.step(step);
 
-        logger.printLine("Directory");
+        logger.line("Directory");
         logger.indent();
         {
-            logger.printLine(directory.toString());
+            logger.line(directory.toString());
             logger.indent();
             {
                 if (directory.successful().exists().isPresent()) {
-                    logger.printIndentedLine("Cache success result present and will be kept");
+                    logger.indentedLine("Cache success result present and will be kept");
 
                     result = J2clStepResult.SUCCESS;
                 } else {
                     if (directory.aborted().exists().isPresent()) {
-                        logger.printIndentedLine("Cache abort result present and will be kept");
+                        logger.indentedLine("Cache abort result present and will be kept");
 
                         result = J2clStepResult.ABORTED;
                     } else {
                         if (directory.skipped().exists().isPresent()) {
-                            logger.printIndentedLine("Cache skip result present and will be kept");
+                            logger.indentedLine("Cache skip result present and will be kept");
 
                             result = J2clStepResult.SKIPPED;
                         } else {
@@ -62,7 +63,7 @@ abstract class J2clStepWorker2 extends J2clStepWorker {
                             if (path.exists().isPresent()) {
                                 path.removeAll();
 
-                                logger.printIndentedLine("Removed all files");
+                                logger.indentedLine("Removed all files");
                             }
                             path.createIfNecessary();
 
@@ -80,7 +81,7 @@ abstract class J2clStepWorker2 extends J2clStepWorker {
 
     private J2clStepResult execute0(final J2clDependency artifact,
                                     final J2clStepDirectory directory,
-                                    final J2clLinePrinter logger) throws Exception {
+                                    final TreeLogger logger) throws Exception {
         // aborted steps for the project are transformed into skipped.
         final J2clStepResult result = this.execute1(artifact,
                 directory,
@@ -92,5 +93,5 @@ abstract class J2clStepWorker2 extends J2clStepWorker {
 
     abstract J2clStepResult execute1(final J2clDependency artifact,
                                      final J2clStepDirectory directory,
-                                     final J2clLinePrinter logger) throws Exception;
+                                     final TreeLogger logger) throws Exception;
 }
