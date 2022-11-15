@@ -201,6 +201,8 @@ abstract class J2clMavenContext implements Context {
 
     abstract String directoryName(final J2clStep step);
 
+    abstract Optional<J2clStep> next(final J2clStep current);
+
     // browserLogLevel..................................................................................................
 
     abstract BrowserLogLevel browserLogLevel();

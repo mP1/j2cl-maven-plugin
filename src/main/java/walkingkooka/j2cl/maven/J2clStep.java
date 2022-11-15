@@ -52,11 +52,6 @@ enum J2clStep {
         boolean skipIfDependency() {
             return false;
         }
-
-        @Override
-        Optional<J2clStep> next(final J2clMavenContext context) {
-            return Optional.of(UNPACK);
-        }
     },
 
     /**
@@ -71,11 +66,6 @@ enum J2clStep {
         @Override
         boolean skipIfDependency() {
             return false;
-        }
-
-        @Override
-        Optional<J2clStep> next(final J2clMavenContext context) {
-            return Optional.of(JAVAC_COMPILE);
         }
     },
 
@@ -92,11 +82,6 @@ enum J2clStep {
         boolean skipIfDependency() {
             return false;
         }
-
-        @Override
-        Optional<J2clStep> next(final J2clMavenContext context) {
-            return Optional.of(GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE);
-        }
     },
 
     /**
@@ -112,11 +97,6 @@ enum J2clStep {
         boolean skipIfDependency() {
             return false;
         }
-
-        @Override
-        Optional<J2clStep> next(final J2clMavenContext context) {
-            return Optional.of(JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE);
-        }
     },
 
     /**
@@ -131,11 +111,6 @@ enum J2clStep {
         @Override
         boolean skipIfDependency() {
             return false;
-        }
-
-        @Override
-        Optional<J2clStep> next(final J2clMavenContext context) {
-            return Optional.of(SHADE_JAVA_SOURCE);
         }
     },
 
@@ -153,11 +128,6 @@ enum J2clStep {
         boolean skipIfDependency() {
             return false;
         }
-
-        @Override
-        Optional<J2clStep> next(final J2clMavenContext context) {
-            return Optional.of(SHADE_CLASS_FILES);
-        }
     },
 
     /**
@@ -174,11 +144,6 @@ enum J2clStep {
         boolean skipIfDependency() {
             return false;
         }
-
-        @Override
-        Optional<J2clStep> next(final J2clMavenContext context) {
-            return Optional.of(TRANSPILE_JAVA_TO_JAVASCRIPT);
-        }
     },
 
     /**
@@ -194,11 +159,6 @@ enum J2clStep {
         boolean skipIfDependency() {
             return false;
         }
-
-        @Override
-        Optional<J2clStep> next(final J2clMavenContext context) {
-            return Optional.of(CLOSURE_COMPILE);
-        }
     },
     /**
      * Calls the closure compiler on the /transpiler along with other "files" into /closure-compiled.
@@ -212,15 +172,6 @@ enum J2clStep {
         @Override
         boolean skipIfDependency() {
             return true;
-        }
-
-        @Override
-        Optional<J2clStep> next(final J2clMavenContext context) {
-            return Optional.of(
-                    J2clClasspathScope.TEST == context.scope() ?
-                            JUNIT_TESTS :
-                            OUTPUT_ASSEMBLE
-            );
         }
     },
     /**
@@ -236,11 +187,6 @@ enum J2clStep {
         boolean skipIfDependency() {
             return true;
         }
-
-        @Override
-        Optional<J2clStep> next(final J2clMavenContext context) {
-            return Optional.empty();
-        }
     },
     /**
      * Uses webdriver to execute a junit test.
@@ -254,11 +200,6 @@ enum J2clStep {
         @Override
         boolean skipIfDependency() {
             return true;
-        }
-
-        @Override
-        Optional<J2clStep> next(final J2clMavenContext context) {
-            return Optional.empty();
         }
     };
 
@@ -314,7 +255,7 @@ enum J2clStep {
 
                 result.reportIfFailure(artifact, this);
             }
-            return result.next(this.next(context));
+            return context.next(this);
         } catch (final Exception cause) {
             output.flush();
 
@@ -394,8 +335,4 @@ enum J2clStep {
 
     // next.............................................................................................................
 
-    /**
-     * Returns the next step if one is present.
-     */
-    abstract Optional<J2clStep> next(final J2clMavenContext context);
 }
