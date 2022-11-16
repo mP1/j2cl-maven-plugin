@@ -19,7 +19,7 @@ package walkingkooka.j2cl.maven;
 
 import java.util.Optional;
 
-enum J2clStepResult {
+public enum J2clStepResult {
     /**
      * Stops processing of remaining steps.
      */

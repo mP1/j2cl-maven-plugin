@@ -15,9 +15,14 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.javac;
 
 import walkingkooka.collect.list.Lists;
+import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clPath;
+import walkingkooka.j2cl.maven.J2clStep;
+import walkingkooka.j2cl.maven.J2clStepDirectory;
+import walkingkooka.j2cl.maven.J2clStepWorker;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
 import java.util.List;
@@ -25,12 +30,12 @@ import java.util.List;
 /**
  * Compiles the java source to the target {@link J2clStepDirectory#output()}.
  */
-final class J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource extends J2clStepWorkerJavacCompiler {
+public final class J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource extends J2clStepWorkerJavacCompiler {
 
     /**
      * Singleton
      */
-    static J2clStepWorker instance() {
+    public static J2clStepWorker instance() {
         return new J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource();
     }
 

@@ -15,7 +15,7 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.closure;
 
 import com.google.javascript.jscomp.CommandLineRunner;
 import com.google.javascript.jscomp.CompilationLevel;
@@ -26,6 +26,8 @@ import com.google.javascript.jscomp.DependencyOptions;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.j2cl.maven.J2clMavenContext;
+import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.LineEnding;
 

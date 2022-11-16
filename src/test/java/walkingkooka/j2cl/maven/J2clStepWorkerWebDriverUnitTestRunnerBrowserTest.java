@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import org.junit.Test;
+import walkingkooka.j2cl.maven.test.J2clStepWorkerWebDriverUnitTestRunnerBrowser;
 
 import static org.junit.Assert.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;

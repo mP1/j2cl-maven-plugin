@@ -15,8 +15,14 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.unpack;
 
+import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clPath;
+import walkingkooka.j2cl.maven.J2clStep;
+import walkingkooka.j2cl.maven.J2clStepDirectory;
+import walkingkooka.j2cl.maven.J2clStepResult;
+import walkingkooka.j2cl.maven.J2clStepWorker;
 import walkingkooka.j2cl.maven.log.TreeFormat;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
@@ -28,12 +34,12 @@ import java.util.Optional;
  * the binary (jar) to {@link J2clStepDirectory#output()}. If no java source files are present processing of this
  * artifact is aborted and no attempt will be made to transpile java to javascript.
  */
-final class J2clStepWorkerUnpack implements J2clStepWorker {
+public final class J2clStepWorkerUnpack implements J2clStepWorker {
 
     /**
      * Singleton
      */
-    static J2clStepWorker instance() {
+    public static J2clStepWorker instance() {
         return new J2clStepWorkerUnpack();
     }
 

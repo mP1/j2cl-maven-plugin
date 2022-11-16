@@ -15,7 +15,7 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.closure;
 
 import walkingkooka.text.CharSequences;
 
@@ -25,17 +25,19 @@ import java.util.stream.Collectors;
 /**
  * {@see CommandLineRunner} for available options, unfortunately the FormattingOption class is not public.
  */
-enum ClosureFormattingOption {
+public enum ClosureFormattingOption {
     PRETTY_PRINT,
     PRINT_INPUT_DELIMITER,
     SINGLE_QUOTES;
 
-    static ClosureFormattingOption fromCommandLine(final String option) {
+    public static ClosureFormattingOption fromCommandLine(final String option) {
         return Arrays.stream(ClosureFormattingOption.values())
                 .filter(e -> e.name().equals(option) || e.name().toLowerCase().equals(option))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unknown formatting option " + CharSequences.quote(option) + " expected one of " +
-                        Arrays.stream(ClosureFormattingOption.values()).map(Enum::name).collect(Collectors.joining(", ")) +
-                        "\nhttps:///googleclosure.blogspot.com/2010/10/pretty-print-javascript-with-closure.html"));
+                .orElseThrow(
+                        () -> new IllegalArgumentException("Unknown formatting option " + CharSequences.quote(option) + " expected one of " +
+                                Arrays.stream(ClosureFormattingOption.values()).map(Enum::name).collect(Collectors.joining(", ")) +
+                                "\nhttps:///googleclosure.blogspot.com/2010/10/pretty-print-javascript-with-closure.html")
+                );
     }
 }

@@ -23,9 +23,12 @@ import walkingkooka.Context;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.j2cl.maven.closure.ClosureFormattingOption;
+import walkingkooka.j2cl.maven.hash.HashBuilder;
 import walkingkooka.j2cl.maven.log.BrowserLogLevel;
 import walkingkooka.j2cl.maven.log.MavenLogger;
 import walkingkooka.j2cl.maven.log.TreeLogger;
+import walkingkooka.j2cl.maven.test.J2clStepWorkerWebDriverUnitTestRunnerBrowser;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -51,7 +54,7 @@ import java.util.stream.Collectors;
  * Context about a build/test request. It contains common properties shared by different phases of the build/test process,
  * including classpaths, closure compiler parameters and maven scoping which is used to select dependencies/artifacts.
  */
-abstract class J2clMavenContext implements Context {
+public abstract class J2clMavenContext implements Context {
 
     J2clMavenContext(final J2clPath base,
                      final J2clPath target,
@@ -96,7 +99,7 @@ abstract class J2clMavenContext implements Context {
     /**
      * Classpath scope used to filter artifacts.
      */
-    final J2clClasspathScope scope() {
+    public final J2clClasspathScope scope() {
         return this.scope;
     }
 
@@ -108,7 +111,7 @@ abstract class J2clMavenContext implements Context {
     /**
      * The base or cache directory.
      */
-    final J2clPath base() {
+    public final J2clPath base() {
         return this.base;
     }
 
@@ -117,30 +120,30 @@ abstract class J2clMavenContext implements Context {
      */
     private final J2clPath base;
 
-    final J2clPath target() {
+    public final J2clPath target() {
         return this.target;
     }
 
     /**
      * The target or base directory receiving all build files.
      */
-    final J2clPath target;
+    public final J2clPath target;
 
     // dependencies.....................................................................................................
 
-    final boolean isClasspathRequired(final J2clArtifactCoords coords) {
+    public final boolean isClasspathRequired(final J2clArtifactCoords coords) {
         return this.classpathRequired.contains(coords);
     }
 
     private final List<J2clArtifactCoords> classpathRequired;
 
-    final boolean isIgnored(final J2clArtifactCoords coords) {
+    public final boolean isIgnored(final J2clArtifactCoords coords) {
         return this.ignoredDependencies.contains(coords);
     }
 
     private final List<J2clArtifactCoords> ignoredDependencies;
 
-    final boolean isJavascriptSourceRequired(final J2clArtifactCoords coords) {
+    public final boolean isJavascriptSourceRequired(final J2clArtifactCoords coords) {
         return this.javascriptSourceRequired.contains(coords);
     }
 
@@ -148,51 +151,51 @@ abstract class J2clMavenContext implements Context {
 
     // java.............................................................................................................
 
-    abstract J2clSourcesKind sourcesKind();
+    public abstract J2clSourcesKind sourcesKind();
 
     // closure.........................................................................................................
 
-    final CompilationLevel level() {
+    public final CompilationLevel level() {
         return this.level;
     }
 
     private final CompilationLevel level;
 
-    final Map<String, String> defines() {
+    public final Map<String, String> defines() {
         return this.defines;
     }
 
     private final Map<String, String> defines;
 
-    abstract List<String> entryPoints();
+    public abstract List<String> entryPoints();
 
-    final Set<String> externs() {
+    public final Set<String> externs() {
         return this.externs;
     }
 
     private final Set<String> externs;
 
-    final Set<ClosureFormattingOption> formatting() {
+    public final Set<ClosureFormattingOption> formatting() {
         return this.formatting;
     }
 
     private final Set<ClosureFormattingOption> formatting;
 
-    abstract J2clPath initialScriptFilename();
+    public abstract J2clPath initialScriptFilename();
 
     private final Set<String> javaCompilerArguments;
 
-    final Set<String> javaCompilerArguments() {
+    public final Set<String> javaCompilerArguments() {
         return this.javaCompilerArguments;
     }
 
-    final LanguageMode languageOut() {
+    public final LanguageMode languageOut() {
         return this.languageOut;
     }
 
     private final LanguageMode languageOut;
 
-    final Optional<String> sourceMaps() {
+    public final Optional<String> sourceMaps() {
         return this.sourceMaps;
     }
 
@@ -208,15 +211,15 @@ abstract class J2clMavenContext implements Context {
 
     // browserLogLevel..................................................................................................
 
-    abstract BrowserLogLevel browserLogLevel();
+    public abstract BrowserLogLevel browserLogLevel();
 
     // browsers.........................................................................................................
 
-    abstract List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers();
+    public abstract List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers();
 
     // testTimeout......................................................................................................
 
-    abstract int testTimeout();
+    public abstract int testTimeout();
 
     // MAVEN..............................................................................................................
 
@@ -232,7 +235,7 @@ abstract class J2clMavenContext implements Context {
      * Returns a sha1 hash in hex digits that uniquely identifies this request using components.
      * Requests should cache the hash for performance reasons.
      */
-    abstract HashBuilder computeHash(final Set<String> hashItemsNames);
+    public abstract HashBuilder computeHash(final Set<String> hashItemsNames);
 
     /**
      * Creates a {@link HashBuilder} and hashes most of the properties of a request.

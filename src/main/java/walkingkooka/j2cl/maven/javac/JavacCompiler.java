@@ -15,9 +15,11 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.javac;
 
 import walkingkooka.collect.list.Lists;
+import walkingkooka.j2cl.maven.J2clException;
+import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.log.TreeFormat;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.util.SystemProperty;

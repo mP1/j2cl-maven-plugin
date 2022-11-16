@@ -29,7 +29,7 @@ import java.util.List;
  * Represents a single compile step directory. Each and every dependency will have multiple steps and each step will
  * have its own directory holding a log and possibly other related local files.
  */
-final class J2clStepDirectory {
+public final class J2clStepDirectory {
 
     static J2clStepDirectory with(final Path path) {
         return new J2clStepDirectory(J2clPath.with(path));
@@ -43,11 +43,11 @@ final class J2clStepDirectory {
     /**
      * An abort is not a failure, its simply notes that a step has completed successfully and future steps need not be executed.
      */
-    J2clPath aborted() {
+    public J2clPath aborted() {
         return this.path.append("!ABORTED");
     }
 
-    J2clPath failed() {
+    public J2clPath failed() {
         return this.path.append("!FAILED");
     }
 
@@ -61,26 +61,26 @@ final class J2clStepDirectory {
     /**
      * The file that will capture the components of a hashing.
      */
-    J2clPath hashFile() {
+    public J2clPath hashFile() {
         return this.path.hashFile();
     }
 
     /**
      * The output directory for the javac compiler, transpiler etc.
      */
-    J2clPath output() {
+    public J2clPath output() {
         return this.path.output();
     }
 
-    J2clPath skipped() {
+    public J2clPath skipped() {
         return this.path.append("!SKIPPED");
     }
 
-    J2clPath successful() {
+    public J2clPath successful() {
         return this.path.append("!SUCCESSFUL");
     }
 
-    J2clPath path() {
+    public J2clPath path() {
         return this.path;
     }
 
@@ -88,9 +88,9 @@ final class J2clStepDirectory {
      * Writes the given lines to a log file under this job step directory.
      * Each step is given its own directory and will also have its own local log file showing the output for a particular single step.
      */
-    J2clStepDirectory writeLog(final List<CharSequence> lines,
-                               final Duration timeTaken,
-                               final TreeLogger logger) throws IOException {
+    public J2clStepDirectory writeLog(final List<CharSequence> lines,
+                                      final Duration timeTaken,
+                                      final TreeLogger logger) throws IOException {
         logger.emptyLine();
 
         final J2clPath logFile = this.logFile();

@@ -17,10 +17,21 @@
 
 package walkingkooka.j2cl.maven;
 
+import walkingkooka.j2cl.maven.closure.J2clStepWorkerClosureCompiler;
+import walkingkooka.j2cl.maven.hash.J2clStepWorkerHash;
+import walkingkooka.j2cl.maven.javac.J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource;
+import walkingkooka.j2cl.maven.javac.J2clStepWorkerJavacCompilerUnpackedSource;
 import walkingkooka.j2cl.maven.log.TreeLogger;
+import walkingkooka.j2cl.maven.output.J2clStepWorkerOutputAssembler;
+import walkingkooka.j2cl.maven.shade.J2clStepWorkerShadeClassFile;
+import walkingkooka.j2cl.maven.shade.J2clStepWorkerShadeJavaSource;
+import walkingkooka.j2cl.maven.strip.J2clStepWorkerGwtIncompatibleStripPreprocessor;
+import walkingkooka.j2cl.maven.test.J2clStepWorkerWebDriverUnitTestRunner;
+import walkingkooka.j2cl.maven.transpile.J2clStepWorkerJ2clTranspiler;
+import walkingkooka.j2cl.maven.unpack.J2clStepWorkerUnpack;
 
 @SuppressWarnings("StaticInitializerReferencesSubClass")
-interface J2clStepWorker {
+public interface J2clStepWorker {
 
     J2clStepWorker HASH = J2clStepWorkerHash.instance();
 

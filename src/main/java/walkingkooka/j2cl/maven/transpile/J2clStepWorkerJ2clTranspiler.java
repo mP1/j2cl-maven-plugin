@@ -15,9 +15,15 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.transpile;
 
 import walkingkooka.collect.set.Sets;
+import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clPath;
+import walkingkooka.j2cl.maven.J2clStep;
+import walkingkooka.j2cl.maven.J2clStepDirectory;
+import walkingkooka.j2cl.maven.J2clStepResult;
+import walkingkooka.j2cl.maven.J2clStepWorker;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
 import java.util.Optional;
@@ -26,12 +32,12 @@ import java.util.Set;
 /**
  * Transpiles the stripped source into javascript equivalents.
  */
-final class J2clStepWorkerJ2clTranspiler implements J2clStepWorker {
+public final class J2clStepWorkerJ2clTranspiler implements J2clStepWorker {
 
     /**
      * Singleton
      */
-    static J2clStepWorker instance() {
+    public static J2clStepWorker instance() {
         return new J2clStepWorkerJ2clTranspiler();
     }
 

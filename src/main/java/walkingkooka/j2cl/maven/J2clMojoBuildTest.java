@@ -30,6 +30,7 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.j2cl.maven.closure.ClosureFormattingOption;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;

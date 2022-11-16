@@ -58,42 +58,42 @@ import java.util.stream.Collectors;
  */
 public final class J2clPath implements Comparable<J2clPath> {
 
-    static final String FILE_PREFIX = ".walkingkooka-j2cl-maven-plugin";
+    public static final String FILE_PREFIX = ".walkingkooka-j2cl-maven-plugin";
 
     /**
      * Matches all files but not directories.
      */
-    static final Predicate<Path> ALL_FILES = Files::isRegularFile;
+    public static final Predicate<Path> ALL_FILES = Files::isRegularFile;
 
     /**
      * Matches paths with a class file extension.
      */
-    static final Predicate<Path> CLASS_FILEEXTENSION = fileEndsWith(".class");
+    public static final Predicate<Path> CLASS_FILEEXTENSION = fileEndsWith(".class");
 
     /**
      * Matches existing class files.
      */
-    static final Predicate<Path> CLASS_FILES = ALL_FILES.and(CLASS_FILEEXTENSION);
+    public static final Predicate<Path> CLASS_FILES = ALL_FILES.and(CLASS_FILEEXTENSION);
 
     /**
      * Matches paths with a java file extension.
      */
-    static final Predicate<Path> JAVA_FILEEXTENSION = fileEndsWith(".java");
+    public static final Predicate<Path> JAVA_FILEEXTENSION = fileEndsWith(".java");
 
     /**
      * Matches existing java files.
      */
-    static final Predicate<Path> JAVA_FILES = ALL_FILES.and(JAVA_FILEEXTENSION);
+    public static final Predicate<Path> JAVA_FILES = ALL_FILES.and(JAVA_FILEEXTENSION);
 
     /**
      * Matches existing js files.
      */
-    static final Predicate<Path> JAVASCRIPT_FILES = ALL_FILES.and(fileEndsWith(".js"));
+    public static final Predicate<Path> JAVASCRIPT_FILES = ALL_FILES.and(fileEndsWith(".js"));
 
     /**
      * Matches existing native.js files.
      */
-    static final Predicate<Path> NATIVE_JAVASCRIPT_FILES = ALL_FILES.and(fileEndsWith(".native.js"));
+    public static final Predicate<Path> NATIVE_JAVASCRIPT_FILES = ALL_FILES.and(fileEndsWith(".native.js"));
 
     /**
      * Matches all files that end with the given extension, assumes the extension includes a leading dot.
@@ -105,19 +105,21 @@ public final class J2clPath implements Comparable<J2clPath> {
     /**
      * This filter filters the /META-INF directory when extracting from an archive.
      */
-    static final Predicate<Path> WITHOUT_META_INF = (p) -> false == p.startsWith("/META-INF");
+    public static final Predicate<Path> WITHOUT_META_INF = (p) -> false == p.startsWith("/META-INF");
 
     /**
      * Matches all files except for java source.
      */
-    static final Predicate<Path> ALL_FILES_EXCEPT_JAVA = ALL_FILES.and((p) -> ! JAVA_FILEEXTENSION.test(p));
+    public static final Predicate<Path> ALL_FILES_EXCEPT_JAVA = ALL_FILES.and((p) -> !JAVA_FILEEXTENSION.test(p));
 
-    static List<File> toFiles(final Collection<J2clPath> paths) {
-        return paths.stream().map(J2clPath::file).collect(Collectors.toList());
+    public static List<File> toFiles(final Collection<J2clPath> paths) {
+        return paths.stream()
+                .map(J2clPath::file)
+                .collect(Collectors.toList());
     }
 
-    static List<FileInfo> toFileInfo(final Collection<J2clPath> files,
-                                     final J2clPath base) {
+    public static List<FileInfo> toFileInfo(final Collection<J2clPath> files,
+                                            final J2clPath base) {
         return files.stream()
                 .map(p -> {
                     final Path path = p.path();
@@ -136,7 +138,7 @@ public final class J2clPath implements Comparable<J2clPath> {
     }
 
     @SuppressWarnings("ThrowableNotThrown")
-    J2clPath absentOrFail() throws IOException {
+    public J2clPath absentOrFail() throws IOException {
         if (this.exists().isPresent()) {
             throw new IllegalArgumentException("Directory exists: " + this);
         }
@@ -144,23 +146,28 @@ public final class J2clPath implements Comparable<J2clPath> {
         return this.createIfNecessary();
     }
 
-    J2clPath append(final String directory) {
-        return J2clPath.with(Paths.get(this.path.toString(), directory));
+    public J2clPath append(final String directory) {
+        return J2clPath.with(
+                Paths.get(
+                        this.path.toString(),
+                        directory
+                )
+        );
     }
 
     /**
      * An identity {@link BiFunction} that does not modify the given file content.
      * Most copy operations except for shading dont want to modify each file they encounter.
      */
-    final static BiFunction<byte[], J2clPath, byte[]> COPY_FILE_CONTENT_VERBATIM = (b, path) -> b;
+    public final static BiFunction<byte[], J2clPath, byte[]> COPY_FILE_CONTENT_VERBATIM = (b, path) -> b;
 
     /**
      * Copies the files from the given source to this directory.
      */
-    Collection<J2clPath> copyFiles(final J2clPath src,
-                                   final Collection<J2clPath> files,
-                                   final BiFunction<byte[], J2clPath, byte[]> contentTransformer,
-                                   final TreeLogger logger) throws IOException {
+    public Collection<J2clPath> copyFiles(final J2clPath src,
+                                          final Collection<J2clPath> files,
+                                          final BiFunction<byte[], J2clPath, byte[]> contentTransformer,
+                                          final TreeLogger logger) throws IOException {
         final Path srcPath = src.path();
         final Path destPath = this.path();
 
@@ -204,12 +211,12 @@ public final class J2clPath implements Comparable<J2clPath> {
         return copied;
     }
 
-    J2clPath createIfNecessary() throws IOException {
+    public J2clPath createIfNecessary() throws IOException {
         Files.createDirectories(this.path());
         return this;
     }
 
-    Optional<J2clPath> exists() {
+    public Optional<J2clPath> exists() {
         return Optional.ofNullable(Files.exists(this.path()) ? this : null);
     }
 
@@ -218,9 +225,9 @@ public final class J2clPath implements Comparable<J2clPath> {
     /**
      * Extract ALL the files from this archive, returning number of files extracted
      */
-    Set<J2clPath> extractArchiveFiles(final Predicate<Path> filter,
-                                      final J2clPath target,
-                                      final TreeLogger logger) throws IOException {
+    public Set<J2clPath> extractArchiveFiles(final Predicate<Path> filter,
+                                             final J2clPath target,
+                                             final TreeLogger logger) throws IOException {
         final URI uri = URI.create("jar:" + this.path().toAbsolutePath().toUri());
         try (final FileSystem zip = FileSystems.newFileSystem(uri, Maps.empty())) {
             return this.extractArchiveFiles0(zip.getPath("/"),
@@ -275,21 +282,21 @@ public final class J2clPath implements Comparable<J2clPath> {
     /**
      * Uses to collect all files that match the {@link BiPredicate} and returns a sorted {@link Set}.
      */
-    Set<J2clPath> gatherFiles(final Predicate<Path> filter) throws IOException {
+    public Set<J2clPath> gatherFiles(final Predicate<Path> filter) throws IOException {
         return Files.find(this.path(), Integer.MAX_VALUE, (p, a) -> filter.test(p))
                 .map(J2clPath::with)
                 .sorted()
                 .collect(Collectors.toCollection(Sets::sorted));
     }
 
-    boolean isFile() {
+    public boolean isFile() {
         return Files.isRegularFile(this.path());
     }
 
     /**
      * Builds a new path holding the ignore file.
      */
-    J2clPath ignoredFiles() {
+    public J2clPath ignoredFiles() {
         return this.append(IGNORED_FILES);
     }
 
@@ -301,7 +308,7 @@ public final class J2clPath implements Comparable<J2clPath> {
     /**
      * Returns true if this file is a java file.
      */
-    boolean isJava() {
+    public boolean isJava() {
         return this.filename().endsWith(".java");
     }
 
@@ -317,14 +324,14 @@ public final class J2clPath implements Comparable<J2clPath> {
     /**
      * Builds a new path holding the output directory within this directory.
      */
-    J2clPath output() {
+    public J2clPath output() {
         return this.append(OUTPUT);
     }
 
     /**
      * Only returns true if this path is the output directory of an UNPACK.
      */
-    boolean isUnpackOutput(final J2clMavenContext context) {
+    public boolean isUnpackOutput(final J2clMavenContext context) {
         return this.filename().equals(OUTPUT) &&
                 this.path()
                         .getParent()
@@ -335,7 +342,7 @@ public final class J2clPath implements Comparable<J2clPath> {
 
     private final static String OUTPUT = "output";
 
-    J2clPath parent() {
+    public J2clPath parent() {
         return new J2clPath(this.path().getParent());
     }
 
@@ -345,18 +352,18 @@ public final class J2clPath implements Comparable<J2clPath> {
 
     private final Path path;
 
-    String filename() {
+    public String filename() {
         return this.path().getFileName().toString();
     }
 
-    File file() {
+    public File file() {
         return this.path().toFile();
     }
 
     /**
      * Performs a recursive file delete on this path.
      */
-    J2clPath removeAll() throws IOException {
+    public J2clPath removeAll() throws IOException {
         Files.walkFileTree(this.path(),
                 new SimpleFileVisitor<>() {
                     @Override
@@ -379,14 +386,14 @@ public final class J2clPath implements Comparable<J2clPath> {
     /**
      * Builds a new path holding the shade mapping file.
      */
-    J2clPath shadeFile() {
+    public J2clPath shadeFile() {
         return this.append(SHADE_FILE);
     }
 
     /**
      * The name of the shade file used during {@link J2clStep#SHADE_JAVA_SOURCE} and the package prefix to be removed.
      */
-    static final String SHADE_FILE = FILE_PREFIX + "-shade.txt";
+    public static final String SHADE_FILE = FILE_PREFIX + "-shade.txt";
 
     /**
      * Used to read the {@link #SHADE_FILE} properties file. Note the {@link Map} keeps entries in the file order.
@@ -430,11 +437,11 @@ public final class J2clPath implements Comparable<J2clPath> {
     /**
      * Returns true if the given {@link Path} belongs to the super under this path.
      */
-    boolean isSuperSource(final Path path) {
+    public boolean isSuperSource(final Path path) {
         return this.path.relativize(path).toString().startsWith("super");
     }
 
-    boolean isTestAnnotation() {
+    public boolean isTestAnnotation() {
         final Path path = this.path();
         return Files.isDirectory(path) && path.getFileName().toString().equals("test-annotations");
     }
@@ -442,7 +449,7 @@ public final class J2clPath implements Comparable<J2clPath> {
     /**
      * Builds the name of the testsuite javascript file from the class name. It should appear in the output directory.
      */
-    J2clPath testAdapterSuiteGeneratedFilename(final String testClassName) {
+    public J2clPath testAdapterSuiteGeneratedFilename(final String testClassName) {
         //  'org.gwtproject.timer.client.TimerJ2clTest');
         return this.append(testClassName.replace('.', File.separatorChar) + TESTSUITE_FILEEXTENSION);
     }
@@ -450,7 +457,7 @@ public final class J2clPath implements Comparable<J2clPath> {
     /**
      * Using the output directory and the testClassName and computes the testSuite js path.
      */
-    J2clPath testAdapterSuiteCorrectFilename(final String testClassName) {
+    public J2clPath testAdapterSuiteCorrectFilename(final String testClassName) {
         // goog.module('javatests.org.gwtproject.timer.client.TimerJ2clTest_AdapterSuite');
         return this.append(("/javatests/" + testClassName + "_AdapterSuite")
                 .replace('.', File.separatorChar)
@@ -462,7 +469,7 @@ public final class J2clPath implements Comparable<J2clPath> {
     /**
      * Writes the content to this path.
      */
-    J2clPath writeFile(final byte[] contents) throws IOException {
+    public J2clPath writeFile(final byte[] contents) throws IOException {
         Files.write(this.path(), contents, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         return this;
     }

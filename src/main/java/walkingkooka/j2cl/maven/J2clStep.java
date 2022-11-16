@@ -38,7 +38,7 @@ import java.util.concurrent.Callable;
 /**
  * The individual steps that are executed in series to complete the process of building.
  */
-enum J2clStep {
+public enum J2clStep {
     /**
      * Computes the hash for the given {@link J2clDependency} including its dependencies.
      */

@@ -15,20 +15,25 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.strip;
 
 import walkingkooka.collect.list.Lists;
+import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clStep;
+import walkingkooka.j2cl.maven.J2clStepDirectory;
+import walkingkooka.j2cl.maven.J2clStepResult;
+import walkingkooka.j2cl.maven.J2clStepWorker;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
 /**
  * Compiles the java source to the target {@link J2clStepDirectory#output()}.
  */
-final class J2clStepWorkerGwtIncompatibleStripPreprocessor implements J2clStepWorker {
+public final class J2clStepWorkerGwtIncompatibleStripPreprocessor implements J2clStepWorker {
 
     /**
      * Singleton
      */
-    static J2clStepWorker instance() {
+    public static J2clStepWorker instance() {
         return new J2clStepWorkerGwtIncompatibleStripPreprocessor();
     }
 
