@@ -15,9 +15,17 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.closure;
 
 import walkingkooka.collect.set.Sets;
+import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clMavenContext;
+import walkingkooka.j2cl.maven.J2clPath;
+import walkingkooka.j2cl.maven.J2clSourcesKind;
+import walkingkooka.j2cl.maven.J2clStep;
+import walkingkooka.j2cl.maven.J2clStepDirectory;
+import walkingkooka.j2cl.maven.J2clStepResult;
+import walkingkooka.j2cl.maven.J2clStepWorker;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
 import java.util.Set;
@@ -25,12 +33,12 @@ import java.util.Set;
 /**
  * Calls the closure compiler and assembles the final Javascript output.
  */
-final class J2clStepWorkerClosureCompiler implements J2clStepWorker {
+public final class J2clStepWorkerClosureCompiler implements J2clStepWorker {
 
     /**
      * Singleton
      */
-    static J2clStepWorker instance() {
+    public static J2clStepWorker instance() {
         return new J2clStepWorkerClosureCompiler();
     }
 

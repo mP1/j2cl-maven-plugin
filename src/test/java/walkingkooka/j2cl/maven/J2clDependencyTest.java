@@ -64,6 +64,6 @@ public final class J2clDependencyTest implements ClassTesting2<J2clDependency> {
 
     @Override
     public JavaVisibility typeVisibility() {
-        return JavaVisibility.PACKAGE_PRIVATE;
+        return JavaVisibility.PUBLIC;
     }
 }

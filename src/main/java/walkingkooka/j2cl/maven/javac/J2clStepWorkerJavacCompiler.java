@@ -15,9 +15,15 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.javac;
 
 import walkingkooka.collect.set.Sets;
+import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clPath;
+import walkingkooka.j2cl.maven.J2clStep;
+import walkingkooka.j2cl.maven.J2clStepDirectory;
+import walkingkooka.j2cl.maven.J2clStepResult;
+import walkingkooka.j2cl.maven.J2clStepWorker;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
 import java.util.List;

@@ -15,7 +15,7 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.test;
 
 import com.google.common.io.CharStreams;
 import org.openqa.selenium.JavascriptExecutor;
@@ -23,6 +23,14 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.support.ui.FluentWait;
+import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clException;
+import walkingkooka.j2cl.maven.J2clMavenContext;
+import walkingkooka.j2cl.maven.J2clPath;
+import walkingkooka.j2cl.maven.J2clStep;
+import walkingkooka.j2cl.maven.J2clStepDirectory;
+import walkingkooka.j2cl.maven.J2clStepResult;
+import walkingkooka.j2cl.maven.J2clStepWorker;
 import walkingkooka.j2cl.maven.log.BrowserLogLevel;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.CharSequences;
@@ -39,12 +47,12 @@ import java.util.List;
  * Assumes that the closure compiler has completed successfully and then invokes web driver to execute the prepared
  * js file containing the tests.
  */
-final class J2clStepWorkerWebDriverUnitTestRunner implements J2clStepWorker {
+public final class J2clStepWorkerWebDriverUnitTestRunner implements J2clStepWorker {
 
     /**
      * Singleton
      */
-    static J2clStepWorker instance() {
+    public static J2clStepWorker instance() {
         return new J2clStepWorkerWebDriverUnitTestRunner();
     }
 

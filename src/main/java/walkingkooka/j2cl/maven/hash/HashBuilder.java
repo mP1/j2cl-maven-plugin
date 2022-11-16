@@ -15,7 +15,7 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.hash;
 
 import org.apache.commons.codec.binary.Hex;
 
@@ -29,12 +29,12 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Builds a SHA1 composed of several inputs, such as dependencies & maven parameters.
  */
-final class HashBuilder {
+public final class HashBuilder {
 
     private final MessageDigest digest;
     private String hash;
 
-    static HashBuilder empty() {
+    public static HashBuilder empty() {
         return new HashBuilder();
     }
 
@@ -46,19 +46,19 @@ final class HashBuilder {
         }
     }
 
-    HashBuilder append(final Enum<?> e) {
+    public HashBuilder append(final Enum<?> e) {
         return this.append(e.name());
     }
 
-    HashBuilder append(final String text) {
+    public HashBuilder append(final String text) {
         return this.append(text.getBytes(Charset.defaultCharset()));
     }
 
-    HashBuilder append(final Path file) throws IOException {
+    public HashBuilder append(final Path file) throws IOException {
         return this.append(Files.readAllBytes(file));
     }
 
-    HashBuilder append(final byte[] content) {
+    public HashBuilder append(final byte[] content) {
         final String hash = this.hash;
         if (null != hash) {
             throw new IllegalStateException("Hash already computed: " + hash);

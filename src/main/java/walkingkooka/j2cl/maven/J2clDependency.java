@@ -63,7 +63,7 @@ import java.util.stream.Stream;
 /**
  * Represents a single artifact including the project or any of its dependencies. These will in turn have java files etc.
  */
-final class J2clDependency implements Comparable<J2clDependency> {
+public final class J2clDependency implements Comparable<J2clDependency> {
 
     static Set<J2clDependency> set() {
         return Sets.ordered();
@@ -671,7 +671,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Returns the archive file attached to this archive.
      */
-    synchronized Optional<J2clPath> artifactFile() {
+    public synchronized Optional<J2clPath> artifactFile() {
         if (null == this.artifactFile) {
             final J2clArtifactCoords coords = this.coords();
             this.artifactFile = Optional.of(this.context()
@@ -691,7 +691,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Returns the archive file or fails if absent.
      */
-    J2clPath artifactFileOrFail() {
+    public J2clPath artifactFileOrFail() {
         return this.artifactFile().orElseThrow(this.archiveFileMissing());
     }
 
@@ -701,7 +701,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     // coords...........................................................................................................
 
-    J2clArtifactCoords coords() {
+    public J2clArtifactCoords coords() {
         return this.coords;
     }
 
@@ -712,8 +712,8 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     // project...........................................................................................................
 
-    MavenProject project() {
-        if(null == this.project) {
+    public MavenProject project() {
+        if (null == this.project) {
             // all requests with a null project must be dependencies of the project being built and their COMPILE dependencies should be fetched.
             final J2clMavenContext context = this.context();
             this.project = context.mavenMiddleware()
@@ -732,7 +732,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Retrieves all dependencies including transients, and will include any required artifacts.
      */
-    Set<J2clDependency> dependencies() {
+    public Set<J2clDependency> dependencies() {
         return this.dependencies;
     }
 
@@ -740,7 +740,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     // isDependency.....................................................................................................
 
-    boolean isDependency() {
+    public boolean isDependency() {
         return this.artifactFile().isPresent();
     }
 
@@ -748,7 +748,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Only returns true for artifacts that have been declared as classpath required or identified as an annotation
      * processor archive.
      */
-    boolean isClasspathRequired() {
+    public boolean isClasspathRequired() {
         if (null == this.classpathRequired) {
             this.testArchive();
 
@@ -800,7 +800,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Returns true for artifacts that only contain javascript.
      */
-    boolean isJavascriptSourceRequired() {
+    public boolean isJavascriptSourceRequired() {
         if (null == this.javascriptSourceRequired) {
             this.testArchive();
 
@@ -853,7 +853,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Only files marked with an ignore file or in the POM under the ignored-dependencies will return true.
      */
-    boolean isIgnored() {
+    public boolean isIgnored() {
         if (null == this.ignored) {
             this.testArchive();
 
@@ -870,7 +870,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Returns true if this dependency only includes annotation class files.
      */
-    boolean isAnnotationClassFiles() {
+    public boolean isAnnotationClassFiles() {
         if (null == this.annotationClassFiles) {
             this.testArchive();
         }
@@ -893,7 +893,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Returns true if this dependency includes an annotation processor services file.
      */
-    boolean isAnnotationProcessor() {
+    public boolean isAnnotationProcessor() {
         if (null == this.annotationProcessor) {
             this.testArchive();
         }
@@ -918,7 +918,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Returns true if this archive contains JAVASCRIPT bootstrap class files, by testing if java.lang.Class class file exists.
      */
-    boolean isJreJavascriptBootstrapFiles() {
+    public boolean isJreJavascriptBootstrapFiles() {
         if (null == this.jreJavascriptBootstrapFiles) {
             this.testArchive();
         }
@@ -933,7 +933,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Returns true if this archive contains JAVASCRIPT  files, by testing if java.lang.  file exists.
      */
-    boolean isJreJavascriptFiles() {
+    public boolean isJreJavascriptFiles() {
         if (null == this.jreJavascriptFiles) {
             this.testArchive();
         }
@@ -948,7 +948,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Returns true if this archive contains JRE bootstrap class files, by testing if java.lang.Class class file exists.
      */
-    boolean isJreBootstrapClassFiles() {
+    public boolean isJreBootstrapClassFiles() {
         if (null == this.jreBootstrapClassFiles) {
             this.testArchive();
         }
@@ -963,7 +963,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Returns true if this archive contains JRE class files, by testing if java.lang.Class class file exists.
      */
-    boolean isJreClassFiles() {
+    public boolean isJreClassFiles() {
         if (null == this.jreClassFiles) {
             this.testArchive();
         }
@@ -1123,7 +1123,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     // shade............................................................................................................
 
-    Map<String, String> shadeMappings() throws IOException {
+    public Map<String, String> shadeMappings() throws IOException {
         if (null == this.shadeMappings) {
             this.shadeMappings = this.loadShadeFile();
         }
@@ -1146,7 +1146,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
 
     // tasks............................................................................................................
 
-    J2clMavenContext context() {
+    public J2clMavenContext context() {
         return this.context;
     }
 
@@ -1157,7 +1157,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Sets the directory for this dependency, assumes the hash has been computed
      */
-    J2clDependency setDirectory(final String hash) throws IOException {
+    public J2clDependency setDirectory(final String hash) throws IOException {
         final J2clPath create = this.context.base().append(this.coords.directorySafeName() + "-" + hash);
         final J2clPath previous = this.directory.compareAndExchange(null, create);
         if (null != previous) {
@@ -1185,7 +1185,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Returns a compile step directory, creating it if necessary.
      */
-    J2clStepDirectory step(final J2clStep step) {
+    public J2clStepDirectory step(final J2clStep step) {
         return J2clStepDirectory.with(
                 Paths.get(
                         this.directory().toString(),
@@ -1198,7 +1198,7 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Tries to find the output directory for the given {@link J2clStep} stopping when one is found or returns
      * the archive file for this dependency.
      */
-    J2clPath stepSourcesOrArchiveFile(final List<J2clStep> steps) {
+    public J2clPath stepSourcesOrArchiveFile(final List<J2clStep> steps) {
         Objects.requireNonNull(steps, "steps");
 
         J2clPath result = null;
@@ -1221,13 +1221,13 @@ final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Returns all source roots including resources which can be directories or archives.
      */
-    List<J2clPath> sourcesRoot() {
+    public List<J2clPath> sourcesRoot() {
         final J2clMavenContext context = this.context();
         final List<J2clPath> sources = Lists.array();
 
         final MavenProject project = this.project();
         final File projectBase = project.getFile();
-        if(null != projectBase) {
+        if (null != projectBase) {
             sources.addAll(context
                     .sourcesKind()
                     .compileSourceRoots(project, J2clPath.with(projectBase.toPath())));

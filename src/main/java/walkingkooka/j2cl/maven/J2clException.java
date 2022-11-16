@@ -17,7 +17,7 @@
 
 package walkingkooka.j2cl.maven;
 
-class J2clException extends RuntimeException {
+public class J2clException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     public J2clException(final String message) {

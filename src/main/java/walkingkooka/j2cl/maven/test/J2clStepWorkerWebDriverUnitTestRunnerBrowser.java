@@ -15,7 +15,7 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.test;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -35,10 +35,10 @@ import java.util.stream.Collectors;
 /**
  * Lists all available or supported browsers, with a single factory method for each to create a {@link WebDriver} instance.
  */
-enum J2clStepWorkerWebDriverUnitTestRunnerBrowser {
+public enum J2clStepWorkerWebDriverUnitTestRunnerBrowser {
     CHROME {
         @Override
-        WebDriver webDriver(final BrowserLogLevel logLevel) {
+        public WebDriver webDriver(final BrowserLogLevel logLevel) {
             WebDriverManager.chromedriver().setup();
 
             final ChromeOptions options = new ChromeOptions()
@@ -51,7 +51,7 @@ enum J2clStepWorkerWebDriverUnitTestRunnerBrowser {
     },
     FIREFOX {
         @Override
-        WebDriver webDriver(final BrowserLogLevel logLevel) {
+        public WebDriver webDriver(final BrowserLogLevel logLevel) {
             WebDriverManager.firefoxdriver().setup();
 
             final FirefoxOptions options = new FirefoxOptions()
@@ -64,14 +64,14 @@ enum J2clStepWorkerWebDriverUnitTestRunnerBrowser {
     },
     HTML_UNIT {
         @Override
-        WebDriver webDriver(final BrowserLogLevel ignored) {
+        public WebDriver webDriver(final BrowserLogLevel ignored) {
             return new HtmlUnitDriver(BrowserVersion.BEST_SUPPORTED, true);
         }
     };
 
-    abstract WebDriver webDriver(final BrowserLogLevel logLevel);
+    public abstract WebDriver webDriver(final BrowserLogLevel logLevel);
 
-    static J2clStepWorkerWebDriverUnitTestRunnerBrowser fromCommandLine(final String option) {
+    public static J2clStepWorkerWebDriverUnitTestRunnerBrowser fromCommandLine(final String option) {
         return Arrays.stream(values())
                 .filter(e -> e.name().equals(option) || e.name().toLowerCase().equals(option))
                 .findFirst()

@@ -15,9 +15,16 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.javac;
 
 import walkingkooka.collect.list.Lists;
+import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clMavenContext;
+import walkingkooka.j2cl.maven.J2clPath;
+import walkingkooka.j2cl.maven.J2clSourcesKind;
+import walkingkooka.j2cl.maven.J2clStep;
+import walkingkooka.j2cl.maven.J2clStepDirectory;
+import walkingkooka.j2cl.maven.J2clStepWorker;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.CharSequences;
 
@@ -27,12 +34,12 @@ import java.util.List;
 /**
  * Compiles the java source to the target {@link J2clStepDirectory#output()}, with annotation processors enabled.
  */
-final class J2clStepWorkerJavacCompilerUnpackedSource extends J2clStepWorkerJavacCompiler {
+public final class J2clStepWorkerJavacCompilerUnpackedSource extends J2clStepWorkerJavacCompiler {
 
     /**
      * Singleton
      */
-    static J2clStepWorker instance() {
+    public static J2clStepWorker instance() {
         return new J2clStepWorkerJavacCompilerUnpackedSource();
     }
 
@@ -106,8 +113,9 @@ final class J2clStepWorkerJavacCompilerUnpackedSource extends J2clStepWorkerJava
     }
 
     // 'javatests.org.gwtproject.timer.client.TimerJ2clTest_AdapterSuite' -> org.gwtproject.timer.client.TimerJ2clTest
-    static String extractTestClassName(final String typeName) {
-        return CharSequences.subSequence(typeName, "javatests.".length(), -"_AdapterSuite".length())
-                .toString();
+    public static String extractTestClassName(final String typeName) {
+        return CharSequences.subSequence(
+                typeName, "javatests.".length(), -"_AdapterSuite".length()
+        ).toString();
     }
 }

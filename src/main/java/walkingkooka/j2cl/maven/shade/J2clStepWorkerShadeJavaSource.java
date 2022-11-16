@@ -15,9 +15,13 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.shade;
 
 import walkingkooka.collect.list.Lists;
+import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clPath;
+import walkingkooka.j2cl.maven.J2clStep;
+import walkingkooka.j2cl.maven.J2clStepWorker;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.javashader.JavaShaders;
 
@@ -33,12 +37,12 @@ import java.util.function.Predicate;
  * If the dependency source has a shade file, create an output directory with selected shaded class files combined
  * with the other class files changed.
  */
-final class J2clStepWorkerShadeJavaSource extends J2clStepWorkerShade {
+public final class J2clStepWorkerShadeJavaSource extends J2clStepWorkerShade {
 
     /**
      * Singleton
      */
-    static J2clStepWorker instance() {
+    public static J2clStepWorker instance() {
         return new J2clStepWorkerShadeJavaSource();
     }
 

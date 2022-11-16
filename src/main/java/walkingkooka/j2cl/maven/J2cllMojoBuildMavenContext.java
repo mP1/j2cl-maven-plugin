@@ -20,8 +20,11 @@ package walkingkooka.j2cl.maven;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import walkingkooka.collect.list.Lists;
+import walkingkooka.j2cl.maven.closure.ClosureFormattingOption;
+import walkingkooka.j2cl.maven.hash.HashBuilder;
 import walkingkooka.j2cl.maven.log.BrowserLogLevel;
 import walkingkooka.j2cl.maven.log.MavenLogger;
+import walkingkooka.j2cl.maven.test.J2clStepWorkerWebDriverUnitTestRunnerBrowser;
 
 import java.util.List;
 import java.util.Map;
@@ -111,26 +114,26 @@ final class J2cllMojoBuildMavenContext extends J2clMavenContext {
     }
 
     @Override
-    J2clSourcesKind sourcesKind() {
+    public J2clSourcesKind sourcesKind() {
         return J2clSourcesKind.SRC;
     }
 
     @Override
-    List<String> entryPoints() {
+    public List<String> entryPoints() {
         return this.entryPoints;
     }
 
     private final List<String> entryPoints;
 
     @Override
-    J2clPath initialScriptFilename() {
+    public J2clPath initialScriptFilename() {
         return this.initialScriptFilename;
     }
 
     private final J2clPath initialScriptFilename;
 
     @Override
-    HashBuilder computeHash(final Set<String> hashItemNames) {
+    public HashBuilder computeHash(final Set<String> hashItemNames) {
         final HashBuilder hash = this.computeHash0(hashItemNames);
 
         this.entryPoints.forEach(e -> {
@@ -146,17 +149,17 @@ final class J2cllMojoBuildMavenContext extends J2clMavenContext {
     }
 
     @Override
-    List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers() {
+    public List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    BrowserLogLevel browserLogLevel() {
+    public BrowserLogLevel browserLogLevel() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    int testTimeout() {
+    public int testTimeout() {
         throw new UnsupportedOperationException();
     }
 

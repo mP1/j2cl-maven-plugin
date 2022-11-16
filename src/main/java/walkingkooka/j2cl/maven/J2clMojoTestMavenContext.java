@@ -20,8 +20,11 @@ package walkingkooka.j2cl.maven;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import walkingkooka.collect.list.Lists;
+import walkingkooka.j2cl.maven.closure.ClosureFormattingOption;
+import walkingkooka.j2cl.maven.hash.HashBuilder;
 import walkingkooka.j2cl.maven.log.BrowserLogLevel;
 import walkingkooka.j2cl.maven.log.MavenLogger;
+import walkingkooka.j2cl.maven.test.J2clStepWorkerWebDriverUnitTestRunnerBrowser;
 
 import java.util.List;
 import java.util.Map;
@@ -120,18 +123,18 @@ final class J2clMojoTestMavenContext extends J2clMavenContext {
     }
 
     @Override
-    J2clSourcesKind sourcesKind() {
+    public J2clSourcesKind sourcesKind() {
         return J2clSourcesKind.TEST;
     }
 
     @Override
-    List<String> entryPoints() {
+    public List<String> entryPoints() {
         // this is the mangled name of a javascript file produced by the junit annotation-processor.
         return Lists.of("javatests." + this.testClassName + "_AdapterSuite");
     }
 
     @Override
-    J2clPath initialScriptFilename() {
+    public J2clPath initialScriptFilename() {
         return this.project.directory()
                 .append(this.directoryName(J2clStep.CLOSURE_COMPILE))
                 .output()
@@ -139,7 +142,7 @@ final class J2clMojoTestMavenContext extends J2clMavenContext {
     }
 
     @Override
-    HashBuilder computeHash(final Set<String> hashItemNames) {
+    public HashBuilder computeHash(final Set<String> hashItemNames) {
         final HashBuilder hash = this.computeHash0(hashItemNames);
 
         // no need to include browser or testTimeout in hash as these do no affect generated js
@@ -158,14 +161,14 @@ final class J2clMojoTestMavenContext extends J2clMavenContext {
     private J2clDependency project;
 
     @Override
-    List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers() {
+    public List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers() {
         return this.browsers;
     }
 
     private final List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers;
 
     @Override
-    BrowserLogLevel browserLogLevel() {
+    public BrowserLogLevel browserLogLevel() {
         return this.browserLogLevel;
     }
 
@@ -174,7 +177,7 @@ final class J2clMojoTestMavenContext extends J2clMavenContext {
     private final String testClassName;
 
     @Override
-    int testTimeout() {
+    public int testTimeout() {
         return this.testTimeout;
     }
 

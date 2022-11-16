@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 /**
  * Used to select either SRC or TEST sources including resources
  */
-enum J2clSourcesKind {
+public enum J2clSourcesKind {
 
     /**
      * Use the project and dependencies src and resource directories.

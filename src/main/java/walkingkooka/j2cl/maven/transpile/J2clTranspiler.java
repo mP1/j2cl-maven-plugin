@@ -15,12 +15,13 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.transpile;
 
 import com.google.j2cl.common.Problems;
 import com.google.j2cl.frontend.Frontend;
 import com.google.j2cl.transpiler.J2clTranspilerOptions;
 import walkingkooka.collect.list.Lists;
+import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.log.TreeFormat;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.CharSequences;

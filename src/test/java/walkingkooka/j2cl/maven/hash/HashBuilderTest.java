@@ -15,7 +15,7 @@
  *
  */
 
-package walkingkooka.j2cl.maven;
+package walkingkooka.j2cl.maven.hash;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.AfterEach;
@@ -49,50 +49,58 @@ public final class HashBuilderTest implements ClassTesting2<HashBuilder>, ToStri
 
     @Test
     public void testHashBytes() {
-        this.checkNotEquals(HashBuilder.empty()
+        this.checkNotEquals(
+                HashBuilder.empty()
                         .append(new byte[1])
                         .append(new byte[]{2, 3})
                         .toString(),
                 HashBuilder.empty()
                         .append(new byte[]{2, 3})
                         .append(new byte[1])
-                        .toString());
+                        .toString()
+        );
     }
 
     @Test
     public void testHashBytesRepeated() {
-        this.checkEquals(HashBuilder.empty()
+        this.checkEquals(
+                HashBuilder.empty()
                         .append(new byte[]{1, 2})
                         .append(new byte[]{3, 4})
                         .toString(),
                 HashBuilder.empty()
                         .append(new byte[]{1, 2})
                         .append(new byte[]{3, 4})
-                        .toString());
+                        .toString()
+        );
     }
 
     @Test
     public void testHashEnum() {
-        this.checkNotEquals(HashBuilder.empty()
+        this.checkNotEquals(
+                HashBuilder.empty()
                         .append(RoundingMode.CEILING)
                         .append(RoundingMode.FLOOR)
                         .toString(),
                 HashBuilder.empty()
                         .append(RoundingMode.FLOOR)
                         .append(RoundingMode.CEILING)
-                        .toString());
+                        .toString()
+        );
     }
 
     @Test
     public void testHashEnumRepeated() {
-        this.checkEquals(HashBuilder.empty()
+        this.checkEquals(
+                HashBuilder.empty()
                         .append(RoundingMode.CEILING)
                         .append(RoundingMode.FLOOR)
                         .toString(),
                 HashBuilder.empty()
                         .append(RoundingMode.CEILING)
                         .append(RoundingMode.FLOOR)
-                        .toString());
+                        .toString()
+        );
     }
 
     @Test
@@ -105,14 +113,16 @@ public final class HashBuilderTest implements ClassTesting2<HashBuilder>, ToStri
         final byte[] content2 = "def".getBytes(Charset.defaultCharset());
         Files.write(path2, content2);
 
-        this.checkNotEquals(HashBuilder.empty()
+        this.checkNotEquals(
+                HashBuilder.empty()
                         .append(path1)
                         .append(path2)
                         .toString(),
                 HashBuilder.empty()
                         .append(path2)
                         .append(path1)
-                        .toString());
+                        .toString()
+        );
     }
 
     @Test
@@ -125,14 +135,16 @@ public final class HashBuilderTest implements ClassTesting2<HashBuilder>, ToStri
         final byte[] content2 = "def".getBytes(Charset.defaultCharset());
         Files.write(path2, content2);
 
-        this.checkEquals(HashBuilder.empty()
+        this.checkEquals(
+                HashBuilder.empty()
                         .append(path1)
                         .append(path2)
                         .toString(),
                 HashBuilder.empty()
                         .append(path1)
                         .append(path2)
-                        .toString());
+                        .toString()
+        );
     }
 
     @Test
@@ -141,36 +153,42 @@ public final class HashBuilderTest implements ClassTesting2<HashBuilder>, ToStri
         final byte[] content = "abc".getBytes(Charset.defaultCharset());
         Files.write(path, content);
 
-        this.checkEquals(HashBuilder.empty()
+        this.checkEquals(
+                HashBuilder.empty()
                         .append(path)
                         .toString(),
                 HashBuilder.empty()
                         .append("abc")
-                        .toString());
+                        .toString()
+        );
     }
 
     @Test
     public void testHashString() {
-        this.checkNotEquals(HashBuilder.empty()
+        this.checkNotEquals(
+                HashBuilder.empty()
                         .append("A")
                         .append("BC")
                         .toString(),
                 HashBuilder.empty()
                         .append("BC")
                         .append("A")
-                        .toString());
+                        .toString()
+        );
     }
 
     @Test
     public void testHashStringRepeated() {
-        this.checkEquals(HashBuilder.empty()
+        this.checkEquals(
+                HashBuilder.empty()
                         .append("A")
                         .append("BC")
                         .toString(),
                 HashBuilder.empty()
                         .append("A")
                         .append("BC")
-                        .toString());
+                        .toString()
+        );
     }
 
     // ClassTesting.....................................................................................................
@@ -182,6 +200,6 @@ public final class HashBuilderTest implements ClassTesting2<HashBuilder>, ToStri
 
     @Override
     public JavaVisibility typeVisibility() {
-        return JavaVisibility.PACKAGE_PRIVATE;
+        return JavaVisibility.PUBLIC;
     }
 }
