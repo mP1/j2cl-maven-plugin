@@ -1169,13 +1169,15 @@ final class J2clDependency implements Comparable<J2clDependency> {
      * Executes all steps in order for this artifact. This assumes that all dependencies have already completed successfully.
      */
     private J2clDependency job0() throws Exception {
-        final MavenLogger logger = this.context().mavenLogger();
+        final J2clMavenContext context = this.context();
+
+        final MavenLogger logger = context.mavenLogger();
         final String coords = this.coords().toString();
         final Instant start = Instant.now();
 
         logger.info(coords);
         {
-            this.executeStep(J2clStep.FIRST);
+            this.executeStep(context.firstStep());
         }
         logger.info(coords + " completed, " + Duration.between(start, Instant.now()).toSeconds() + " second(s) taken");
 
