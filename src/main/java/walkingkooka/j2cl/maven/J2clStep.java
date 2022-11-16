@@ -253,7 +253,7 @@ enum J2clStep {
 
                 result.reportIfFailure(artifact, this);
             }
-            return context.next(this);
+            return context.nextStep(this);
         } catch (final Exception cause) {
             output.flush();
 
