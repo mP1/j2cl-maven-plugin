@@ -173,7 +173,7 @@ final class J2cllMojoBuildMavenContext extends J2clMavenContext {
     }
 
     @Override
-    Optional<J2clStep> next(final J2clStep current) {
+    Optional<J2clStep> nextStep(final J2clStep current) {
         final int index = STEPS.indexOf(current);
         return Optional.ofNullable(
                 index + 1 < STEPS.size() ?

@@ -203,7 +203,7 @@ abstract class J2clMavenContext implements Context {
 
     abstract J2clStep firstStep();
 
-    abstract Optional<J2clStep> next(final J2clStep current);
+    abstract Optional<J2clStep> nextStep(final J2clStep current);
 
     // browserLogLevel..................................................................................................
 
