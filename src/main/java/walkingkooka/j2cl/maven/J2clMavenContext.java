@@ -27,6 +27,8 @@ import walkingkooka.j2cl.maven.log.BrowserLogLevel;
 import walkingkooka.j2cl.maven.log.MavenLogger;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +36,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -408,7 +409,7 @@ abstract class J2clMavenContext implements Context {
         final TreeLogger logger = this.mavenLogger()
                 .output();
 
-        final List<Callable<J2clDependency>> submit = Lists.array();
+        final List<J2clDependency> submits = Lists.array();
 
         this.executeWithLock(() -> {
             final String message;
@@ -432,8 +433,8 @@ abstract class J2clMavenContext implements Context {
                     {
                         if (required.isEmpty()) {
                             this.jobs.remove(artifact);
-                            submit.add(artifact.job());
-                            logger.line("Queued " + artifact + " for submission " + submit.size());
+                            submits.add(artifact);
+                            logger.line("Queued " + artifact + " for submission " + submits.size());
                         } else {
                             logger.line("Waiting for " + required.size() + " dependencies");
                             logger.indent();
@@ -446,8 +447,8 @@ abstract class J2clMavenContext implements Context {
                     logger.outdent();
                 }
 
-                final int submitCount = submit.size();
-                final int waiting = alphaSortedJobs.size() - submit.size();
+                final int submitCount = submits.size();
+                final int waiting = alphaSortedJobs.size() - submits.size();
                 final int running = this.running.get();
 
                 if (0 == submitCount && waiting > 0 && 0 == running) {
@@ -461,15 +462,38 @@ abstract class J2clMavenContext implements Context {
             logger.line(message);
             logger.flush();
 
-            submit.forEach(this::submitTask);
+            submits.forEach(this::submitTask);
         });
 
-        return submit.size();
+        return submits.size();
     }
 
-    private void submitTask(final Callable<J2clDependency> task) {
-        this.completionService.submit(task);
+    private void submitTask(final J2clDependency task) {
+        this.completionService.submit(() -> this.callable(task));
         this.running.incrementAndGet();
+    }
+
+    final Void callable(final J2clDependency task) throws Exception {
+        final MavenLogger logger = this.mavenLogger();
+        final String coords = task.coords().toString();
+        final Instant start = Instant.now();
+
+        logger.info(coords);
+        {
+            J2clStep step = this.firstStep();
+            do {
+                Thread.currentThread()
+                        .setName(coords + "-" + step);
+
+                step = step.execute(task)
+                        .orElse(null);
+            } while (null != step);
+        }
+        logger.info(coords + " completed, " + Duration.between(start, Instant.now()).toSeconds() + " second(s) taken");
+
+        this.taskCompleted(task);
+
+        return null;
     }
 
     private final AtomicInteger running = new AtomicInteger();
@@ -508,7 +532,7 @@ abstract class J2clMavenContext implements Context {
      */
     private final Lock jobsLock = new ReentrantLock();
 
-    private final CompletionService<J2clDependency> completionService;
+    private final CompletionService<Void> completionService;
 
     /**
      * Waits (aka Blocks) for all outstanding tasks to complete.

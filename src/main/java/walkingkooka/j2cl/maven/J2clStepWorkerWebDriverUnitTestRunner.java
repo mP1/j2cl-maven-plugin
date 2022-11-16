@@ -39,7 +39,7 @@ import java.util.List;
  * Assumes that the closure compiler has completed successfully and then invokes web driver to execute the prepared
  * js file containing the tests.
  */
-final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
+final class J2clStepWorkerWebDriverUnitTestRunner implements J2clStepWorker {
 
     /**
      * Singleton
@@ -53,9 +53,20 @@ final class J2clStepWorkerWebDriverUnitTestRunner extends J2clStepWorker2 {
     }
 
     @Override
-    J2clStepResult execute1(final J2clDependency artifact,
-                            final J2clStepDirectory directory,
-                            final TreeLogger logger) throws Exception {
+    public J2clStepResult execute(final J2clDependency artifact,
+                                  final J2clStep step,
+                                  final TreeLogger logger) throws Exception {
+        return this.executeIfNecessary(
+                artifact,
+                step,
+                logger
+        );
+    }
+
+    @Override
+    public J2clStepResult executeWithDirectory(final J2clDependency artifact,
+                                               final J2clStepDirectory directory,
+                                               final TreeLogger logger) throws Exception {
         logger.line("Junit Tests");
         logger.indent();
         {

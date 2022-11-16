@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 /**
  * Takes a {@link J2clDependency} and computes the hash for the files directly belonging to the artifact and then its dependencies.
  */
-final class J2clStepWorkerHash extends J2clStepWorker {
+final class J2clStepWorkerHash implements J2clStepWorker {
 
     /**
      * Singleton
@@ -57,9 +57,9 @@ final class J2clStepWorkerHash extends J2clStepWorker {
     }
 
     @Override
-    J2clStepResult execute(final J2clDependency artifact,
-                           final J2clStep step,
-                           final TreeLogger logger) throws Exception {
+    public J2clStepResult execute(final J2clDependency artifact,
+                                  final J2clStep step,
+                                  final TreeLogger logger) throws Exception {
         final Set<String> hashItemNames = Sets.sorted();
         final HashBuilder hash = artifact.context()
                 .computeHash(hashItemNames);
@@ -199,5 +199,19 @@ final class J2clStepWorkerHash extends J2clStepWorker {
         });
 
         logger.outdent();
+    }
+
+    @Override
+    public J2clStepResult executeWithDirectory(final J2clDependency artifact,
+                                               final J2clStepDirectory directory,
+                                               final TreeLogger logger) throws Exception {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public J2clStepResult executeIfNecessary(final J2clDependency artifact,
+                                             final J2clStep step,
+                                             final TreeLogger logger) {
+        throw new UnsupportedOperationException();
     }
 }

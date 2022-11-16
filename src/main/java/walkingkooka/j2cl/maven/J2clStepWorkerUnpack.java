@@ -28,7 +28,7 @@ import java.util.Optional;
  * the binary (jar) to {@link J2clStepDirectory#output()}. If no java source files are present processing of this
  * artifact is aborted and no attempt will be made to transpile java to javascript.
  */
-final class J2clStepWorkerUnpack extends J2clStepWorker2 {
+final class J2clStepWorkerUnpack implements J2clStepWorker {
 
     /**
      * Singleton
@@ -45,9 +45,20 @@ final class J2clStepWorkerUnpack extends J2clStepWorker2 {
     }
 
     @Override
-    J2clStepResult execute1(final J2clDependency artifact,
-                            final J2clStepDirectory directory,
-                            final TreeLogger logger) throws Exception {
+    public J2clStepResult execute(final J2clDependency artifact,
+                                  final J2clStep step,
+                                  final TreeLogger logger) throws Exception {
+        return this.executeIfNecessary(
+                artifact,
+                step,
+                logger
+        );
+    }
+
+    @Override
+    public J2clStepResult executeWithDirectory(final J2clDependency artifact,
+                                               final J2clStepDirectory directory,
+                                               final TreeLogger logger) throws Exception {
         J2clStepResult result;
 
         final J2clPath dest = directory.output().absentOrFail();

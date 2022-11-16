@@ -20,35 +20,91 @@ package walkingkooka.j2cl.maven;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
 @SuppressWarnings("StaticInitializerReferencesSubClass")
-abstract class J2clStepWorker {
+interface J2clStepWorker {
 
-    final static J2clStepWorker HASH = J2clStepWorkerHash.instance();
+    J2clStepWorker HASH = J2clStepWorkerHash.instance();
 
-    final static J2clStepWorker UNPACK = J2clStepWorkerUnpack.instance();
+    J2clStepWorker UNPACK = J2clStepWorkerUnpack.instance();
 
-    final static J2clStepWorker COMPILE_SOURCE = J2clStepWorkerJavacCompilerUnpackedSource.instance();
+    J2clStepWorker COMPILE_SOURCE = J2clStepWorkerJavacCompilerUnpackedSource.instance();
 
-    final static J2clStepWorker STRIP_GWT_INCOMPAT = J2clStepWorkerGwtIncompatibleStripPreprocessor.instance();
+    J2clStepWorker STRIP_GWT_INCOMPAT = J2clStepWorkerGwtIncompatibleStripPreprocessor.instance();
 
-    final static J2clStepWorker COMPILE_STRIP_GWT_INCOMPAT = J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource.instance();
+    J2clStepWorker COMPILE_STRIP_GWT_INCOMPAT = J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource.instance();
 
-    final static J2clStepWorker SHADE_JAVA_SOURCE = J2clStepWorkerShadeJavaSource.instance();
+    J2clStepWorker SHADE_JAVA_SOURCE = J2clStepWorkerShadeJavaSource.instance();
 
-    final static J2clStepWorker SHADE_CLASS_FILE = J2clStepWorkerShadeClassFile.instance();
+    J2clStepWorker SHADE_CLASS_FILE = J2clStepWorkerShadeClassFile.instance();
 
-    final static J2clStepWorker TRANSPILER = J2clStepWorkerJ2clTranspiler.instance();
+    J2clStepWorker TRANSPILER = J2clStepWorkerJ2clTranspiler.instance();
 
-    final static J2clStepWorker CLOSURE = J2clStepWorkerClosureCompiler.instance();
+    J2clStepWorker CLOSURE = J2clStepWorkerClosureCompiler.instance();
 
-    final static J2clStepWorker OUTPUT_ASSEMBLER = J2clStepWorkerOutputAssembler.instance();
+    J2clStepWorker OUTPUT_ASSEMBLER = J2clStepWorkerOutputAssembler.instance();
 
-    final static J2clStepWorker JUNIT_WEBDRIVER_TESTS = J2clStepWorkerWebDriverUnitTestRunner.instance();
+    J2clStepWorker JUNIT_WEBDRIVER_TESTS = J2clStepWorkerWebDriverUnitTestRunner.instance();
 
-    J2clStepWorker() {
-        super();
+    J2clStepResult execute(final J2clDependency artifact,
+                           final J2clStep step,
+                           final TreeLogger logger) throws Exception;
+
+    default J2clStepResult executeIfNecessary(final J2clDependency artifact,
+                                              final J2clStep step,
+                                              final TreeLogger logger) throws Exception {
+        final J2clStepResult result;
+
+        final J2clStepDirectory directory = artifact.step(step);
+
+        logger.line("Directory");
+        logger.indent();
+        {
+            logger.line(directory.toString());
+            logger.indent();
+            {
+                if (directory.successful().exists().isPresent()) {
+                    logger.indentedLine("Cache success result present and will be kept");
+
+                    result = J2clStepResult.SUCCESS;
+                } else {
+                    if (directory.aborted().exists().isPresent()) {
+                        logger.indentedLine("Cache abort result present and will be kept");
+
+                        result = J2clStepResult.ABORTED;
+                    } else {
+                        if (directory.skipped().exists().isPresent()) {
+                            logger.indentedLine("Cache skip result present and will be kept");
+
+                            result = J2clStepResult.SKIPPED;
+                        } else {
+                            final J2clPath path = directory.path();
+                            if (path.exists().isPresent()) {
+                                path.removeAll();
+
+                                logger.indentedLine("Removed all files");
+                            }
+                            path.createIfNecessary();
+
+                            // aborted steps for the project are transformed into skipped.
+                            final J2clStepResult result1 = this.executeWithDirectory(
+                                    artifact,
+                                    directory,
+                                    logger
+                            );
+                            result = J2clStepResult.ABORTED == result1 && false == artifact.isDependency() ?
+                                    J2clStepResult.SKIPPED :
+                                    result1;
+                        }
+                    }
+                }
+            }
+            logger.outdent();
+        }
+        logger.outdent();
+
+        return result;
     }
 
-    abstract J2clStepResult execute(final J2clDependency artifact,
-                                    final J2clStep step,
-                                    final TreeLogger logger) throws Exception;
+    J2clStepResult executeWithDirectory(final J2clDependency artifact,
+                                        final J2clStepDirectory directory,
+                                        final TreeLogger logger) throws Exception;
 }

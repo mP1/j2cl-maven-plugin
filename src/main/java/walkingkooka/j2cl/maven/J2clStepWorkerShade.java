@@ -33,7 +33,7 @@ import java.util.function.Predicate;
  * If the dependency source has a shade file, create an output directory with selected shaded class files combined
  * with the other class files changed.
  */
-abstract class J2clStepWorkerShade extends J2clStepWorker2 {
+abstract class J2clStepWorkerShade implements J2clStepWorker {
 
     /**
      * Package private to limit sub classing.
@@ -42,10 +42,22 @@ abstract class J2clStepWorkerShade extends J2clStepWorker2 {
         super();
     }
 
-    @Override final J2clStepResult execute1(final J2clDependency artifact,
-                                            final J2clStepDirectory directory,
-                                            final TreeLogger logger) throws Exception {
-        J2clStepResult result = null;
+    @Override
+    public J2clStepResult execute(final J2clDependency artifact,
+                                  final J2clStep step,
+                                  final TreeLogger logger) throws Exception {
+        return this.executeIfNecessary(
+                artifact,
+                step,
+                logger
+        );
+    }
+
+    @Override
+    public final J2clStepResult executeWithDirectory(final J2clDependency artifact,
+                                                     final J2clStepDirectory directory,
+                                                     final TreeLogger logger) throws Exception {
+        final J2clStepResult result;
 
         if (artifact.isIgnored()) {
             result = J2clStepResult.SKIPPED;
