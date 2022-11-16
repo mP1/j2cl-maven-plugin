@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * Compiles the java source from sources and the given target.
  */
-abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
+abstract class J2clStepWorkerJavacCompiler implements J2clStepWorker {
 
     /**
      * Package private to limit sub classing.
@@ -35,9 +35,21 @@ abstract class J2clStepWorkerJavacCompiler extends J2clStepWorker2 {
         super();
     }
 
-    @Override final J2clStepResult execute1(final J2clDependency artifact,
-                                            final J2clStepDirectory directory,
-                                            final TreeLogger logger) throws Exception {
+    @Override
+    public J2clStepResult execute(final J2clDependency artifact,
+                                  final J2clStep step,
+                                  final TreeLogger logger) throws Exception {
+        return this.executeIfNecessary(
+                artifact,
+                step,
+                logger
+        );
+    }
+
+    @Override
+    public final J2clStepResult executeWithDirectory(final J2clDependency artifact,
+                                                     final J2clStepDirectory directory,
+                                                     final TreeLogger logger) throws Exception {
         J2clStepResult result = null;
         final J2clStep sourceStep = this.sourcesStep();
 

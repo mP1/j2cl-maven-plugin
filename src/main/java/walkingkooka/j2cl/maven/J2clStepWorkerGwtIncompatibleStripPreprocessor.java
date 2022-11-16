@@ -23,7 +23,7 @@ import walkingkooka.j2cl.maven.log.TreeLogger;
 /**
  * Compiles the java source to the target {@link J2clStepDirectory#output()}.
  */
-final class J2clStepWorkerGwtIncompatibleStripPreprocessor extends J2clStepWorker2 {
+final class J2clStepWorkerGwtIncompatibleStripPreprocessor implements J2clStepWorker {
 
     /**
      * Singleton
@@ -40,11 +40,27 @@ final class J2clStepWorkerGwtIncompatibleStripPreprocessor extends J2clStepWorke
     }
 
     @Override
-    J2clStepResult execute1(final J2clDependency artifact,
-                            final J2clStepDirectory directory,
-                            final TreeLogger logger) throws Exception {
-        return GwtIncompatibleStripPreprocessor.execute(Lists.of(artifact.step(J2clStep.JAVAC_COMPILE).output(), artifact.step(J2clStep.UNPACK).output()),
+    public J2clStepResult execute(final J2clDependency artifact,
+                                  final J2clStep step,
+                                  final TreeLogger logger) throws Exception {
+        return this.executeIfNecessary(
+                artifact,
+                step,
+                logger
+        );
+    }
+
+    @Override
+    public J2clStepResult executeWithDirectory(final J2clDependency artifact,
+                                               final J2clStepDirectory directory,
+                                               final TreeLogger logger) throws Exception {
+        return GwtIncompatibleStripPreprocessor.execute(
+                Lists.of(
+                        artifact.step(J2clStep.JAVAC_COMPILE).output(),
+                        artifact.step(J2clStep.UNPACK).output()
+                ),
                 directory.output().absentOrFail(),
-                logger);
+                logger
+        );
     }
 }

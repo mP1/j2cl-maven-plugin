@@ -29,7 +29,6 @@ import org.objectweb.asm.Opcodes;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
-import walkingkooka.j2cl.maven.log.MavenLogger;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.predicate.Predicates;
 import walkingkooka.text.CharSequences;
@@ -47,8 +46,6 @@ import java.nio.file.Paths;
 import java.nio.file.ProviderNotFoundException;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -56,7 +53,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -1155,44 +1151,6 @@ final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private final J2clMavenContext context;
-
-    // job..............................................................................................................
-
-    /**
-     * Returns the {@link Callable job}.
-     */
-    Callable<J2clDependency> job() {
-        return this::job0;
-    }
-
-    /**
-     * Executes all steps in order for this artifact. This assumes that all dependencies have already completed successfully.
-     */
-    private J2clDependency job0() throws Exception {
-        final J2clMavenContext context = this.context();
-
-        final MavenLogger logger = context.mavenLogger();
-        final String coords = this.coords().toString();
-        final Instant start = Instant.now();
-
-        logger.info(coords);
-        {
-            this.executeStep(context.firstStep());
-        }
-        logger.info(coords + " completed, " + Duration.between(start, Instant.now()).toSeconds() + " second(s) taken");
-
-        this.context()
-                .taskCompleted(this);
-        return this;
-    }
-
-    private void executeStep(final J2clStep step) throws Exception {
-        Thread.currentThread().setName(this.coords() + "-" + step);
-        final Optional<J2clStep> next = step.execute(this);
-        if (next.isPresent()) {
-            this.executeStep(next.get());
-        }
-    }
 
     // directories......................................................................................................
 

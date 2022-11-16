@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * Transpiles the stripped source into javascript equivalents.
  */
-final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
+final class J2clStepWorkerJ2clTranspiler implements J2clStepWorker {
 
     /**
      * Singleton
@@ -39,9 +39,21 @@ final class J2clStepWorkerJ2clTranspiler extends J2clStepWorker2 {
         super();
     }
 
-    @Override J2clStepResult execute1(final J2clDependency artifact,
-                                      final J2clStepDirectory directory,
-                                      final TreeLogger logger) throws Exception {
+    @Override
+    public J2clStepResult execute(final J2clDependency artifact,
+                                  final J2clStep step,
+                                  final TreeLogger logger) throws Exception {
+        return this.executeIfNecessary(
+                artifact,
+                step,
+                logger
+        );
+    }
+
+    @Override
+    public J2clStepResult executeWithDirectory(final J2clDependency artifact,
+                                               final J2clStepDirectory directory,
+                                               final TreeLogger logger) throws Exception {
         logger.line("Preparing...");
 
         final J2clPath sourceRoot = this.sourceRoot(artifact);

@@ -237,9 +237,11 @@ enum J2clStep {
                 output.indent();
 
                 result = this.execute1()
-                        .execute(artifact,
+                        .execute(
+                                artifact,
                                 this,
-                                output);
+                                output
+                        );
 
                 final J2clStepDirectory directory = artifact.step(this);
 

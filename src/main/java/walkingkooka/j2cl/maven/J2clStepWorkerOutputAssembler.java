@@ -24,7 +24,7 @@ import java.util.Collection;
 /**
  * Calls the closure compiler and assembles the final Javascript output.
  */
-final class J2clStepWorkerOutputAssembler extends J2clStepWorker2 {
+final class J2clStepWorkerOutputAssembler implements J2clStepWorker {
 
     /**
      * Singleton
@@ -37,9 +37,21 @@ final class J2clStepWorkerOutputAssembler extends J2clStepWorker2 {
         super();
     }
 
-    @Override J2clStepResult execute1(final J2clDependency artifact,
-                                      final J2clStepDirectory directory,
-                                      final TreeLogger logger) throws Exception {
+    @Override
+    public J2clStepResult execute(final J2clDependency artifact,
+                                  final J2clStep step,
+                                  final TreeLogger logger) throws Exception {
+        return this.executeIfNecessary(
+                artifact,
+                step,
+                logger
+        );
+    }
+
+    @Override
+    public J2clStepResult executeWithDirectory(final J2clDependency artifact,
+                                               final J2clStepDirectory directory,
+                                               final TreeLogger logger) throws Exception {
         final J2clPath source = artifact.step(J2clStep.CLOSURE_COMPILE).output();
         logger.path("Source", source);
 
