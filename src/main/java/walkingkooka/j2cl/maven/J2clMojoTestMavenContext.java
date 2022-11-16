@@ -188,6 +188,11 @@ final class J2clMojoTestMavenContext extends J2clMavenContext {
     }
 
     @Override
+    J2clStep firstStep() {
+        return STEPS.get(0);
+    }
+
+    @Override
     Optional<J2clStep> next(final J2clStep current) {
         final int index = STEPS.indexOf(current);
         return Optional.ofNullable(
