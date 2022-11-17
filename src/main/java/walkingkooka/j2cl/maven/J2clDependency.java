@@ -138,7 +138,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
 
             makeDependenciesGetterReadOnly(root.dependencies);
         }
-        root.print(true);
+        root.log(true);
 
         return root;
     }
@@ -392,7 +392,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
         if (false == nonIgnored) {
             this.ignored = true;
 
-            this.printParents(
+            this.logParentDependencies(
                     childToParents,
                     logger
             );
@@ -424,18 +424,20 @@ public final class J2clDependency implements Comparable<J2clDependency> {
      * Used to print a tree of ignored dependency to all its parents, which may be useful in debugging transpile failures
      * due to ignored dependencies.
      */
-    private void printParents(final Map<J2clDependency, Set<J2clDependency>> childToParents,
-                              final TreeLogger logger) {
+    private void logParentDependencies(final Map<J2clDependency, Set<J2clDependency>> childToParents,
+                                       final TreeLogger logger) {
         final Set<J2clDependency> parents = childToParents.get(this);
         if (null != parents) {
             logger.indent();
             {
-                parents.forEach(p -> {
-                    if (p.isIgnored()) {
-                        logger.line(p.coords().toString());
-                        p.printParents(childToParents, logger);
-                    }
-                });
+                parents.forEach(
+                        p -> {
+                            if (p.isIgnored()) {
+                                logger.line(p.coords().toString());
+                                p.logParentDependencies(childToParents, logger);
+                            }
+                        }
+                );
             }
             logger.outdent();
         }
@@ -571,7 +573,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
         }
 
         if (duplicateCoords.size() > 0) {
-            this.print(false);
+            this.log(false);
 
             throw new IllegalStateException(duplicateCoords.size() + " duplicate(s)\n" + duplicatesText.stream().collect(Collectors.joining("\n")));
         }
@@ -592,16 +594,16 @@ public final class J2clDependency implements Comparable<J2clDependency> {
      * Prints a dependency graph and various metadata that will be used to plan the approach for building.
      * The printMetadata flag will be false when printing dependencies before a verify exception is thrown.
      */
-    void print(final boolean printMetadata) {
+    void log(final boolean includeMetadata) {
         final TreeLogger logger = this.context.mavenLogger()
                 .output();
         logger.line("Dependencies");
         logger.indent();
         {
-            this.prettyPrintDependencies(logger);
+            this.logPrettyPrintDependencies(logger);
 
-            if (printMetadata) {
-                this.printPlanMetadata(logger);
+            if (includeMetadata) {
+                this.logPlanMetadata(logger);
             }
         }
         logger.outdent();
@@ -611,53 +613,53 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Pretty prints all dependencies with indentation.
      */
-    private void prettyPrintDependencies(final TreeLogger printer) {
-        printer.line("Graph");
-        printer.indent();
+    private void logPrettyPrintDependencies(final TreeLogger logger) {
+        logger.line("Graph");
+        logger.indent();
         {
 
             for (final J2clDependency artifact : this.dependencies()) {
-                printer.line(artifact.toString());
-                printer.indent();
+                logger.line(artifact.toString());
+                logger.indent();
                 {
                     for (final J2clDependency dependency : artifact.dependencies()) {
-                        printer.line(dependency.toString());
+                        logger.line(dependency.toString());
                     }
                 }
-                printer.outdent();
+                logger.outdent();
             }
         }
-        printer.outdent();
-        printer.flush();
+        logger.outdent();
+        logger.flush();
     }
 
     /**
      * Prints all groupings of artifact in alphabetical order.
      */
-    private void printPlanMetadata(final TreeLogger printer) {
-        printer.line("Metadata");
-        printer.indent();
+    private void logPlanMetadata(final TreeLogger logger) {
+        logger.line("Metadata");
+        logger.indent();
         {
-            this.print("Annotation processor", J2clDependency::isAnnotationProcessor, printer);
+            this.logDependencies("Annotation processor", J2clDependency::isAnnotationProcessor, logger);
 
-            this.print("Annotation only class files", J2clDependency::isAnnotationClassFiles, printer);
-            this.print("JRE bootstrap class files", J2clDependency::isJreBootstrapClassFiles, printer);
-            this.print("JRE class files", J2clDependency::isJreClassFiles, printer);
-            this.print("Javascript bootstrap class files", J2clDependency::isJreJavascriptBootstrapFiles, printer);
-            this.print("Javascript class files", J2clDependency::isJreJavascriptFiles, printer);
+            this.logDependencies("Annotation only class files", J2clDependency::isAnnotationClassFiles, logger);
+            this.logDependencies("JRE bootstrap class files", J2clDependency::isJreBootstrapClassFiles, logger);
+            this.logDependencies("JRE class files", J2clDependency::isJreClassFiles, logger);
+            this.logDependencies("Javascript bootstrap class files", J2clDependency::isJreJavascriptBootstrapFiles, logger);
+            this.logDependencies("Javascript class files", J2clDependency::isJreJavascriptFiles, logger);
 
-            this.print("Classpath required", J2clDependency::isClasspathRequired, printer);
-            this.print("Ignored dependencies", J2clDependency::isIgnored, printer);
-            this.print("Javascript source required", J2clDependency::isJavascriptSourceRequired, printer);
+            this.logDependencies("Classpath required", J2clDependency::isClasspathRequired, logger);
+            this.logDependencies("Ignored dependencies", J2clDependency::isIgnored, logger);
+            this.logDependencies("Javascript source required", J2clDependency::isJavascriptSourceRequired, logger);
         }
-        printer.outdent();
-        printer.flush();
+        logger.outdent();
+        logger.flush();
     }
 
-    private void print(final String label,
-                       final Predicate<J2clDependency> filter,
-                       final TreeLogger printer) {
-        printer.strings(
+    private void logDependencies(final String label,
+                                 final Predicate<J2clDependency> filter,
+                                 final TreeLogger logger) {
+        logger.strings(
                 label,
                 this.dependencies().stream()
                         .filter(filter)
