@@ -492,7 +492,16 @@ public abstract class J2clMavenContext implements Context {
                         .orElse(null);
             } while (null != step);
         }
-        logger.info(coords + " completed, " + Duration.between(start, Instant.now()).toSeconds() + " second(s) taken");
+        logger.info(
+                coords +
+                        " completed, " +
+                        TreeLogger.prettyTimeTaken(
+                                Duration.between(
+                                        start,
+                                        Instant.now()
+                                )
+                        )
+        );
 
         this.taskCompleted(task);
 
