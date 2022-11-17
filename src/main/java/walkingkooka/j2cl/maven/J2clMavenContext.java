@@ -320,7 +320,7 @@ public abstract class J2clMavenContext implements Context {
                 .collect(Collectors.toList());
 
         if (false == unknown.isEmpty()) {
-            project.print(false);
+            project.log(false);
 
             throw new IllegalArgumentException("Unknown " + label + " dependencies: " + join(unknown));
         }
