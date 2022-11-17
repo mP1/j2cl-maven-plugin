@@ -46,6 +46,8 @@ import java.nio.file.Paths;
 import java.nio.file.ProviderNotFoundException;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -155,13 +157,19 @@ public final class J2clDependency implements Comparable<J2clDependency> {
             logger.line(taskName);
             logger.indent();
             {
-                final long start = System.currentTimeMillis();
+                final Instant start = Instant.now();
                 logger.indent();
                 {
                     result = run.get();
                 }
                 logger.outdent();
-                logger.line(taskName + " took " + (System.currentTimeMillis() - start) + " mills(s)");
+                logger.line(
+                        taskName +
+                                " took " +
+                                TreeLogger.prettyTimeTaken(
+                                        Duration.between(start, Instant.now())
+                                )
+                );
             }
             logger.outdent();
         } finally {

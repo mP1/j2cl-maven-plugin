@@ -32,6 +32,7 @@ import walkingkooka.text.printer.IndentingPrinter;
 import walkingkooka.text.printer.Printer;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -54,6 +55,13 @@ final public class TreeLogger {
                 null != treePrinter ? treePrinter.indenting(MavenLogger.INDENTATION) : null,
                 null != treePrinter && false == printer.equals(treePrinter)
         );
+    }
+
+    public static String prettyTimeTaken(final Duration timeTaken) {
+        return timeTaken.getSeconds() +
+                "." +
+                timeTaken.getNano() +
+                " seconds";
     }
 
     private TreeLogger(final IndentingPrinter printer,

@@ -102,7 +102,9 @@ public final class J2clStepDirectory {
         logger.outdent();
 
         logger.line("Time taken");
-        logger.indentedLine(timeTaken.getSeconds() + "." + timeTaken.getNano() + " seconds");
+        logger.indentedLine(
+                TreeLogger.prettyTimeTaken(timeTaken)
+        );
         logger.emptyLine();
         logger.flush();
 
