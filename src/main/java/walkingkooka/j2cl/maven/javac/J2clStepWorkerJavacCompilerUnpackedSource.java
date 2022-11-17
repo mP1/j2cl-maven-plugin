@@ -82,13 +82,13 @@ public final class J2clStepWorkerJavacCompilerUnpackedSource extends J2clStepWor
                      final TreeLogger logger) throws Exception {
         final J2clMavenContext context = artifact.context();
         if (false == artifact.isDependency() && J2clSourcesKind.TEST == context.sourcesKind()) {
-            this.junitProcessorPostFix(artifact, directory, logger);
+            this.postCompileJunitProcessorFix(artifact, directory, logger);
         }
     }
 
-    private void junitProcessorPostFix(final J2clDependency artifact,
-                                       final J2clStepDirectory directory,
-                                       final TreeLogger logger) throws Exception {
+    private void postCompileJunitProcessorFix(final J2clDependency artifact,
+                                              final J2clStepDirectory directory,
+                                              final TreeLogger logger) throws Exception {
         logger.indent();
         {
             logger.line("Junit processor post fixup");
