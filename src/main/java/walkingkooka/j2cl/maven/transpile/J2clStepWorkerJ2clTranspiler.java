@@ -19,6 +19,7 @@ package walkingkooka.j2cl.maven.transpile;
 
 import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clStep;
 import walkingkooka.j2cl.maven.J2clStepDirectory;
@@ -32,13 +33,13 @@ import java.util.Set;
 /**
  * Transpiles the stripped source into javascript equivalents.
  */
-public final class J2clStepWorkerJ2clTranspiler implements J2clStepWorker {
+public final class J2clStepWorkerJ2clTranspiler<C extends J2clMavenContext> implements J2clStepWorker<C> {
 
     /**
      * Singleton
      */
-    public static J2clStepWorker instance() {
-        return new J2clStepWorkerJ2clTranspiler();
+    public static <C extends J2clMavenContext> J2clStepWorker<C> instance() {
+        return new J2clStepWorkerJ2clTranspiler<>();
     }
 
     private J2clStepWorkerJ2clTranspiler() {
@@ -48,10 +49,12 @@ public final class J2clStepWorkerJ2clTranspiler implements J2clStepWorker {
     @Override
     public J2clStepResult execute(final J2clDependency artifact,
                                   final J2clStep step,
+                                  final C context,
                                   final TreeLogger logger) throws Exception {
         return this.executeIfNecessary(
                 artifact,
                 step,
+                context,
                 logger
         );
     }
@@ -59,6 +62,7 @@ public final class J2clStepWorkerJ2clTranspiler implements J2clStepWorker {
     @Override
     public J2clStepResult executeWithDirectory(final J2clDependency artifact,
                                                final J2clStepDirectory directory,
+                                               final C context,
                                                final TreeLogger logger) throws Exception {
         logger.line("Preparing...");
 

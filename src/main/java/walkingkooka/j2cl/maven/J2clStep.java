@@ -17,6 +17,7 @@
 
 package walkingkooka.j2cl.maven;
 
+import walkingkooka.Cast;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.j2cl.maven.log.MavenLogger;
 import walkingkooka.j2cl.maven.log.TreeLogger;
@@ -43,9 +44,8 @@ public enum J2clStep {
      * Computes the hash for the given {@link J2clDependency} including its dependencies.
      */
     HASH {
-        @Override
-        J2clStepWorker execute1() {
-            return J2clStepWorker.HASH;
+        @Override J2clStepWorker<? super J2clMavenContext> execute0() {
+            return J2clStepWorkers.hash();
         }
 
         @Override
@@ -58,9 +58,8 @@ public enum J2clStep {
      * For archives (dependencies) unpack the accompanying sources.
      */
     UNPACK {
-        @Override
-        J2clStepWorker execute1() {
-            return J2clStepWorker.UNPACK;
+        @Override J2clStepWorker<? super J2clMavenContext> execute0() {
+            return J2clStepWorkers.unpack();
         }
 
         @Override
@@ -73,9 +72,8 @@ public enum J2clStep {
      * Calls javac on the unpack directory along with its dependencies on the classpath.
      */
     JAVAC_COMPILE {
-        @Override
-        J2clStepWorker execute1() {
-            return J2clStepWorker.COMPILE_SOURCE;
+        @Override J2clStepWorker<? super J2clMavenContext> execute0() {
+            return J2clStepWorkers.compileJavaSource();
         }
 
         @Override
@@ -88,9 +86,8 @@ public enum J2clStep {
      * Calls the @GwtIncompatible stripper on /compile saving into /gwt-incompatible-strip
      */
     GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE {
-        @Override
-        J2clStepWorker execute1() {
-            return J2clStepWorker.STRIP_GWT_INCOMPAT;
+        @Override J2clStepWorker<? super J2clMavenContext> execute0() {
+            return J2clStepWorkers.gwtIncompatStrip();
         }
 
         @Override
@@ -103,9 +100,8 @@ public enum J2clStep {
      * Compiles /gwt-incompatible-strip along with dependencies on the classpath into /gwt-incompatible-strip-compiled
      */
     JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE {
-        @Override
-        J2clStepWorker execute1() {
-            return J2clStepWorker.COMPILE_STRIP_GWT_INCOMPAT;
+        @Override J2clStepWorker<? super J2clMavenContext> execute0() {
+            return J2clStepWorkers.compileGwtIncompatStripped();
         }
 
         @Override
@@ -119,9 +115,8 @@ public enum J2clStep {
      * shade java source files.
      */
     SHADE_JAVA_SOURCE {
-        @Override
-        J2clStepWorker execute1() {
-            return J2clStepWorker.SHADE_JAVA_SOURCE;
+        @Override J2clStepWorker<? super J2clMavenContext> execute0() {
+            return J2clStepWorkers.shadeJavaSource();
         }
 
         @Override
@@ -135,9 +130,8 @@ public enum J2clStep {
      * shares matching files.
      */
     SHADE_CLASS_FILES {
-        @Override
-        J2clStepWorker execute1() {
-            return J2clStepWorker.SHADE_CLASS_FILE;
+        @Override J2clStepWorker<? super J2clMavenContext> execute0() {
+            return J2clStepWorkers.shadeClassFiles();
         }
 
         @Override
@@ -150,9 +144,8 @@ public enum J2clStep {
      * Calls the transpiler on the output of previous steps.
      */
     TRANSPILE_JAVA_TO_JAVASCRIPT {
-        @Override
-        J2clStepWorker execute1() {
-            return J2clStepWorker.TRANSPILER;
+        @Override J2clStepWorker<? super J2clMavenContext> execute0() {
+            return J2clStepWorkers.transpiler();
         }
 
         @Override
@@ -164,9 +157,8 @@ public enum J2clStep {
      * Calls the closure compiler on the /transpiler along with other "files" into /closure-compiled.
      */
     CLOSURE_COMPILE {
-        @Override
-        J2clStepWorker execute1() {
-            return J2clStepWorker.CLOSURE;
+        @Override J2clStepWorker<? super J2clMavenContext> execute0() {
+            return J2clStepWorkers.closure();
         }
 
         @Override
@@ -178,9 +170,8 @@ public enum J2clStep {
      * Assembles the output and copies files to that place.
      */
     OUTPUT_ASSEMBLE {
-        @Override
-        J2clStepWorker execute1() {
-            return J2clStepWorker.OUTPUT_ASSEMBLER;
+        @Override J2clStepWorker<? super J2clMavenContext> execute0() {
+            return J2clStepWorkers.outputAssembler();
         }
 
         @Override
@@ -192,9 +183,10 @@ public enum J2clStep {
      * Uses webdriver to execute a junit test.
      */
     JUNIT_TESTS {
-        @Override
-        J2clStepWorker execute1() {
-            return J2clStepWorker.JUNIT_WEBDRIVER_TESTS;
+        @Override J2clStepWorker<? super J2clMavenContext> execute0() {
+            return Cast.to(
+                    J2clStepWorkers.unitTests()
+            );
         }
 
         @Override
@@ -209,10 +201,10 @@ public enum J2clStep {
      * A {@link Callable} that creates a logger that is saved to a log file when the task is successful (completes without
      * throwing) or logs as errors to the output anything printed during execution.
      */
-    final Optional<J2clStep> execute(final J2clDependency artifact) throws Exception {
+    final <C extends J2clMavenContext> Optional<J2clStep> execute(final J2clDependency artifact,
+                                                                  final C context) throws Exception {
         final Instant start = Instant.now();
 
-        final J2clMavenContext context = artifact.context();
         final MavenLogger mavenLogger = context.mavenLogger();
         final List<CharSequence> lines = Lists.array(); // these lines will be written to a log file.
         final String prefix = artifact.coords() + "-" + this;
@@ -223,7 +215,7 @@ public enum J2clStep {
             lines.add(line);
         };
 
-        final TreeLogger output = mavenLogger.output(
+        final TreeLogger logger = mavenLogger.output(
                 lineHandler,
                 lineHandler
         );
@@ -233,14 +225,15 @@ public enum J2clStep {
             if (artifact.isDependency() && this.skipIfDependency()) {
                 result = J2clStepResult.SUCCESS;
             } else {
-                output.line(prefix);
-                output.indent();
+                logger.line(prefix);
+                logger.indent();
 
-                result = this.execute1()
+                result = this.execute0()
                         .execute(
                                 artifact,
                                 this,
-                                output
+                                context,
+                                logger
                         );
 
                 final J2clStepDirectory directory = artifact.step(this);
@@ -248,7 +241,7 @@ public enum J2clStep {
                 directory.writeLog(
                         lines,
                         timeTaken(start),
-                        output
+                        logger
                 );
 
                 result.path(directory).createIfNecessary();
@@ -257,7 +250,7 @@ public enum J2clStep {
             }
             return context.nextStep(this);
         } catch (final Exception cause) {
-            output.flush();
+            logger.flush();
 
             mavenLogger.error("Failed to execute " + prefix + " message: " + cause.getMessage(), cause);
             lines.forEach(l -> mavenLogger.error(prefix + " " + l));
@@ -266,8 +259,8 @@ public enum J2clStep {
             final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             final String charset = Charset.defaultCharset().name();
             cause.printStackTrace(new PrintStream(bytes, true, charset));
-            output.emptyLine();
-            output.log(
+            logger.emptyLine();
+            logger.log(
                     new String(
                             bytes.toByteArray(),
                             charset
@@ -282,7 +275,7 @@ public enum J2clStep {
                 directory.writeLog(
                         lines,
                         timeTaken(start),
-                        output
+                        logger
                 );
             } else {
                 // HASH step probably failed so create a unique file and write it to the base directory.
@@ -300,7 +293,7 @@ public enum J2clStep {
 
                 Files.write(base, lines);
             }
-            artifact.context().cancel(cause);
+            context.cancel(cause);
 
             throw cause;
         }
@@ -321,18 +314,11 @@ public enum J2clStep {
                         .replace('_', '-');
     }
 
-    /**
-     * Returns the sub-class of {@link J2clStepWorker} and then calls {@link J2clStepWorker#execute(J2clDependency, J2clStep, TreeLogger)
-     */
-    abstract J2clStepWorker execute1();
-
-    // skipIfJre........................................................................................................
+    abstract J2clStepWorker<? super J2clMavenContext> execute0();
 
     /**
      * Some steps should not be attempted by dependencies.
      */
     abstract boolean skipIfDependency();
-
-    // next.............................................................................................................
 
 }

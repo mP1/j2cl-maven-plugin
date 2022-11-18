@@ -34,13 +34,13 @@ import java.util.List;
 /**
  * Compiles the java source to the target {@link J2clStepDirectory#output()}, with annotation processors enabled.
  */
-public final class J2clStepWorkerJavacCompilerUnpackedSource extends J2clStepWorkerJavacCompiler {
+public final class J2clStepWorkerJavacCompilerUnpackedSource<C extends J2clMavenContext> extends J2clStepWorkerJavacCompiler<C> {
 
     /**
      * Singleton
      */
-    public static J2clStepWorker instance() {
-        return new J2clStepWorkerJavacCompilerUnpackedSource();
+    public static <C extends J2clMavenContext> J2clStepWorker<C> instance() {
+        return new J2clStepWorkerJavacCompilerUnpackedSource<>();
     }
 
     /**
@@ -79,22 +79,27 @@ public final class J2clStepWorkerJavacCompilerUnpackedSource extends J2clStepWor
     @Override
     void postCompile(final J2clDependency artifact,
                      final J2clStepDirectory directory,
+                     final C context,
                      final TreeLogger logger) throws Exception {
-        final J2clMavenContext context = artifact.context();
         if (false == artifact.isDependency() && J2clSourcesKind.TEST == context.sourcesKind()) {
-            this.postCompileJunitProcessorFix(artifact, directory, logger);
+            this.postCompileJunitProcessorFix(
+                    artifact,
+                    directory,
+                    context,
+                    logger
+            );
         }
     }
 
     private void postCompileJunitProcessorFix(final J2clDependency artifact,
                                               final J2clStepDirectory directory,
+                                              final C context,
                                               final TreeLogger logger) throws Exception {
         logger.indent();
         {
             logger.line("Junit processor post fixup");
             logger.indent();
             {
-                final J2clMavenContext context = artifact.context();
                 final J2clPath output = directory.output();
 
                 for (final String testSuiteClassName : context.entryPoints()) {

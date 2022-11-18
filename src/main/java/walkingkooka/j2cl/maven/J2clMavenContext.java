@@ -25,10 +25,8 @@ import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.closure.ClosureFormattingOption;
 import walkingkooka.j2cl.maven.hash.HashBuilder;
-import walkingkooka.j2cl.maven.log.BrowserLogLevel;
 import walkingkooka.j2cl.maven.log.MavenLogger;
 import walkingkooka.j2cl.maven.log.TreeLogger;
-import walkingkooka.j2cl.maven.test.J2clStepWorkerWebDriverUnitTestRunnerBrowser;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -208,18 +206,6 @@ public abstract class J2clMavenContext implements Context {
     abstract J2clStep firstStep();
 
     abstract Optional<J2clStep> nextStep(final J2clStep current);
-
-    // browserLogLevel..................................................................................................
-
-    public abstract BrowserLogLevel browserLogLevel();
-
-    // browsers.........................................................................................................
-
-    public abstract List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers();
-
-    // testTimeout......................................................................................................
-
-    public abstract int testTimeout();
 
     // MAVEN..............................................................................................................
 
@@ -488,8 +474,10 @@ public abstract class J2clMavenContext implements Context {
                 Thread.currentThread()
                         .setName(coords + "-" + step);
 
-                step = step.execute(task)
-                        .orElse(null);
+                step = step.execute(
+                        task,
+                        this
+                ).orElse(null);
             } while (null != step);
         }
         logger.info(

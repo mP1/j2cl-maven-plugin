@@ -51,8 +51,8 @@ public final class J2clMojoBuild extends J2clMojoBuildTest {
     /**
      * The {@link J2clMavenContext} accompanying the build.
      */
-    J2clMavenContext context(final List<String> entryPoints,
-                             final J2clPath initialScriptFilename) {
+    private J2cllMojoBuildMavenContext context(final List<String> entryPoints,
+                                               final J2clPath initialScriptFilename) {
         return J2cllMojoBuildMavenContext.with(this.cache(),
                 this.output(),
                 this.classpathScope(),

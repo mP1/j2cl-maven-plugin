@@ -19,6 +19,7 @@ package walkingkooka.j2cl.maven.javac;
 
 import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clStep;
 import walkingkooka.j2cl.maven.J2clStepDirectory;
@@ -32,7 +33,7 @@ import java.util.Set;
 /**
  * Compiles the java source from sources and the given target.
  */
-abstract class J2clStepWorkerJavacCompiler implements J2clStepWorker {
+abstract class J2clStepWorkerJavacCompiler<C extends J2clMavenContext> implements J2clStepWorker<C> {
 
     /**
      * Package private to limit sub classing.
@@ -44,10 +45,12 @@ abstract class J2clStepWorkerJavacCompiler implements J2clStepWorker {
     @Override
     public J2clStepResult execute(final J2clDependency artifact,
                                   final J2clStep step,
+                                  final C context,
                                   final TreeLogger logger) throws Exception {
         return this.executeIfNecessary(
                 artifact,
                 step,
+                context,
                 logger
         );
     }
@@ -55,6 +58,7 @@ abstract class J2clStepWorkerJavacCompiler implements J2clStepWorker {
     @Override
     public final J2clStepResult executeWithDirectory(final J2clDependency artifact,
                                                      final J2clStepDirectory directory,
+                                                     final C context,
                                                      final TreeLogger logger) throws Exception {
         J2clStepResult result = null;
         final J2clStep sourceStep = this.sourcesStep();
@@ -88,13 +92,18 @@ abstract class J2clStepWorkerJavacCompiler implements J2clStepWorker {
                             classpath,
                             javaSourceFiles,
                             directory.output().absentOrFail(),
-                            artifact.context().javaCompilerArguments(),
+                            context.javaCompilerArguments(),
                             shouldRunAnnotationProcessors,
                             logger) ?
                             J2clStepResult.SUCCESS :
                             J2clStepResult.FAILED;
                     if (J2clStepResult.SUCCESS == result) {
-                        this.postCompile(artifact, directory, logger);
+                        this.postCompile(
+                                artifact,
+                                directory,
+                                context,
+                                logger
+                        );
                     }
                 }
             }
@@ -180,5 +189,6 @@ abstract class J2clStepWorkerJavacCompiler implements J2clStepWorker {
      */
     abstract void postCompile(final J2clDependency artifact,
                               final J2clStepDirectory directory,
+                              final C context,
                               final TreeLogger logger) throws Exception;
 }

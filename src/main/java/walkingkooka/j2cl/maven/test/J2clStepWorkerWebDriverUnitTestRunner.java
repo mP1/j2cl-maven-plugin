@@ -26,6 +26,7 @@ import org.openqa.selenium.support.ui.FluentWait;
 import walkingkooka.j2cl.maven.J2clDependency;
 import walkingkooka.j2cl.maven.J2clException;
 import walkingkooka.j2cl.maven.J2clMavenContext;
+import walkingkooka.j2cl.maven.J2clMojoTestMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clStep;
 import walkingkooka.j2cl.maven.J2clStepDirectory;
@@ -47,12 +48,12 @@ import java.util.List;
  * Assumes that the closure compiler has completed successfully and then invokes web driver to execute the prepared
  * js file containing the tests.
  */
-public final class J2clStepWorkerWebDriverUnitTestRunner implements J2clStepWorker {
+public final class J2clStepWorkerWebDriverUnitTestRunner implements J2clStepWorker<J2clMojoTestMavenContext> {
 
     /**
      * Singleton
      */
-    public static J2clStepWorker instance() {
+    public static J2clStepWorker<J2clMojoTestMavenContext> instance() {
         return new J2clStepWorkerWebDriverUnitTestRunner();
     }
 
@@ -63,10 +64,12 @@ public final class J2clStepWorkerWebDriverUnitTestRunner implements J2clStepWork
     @Override
     public J2clStepResult execute(final J2clDependency artifact,
                                   final J2clStep step,
+                                  final J2clMojoTestMavenContext context,
                                   final TreeLogger logger) throws Exception {
         return this.executeIfNecessary(
                 artifact,
                 step,
+                context,
                 logger
         );
     }
@@ -74,16 +77,18 @@ public final class J2clStepWorkerWebDriverUnitTestRunner implements J2clStepWork
     @Override
     public J2clStepResult executeWithDirectory(final J2clDependency artifact,
                                                final J2clStepDirectory directory,
+                                               final J2clMojoTestMavenContext context,
                                                final TreeLogger logger) throws Exception {
         logger.line("Junit Tests");
         logger.indent();
         {
-            final J2clMavenContext context = artifact.context();
-            this.executeTestSuite(this.prepareJunitHostFileScriptPath(context, logger),
+            this.executeTestSuite(
+                    this.prepareJunitHostFileScriptPath(context, logger),
                     context.browsers(),
                     context.browserLogLevel(),
                     context.testTimeout(),
-                    logger);
+                    logger
+            );
         }
         logger.outdent();
 
