@@ -20,6 +20,7 @@ package walkingkooka.j2cl.maven.hash;
 import com.google.common.collect.Lists;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clStep;
 import walkingkooka.j2cl.maven.J2clStepDirectory;
@@ -46,13 +47,13 @@ import java.util.stream.Collectors;
 /**
  * Takes a {@link J2clDependency} and computes the hash for the files directly belonging to the artifact and then its dependencies.
  */
-public final class J2clStepWorkerHash implements J2clStepWorker {
+public final class J2clStepWorkerHash<C extends J2clMavenContext> implements J2clStepWorker<C> {
 
     /**
      * Singleton
      */
-    public static J2clStepWorker instance() {
-        return new J2clStepWorkerHash();
+    public static <C extends J2clMavenContext> J2clStepWorker<C> instance() {
+        return new J2clStepWorkerHash<>();
     }
 
     /**
@@ -65,10 +66,10 @@ public final class J2clStepWorkerHash implements J2clStepWorker {
     @Override
     public J2clStepResult execute(final J2clDependency artifact,
                                   final J2clStep step,
+                                  final C context,
                                   final TreeLogger logger) throws Exception {
         final Set<String> hashItemNames = Sets.sorted();
-        final HashBuilder hash = artifact.context()
-                .computeHash(hashItemNames);
+        final HashBuilder hash = context.computeHash(hashItemNames);
 
         this.hashDependencies(artifact, hash, hashItemNames, logger);
         this.hashArtifactSources(artifact, hash, hashItemNames, logger);
@@ -210,6 +211,7 @@ public final class J2clStepWorkerHash implements J2clStepWorker {
     @Override
     public J2clStepResult executeWithDirectory(final J2clDependency artifact,
                                                final J2clStepDirectory directory,
+                                               final C context,
                                                final TreeLogger logger) throws Exception {
         throw new UnsupportedOperationException();
     }
@@ -217,6 +219,7 @@ public final class J2clStepWorkerHash implements J2clStepWorker {
     @Override
     public J2clStepResult executeIfNecessary(final J2clDependency artifact,
                                              final J2clStep step,
+                                             final C context,
                                              final TreeLogger logger) {
         throw new UnsupportedOperationException();
     }

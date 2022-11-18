@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven.output;
 
 import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clStep;
 import walkingkooka.j2cl.maven.J2clStepDirectory;
@@ -30,13 +31,13 @@ import java.util.Collection;
 /**
  * Calls the closure compiler and assembles the final Javascript output.
  */
-public final class J2clStepWorkerOutputAssembler implements J2clStepWorker {
+public final class J2clStepWorkerOutputAssembler<C extends J2clMavenContext> implements J2clStepWorker<C> {
 
     /**
      * Singleton
      */
-    public static J2clStepWorker instance() {
-        return new J2clStepWorkerOutputAssembler();
+    public static <C extends J2clMavenContext> J2clStepWorker<C> instance() {
+        return new J2clStepWorkerOutputAssembler<>();
     }
 
     private J2clStepWorkerOutputAssembler() {
@@ -46,10 +47,12 @@ public final class J2clStepWorkerOutputAssembler implements J2clStepWorker {
     @Override
     public J2clStepResult execute(final J2clDependency artifact,
                                   final J2clStep step,
+                                  final C context,
                                   final TreeLogger logger) throws Exception {
         return this.executeIfNecessary(
                 artifact,
                 step,
+                context,
                 logger
         );
     }
@@ -57,11 +60,12 @@ public final class J2clStepWorkerOutputAssembler implements J2clStepWorker {
     @Override
     public J2clStepResult executeWithDirectory(final J2clDependency artifact,
                                                final J2clStepDirectory directory,
+                                               final C context,
                                                final TreeLogger logger) throws Exception {
         final J2clPath source = artifact.step(J2clStep.CLOSURE_COMPILE).output();
         logger.path("Source", source);
 
-        final J2clPath target = artifact.context().target();
+        final J2clPath target = context.target();
         logger.path("Destination", target);
         target.createIfNecessary();
 

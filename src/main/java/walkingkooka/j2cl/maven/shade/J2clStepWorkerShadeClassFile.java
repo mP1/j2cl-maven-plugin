@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven.shade;
 
 import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clStep;
 import walkingkooka.j2cl.maven.J2clStepWorker;
@@ -31,13 +32,13 @@ import java.util.function.Predicate;
 /**
  * Scans the output of the previous step for any shade java class files and if any are found writes the result to an output directory.
  */
-public final class J2clStepWorkerShadeClassFile extends J2clStepWorkerShade {
+public final class J2clStepWorkerShadeClassFile<C extends J2clMavenContext> extends J2clStepWorkerShade<C> {
 
     /**
      * Singleton
      */
-    public static J2clStepWorker instance() {
-        return new J2clStepWorkerShadeClassFile();
+    public static <C extends J2clMavenContext> J2clStepWorker<C> instance() {
+        return new J2clStepWorkerShadeClassFile<>();
     }
 
     /**

@@ -225,7 +225,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     private void gatherDependencies0(final J2clClasspathScope scope,
                                      final Predicate<J2clArtifactCoords> parentExclusions,
                                      final Function<J2clArtifactCoords, J2clArtifactCoords> dependencyManagement) {
-        final J2clMavenContext context = this.context();
+        final J2clMavenContext context = this.context;
 
         final Predicate<String> scopeFilter = scope.scopeFilter();
         for (final Dependency dependency : this.project().getDependencies()) {
@@ -543,7 +543,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
         final Collection<J2clDependency> all = this.dependencies();
         this.verifyWithoutConflictsOrDuplicates(all);
 
-        this.context().verifyClasspathRequiredJavascriptSourceRequiredIgnoredDependencies(all
+        this.context.verifyClasspathRequiredJavascriptSourceRequiredIgnoredDependencies(all
                         .stream()
                         .map(J2clDependency::coords)
                         .collect(Collectors.toCollection(Sets::sorted)),
@@ -684,10 +684,11 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     public synchronized Optional<J2clPath> artifactFile() {
         if (null == this.artifactFile) {
             final J2clArtifactCoords coords = this.coords();
-            this.artifactFile = Optional.of(this.context()
+            this.artifactFile = Optional.of(
+                    this.context
                     .mavenMiddleware()
-                    .mavenFile(coords.toString())
-                    .orElseThrow(this.archiveFileMissing()));
+                    .mavenFile(coords.toString()
+                    ).orElseThrow(this.archiveFileMissing()));
         }
 
         return this.artifactFile;
@@ -725,7 +726,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     public MavenProject project() {
         if (null == this.project) {
             // all requests with a null project must be dependencies of the project being built and their COMPILE dependencies should be fetched.
-            final J2clMavenContext context = this.context();
+            final J2clMavenContext context = this.context;
             this.project = context.mavenMiddleware()
                     .mavenProject(
                             this.coords(),
@@ -782,7 +783,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
                 }
 
                 // was included in POM javascript-source-required
-                final J2clMavenContext context = this.context();
+                final J2clMavenContext context = this.context;
                 final J2clArtifactCoords coords = this.coords();
                 if (context.isClasspathRequired(coords)) {
                     required = true;
@@ -834,7 +835,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
                 }
 
                 // was included in POM javascript-source-required
-                final J2clMavenContext context = this.context();
+                final J2clMavenContext context = this.context;
                 final J2clArtifactCoords coords = this.coords();
                 if (context.isJavascriptSourceRequired(coords)) {
                     required = true;
@@ -867,7 +868,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
         if (null == this.ignored) {
             this.testArchive();
 
-            this.ignored = this.ignoredFile || this.context().isIgnored(this.coords());
+            this.ignored = this.ignoredFile || this.context.isIgnored(this.coords());
         }
         return this.ignored;
     }
@@ -1154,14 +1155,6 @@ public final class J2clDependency implements Comparable<J2clDependency> {
                 Maps.empty();
     }
 
-    // tasks............................................................................................................
-
-    public J2clMavenContext context() {
-        return this.context;
-    }
-
-    private final J2clMavenContext context;
-
     // directories......................................................................................................
 
     /**
@@ -1185,7 +1178,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     J2clPath directory() {
         final J2clPath directory = this.directory.get();
         if (null == directory) {
-            throw new IllegalStateException("Directory under " + this.context().base() + " missing for " + CharSequences.quote(this.coords().toString()));
+            throw new IllegalStateException("Directory under " + this.context.base() + " missing for " + CharSequences.quote(this.coords().toString()));
         }
         return directory;
     }
@@ -1232,7 +1225,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
      * Returns all source roots including resources which can be directories or archives.
      */
     public List<J2clPath> sourcesRoot() {
-        final J2clMavenContext context = this.context();
+        final J2clMavenContext context = this.context;
         final List<J2clPath> sources = Lists.array();
 
         final MavenProject project = this.project();
@@ -1256,6 +1249,8 @@ public final class J2clDependency implements Comparable<J2clDependency> {
 
         return Lists.readOnly(sources);
     }
+
+    private final J2clMavenContext context;
 
     // Object.........................................................................................................
 

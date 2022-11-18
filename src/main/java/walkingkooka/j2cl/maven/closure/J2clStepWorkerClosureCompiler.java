@@ -33,13 +33,13 @@ import java.util.Set;
 /**
  * Calls the closure compiler and assembles the final Javascript output.
  */
-public final class J2clStepWorkerClosureCompiler implements J2clStepWorker {
+public final class J2clStepWorkerClosureCompiler<C extends J2clMavenContext> implements J2clStepWorker<C> {
 
     /**
      * Singleton
      */
-    public static J2clStepWorker instance() {
-        return new J2clStepWorkerClosureCompiler();
+    public static <C extends J2clMavenContext> J2clStepWorker<C> instance() {
+        return new J2clStepWorkerClosureCompiler<>();
     }
 
     private J2clStepWorkerClosureCompiler() {
@@ -49,10 +49,12 @@ public final class J2clStepWorkerClosureCompiler implements J2clStepWorker {
     @Override
     public J2clStepResult execute(final J2clDependency artifact,
                                   final J2clStep step,
+                                  final C context,
                                   final TreeLogger logger) throws Exception {
         return this.executeIfNecessary(
                 artifact,
                 step,
+                context,
                 logger
         );
     }
@@ -60,8 +62,8 @@ public final class J2clStepWorkerClosureCompiler implements J2clStepWorker {
     @Override
     public J2clStepResult executeWithDirectory(final J2clDependency artifact,
                                                final J2clStepDirectory directory,
+                                               final C context,
                                                final TreeLogger logger) throws Exception {
-        final J2clMavenContext context = artifact.context();
         final Set<J2clPath> sources = Sets.ordered();
 
         this.addSources(artifact, sources);

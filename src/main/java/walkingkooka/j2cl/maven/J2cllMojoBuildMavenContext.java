@@ -22,9 +22,7 @@ import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.j2cl.maven.closure.ClosureFormattingOption;
 import walkingkooka.j2cl.maven.hash.HashBuilder;
-import walkingkooka.j2cl.maven.log.BrowserLogLevel;
 import walkingkooka.j2cl.maven.log.MavenLogger;
-import walkingkooka.j2cl.maven.test.J2clStepWorkerWebDriverUnitTestRunnerBrowser;
 
 import java.util.List;
 import java.util.Map;
@@ -37,24 +35,24 @@ import java.util.concurrent.ExecutorService;
  */
 final class J2cllMojoBuildMavenContext extends J2clMavenContext {
 
-    static J2clMavenContext with(final J2clPath base,
-                                 final J2clPath target,
-                                 final J2clClasspathScope scope,
-                                 final List<J2clArtifactCoords> classpathRequired,
-                                 final List<J2clArtifactCoords> ignoredDependencies,
-                                 final List<J2clArtifactCoords> javascriptSourceRequired,
-                                 final CompilationLevel level,
-                                 final Map<String, String> defines,
-                                 final Set<String> externs,
-                                 final List<String> entryPoints,
-                                 final Set<ClosureFormattingOption> formatting,
-                                 final J2clPath initialScriptFilename,
-                                 final Set<String> javaCompilerArguments,
-                                 final LanguageMode languageOut,
-                                 final Optional<String> sourceMaps,
-                                 final J2clMavenMiddleware middleware,
-                                 final ExecutorService executor,
-                                 final MavenLogger logger) {
+    static J2cllMojoBuildMavenContext with(final J2clPath base,
+                                           final J2clPath target,
+                                           final J2clClasspathScope scope,
+                                           final List<J2clArtifactCoords> classpathRequired,
+                                           final List<J2clArtifactCoords> ignoredDependencies,
+                                           final List<J2clArtifactCoords> javascriptSourceRequired,
+                                           final CompilationLevel level,
+                                           final Map<String, String> defines,
+                                           final Set<String> externs,
+                                           final List<String> entryPoints,
+                                           final Set<ClosureFormattingOption> formatting,
+                                           final J2clPath initialScriptFilename,
+                                           final Set<String> javaCompilerArguments,
+                                           final LanguageMode languageOut,
+                                           final Optional<String> sourceMaps,
+                                           final J2clMavenMiddleware middleware,
+                                           final ExecutorService executor,
+                                           final MavenLogger logger) {
         return new J2cllMojoBuildMavenContext(base,
                 target,
                 scope,
@@ -146,21 +144,6 @@ final class J2cllMojoBuildMavenContext extends J2clMavenContext {
         hash.append(initialScriptFilename);
 
         return hash;
-    }
-
-    @Override
-    public List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public BrowserLogLevel browserLogLevel() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int testTimeout() {
-        throw new UnsupportedOperationException();
     }
 
     // directoryName....................................................................................................

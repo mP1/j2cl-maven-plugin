@@ -17,50 +17,19 @@
 
 package walkingkooka.j2cl.maven;
 
-import walkingkooka.j2cl.maven.closure.J2clStepWorkerClosureCompiler;
-import walkingkooka.j2cl.maven.hash.J2clStepWorkerHash;
-import walkingkooka.j2cl.maven.javac.J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource;
-import walkingkooka.j2cl.maven.javac.J2clStepWorkerJavacCompilerUnpackedSource;
 import walkingkooka.j2cl.maven.log.TreeLogger;
-import walkingkooka.j2cl.maven.output.J2clStepWorkerOutputAssembler;
-import walkingkooka.j2cl.maven.shade.J2clStepWorkerShadeClassFile;
-import walkingkooka.j2cl.maven.shade.J2clStepWorkerShadeJavaSource;
-import walkingkooka.j2cl.maven.strip.J2clStepWorkerGwtIncompatibleStripPreprocessor;
-import walkingkooka.j2cl.maven.test.J2clStepWorkerWebDriverUnitTestRunner;
-import walkingkooka.j2cl.maven.transpile.J2clStepWorkerJ2clTranspiler;
-import walkingkooka.j2cl.maven.unpack.J2clStepWorkerUnpack;
 
 @SuppressWarnings("StaticInitializerReferencesSubClass")
-public interface J2clStepWorker {
-
-    J2clStepWorker HASH = J2clStepWorkerHash.instance();
-
-    J2clStepWorker UNPACK = J2clStepWorkerUnpack.instance();
-
-    J2clStepWorker COMPILE_SOURCE = J2clStepWorkerJavacCompilerUnpackedSource.instance();
-
-    J2clStepWorker STRIP_GWT_INCOMPAT = J2clStepWorkerGwtIncompatibleStripPreprocessor.instance();
-
-    J2clStepWorker COMPILE_STRIP_GWT_INCOMPAT = J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource.instance();
-
-    J2clStepWorker SHADE_JAVA_SOURCE = J2clStepWorkerShadeJavaSource.instance();
-
-    J2clStepWorker SHADE_CLASS_FILE = J2clStepWorkerShadeClassFile.instance();
-
-    J2clStepWorker TRANSPILER = J2clStepWorkerJ2clTranspiler.instance();
-
-    J2clStepWorker CLOSURE = J2clStepWorkerClosureCompiler.instance();
-
-    J2clStepWorker OUTPUT_ASSEMBLER = J2clStepWorkerOutputAssembler.instance();
-
-    J2clStepWorker JUNIT_WEBDRIVER_TESTS = J2clStepWorkerWebDriverUnitTestRunner.instance();
+public interface J2clStepWorker<C extends J2clMavenContext> {
 
     J2clStepResult execute(final J2clDependency artifact,
                            final J2clStep step,
+                           final C context,
                            final TreeLogger logger) throws Exception;
 
     default J2clStepResult executeIfNecessary(final J2clDependency artifact,
                                               final J2clStep step,
+                                              final C context,
                                               final TreeLogger logger) throws Exception {
         final J2clStepResult result;
 
@@ -99,6 +68,7 @@ public interface J2clStepWorker {
                             final J2clStepResult result1 = this.executeWithDirectory(
                                     artifact,
                                     directory,
+                                    context,
                                     logger
                             );
                             result = J2clStepResult.ABORTED == result1 && false == artifact.isDependency() ?
@@ -117,5 +87,6 @@ public interface J2clStepWorker {
 
     J2clStepResult executeWithDirectory(final J2clDependency artifact,
                                         final J2clStepDirectory directory,
+                                        final C context,
                                         final TreeLogger logger) throws Exception;
 }

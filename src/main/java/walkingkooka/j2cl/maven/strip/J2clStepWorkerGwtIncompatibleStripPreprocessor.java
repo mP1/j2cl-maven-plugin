@@ -19,6 +19,7 @@ package walkingkooka.j2cl.maven.strip;
 
 import walkingkooka.collect.list.Lists;
 import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clStep;
 import walkingkooka.j2cl.maven.J2clStepDirectory;
 import walkingkooka.j2cl.maven.J2clStepResult;
@@ -28,13 +29,13 @@ import walkingkooka.j2cl.maven.log.TreeLogger;
 /**
  * Compiles the java source to the target {@link J2clStepDirectory#output()}.
  */
-public final class J2clStepWorkerGwtIncompatibleStripPreprocessor implements J2clStepWorker {
+public final class J2clStepWorkerGwtIncompatibleStripPreprocessor<C extends J2clMavenContext> implements J2clStepWorker<C> {
 
     /**
      * Singleton
      */
-    public static J2clStepWorker instance() {
-        return new J2clStepWorkerGwtIncompatibleStripPreprocessor();
+    public static <C extends J2clMavenContext> J2clStepWorker<C> instance() {
+        return new J2clStepWorkerGwtIncompatibleStripPreprocessor<>();
     }
 
     /**
@@ -47,10 +48,12 @@ public final class J2clStepWorkerGwtIncompatibleStripPreprocessor implements J2c
     @Override
     public J2clStepResult execute(final J2clDependency artifact,
                                   final J2clStep step,
+                                  final C context,
                                   final TreeLogger logger) throws Exception {
         return this.executeIfNecessary(
                 artifact,
                 step,
+                context,
                 logger
         );
     }
@@ -58,6 +61,7 @@ public final class J2clStepWorkerGwtIncompatibleStripPreprocessor implements J2c
     @Override
     public J2clStepResult executeWithDirectory(final J2clDependency artifact,
                                                final J2clStepDirectory directory,
+                                               final C context,
                                                final TreeLogger logger) throws Exception {
         return GwtIncompatibleStripPreprocessor.execute(
                 Lists.of(

@@ -19,6 +19,7 @@ package walkingkooka.j2cl.maven.shade;
 
 import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clStep;
 import walkingkooka.j2cl.maven.J2clStepDirectory;
@@ -39,7 +40,7 @@ import java.util.function.Predicate;
  * If the dependency source has a shade file, create an output directory with selected shaded class files combined
  * with the other class files changed.
  */
-abstract class J2clStepWorkerShade implements J2clStepWorker {
+abstract class J2clStepWorkerShade<C extends J2clMavenContext> implements J2clStepWorker<C> {
 
     /**
      * Package private to limit sub classing.
@@ -51,10 +52,12 @@ abstract class J2clStepWorkerShade implements J2clStepWorker {
     @Override
     public J2clStepResult execute(final J2clDependency artifact,
                                   final J2clStep step,
+                                  final C context,
                                   final TreeLogger logger) throws Exception {
         return this.executeIfNecessary(
                 artifact,
                 step,
+                context,
                 logger
         );
     }
@@ -62,6 +65,7 @@ abstract class J2clStepWorkerShade implements J2clStepWorker {
     @Override
     public final J2clStepResult executeWithDirectory(final J2clDependency artifact,
                                                      final J2clStepDirectory directory,
+                                                     final C context,
                                                      final TreeLogger logger) throws Exception {
         final J2clStepResult result;
 
