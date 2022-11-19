@@ -207,123 +207,11 @@ public abstract class J2clMavenContext implements Context {
 
     abstract Optional<J2clStep> nextStep(final J2clStep current);
 
-    // MAVEN..............................................................................................................
-
-    final J2clMavenMiddleware mavenMiddleware() {
-        return this.middleware;
-    }
-
-    private final J2clMavenMiddleware middleware;
-
-    // hash..............................................................................................................
-
-    /**
-     * Returns a sha1 hash in hex digits that uniquely identifies this request using components.
-     * Requests should cache the hash for performance reasons.
-     */
-    public abstract HashBuilder computeHash(final Set<String> hashItemsNames);
-
-    /**
-     * Creates a {@link HashBuilder} and hashes most of the properties of a request.
-     */
-    final HashBuilder computeHash0(final Set<String> hashItemNames) {
-        final HashBuilder hash = HashBuilder.empty();
-
-        final J2clClasspathScope scope = this.scope();
-        hashItemNames.add("scope: " + scope);
-        hash.append(scope);
-
-        final CompilationLevel level = this.level;
-        hashItemNames.add("level: " + level);
-        hash.append(scope);
-
-        final J2clSourcesKind sourcesKind = this.sourcesKind();
-        hashItemNames.add("sources-kind: " + sourcesKind);
-        hash.append(sourcesKind);
-
-        this.defines.forEach((k, v) -> {
-            hashItemNames.add("define: " + k + "=" + v);
-            hash.append(k).append(v);
-        });
-
-        this.externs.forEach(e -> {
-            hashItemNames.add("extern: " + e);
-            hash.append(e);
-        });
-
-        this.formatting.forEach(f -> {
-            hashItemNames.add("formatting: " + f);
-            hash.append(f);
-        });
-
-        final LanguageMode languageOut = this.languageOut();
-        hashItemNames.add("language-out: " + languageOut);
-        hash.append(languageOut);
-
-        final Optional<String> sourceMaps = this.sourceMaps();
-        if(sourceMaps.isPresent()) {
-            final String path = sourceMaps.get();
-            hashItemNames.add("source-maps: " + path);
-            hash.append(path);
-        }
-
-        this.classpathRequired.forEach(c -> {
-            hashItemNames.add("classpath-required: " + c);
-            hash.append(c.toString());
-        });
-
-        this.ignoredDependencies.forEach(i -> {
-            hashItemNames.add("ignored-dependency: " + i);
-            hash.append(i.toString());
-        });
-
-        this.javascriptSourceRequired.forEach(j -> {
-            hashItemNames.add("javascript-source-required: " + j);
-            hash.append(j.toString());
-        });
-
-        return hash;
-    }
-
-    // verify...........................................................................................................
-
-    /**
-     * Verifies all 3 groups of coords using the project to print all dependencies if an test has failed.
-     */
-    final void verifyClasspathRequiredJavascriptSourceRequiredIgnoredDependencies(final Set<J2clArtifactCoords> all,
-                                                                                  final J2clDependency project) {
-        verify(this.classpathRequired, "classpath-required", all, project);
-        verify(this.javascriptSourceRequired, "javascript-required", all, project);
-        verify(this.ignoredDependencies, "ignoredDependencies", all, project);
-    }
-
-    private static void verify(final Collection<J2clArtifactCoords> filtered,
-                               final String label,
-                               final Set<J2clArtifactCoords> all,
-                               final J2clDependency project) {
-        final Collection<J2clArtifactCoords> unknown = filtered.stream()
-                .filter(c -> false == all.contains(c))
-                .collect(Collectors.toList());
-
-        if (false == unknown.isEmpty()) {
-            project.log(false);
-
-            throw new IllegalArgumentException("Unknown " + label + " dependencies: " + join(unknown));
-        }
-    }
-
-    private static String join(final Collection<?> items) {
-        return items.stream()
-                .map(Object::toString)
-                .sorted()
-                .collect(Collectors.joining(", "));
-    }
-
     // tasks............................................................................................................
 
     /**
      * Holds of artifacts and the artifacts it requires to complete before it can start with its own first step.
-     * When the list of required (the map value) becomes empty the {@link J2clDependency coords} can have its steps started.
+     * When the {link Set} of required (the map value) becomes empty the {@link J2clDependency coords} can have its steps started.
      */
     private final Map<J2clDependency, Set<J2clDependency>> jobs = Maps.concurrent();
 
@@ -340,7 +228,7 @@ public abstract class J2clMavenContext implements Context {
     }
 
     private void prepareJobs(final J2clDependency artifact) {
-        if (false == skipJobs(artifact) && false == this.jobs.containsKey(artifact)) {
+        if (false == shouldSkipDependency(artifact) && false == this.jobs.containsKey(artifact)) {
 
             // keep transitive dependencies alphabetical sorted for better readability when trySubmitJob pretty prints queue processing.
             final Set<J2clDependency> required = Sets.sorted();
@@ -348,7 +236,7 @@ public abstract class J2clMavenContext implements Context {
             this.jobs.put(artifact, required);
 
             for (final J2clDependency dependency : artifact.dependencies()) {
-                if (skipJobs(dependency)) {
+                if (shouldSkipDependency(dependency)) {
                     continue;
                 }
 
@@ -361,7 +249,7 @@ public abstract class J2clMavenContext implements Context {
     /**
      * Tests if the dependency should not have a job submitted.
      */
-    private boolean skipJobs(final J2clDependency dependency) {
+    private boolean shouldSkipDependency(final J2clDependency dependency) {
         final boolean skip;
 
         do {
@@ -578,6 +466,118 @@ public abstract class J2clMavenContext implements Context {
     private final ExecutorService executor;
 
     private final AtomicReference<Throwable> cause = new AtomicReference<>();
+
+    // hash..............................................................................................................
+
+    /**
+     * Returns a sha1 hash in hex digits that uniquely identifies this request using components.
+     * Requests should cache the hash for performance reasons.
+     */
+    public abstract HashBuilder computeHash(final Set<String> hashItemsNames);
+
+    /**
+     * Creates a {@link HashBuilder} and hashes most of the properties of a request.
+     */
+    final HashBuilder computeHash0(final Set<String> hashItemNames) {
+        final HashBuilder hash = HashBuilder.empty();
+
+        final J2clClasspathScope scope = this.scope();
+        hashItemNames.add("scope: " + scope);
+        hash.append(scope);
+
+        final CompilationLevel level = this.level;
+        hashItemNames.add("level: " + level);
+        hash.append(scope);
+
+        final J2clSourcesKind sourcesKind = this.sourcesKind();
+        hashItemNames.add("sources-kind: " + sourcesKind);
+        hash.append(sourcesKind);
+
+        this.defines.forEach((k, v) -> {
+            hashItemNames.add("define: " + k + "=" + v);
+            hash.append(k).append(v);
+        });
+
+        this.externs.forEach(e -> {
+            hashItemNames.add("extern: " + e);
+            hash.append(e);
+        });
+
+        this.formatting.forEach(f -> {
+            hashItemNames.add("formatting: " + f);
+            hash.append(f);
+        });
+
+        final LanguageMode languageOut = this.languageOut();
+        hashItemNames.add("language-out: " + languageOut);
+        hash.append(languageOut);
+
+        final Optional<String> sourceMaps = this.sourceMaps();
+        if (sourceMaps.isPresent()) {
+            final String path = sourceMaps.get();
+            hashItemNames.add("source-maps: " + path);
+            hash.append(path);
+        }
+
+        this.classpathRequired.forEach(c -> {
+            hashItemNames.add("classpath-required: " + c);
+            hash.append(c.toString());
+        });
+
+        this.ignoredDependencies.forEach(i -> {
+            hashItemNames.add("ignored-dependency: " + i);
+            hash.append(i.toString());
+        });
+
+        this.javascriptSourceRequired.forEach(j -> {
+            hashItemNames.add("javascript-source-required: " + j);
+            hash.append(j.toString());
+        });
+
+        return hash;
+    }
+
+    // verify...........................................................................................................
+
+    /**
+     * Verifies all 3 groups of coords using the project to print all dependencies if a test has failed.
+     */
+    final void verifyClasspathRequiredJavascriptSourceRequiredIgnoredDependencies(final Set<J2clArtifactCoords> all,
+                                                                                  final J2clDependency project) {
+        verify(this.classpathRequired, "classpath-required", all, project);
+        verify(this.javascriptSourceRequired, "javascript-required", all, project);
+        verify(this.ignoredDependencies, "ignoredDependencies", all, project);
+    }
+
+    private static void verify(final Collection<J2clArtifactCoords> filtered,
+                               final String label,
+                               final Set<J2clArtifactCoords> all,
+                               final J2clDependency project) {
+        final Collection<J2clArtifactCoords> unknown = filtered.stream()
+                .filter(c -> false == all.contains(c))
+                .collect(Collectors.toList());
+
+        if (false == unknown.isEmpty()) {
+            project.log(false);
+
+            throw new IllegalArgumentException("Unknown " + label + " dependencies: " + join(unknown));
+        }
+    }
+
+    private static String join(final Collection<?> items) {
+        return items.stream()
+                .map(Object::toString)
+                .sorted()
+                .collect(Collectors.joining(", "));
+    }
+
+    // MAVEN..............................................................................................................
+
+    final J2clMavenMiddleware mavenMiddleware() {
+        return this.middleware;
+    }
+
+    private final J2clMavenMiddleware middleware;
 
     // logger...........................................................................................................
 
