@@ -160,24 +160,11 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
 
     private J2clDependency project;
 
-    @Override
-    String directoryName(final J2clStep step) {
-        return step.directoryName(STEPS.indexOf(step));
-    }
+    // steps............................................................................................................
 
     @Override
-    J2clStep firstStep() {
-        return STEPS.get(0);
-    }
-
-    @Override
-    Optional<J2clStep> nextStep(final J2clStep current) {
-        final int index = STEPS.indexOf(current);
-        return Optional.ofNullable(
-                index + 1 < STEPS.size() ?
-                        STEPS.get(index + 1) :
-                        null
-        );
+    List<J2clStep> steps() {
+        return STEPS;
     }
 
     private final List<J2clStep> STEPS = Lists.of(
@@ -192,6 +179,8 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
             J2clStep.CLOSURE_COMPILE,
             J2clStep.JUNIT_TESTS
     );
+
+    // test only props..................................................................................................
 
     public List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers() {
         return this.browsers;
