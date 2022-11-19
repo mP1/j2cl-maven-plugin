@@ -199,13 +199,31 @@ public abstract class J2clMavenContext implements Context {
 
     private final Optional<String> sourceMaps;
 
-    // directoryName....................................................................................................
+    // steps............................................................................................................
 
-    abstract String directoryName(final J2clStep step);
+    final String directoryName(final J2clStep step) {
+        return step.directoryName(
+                this.steps()
+                        .indexOf(step)
+        );
+    }
 
-    abstract J2clStep firstStep();
+    final J2clStep firstStep() {
+        return this.steps().get(0);
+    }
 
-    abstract Optional<J2clStep> nextStep(final J2clStep current);
+    final Optional<J2clStep> nextStep(final J2clStep current) {
+        final List<J2clStep> steps = this.steps();
+
+        final int index = steps.indexOf(current);
+        return Optional.ofNullable(
+                index + 1 < steps.size() ?
+                        steps.get(index + 1) :
+                        null
+        );
+    }
+
+    abstract List<J2clStep> steps();
 
     // tasks............................................................................................................
 

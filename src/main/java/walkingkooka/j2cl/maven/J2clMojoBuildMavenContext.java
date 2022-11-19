@@ -146,26 +146,11 @@ final class J2clMojoBuildMavenContext extends J2clMavenContext {
         return hash;
     }
 
-    // directoryName....................................................................................................
+    // steps....................................................................................................
 
     @Override
-    String directoryName(final J2clStep step) {
-        return step.directoryName(STEPS.indexOf(step));
-    }
-
-    @Override
-    J2clStep firstStep() {
-        return STEPS.get(0);
-    }
-
-    @Override
-    Optional<J2clStep> nextStep(final J2clStep current) {
-        final int index = STEPS.indexOf(current);
-        return Optional.ofNullable(
-                index + 1 < STEPS.size() ?
-                        STEPS.get(index + 1) :
-                        null
-        );
+    List<J2clStep> steps() {
+        return STEPS;
     }
 
     private final List<J2clStep> STEPS = Lists.of(
