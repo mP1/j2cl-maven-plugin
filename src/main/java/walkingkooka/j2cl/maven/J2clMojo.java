@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven;
 
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Parameter;
 import walkingkooka.j2cl.maven.log.MavenLogger;
 
@@ -45,8 +46,23 @@ abstract class J2clMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}/walkingkooka-j2cl-maven-plugin-cache", required = true, property = "walkingkooka-j2cl-maven-plugin.cache.dir")
     private File cache;
 
+    // logging..........................................................................................................
 
-    final MavenLogger logger() {
-        return MavenLogger.maven(this.getLog());
+    @Override
+    public void setLog(final Log log) {
+        super.setLog(log);
+        this.logger = null;
     }
+
+    /**
+     * Returns a {@link MavenLogger} which wraps the real maven logger.
+     */
+    final MavenLogger logger() {
+        if (null == this.logger) {
+            this.logger = MavenLogger.maven(this.getLog());
+        }
+        return this.logger;
+    }
+
+    private MavenLogger logger;
 }
