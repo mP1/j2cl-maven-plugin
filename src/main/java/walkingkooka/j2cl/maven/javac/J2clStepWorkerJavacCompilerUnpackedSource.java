@@ -83,7 +83,6 @@ public final class J2clStepWorkerJavacCompilerUnpackedSource<C extends J2clMaven
                      final TreeLogger logger) throws Exception {
         if (false == artifact.isDependency() && J2clSourcesKind.TEST == context.sourcesKind()) {
             this.postCompileJunitProcessorFix(
-                    artifact,
                     directory,
                     context,
                     logger
@@ -91,8 +90,7 @@ public final class J2clStepWorkerJavacCompilerUnpackedSource<C extends J2clMaven
         }
     }
 
-    private void postCompileJunitProcessorFix(final J2clDependency artifact,
-                                              final J2clStepDirectory directory,
+    private void postCompileJunitProcessorFix(final J2clStepDirectory directory,
                                               final C context,
                                               final TreeLogger logger) throws Exception {
         logger.indent();
