@@ -132,7 +132,7 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
         logger.log("Test sources");
         logger.indent();
         {
-            for (final String testSourceRoot : this.project().getTestCompileSourceRoots()) {
+            for (final String testSourceRoot : this.mavenProject().getTestCompileSourceRoots()) {
                 final Path testSourceRootPath = Paths.get(testSourceRoot);
 
                 logger.line(testSourceRootPath.toAbsolutePath().toString());
