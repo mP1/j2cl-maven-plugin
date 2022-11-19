@@ -1161,7 +1161,10 @@ public final class J2clDependency implements Comparable<J2clDependency> {
      * Sets the directory for this dependency, assumes the hash has been computed
      */
     public J2clDependency setDirectory(final String hash) throws IOException {
-        final J2clPath create = this.context.base().append(this.coords.directorySafeName() + "-" + hash);
+        final J2clPath create = this.context.cache()
+                .append(
+                        this.coords.directorySafeName() + "-" + hash
+                );
         final J2clPath previous = this.directory.compareAndExchange(null, create);
         if (null != previous) {
             throw new IllegalStateException("Hash already set for this artifact: " + CharSequences.quote(create.toString()));
@@ -1173,12 +1176,20 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     /**
-     * Getter that returns the base directory for this artifact. Within that directory will have the step directories.
+     * Getter that returns the base directory for this artifact which includes the output for after preparation.
      */
     J2clPath directory() {
         final J2clPath directory = this.directory.get();
         if (null == directory) {
-            throw new IllegalStateException("Directory under " + this.context.base() + " missing for " + CharSequences.quote(this.coords().toString()));
+            throw new IllegalStateException(
+                    "Directory under " +
+                            this.context.cache() +
+                            " missing for " +
+                            CharSequences.quote(
+                                    this.coords()
+                                            .toString()
+                            )
+            );
         }
         return directory;
     }

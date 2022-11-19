@@ -53,7 +53,8 @@ public final class J2clMojoBuild extends J2clMojoBuildTest {
      */
     private J2clMojoBuildMavenContext context(final List<String> entryPoints,
                                               final J2clPath initialScriptFilename) {
-        return J2clMojoBuildMavenContext.with(this.cache(),
+        return J2clMojoBuildMavenContext.with(
+                this.cache(),
                 this.output(),
                 this.classpathScope(),
                 this.classpathRequired(),
@@ -70,7 +71,8 @@ public final class J2clMojoBuild extends J2clMojoBuildTest {
                 this.sourceMaps(),
                 this.mavenMiddleware(),
                 this.executor(),
-                this.logger());
+                this.logger()
+        );
     }
 
     // entry-points.....................................................................................................

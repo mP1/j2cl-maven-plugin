@@ -35,7 +35,7 @@ import java.util.concurrent.ExecutorService;
  */
 final class J2clMojoBuildMavenContext extends J2clMavenContext {
 
-    static J2clMojoBuildMavenContext with(final J2clPath base,
+    static J2clMojoBuildMavenContext with(final J2clPath cache,
                                           final J2clPath target,
                                           final J2clClasspathScope scope,
                                           final List<J2clArtifactCoords> classpathRequired,
@@ -53,7 +53,8 @@ final class J2clMojoBuildMavenContext extends J2clMavenContext {
                                           final J2clMavenMiddleware middleware,
                                           final ExecutorService executor,
                                           final MavenLogger logger) {
-        return new J2clMojoBuildMavenContext(base,
+        return new J2clMojoBuildMavenContext(
+                cache,
                 target,
                 scope,
                 classpathRequired,
@@ -70,10 +71,11 @@ final class J2clMojoBuildMavenContext extends J2clMavenContext {
                 sourceMaps,
                 middleware,
                 executor,
-                logger);
+                logger
+        );
     }
 
-    private J2clMojoBuildMavenContext(final J2clPath base,
+    private J2clMojoBuildMavenContext(final J2clPath cache,
                                       final J2clPath target,
                                       final J2clClasspathScope scope,
                                       final List<J2clArtifactCoords> classpathRequired,
@@ -91,7 +93,8 @@ final class J2clMojoBuildMavenContext extends J2clMavenContext {
                                       final J2clMavenMiddleware middleware,
                                       final ExecutorService executor,
                                       final MavenLogger logger) {
-        super(base,
+        super(
+                cache,
                 target,
                 scope,
                 classpathRequired,
@@ -106,7 +109,8 @@ final class J2clMojoBuildMavenContext extends J2clMavenContext {
                 sourceMaps,
                 middleware,
                 executor,
-                logger);
+                logger
+        );
         this.entryPoints = entryPoints;
         this.initialScriptFilename = initialScriptFilename;
     }

@@ -38,7 +38,7 @@ import java.util.concurrent.ExecutorService;
  */
 public final class J2clMojoTestMavenContext extends J2clMavenContext {
 
-    static J2clMojoTestMavenContext with(final J2clPath base,
+    static J2clMojoTestMavenContext with(final J2clPath cache,
                                          final J2clPath target,
                                          final J2clClasspathScope scope,
                                          final List<J2clArtifactCoords> classpathRequired,
@@ -58,7 +58,8 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
                                          final J2clMavenMiddleware middleware,
                                          final ExecutorService executor,
                                          final MavenLogger logger) {
-        return new J2clMojoTestMavenContext(base,
+        return new J2clMojoTestMavenContext(
+                cache,
                 target,
                 scope,
                 classpathRequired,
@@ -77,10 +78,11 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
                 testTimeout,
                 middleware,
                 executor,
-                logger);
+                logger
+        );
     }
 
-    private J2clMojoTestMavenContext(final J2clPath base,
+    private J2clMojoTestMavenContext(final J2clPath cache,
                                      final J2clPath target,
                                      final J2clClasspathScope scope,
                                      final List<J2clArtifactCoords> classpathRequired,
@@ -100,7 +102,8 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
                                      final J2clMavenMiddleware middleware,
                                      final ExecutorService executor,
                                      final MavenLogger logger) {
-        super(base,
+        super(
+                cache,
                 target,
                 scope,
                 classpathRequired,
@@ -115,7 +118,8 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
                 sourceMaps,
                 middleware,
                 executor,
-                logger);
+                logger
+        );
         this.browsers = browsers;
         this.browserLogLevel = browserLogLevel;
         this.testClassName = testClassName;

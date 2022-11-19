@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
  */
 public abstract class J2clMavenContext implements Context {
 
-    J2clMavenContext(final J2clPath base,
+    J2clMavenContext(final J2clPath cache,
                      final J2clPath target,
                      final J2clClasspathScope scope,
                      final List<J2clArtifactCoords> classpathRequired,
@@ -72,7 +72,7 @@ public abstract class J2clMavenContext implements Context {
                      final MavenLogger logger) {
         super();
 
-        this.base = base;
+        this.cache = cache;
         this.target = target;
         this.scope = scope;
 
@@ -107,16 +107,16 @@ public abstract class J2clMavenContext implements Context {
     private final J2clClasspathScope scope;
 
     /**
-     * The base or cache directory.
+     * The cache directory, which contains the output of building all dependencies.
      */
-    public final J2clPath base() {
-        return this.base;
+    public final J2clPath cache() {
+        return this.cache;
     }
 
     /**
      * The base or cache directory.
      */
-    private final J2clPath base;
+    private final J2clPath cache;
 
     public final J2clPath target() {
         return this.target;
@@ -612,7 +612,7 @@ public abstract class J2clMavenContext implements Context {
 
     @Override
     public String toString() {
-        return this.base + " " +
+        return this.cache + " " +
                 this.classpathRequired + " " +
                 this.ignoredDependencies + " " +
                 this.javascriptSourceRequired + " " +

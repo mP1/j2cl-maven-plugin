@@ -280,7 +280,7 @@ public enum J2clStep {
             } else {
                 // HASH step probably failed so create a unique file and write it to the base directory.
                 final Path base = Paths.get(
-                        context.base()
+                        context.cache()
                                 .path()
                                 .toString(),
                         artifact.coords() +
