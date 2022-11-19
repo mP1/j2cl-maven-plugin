@@ -132,7 +132,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
      */
     final J2clDependency gatherDependencies(final J2clMavenContext context) {
         return J2clDependency.gather(
-                this.project(),
+                this.mavenProject(),
                 context
         );
     }
@@ -247,17 +247,17 @@ abstract class J2clMojoBuildTest extends J2clMojo {
 
     @Parameter(alias = "source-maps")
     private String sourceMaps;
-    
+
     // project..........................................................................................................
 
-    final MavenProject project() {
-        return this.project;
+    final MavenProject mavenProject() {
+        return this.mavenProject;
     }
 
     @Parameter(defaultValue = "${project}",
             readonly = true,
             required = true)
-    private MavenProject project;
+    private MavenProject mavenProject;
 
     // threadPool.......................................................................................................
 
@@ -293,13 +293,15 @@ abstract class J2clMojoBuildTest extends J2clMojo {
      */
     final J2clMavenMiddleware mavenMiddleware() {
         if (null == this.mavenMiddleware) {
-            this.mavenMiddleware = J2clMavenMiddleware.of(this.artifactHandlerManager,
+            this.mavenMiddleware = J2clMavenMiddleware.of(
+                    this.artifactHandlerManager,
                     this.mavenSession,
                     this.projectBuilder,
-                    this.project.getRemoteArtifactRepositories(),
+                    this.mavenProject.getRemoteArtifactRepositories(),
                     this.repositories,
                     this.repositorySession,
-                    this.repositorySystem);
+                    this.repositorySystem
+            );
         }
         return this.mavenMiddleware;
     }

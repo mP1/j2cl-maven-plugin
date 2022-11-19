@@ -74,7 +74,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Gathers all dependencies honouring excludes and dependencyManagement entries in POMs.
      */
-    static J2clDependency gather(final MavenProject project,
+    static J2clDependency gather(final MavenProject mavenProject,
                                  final J2clMavenContext context) {
         final TreeLogger logger = context.mavenLogger()
                 .output();
@@ -83,12 +83,16 @@ public final class J2clDependency implements Comparable<J2clDependency> {
             root = timeTask(
                     "Gather dependencies",
                     () -> {
-                        final J2clDependency r = new J2clDependency(J2clArtifactCoords.with(project.getArtifact()),
-                                project,
+                        final J2clDependency d = new J2clDependency(
+                                J2clArtifactCoords.with(
+                                        mavenProject.getArtifact()
+                                ),
+                                mavenProject,
                                 Optional.empty(),
-                                context);
-                        r.gatherDependencies(context.scope(), Predicates.never(), Function.identity());
-                        return r;
+                                context
+                        );
+                        d.gatherDependencies(context.scope(), Predicates.never(), Function.identity());
+                        return d;
                     },
                     logger
             );
@@ -181,12 +185,12 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     // ctor.............................................................................................................
 
     private J2clDependency(final J2clArtifactCoords coords,
-                           final MavenProject project,
+                           final MavenProject mavenProject,
                            final Optional<J2clPath> artifactFile,
                            final J2clMavenContext context) {
         super();
         this.coords = coords;
-        this.project = project;
+        this.mavenProject = mavenProject;
         this.artifactFile = artifactFile;
         this.context = context;
     }
@@ -198,7 +202,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     private Function<J2clArtifactCoords, J2clArtifactCoords> dependencyManagement(final Function<J2clArtifactCoords, J2clArtifactCoords> transformer) {
-        final DependencyManagement management = this.project().getDependencyManagement();
+        final DependencyManagement management = this.mavenProject().getDependencyManagement();
         return null == management ?
                 transformer :
                 this.dependencyManagement0(transformer, management);
@@ -228,7 +232,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
         final J2clMavenContext context = this.context;
 
         final Predicate<String> scopeFilter = scope.scopeFilter();
-        for (final Dependency dependency : this.project().getDependencies()) {
+        for (final Dependency dependency : this.mavenProject().getDependencies()) {
             // filter if wrong scope
             if (false == scopeFilter.test(dependency.getScope())) {
                 continue;
@@ -723,20 +727,19 @@ public final class J2clDependency implements Comparable<J2clDependency> {
 
     // project...........................................................................................................
 
-    public MavenProject project() {
-        if (null == this.project) {
-            // all requests with a null project must be dependencies of the project being built and their COMPILE dependencies should be fetched.
-            final J2clMavenContext context = this.context;
-            this.project = context.mavenMiddleware()
+    public MavenProject mavenProject() {
+        if (null == this.mavenProject) {
+            // all requests with a null mavenProject must be dependencies of the project being built and their COMPILE dependencies should be fetched.
+            this.mavenProject = this.context.mavenMiddleware()
                     .mavenProject(
                             this.coords(),
                             J2clClasspathScope.COMPILE
                     );
         }
-        return this.project;
+        return this.mavenProject;
     }
 
-    private MavenProject project;
+    private MavenProject mavenProject;
 
     // dependencies.....................................................................................................
 
@@ -1239,15 +1242,19 @@ public final class J2clDependency implements Comparable<J2clDependency> {
         final J2clMavenContext context = this.context;
         final List<J2clPath> sources = Lists.array();
 
-        final MavenProject project = this.project();
-        final File projectBase = project.getFile();
-        if (null != projectBase) {
+        final MavenProject mavenProject = this.mavenProject();
+        final File mavenProjectBase = mavenProject.getFile();
+        if (null != mavenProjectBase) {
             sources.addAll(context
                     .sourcesKind()
-                    .compileSourceRoots(project, J2clPath.with(projectBase.toPath())));
+                    .compileSourceRoots(
+                            mavenProject,
+                            J2clPath.with(mavenProjectBase.toPath())
+                    )
+            );
         }
         // no project source try and sources archive and then jar file itself
-        if(sources.isEmpty()) {
+        if (sources.isEmpty()) {
             final J2clArtifactCoords coords = this.coords();
             final J2clMavenMiddleware middleware = context.mavenMiddleware();
 
