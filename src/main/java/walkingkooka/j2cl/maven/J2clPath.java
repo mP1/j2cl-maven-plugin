@@ -162,7 +162,7 @@ public final class J2clPath implements Comparable<J2clPath> {
     public final static BiFunction<byte[], J2clPath, byte[]> COPY_FILE_CONTENT_VERBATIM = (b, path) -> b;
 
     /**
-     * Copies the files from the given source to this directory.
+     * Copies the files from the given source to this directory. Existing files are replaced, new files are copied.
      */
     public Collection<J2clPath> copyFiles(final J2clPath src,
                                           final Collection<J2clPath> files,
@@ -172,17 +172,11 @@ public final class J2clPath implements Comparable<J2clPath> {
         final Path destPath = this.path();
 
         final List<J2clPath> copied = Lists.array();
-        final List<J2clPath> skipped = Lists.array();
 
         for (final J2clPath file : files) {
             final Path filePath = file.path();
             final String relative = srcPath.relativize(filePath).toString();
             final Path copyTarget = destPath.resolve(relative);
-
-            if (Files.exists(copyTarget)) {
-                skipped.add(file);
-                continue;
-            }
 
             Files.createDirectories(copyTarget.getParent());
 
@@ -193,20 +187,7 @@ public final class J2clPath implements Comparable<J2clPath> {
             copied.add(copyTargetPath);
         }
 
-        if (copied.isEmpty()) {
-            logger.indentedLine(src.toString());
-            logger.line("0 file(s)");
-        } else {
-            logger.paths("", copied, TreeFormat.TREE);
-        }
-
-        if (false == skipped.isEmpty()) {
-            logger.indent();
-            {
-                logger.paths("Skipped", skipped, TreeFormat.TREE);
-            }
-            logger.outdent();
-        }
+        logger.paths("", copied, TreeFormat.TREE);
 
         return copied;
     }
