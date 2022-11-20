@@ -375,7 +375,7 @@ public final class J2clPath implements Comparable<J2clPath> {
     /**
      * Builds a new path holding the shade mapping file.
      */
-    public J2clPath shadeFile() {
+    J2clPath shadeFile() {
         return this.append(SHADE_FILE);
     }
 
