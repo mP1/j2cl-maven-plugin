@@ -666,23 +666,35 @@ The source after step 5 processing.
 package java.util;
 
 class Base64 {
-  class Decoder {
-    
-  }
+    class Decoder {
 
-  class Encoder {
-  
-  }
+    }
+
+    class Encoder {
+
+    }
 }
 ```
 
+## Sample .walkingkooka-j2cl-maven-plugin-public-files.txt
+
+This file must appear in the root of the artifact and can be used to copy files to the final assembly output.
+
+```text
+# This is a comment and ignored. The two blank lines are also ignored.
+
+
+# Any files that match the pattern below will be copied from the source.
+index.html
+images/*.gif
+``` 
 
 # Building steps or phases.
 
-The build process involves transforming the parent project and dependencies including transitives from java into javascript,
-in reverse order. Reverse order here means that if the project is the root of the dependency tree, then for all
-operations to complete successfully dependencies that are leaves of this tree must be processed first. Once the leaves
-are completed successfully dependencies or the project only requiring them can be attempted. Eventually the only
+The build process involves transforming the parent project and dependencies including transitives from java into
+javascript, in reverse order. Reverse order here means that if the project is the root of the dependency tree, then for
+all operations to complete successfully dependencies that are leaves of this tree must be processed first. Once the
+leaves are completed successfully dependencies or the project only requiring them can be attempted. Eventually the only
 outstanding artifact or dependency is the project itself.
 
 The plugin will create a separate directory for each artifact, using the maven coordinates and a HASH of all dependencies.
