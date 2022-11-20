@@ -78,13 +78,13 @@ public final class J2clMojoBuild extends J2clMojoBuildTest {
     // entry-points.....................................................................................................
 
     private List<String> entryPoints() {
-        return this.entrypoints.stream()
+        return this.entryPoints.stream()
                 .map(String::trim)
                 .collect(Collectors.toList());
     }
 
     @Parameter(alias = "entry-points", required = true)
-    private final List<String> entrypoints = new ArrayList<>();
+    private final List<String> entryPoints = new ArrayList<>();
 
     // initial-script-filename..........................................................................................
 
