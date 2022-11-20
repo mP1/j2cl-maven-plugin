@@ -58,7 +58,15 @@ import java.util.stream.Collectors;
  */
 public final class J2clPath implements Comparable<J2clPath> {
 
-    public static final String FILE_PREFIX = ".walkingkooka-j2cl-maven-plugin";
+    /**
+     * A common prefix for all file and directories related to this plugin.
+     */
+    public static final String PREFIX = "walkingkooka-j2cl-maven-plugin";
+
+    /**
+     * The file prefix for the various user files that may appear within source or archive describing various plugin features.
+     */
+    public static final String FILE_PREFIX = "." + PREFIX;
 
     /**
      * Matches all files but not directories.

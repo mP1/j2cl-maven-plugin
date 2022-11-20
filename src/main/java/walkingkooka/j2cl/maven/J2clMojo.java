@@ -43,7 +43,11 @@ abstract class J2clMojo extends AbstractMojo {
     /**
      * Specifies the path fo the cache directory where all dependencies are processed and their respective files.
      */
-    @Parameter(defaultValue = "${project.build.directory}/walkingkooka-j2cl-maven-plugin-cache", required = true, property = "walkingkooka-j2cl-maven-plugin.cache.dir")
+    @Parameter(
+            defaultValue = "${project.build.directory}/" + J2clPath.PREFIX + "-cache",
+            required = true,
+            property = J2clPath.PREFIX + ".cache.dir"
+    )
     private File cache;
 
     // logging..........................................................................................................
