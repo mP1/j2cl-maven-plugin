@@ -65,10 +65,10 @@ public final class J2clStepWorkerOutputAssembler<C extends J2clMavenContext> imp
         final J2clPath source = artifact.step(J2clStep.CLOSURE_COMPILE).output();
         logger.path("Source", source);
 
-        final J2clPath target = context.target();
-        logger.path("Destination", target);
-        target.createIfNecessary();
+        final J2clPath target = context.target()
+                .createIfNecessary();
 
+        logger.line("Destination");
         final Collection<J2clPath> files = source.gatherFiles(J2clPath.ALL_FILES);
 
         final J2clStepResult result;
