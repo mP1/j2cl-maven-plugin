@@ -80,7 +80,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
                 .output();
         final J2clDependency root;
         {
-            root = timeTask(
+            root = gatherSubTask(
                     "Gather dependencies",
                     () -> {
                         final J2clDependency d = new J2clDependency(
@@ -91,13 +91,17 @@ public final class J2clDependency implements Comparable<J2clDependency> {
                                 Optional.empty(),
                                 context
                         );
-                        d.gatherDependencies(context.scope(), Predicates.never(), Function.identity());
+                        d.gatherDependencies(
+                                context.scope(),
+                                Predicates.never(),
+                                Function.identity()
+                        );
                         return d;
                     },
                     logger
             );
 
-            timeTask(
+            gatherSubTask(
                     "Reduce duplicate dependencies",
                     () -> {
                         root.reduce();
@@ -106,7 +110,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
                     logger
             );
 
-            timeTask(
+            gatherSubTask(
                     "Discover and mark ignored transitive dependencies",
                     () -> {
                         root.discoverAndMarkIgnoredTransitiveDependencies();
@@ -115,7 +119,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
                     logger
             );
 
-            timeTask(
+            gatherSubTask(
                     "Expand dependencies",
                     () -> {
                         root.addTransitiveDependencies();
@@ -124,7 +128,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
                     logger
             );
 
-            timeTask(
+            gatherSubTask(
                     "Add Bootstrap Classpath to all dependencies",
                     () -> {
                         root.addBootstrapClasspath();
@@ -133,7 +137,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
                     logger
             );
 
-            timeTask(
+            gatherSubTask(
                     "Verify dependencies maven coordinates",
                     () -> {
                         root.verify();
@@ -149,9 +153,9 @@ public final class J2clDependency implements Comparable<J2clDependency> {
         return root;
     }
 
-    private static <T> T timeTask(final String taskName,
-                                  final Supplier<T> run,
-                                  final TreeLogger logger) {
+    private static <T> T gatherSubTask(final String taskName,
+                                       final Supplier<T> run,
+                                       final TreeLogger logger) {
         final T result;
 
         final Thread thread = Thread.currentThread();
@@ -159,21 +163,22 @@ public final class J2clDependency implements Comparable<J2clDependency> {
         thread.setName(taskName);
         try {
             logger.line(taskName);
+
+            final Instant start = Instant.now();
+            result = run.get();
+
             logger.indent();
             {
-                final Instant start = Instant.now();
-                logger.indent();
-                {
-                    result = run.get();
-                }
-                logger.outdent();
-                logger.line(
-                        taskName +
-                                " took " +
-                                TreeLogger.prettyTimeTaken(
-                                        Duration.between(start, Instant.now())
+                logger.line("Time Taken");
+                logger.indentedLine(
+                        TreeLogger.prettyTimeTaken(
+                                Duration.between(
+                                        start,
+                                        Instant.now()
                                 )
+                        )
                 );
+
             }
             logger.outdent();
         } finally {
