@@ -29,9 +29,7 @@ import walkingkooka.j2cl.maven.log.TreeFormat;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.CharSequences;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,11 +39,11 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * Accepts a directory and removes any files marked with @GwtIncompatible.
@@ -182,50 +180,51 @@ final class GwtIncompatibleStripPreprocessor {
                                               final Predicate<Path> include) throws IOException {
         final SortedSet<J2clPath> files = Sets.sorted();
 
-        final Map<Path, List<PathMatcher>> pathToMatchers = Maps.hash();
+        final Map<Path, PathMatcher> pathToMatchers = Maps.hash();
         final List<PathMatcher> exclude = Lists.array();
 
-        Files.walkFileTree(root.path(), new SimpleFileVisitor<>() {
+        Files.walkFileTree(
+                root.path(),
+                new SimpleFileVisitor<>() {
 
-            @Override
-            public FileVisitResult preVisitDirectory(final Path dir,
-                                                     final BasicFileAttributes attrs) throws IOException {
-                final J2clPath ignoreFile = J2clPath.with(dir).ignoredFiles();
-                if (ignoreFile.exists().isPresent()) {
-                    final List<PathMatcher> matchers = Files.readAllLines(ignoreFile.path())
-                            .stream()
-                            .filter(l -> false == l.startsWith("#") | l.trim().length() > 0)
-                            .map(l -> FileSystems.getDefault().getPathMatcher("glob:" + dir + File.separator + l))
-                            .collect(Collectors.toList());
-                    pathToMatchers.put(dir, matchers);
-                    exclude.addAll(matchers);
-                }
+                    @Override
+                    public FileVisitResult preVisitDirectory(final Path dir,
+                                                             final BasicFileAttributes attrs) throws IOException {
+                        final Optional<PathMatcher> maybeIgnoreFile = J2clPath.with(dir)
+                                .ignoredFiles();
+                        if (maybeIgnoreFile.isPresent()) {
+                            final PathMatcher ignoreFile = maybeIgnoreFile.get();
 
-                return FileVisitResult.CONTINUE;
-            }
+                            pathToMatchers.put(dir, ignoreFile);
+                            exclude.add(ignoreFile);
+                        }
 
-            @Override
-            public FileVisitResult postVisitDirectory(final Path dir,
-                                                      final IOException cause) {
-                final List<PathMatcher> matchers = pathToMatchers.remove(dir);
-                if (null != matchers) {
-                    matchers.forEach(exclude::remove);
-                }
-                return FileVisitResult.CONTINUE;
-            }
 
-            @Override
-            public FileVisitResult visitFile(final Path file,
-                                             final BasicFileAttributes attributes) {
-                if (exclude.stream().noneMatch(m -> m.matches(file))) {
-                    if (include.test(file)) {
-                        files.add(J2clPath.with(file));
+                        return FileVisitResult.CONTINUE;
                     }
-                }
 
-                return FileVisitResult.CONTINUE;
-            }
-        });
+                    @Override
+                    public FileVisitResult postVisitDirectory(final Path dir,
+                                                              final IOException cause) {
+                        final PathMatcher matcher = pathToMatchers.remove(dir);
+                        if (null != matcher) {
+                            exclude.remove(matcher);
+                        }
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                    @Override
+                    public FileVisitResult visitFile(final Path file,
+                                                     final BasicFileAttributes attributes) {
+                        if (exclude.stream().noneMatch(m -> m.matches(file))) {
+                            if (include.test(file)) {
+                                files.add(J2clPath.with(file));
+                            }
+                        }
+
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
 
         return files;
     }

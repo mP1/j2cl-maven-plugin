@@ -37,6 +37,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
@@ -283,16 +284,42 @@ public final class J2clPath implements Comparable<J2clPath> {
     }
 
     /**
-     * Builds a new path holding the ignore file.
+     * Builds a new path holding the ignore file. Note that ignored files are simply ignored with no logging happening.
      */
-    public J2clPath ignoredFiles() {
-        return this.append(IGNORED_FILES);
+    public Optional<PathMatcher> ignoredFiles() throws IOException {
+        return this.append(IGNORED_FILES)
+                .pathMatcher(
+                        this
+                );
     }
 
     /**
      * The name of the ignore file which is used during the unpack phase to filter files.
      */
-    private static final String IGNORED_FILES = FILE_PREFIX + "-ignored-files.txt";
+    // @VisibleForTesting
+    static final String IGNORED_FILES = FILE_PREFIX + "-ignored-files.txt";
+
+    /**
+     * Tries to read this file turning each non comment / non empty line into a {@link PathMatcher}.
+     */
+    private Optional<PathMatcher> pathMatcher(final J2clPath parent) throws IOException {
+        PathMatcher pathMatcher = null;
+
+        if (this.exists().isPresent()) {
+            final List<PathMatcher> matchers = Files.readAllLines(this.path())
+                    .stream()
+                    .filter(l -> false == l.startsWith("#") | l.trim().length() > 0)
+                    .map(l -> FileSystems.getDefault().getPathMatcher("glob:" + parent + File.separator + l))
+                    .collect(Collectors.toList());
+
+            if (!matchers.isEmpty()) {
+                pathMatcher = (p) -> matchers.stream()
+                        .anyMatch(m -> m.matches(p));
+            }
+        }
+
+        return Optional.ofNullable(pathMatcher);
+    }
 
     /**
      * Returns true if this file is a java file.

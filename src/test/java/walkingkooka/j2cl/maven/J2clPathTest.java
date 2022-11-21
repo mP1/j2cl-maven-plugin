@@ -30,6 +30,9 @@ import walkingkooka.text.CharSequences;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
@@ -115,9 +118,21 @@ public final class J2clPathTest implements ComparableTesting2<J2clPath>, HashCod
     }
 
     @Test
-    public void testIgnoredFiles() {
-        final J2clPath path = this.createObject();
-        this.checkPath(path.ignoredFiles(), path + File.separator + ".walkingkooka-j2cl-maven-plugin-ignored-files.txt");
+    public void testIgnoredFiles() throws IOException {
+        final Path folder = this.base.newFolder()
+                .toPath();
+
+        Files.write(
+                folder.resolve(J2clPath.IGNORED_FILES),
+                "*.txt".getBytes(StandardCharsets.UTF_8)
+        );
+
+        final J2clPath path = J2clPath.with(folder);
+
+        this.checkNotEquals(
+                path.ignoredFiles(),
+                Optional.empty()
+        );
     }
 
     @Test
