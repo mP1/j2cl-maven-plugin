@@ -113,7 +113,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
             gatherSubTask(
                     "Discover and mark ignored transitive dependencies",
                     () -> {
-                        root.discoverAndMarkIgnoredTransitiveDependencies();
+                        root.discoverAndMarkIgnoredTransitiveDependencies(logger);
                         return null;
                     },
                     logger
@@ -181,6 +181,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
 
             }
             logger.outdent();
+            logger.flush();
         } finally {
             thread.setName(threadNameBackup);
         }
@@ -343,17 +344,24 @@ public final class J2clDependency implements Comparable<J2clDependency> {
      *       -> project
      * </pre>
      */
-    private void discoverAndMarkIgnoredTransitiveDependencies() {
+    private void discoverAndMarkIgnoredTransitiveDependencies(final TreeLogger logger) {
         final Map<J2clDependency, Set<J2clDependency>> childToParents = Maps.sorted();
 
-        this.discoverAndRecordParents(childToParents);
-        this.markIgnoredTransitiveDependencies(childToParents);
+        this.discoverAndRecordParents(
+                childToParents,
+                logger
+        );
+        this.markIgnoredTransitiveDependencies(
+                childToParents,
+                logger
+        );
     }
 
     /**
      * Builds a {@link Map} of child to parent.
      */
-    private void discoverAndRecordParents(final Map<J2clDependency, Set<J2clDependency>> childToParents) {
+    private void discoverAndRecordParents(final Map<J2clDependency, Set<J2clDependency>> childToParents,
+                                          final TreeLogger logger) {
         this.dependencies.stream()
                 .filter(c -> false == c.isAnnotationsBootstrapOrJreFiles())
                 .forEach(c -> {
@@ -364,29 +372,38 @@ public final class J2clDependency implements Comparable<J2clDependency> {
                     }
                     parents.add(this);
 
-                    c.discoverAndRecordParents(childToParents);
+                    c.discoverAndRecordParents(
+                            childToParents,
+                            logger
+                    );
                 });
     }
 
-    private void markIgnoredTransitiveDependencies(final Map<J2clDependency, Set<J2clDependency>> childToParents) {
-        final TreeLogger logger = this.context.mavenLogger()
-                .output();
-
-        logger.line("Marking ignored transitive dependencies");
+    private void markIgnoredTransitiveDependencies(final Map<J2clDependency, Set<J2clDependency>> childToParents,
+                                                   final TreeLogger logger) {
         logger.indent();
         {
-            childToParents.entrySet()
-                    .forEach(e -> {
-                        final Set<J2clDependency> parents = e.getValue();
-                        if (null != parents) {
-                            e.getKey()
-                                    .markIgnoredTransitiveDependencies0(
-                                            parents,
-                                            childToParents,
-                                            logger
-                                    );
-                        }
-                    });
+            logger.indent();
+            {
+                logger.line("Marking ignored transitive dependencies");
+                logger.indent();
+                {
+                    childToParents.entrySet()
+                            .forEach(e -> {
+                                final Set<J2clDependency> parents = e.getValue();
+                                if (null != parents) {
+                                    e.getKey()
+                                            .markIgnoredTransitiveDependencies0(
+                                                    parents,
+                                                    childToParents,
+                                                    logger
+                                            );
+                                }
+                            });
+                }
+                logger.outdent();
+            }
+            logger.outdent();
         }
         logger.outdent();
     }
