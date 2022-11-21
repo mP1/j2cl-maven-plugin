@@ -140,7 +140,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
             gatherSubTask(
                     "Verify dependencies maven coordinates",
                     () -> {
-                        root.verify();
+                        root.verify(logger);
                         return null;
                     },
                     logger
@@ -148,7 +148,10 @@ public final class J2clDependency implements Comparable<J2clDependency> {
 
             makeDependenciesGetterReadOnly(root.dependencies);
         }
-        root.log(true);
+        root.log(
+                true,
+                logger
+        );
 
         return root;
     }
@@ -565,21 +568,27 @@ public final class J2clDependency implements Comparable<J2clDependency> {
      * Checks that dependency coords do not have version conflicts, duplicates, and classpath required, javascript source
      * required and ignored dependency declarations.
      */
-    private void verify() {
+    private void verify(final TreeLogger logger) {
         final Collection<J2clDependency> all = this.dependencies();
-        this.verifyWithoutConflictsOrDuplicates(all);
+        this.verifyWithoutConflictsOrDuplicates(
+                all,
+                logger
+        );
 
-        this.context.verifyClasspathRequiredJavascriptSourceRequiredIgnoredDependencies(all
-                        .stream()
+        this.context.verifyClasspathRequiredJavascriptSourceRequiredIgnoredDependencies(
+                all.stream()
                         .map(J2clDependency::coords)
                         .collect(Collectors.toCollection(Sets::sorted)),
-                this);
+                this,
+                logger
+        );
     }
 
     /**
      * Verifies there are not dependencies that share the same group and artifact id but differ in other components.
      */
-    private void verifyWithoutConflictsOrDuplicates(final Collection<J2clDependency> all) {
+    private void verifyWithoutConflictsOrDuplicates(final Collection<J2clDependency> all,
+                                                    final TreeLogger logger) {
         final Set<J2clArtifactCoords> duplicateCoords = J2clArtifactCoords.set();
         final List<String> duplicatesText = Lists.array();
 
@@ -607,7 +616,10 @@ public final class J2clDependency implements Comparable<J2clDependency> {
         }
 
         if (duplicateCoords.size() > 0) {
-            this.log(false);
+            this.log(
+                    false,
+                    logger
+            );
 
             throw new IllegalStateException(duplicateCoords.size() + " duplicate(s)\n" + duplicatesText.stream().collect(Collectors.joining("\n")));
         }
@@ -628,9 +640,8 @@ public final class J2clDependency implements Comparable<J2clDependency> {
      * Prints a dependency graph and various metadata that will be used to plan the approach for building.
      * The printMetadata flag will be false when printing dependencies before a verify exception is thrown.
      */
-    void log(final boolean includeMetadata) {
-        final TreeLogger logger = this.context.mavenLogger()
-                .output();
+    void log(final boolean includeMetadata,
+             final TreeLogger logger) {
         logger.line("Dependencies");
         logger.indent();
         {

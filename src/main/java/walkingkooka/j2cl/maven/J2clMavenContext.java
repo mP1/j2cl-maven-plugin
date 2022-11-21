@@ -561,22 +561,27 @@ public abstract class J2clMavenContext implements Context {
      * Verifies all 3 groups of coords using the project to print all dependencies if a test has failed.
      */
     final void verifyClasspathRequiredJavascriptSourceRequiredIgnoredDependencies(final Set<J2clArtifactCoords> all,
-                                                                                  final J2clDependency project) {
-        verify(this.classpathRequired, "classpath-required", all, project);
-        verify(this.javascriptSourceRequired, "javascript-required", all, project);
-        verify(this.ignoredDependencies, "ignoredDependencies", all, project);
+                                                                                  final J2clDependency project,
+                                                                                  final TreeLogger logger) {
+        verify(this.classpathRequired, "classpath-required", all, project, logger);
+        verify(this.javascriptSourceRequired, "javascript-required", all, project, logger);
+        verify(this.ignoredDependencies, "ignoredDependencies", all, project, logger);
     }
 
     private static void verify(final Collection<J2clArtifactCoords> filtered,
                                final String label,
                                final Set<J2clArtifactCoords> all,
-                               final J2clDependency project) {
+                               final J2clDependency project,
+                               final TreeLogger logger) {
         final Collection<J2clArtifactCoords> unknown = filtered.stream()
                 .filter(c -> false == all.contains(c))
                 .collect(Collectors.toList());
 
         if (false == unknown.isEmpty()) {
-            project.log(false);
+            project.log(
+                    false,
+                    logger
+            );
 
             throw new IllegalArgumentException("Unknown " + label + " dependencies: " + join(unknown));
         }
