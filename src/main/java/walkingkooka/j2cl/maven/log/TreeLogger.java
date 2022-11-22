@@ -85,7 +85,15 @@ final public class TreeLogger {
     public void path(final String label,
                      final J2clPath file) {
         this.line(label);
-        this.indentedLine(file.toString());
+        this.indentedLine(
+                file.toString()
+        );
+    }
+
+    public void path(final J2clPath file) {
+        this.line(
+                file.toString()
+        );
     }
 
     /**
@@ -147,21 +155,16 @@ final public class TreeLogger {
     private <T> void stringPath0(final Collection<T> paths,
                                  final Function<T, StringPath> toStringPath,
                                  final TreeFormat format) {
-        this.indent();
-        {
-            switch (format) {
-                case FLAT:
-                    flat(paths, toStringPath, this.treePrinter);
-                    break;
-                case TREE:
-                    tree(paths, toStringPath, this.treePrinter);
-                    break;
-                default:
-                    NeverError.unhandledEnum(format, TreeFormat.values());
-            }
+        switch (format) {
+            case FLAT:
+                flat(paths, toStringPath, this.treePrinter);
+                break;
+            case TREE:
+                tree(paths, toStringPath, this.treePrinter);
+                break;
+            default:
+                NeverError.unhandledEnum(format, TreeFormat.values());
         }
-        this.outdent();
-        this.line(paths.size() + " file(s)");
     }
 
     /**

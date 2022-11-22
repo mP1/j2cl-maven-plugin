@@ -29,6 +29,7 @@ import walkingkooka.j2cl.maven.log.TreeLogger;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Unpacks the source from the sources artifact (jar with sources) and if no java files are present tries
@@ -72,8 +73,7 @@ public final class J2clStepWorkerUnpack<C extends J2clMavenContext> implements J
         J2clStepResult result;
 
         final J2clPath dest = directory.output().absentOrFail();
-        logger.path("Destination", dest);
-        {
+
             boolean filesFound = this.extractSourceRoots(artifact, dest, logger);
 
             if (false == filesFound) {
@@ -95,13 +95,14 @@ public final class J2clStepWorkerUnpack<C extends J2clMavenContext> implements J
             }
 
             if(filesFound) {
+                logger.path("Destination", dest);
+
                 logger.line("Source files found, transpiling will happen");
                 result = J2clStepResult.SUCCESS;
             } else {
                 logger.line("No source files found, transpiling will not be attempted");
                 result = J2clStepResult.ABORTED;
             }
-        }
 
         return result;
     }
@@ -112,33 +113,57 @@ public final class J2clStepWorkerUnpack<C extends J2clMavenContext> implements J
         boolean filesFound = false;
 
         final List<J2clPath> sourceRoots = artifact.sourcesRoot();
-        logger.paths("Source root(s)", sourceRoots, TreeFormat.TREE);
+        logger.paths(
+                "Source root(s)",
+                sourceRoots,
+                TreeFormat.TREE
+        );
 
         logger.line("Unpacking...");
         logger.indent();
         {
-
             for (final J2clPath source : sourceRoots) {
-                logger.line(source.toString());
-                logger.indent();
-                {
-                    if (source.isTestAnnotation()) {
+                if (source.isTestAnnotation()) {
+                    logger.line(source.toString());
+                    logger.indent();
+                    {
                         logger.line("// test annotations source skipped");
-                        continue;
                     }
-
+                    logger.outdent();
+                } else {
                     // dont want to copy test-annotations will contain the generated class by any annotation processor.
-                    filesFound |= source.isFile() ?
-                            source.extractArchiveFiles(J2clPath.WITHOUT_META_INF,
+                    if (source.isFile()) {
+                        logger.line(source.toString());
+                        logger.indent();
+                        {
+                            final Set<J2clPath> extractedFiles = source.extractArchiveFiles(
+                                    J2clPath.WITHOUT_META_INF,
                                     dest,
-                                    logger)
-                                    .size() > 0 :
-                            dest.copyFiles(source,
-                                    source.gatherFiles(J2clPath.ALL_FILES),
-                                    J2clPath.COPY_FILE_CONTENT_VERBATIM,
-                                    logger).size() > 0;
+                                    logger
+                            );
+
+                            filesFound = extractedFiles.size() > 0;
+                        }
+                        logger.outdent();
+
+                    } else {
+                        final Set<J2clPath> sourceFiles = source.gatherFiles(J2clPath.ALL_FILES);
+
+                        dest.copyFiles(
+                                source,
+                                sourceFiles,
+                                J2clPath.COPY_FILE_CONTENT_VERBATIM
+                        );
+
+                        logger.paths(
+                                "",
+                                sourceFiles,
+                                TreeFormat.TREE
+                        );
+
+                        filesFound = sourceFiles.size() > 0;
+                    }
                 }
-                logger.outdent();
             }
         }
         logger.outdent();

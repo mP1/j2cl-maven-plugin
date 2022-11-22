@@ -156,12 +156,13 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
 
         logger.paths("label1", List.of(path("/path/2"), path("/path/1"), path("/path/3")), TreeFormat.FLAT);
 
-        this.check("label1\n" +
-                        "    /path/2<\n" +
-                        "    /path/1<\n" +
-                        "    /path/3<\n" +
-                        "  3 file(s)",
-                b);
+        this.check(
+                "label1\n" +
+                        "  /path/2<\n" +
+                        "  /path/1<\n" +
+                        "  /path/3<\n",
+                b
+        );
     }
 
     @Test
@@ -171,11 +172,12 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
 
         logger.paths("label1", List.of(path("/path/to")), TreeFormat.TREE);
 
-        this.check("label1\n" +
-                        "    /path<\n" +
-                        "      to<\n" +
-                        "  1 file(s)",
-                b);
+        this.check(
+                "label1\n" +
+                        "  /path<\n" +
+                        "    to<\n",
+                b
+        );
     }
 
     @Test
@@ -185,11 +187,12 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
 
         logger.paths("label1", List.of(path("/path/to"), path("/path/to2")), TreeFormat.TREE);
 
-        this.check("label1\n" +
-                        "    /path<\n" +
-                        "      to                                                           to2<\n" +
-                        "  2 file(s)",
-                b);
+        this.check(
+                "label1\n" +
+                        "  /path<\n" +
+                        "    to                                                           to2<\n",
+                b
+        );
     }
 
     @Test
