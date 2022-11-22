@@ -64,11 +64,7 @@ public final class J2clStepWorkerJ2clTranspiler<C extends J2clMavenContext> impl
                                                final J2clStepDirectory directory,
                                                final C context,
                                                final TreeLogger logger) throws Exception {
-        logger.line("Preparing...");
-
         final J2clPath sourceRoot = this.sourceRoot(artifact);
-        logger.path("Source path(s)", sourceRoot);
-
         final Set<J2clPath> classpath = this.classpath(artifact);
 
         return J2clTranspiler.execute(classpath,

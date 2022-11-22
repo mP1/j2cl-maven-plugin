@@ -23,6 +23,7 @@ import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clStep;
 import walkingkooka.j2cl.maven.J2clStepWorker;
+import walkingkooka.j2cl.maven.log.TreeFormat;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.javashader.JavaShaders;
 
@@ -91,16 +92,19 @@ public final class J2clStepWorkerShadeJavaSource<C extends J2clMavenContext> ext
         logger.indent();
         {
             for (final J2clPath sourceRoot : sourceRoots) {
-                logger.line(sourceRoot.toString());
-                logger.indent();
-                {
-                    final Set<J2clPath> copy = sourceRoot.gatherFiles(J2clPath.JAVASCRIPT_FILES);
-                    output.copyFiles(sourceRoot,
-                            copy,
-                            J2clPath.COPY_FILE_CONTENT_VERBATIM,
-                            logger);
-                }
-                logger.outdent();
+                final Set<J2clPath> fromFiles = sourceRoot.gatherFiles(J2clPath.JAVASCRIPT_FILES);
+
+                output.copyFiles(
+                        sourceRoot,
+                        fromFiles,
+                        J2clPath.COPY_FILE_CONTENT_VERBATIM
+                );
+
+                logger.paths(
+                        "",
+                        fromFiles,
+                        TreeFormat.TREE
+                );
             }
         }
         logger.outdent();

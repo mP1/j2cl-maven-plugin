@@ -28,6 +28,7 @@ import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
+import walkingkooka.j2cl.maven.log.TreeFormat;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.LineEnding;
 
@@ -102,28 +103,40 @@ class ClosureCompiler {
         logger.indent();
         {
             for (final J2clPath sourceRoot : sources) {
-                logger.line(sourceRoot.toString());
-                logger.indent();
-                {
-                    final Collection<J2clPath> copied;
-                    if (sourceRoot.isFile()) {
-                        copied = sourceRoot.extractArchiveFiles(J2clPath.WITHOUT_META_INF,
-                                unitedSourceRoot,
-                                logger);
-                    } else {
-                        // if unpack/output dont want to copy java source.
-                        final Predicate<Path> filter = sourceRoot.isUnpackOutput(context) ?
-                                J2clPath.ALL_FILES_EXCEPT_JAVA :
-                                J2clPath.ALL_FILES;
+                final Collection<J2clPath> copied;
 
-                        copied = unitedSourceRoot.copyFiles(sourceRoot,
-                                sourceRoot.gatherFiles(filter),
-                                J2clPath.COPY_FILE_CONTENT_VERBATIM,
-                                logger);
+                if (sourceRoot.isFile()) {
+                    logger.line(sourceRoot.toString());
+                    logger.indent();
+                    {
+                        copied = sourceRoot.extractArchiveFiles(
+                                J2clPath.WITHOUT_META_INF,
+                                unitedSourceRoot,
+                                logger
+                        );
                     }
-                    fileCount += copied.size();
+                    logger.outdent();
+                } else {
+                    // if unpack/output dont want to copy java source.
+                    final Predicate<Path> filter = sourceRoot.isUnpackOutput(context) ?
+                            J2clPath.ALL_FILES_EXCEPT_JAVA :
+                            J2clPath.ALL_FILES;
+
+                    final Set<J2clPath> copyFrom = sourceRoot.gatherFiles(filter);
+
+                    copied = unitedSourceRoot.copyFiles(
+                            sourceRoot,
+                            copyFrom,
+                            J2clPath.COPY_FILE_CONTENT_VERBATIM
+                    );
+
+                    logger.paths(
+                            "",
+                            copyFrom,
+                            TreeFormat.TREE
+                    );
                 }
-                logger.outdent();
+                fileCount += copied.size();
             }
             logger.endOfList();
         }

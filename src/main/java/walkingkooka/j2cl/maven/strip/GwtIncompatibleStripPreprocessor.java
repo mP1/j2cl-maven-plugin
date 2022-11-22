@@ -68,7 +68,11 @@ final class GwtIncompatibleStripPreprocessor {
             result = processStripAnnotationsFiles(javaFiles, output, logger);
 
             copyJavascriptFiles(sourceRoots, output, logger);
-            logger.paths("Output file(s)", output.gatherFiles(J2clPath.ALL_FILES), TreeFormat.TREE);
+            logger.paths(
+                    "Output file(s)",
+                    output.gatherFiles(J2clPath.ALL_FILES),
+                    TreeFormat.TREE
+            );
 
         } else {
             logger.indentedLine("No files found");
@@ -88,22 +92,36 @@ final class GwtIncompatibleStripPreprocessor {
         logger.line("Preparing java files");
         logger.indent();
         {
-            logger.indent();
-            {
-                for (final J2clPath sourceRoot : sourceRoots) {
-                    final Set<J2clPath> copied = gatherFiles(sourceRoot, J2clPath.JAVA_FILES);
+
+            for (final J2clPath sourceRoot : sourceRoots) {
+                {
+                    final Set<J2clPath> fromFiles = gatherFiles(
+                            sourceRoot,
+                            J2clPath.JAVA_FILES
+                    );
+
                     // find then copy from unpack to $output
-                    final Collection<J2clPath> files = output.copyFiles(sourceRoot,
-                            copied,
-                            J2clPath.COPY_FILE_CONTENT_VERBATIM,
-                            logger);
+                    final Collection<J2clPath> files = output.copyFiles(
+                            sourceRoot,
+                            fromFiles,
+                            J2clPath.COPY_FILE_CONTENT_VERBATIM
+                    );
+
+                    logger.paths(
+                            "",
+                            fromFiles,
+                            TreeFormat.TREE
+                    );
 
                     // necessary to prepare FileInfo with correct sourceRoot otherwise stripped files will be written back to the wrong place.
-                    javaFiles.addAll(J2clPath.toFileInfo(files, output));
+                    javaFiles.addAll(
+                            J2clPath.toFileInfo(
+                                    files,
+                                    output
+                            )
+                    );
                 }
             }
-            logger.outdent();
-            logger.line(javaFiles.size() + " file(s)");
         }
         logger.outdent();
 
@@ -151,17 +169,25 @@ final class GwtIncompatibleStripPreprocessor {
                                             final J2clPath output,
                                             final TreeLogger logger) throws IOException {
         logger.line("Copy *.js from source root(s) to output");
-        logger.indent();
-        {
-            for (final J2clPath sourceRoot : sourceRoots) {
-                final Set<J2clPath> copy = gatherFiles(sourceRoot, J2clPath.JAVASCRIPT_FILES);
-                output.copyFiles(sourceRoot,
-                        copy,
-                        J2clPath.COPY_FILE_CONTENT_VERBATIM,
-                        logger);
-            }
+
+        for (final J2clPath sourceRoot : sourceRoots) {
+            final Set<J2clPath> copy = gatherFiles(
+                    sourceRoot,
+                    J2clPath.JAVASCRIPT_FILES
+            );
+
+            output.copyFiles(
+                    sourceRoot,
+                    copy,
+                    J2clPath.COPY_FILE_CONTENT_VERBATIM
+            );
+
+            logger.paths(
+                    "",
+                    copy,
+                    TreeFormat.TREE
+            );
         }
-        logger.outdent();
     }
 
     /**

@@ -25,9 +25,11 @@ import walkingkooka.j2cl.maven.J2clStep;
 import walkingkooka.j2cl.maven.J2clStepDirectory;
 import walkingkooka.j2cl.maven.J2clStepResult;
 import walkingkooka.j2cl.maven.J2clStepWorker;
+import walkingkooka.j2cl.maven.log.TreeFormat;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
 import java.nio.file.PathMatcher;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
@@ -65,45 +67,69 @@ public final class J2clStepWorkerOutputAssembler<C extends J2clMavenContext> imp
                                                final J2clStepDirectory directory,
                                                final C context,
                                                final TreeLogger logger) throws Exception {
-        final J2clPath closureCompile = artifact.step(J2clStep.CLOSURE_COMPILE).output();
-        final Set<J2clPath> closureCompileFiles = closureCompile.gatherFiles(J2clPath.ALL_FILES);
+        final Collection<J2clPath> closureCompileDestinationFiles;
+        final Collection<J2clPath> unpackPublicDestinationFiles;
 
-        final J2clPath unpackPublic = artifact.step(J2clStep.UNPACK).output();
-        final Optional<PathMatcher> unpackPublicPathMatcher = unpackPublic.publicFiles();
-        final Set<J2clPath> unpackPublicFiles =
-                unpackPublicPathMatcher.isPresent() ?
-                        unpackPublic.gatherFiles((p) -> unpackPublicPathMatcher.get().matches(p)) :
-                        Sets.empty();
+        logger.line("Sources");
+        logger.indent();
+        {
+            final J2clPath closureCompile = artifact.step(J2clStep.CLOSURE_COMPILE).output();
+            final Set<J2clPath> closureCompileFiles = closureCompile.gatherFiles(J2clPath.ALL_FILES);
 
-        logger.path("Source", closureCompile);
-        if (unpackPublicPathMatcher.isPresent()) {
-            logger.path("Source", unpackPublic);
-        }
+            logger.paths(
+                    "",
+                    closureCompileFiles,
+                    TreeFormat.TREE
+            );
 
-        final J2clPath destination = context.target()
-                .createIfNecessary();
+            final J2clPath unpackPublic = artifact.step(J2clStep.UNPACK).output();
+            final Optional<PathMatcher> unpackPublicPathMatcher = unpackPublic.publicFiles();
+            final Set<J2clPath> unpackPublicFiles;
 
-        logger.line("Destination");
+            if (unpackPublicPathMatcher.isPresent()) {
+                unpackPublicFiles = unpackPublic.gatherFiles(
+                        (p) -> unpackPublicPathMatcher.get().matches(p)
+                );
 
-        int copyCount = destination.copyFiles(
-                closureCompile,
-                closureCompileFiles,
-                J2clPath.COPY_FILE_CONTENT_VERBATIM,
-                logger
-        ).size();
+                logger.paths(
+                        "",
+                        unpackPublicFiles,
+                        TreeFormat.TREE
+                );
+            } else {
+                unpackPublicFiles = Sets.empty();
+            }
 
-        if (unpackPublicPathMatcher.isPresent()) {
-            copyCount += destination.copyFiles(
+            final J2clPath destination = context.target()
+                    .createIfNecessary();
+
+            closureCompileDestinationFiles = destination.copyFiles(
+                    closureCompile,
+                    closureCompileFiles,
+                    J2clPath.COPY_FILE_CONTENT_VERBATIM
+            );
+
+            unpackPublicDestinationFiles = destination.copyFiles(
                     unpackPublic,
                     unpackPublicFiles,
-                    J2clPath.COPY_FILE_CONTENT_VERBATIM,
-                    logger
-            ).size();
+                    J2clPath.COPY_FILE_CONTENT_VERBATIM
+            );
         }
+        logger.outdent();
+
+        final Set<J2clPath> destinationFiles = Sets.sorted();
+        destinationFiles.addAll(closureCompileDestinationFiles);
+        destinationFiles.addAll(unpackPublicDestinationFiles);
+
+        logger.paths(
+                "Destination",
+                destinationFiles,
+                TreeFormat.TREE
+        );
 
         final J2clStepResult result;
 
-        if (0 == copyCount) {
+        if (destinationFiles.isEmpty()) {
             logger.line("No files copied, transpile step likely failed with warnings that are actually errors.");
             result = J2clStepResult.FAILED;
         } else {

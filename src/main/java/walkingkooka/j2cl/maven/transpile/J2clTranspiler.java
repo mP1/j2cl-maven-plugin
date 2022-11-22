@@ -105,16 +105,18 @@ final class J2clTranspiler {
                     logger.line("Copy js to output");
                     logger.indent();
                     {
-                        output.copyFiles(sourcePath,
+                        output.copyFiles(
+                                sourcePath,
                                 jsInput,
-                                J2clPath.COPY_FILE_CONTENT_VERBATIM,
-                                logger);
+                                J2clPath.COPY_FILE_CONTENT_VERBATIM);
                     }
                     logger.outdent();
 
-                    logger.paths("File(s)",
+                    logger.paths(
+                            "Output",
                             output.gatherFiles(J2clPath.ALL_FILES),
-                            TreeFormat.TREE);
+                            TreeFormat.TREE
+                    );
                 }
             }
         }

@@ -175,8 +175,7 @@ public final class J2clPath implements Comparable<J2clPath> {
      */
     public Collection<J2clPath> copyFiles(final J2clPath src,
                                           final Collection<J2clPath> files,
-                                          final BiFunction<byte[], J2clPath, byte[]> contentTransformer,
-                                          final TreeLogger logger) throws IOException {
+                                          final BiFunction<byte[], J2clPath, byte[]> contentTransformer) throws IOException {
         final Path srcPath = src.path();
         final Path destPath = this.path();
 
@@ -190,13 +189,13 @@ public final class J2clPath implements Comparable<J2clPath> {
             Files.createDirectories(copyTarget.getParent());
 
             final J2clPath copyTargetPath = J2clPath.with(copyTarget);
-            Files.write(copyTarget,
-                    contentTransformer.apply(Files.readAllBytes(filePath), copyTargetPath));
+            Files.write(
+                    copyTarget,
+                    contentTransformer.apply(Files.readAllBytes(filePath), copyTargetPath)
+            );
 
             copied.add(copyTargetPath);
         }
-
-        logger.paths("", copied, TreeFormat.TREE);
 
         return copied;
     }
@@ -266,7 +265,7 @@ public final class J2clPath implements Comparable<J2clPath> {
             Files.copy(filePath, copyTarget, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        logger.paths("Extracting", files, TreeFormat.TREE);
+        logger.paths("", files, TreeFormat.TREE);
     }
 
     /**

@@ -25,6 +25,7 @@ import walkingkooka.j2cl.maven.J2clStep;
 import walkingkooka.j2cl.maven.J2clStepDirectory;
 import walkingkooka.j2cl.maven.J2clStepResult;
 import walkingkooka.j2cl.maven.J2clStepWorker;
+import walkingkooka.j2cl.maven.log.TreeFormat;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.CharSequences;
 
@@ -72,29 +73,23 @@ abstract class J2clStepWorkerShade<C extends J2clMavenContext> implements J2clSt
         if (artifact.isIgnored()) {
             result = J2clStepResult.SKIPPED;
         } else {
+            logger.line(J2clPath.SHADE_FILE);
             logger.indent();
             {
-                logger.line(J2clPath.SHADE_FILE);
-                logger.indent();
-                {
-                    final Map<String, String> shadeMappings = artifact.shadeMappings();
+                final Map<String, String> shadeMappings = artifact.shadeMappings();
 
-                    if (!shadeMappings.isEmpty()) {
-                        this.copyAndShade(artifact,
-                                artifact.step(this.step()).output(),
-                                shadeMappings,
-                                directory.output(),
-                                logger);
-                        result = J2clStepResult.SUCCESS;
-                    } else {
-                        logger.line("Not found");
-                        result = J2clStepResult.SKIPPED;
-                    }
-
+                if (!shadeMappings.isEmpty()) {
+                    this.copyAndShade(artifact,
+                            artifact.step(this.step()).output(),
+                            shadeMappings,
+                            directory.output(),
+                            logger);
+                    result = J2clStepResult.SUCCESS;
+                } else {
+                    logger.line("Not found");
+                    result = J2clStepResult.SKIPPED;
                 }
-                logger.outdent();
             }
-
             logger.outdent();
         }
 
@@ -123,8 +118,6 @@ abstract class J2clStepWorkerShade<C extends J2clMavenContext> implements J2clSt
         final Set<J2clPath> nonShadedFiles = Sets.sorted();
         nonShadedFiles.addAll(files);
 
-        logger.indent();
-        {
             for (final Entry<String, String> mapping : shade.entrySet()) {
                 final String find = mapping.getKey();
                 final String replace = mapping.getValue();
@@ -151,10 +144,18 @@ abstract class J2clStepWorkerShade<C extends J2clMavenContext> implements J2clSt
                     logger.indent();
                     {
                         // copy and shade java source and copy other files to output.
-                        shadeDirectory.copyFiles(shadedRoot,
+                        shadeDirectory.copyFiles(
+                                shadedRoot,
                                 shadedFiles,
-                                contentShader,
-                                logger);
+                                contentShader
+                        );
+
+                        logger.paths(
+                                "",
+                                shadedFiles,
+                                TreeFormat.TREE
+                        );
+
                         nonShadedFiles.removeAll(shadedFiles);
                     }
                     logger.outdent();
@@ -163,22 +164,28 @@ abstract class J2clStepWorkerShade<C extends J2clMavenContext> implements J2clSt
 
             logger.line("Copying other files");
             logger.indent();
-            {
+        {
 
-                // copy all other files verbatim.
-                output.copyFiles(root,
-                        nonShadedFiles,
-                        contentShader,
-                        logger);
+            // copy all other files verbatim.
+            output.copyFiles(
+                    root,
+                    nonShadedFiles,
+                    contentShader
+            );
 
-                this.postCopyAndShade(artifact,
-                        output,
-                        logger);
+            logger.paths(
+                    "",
+                    nonShadedFiles,
+                    TreeFormat.TREE
+            );
 
-            }
-            logger.outdent();
+            this.postCopyAndShade(
+                    artifact,
+                    output,
+                    logger
+            );
         }
-        logger.outdent();
+            logger.outdent();
     }
 
     /**
