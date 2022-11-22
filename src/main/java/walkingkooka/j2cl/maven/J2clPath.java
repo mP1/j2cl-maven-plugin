@@ -358,6 +358,22 @@ public final class J2clPath implements Comparable<J2clPath> {
 
     private final static String OUTPUT = "output";
 
+    /**
+     * Returns a {@link PathMatcher} for all the patterns within any present public files.
+     */
+    public Optional<PathMatcher> publicFiles() throws IOException {
+        return this.append(PUBLIC_FILES)
+                .pathMatcher(
+                        this
+                );
+    }
+
+    /**
+     * A text file that contains zero or more paths/file patterns that will be used to copy matching files during
+     * the {@link J2clStep#OUTPUT_ASSEMBLE} step. This will probably match assets like images, supporting javascript and so on.
+     */
+    private static final String PUBLIC_FILES = FILE_PREFIX + "-public-files.txt";
+
     public J2clPath parent() {
         return new J2clPath(this.path().getParent());
     }
