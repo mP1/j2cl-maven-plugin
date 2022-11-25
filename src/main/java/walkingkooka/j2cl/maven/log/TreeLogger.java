@@ -48,12 +48,11 @@ import java.util.stream.Collectors;
  */
 final public class TreeLogger {
 
-    static TreeLogger with(final Printer printer,
-                           final Printer treePrinter) {
+    static TreeLogger with(final Printer debug,
+                           final Printer info) {
         return new TreeLogger(
-                printer.indenting(MavenLogger.INDENTATION),
-                null != treePrinter ? treePrinter.indenting(MavenLogger.INDENTATION) : null,
-                null != treePrinter && false == printer.equals(treePrinter)
+                debug.indenting(MavenLogger.INDENTATION),
+                info.indenting(MavenLogger.INDENTATION)
         );
     }
 
@@ -64,22 +63,17 @@ final public class TreeLogger {
                 " seconds";
     }
 
-    private TreeLogger(final IndentingPrinter printer,
-                       final IndentingPrinter treePrinter,
-                       final boolean indentOutdentBothPrinters) {
+    private TreeLogger(final IndentingPrinter debug,
+                       final IndentingPrinter info) {
         super();
 
-        this.printer = printer;
-        this.treePrinter = treePrinter;
-        this.indentOutdentBothPrinters = indentOutdentBothPrinters;
+        this.debug = debug;
+        this.info = info;
     }
 
     public void indent() {
-        this.printer.indent();
-
-        if (this.indentOutdentBothPrinters) {
-            this.treePrinter.indent();
-        }
+        this.info.indent();
+        this.debug.indent();
     }
 
     public void path(final String label,
@@ -157,10 +151,10 @@ final public class TreeLogger {
                                  final TreeFormat format) {
         switch (format) {
             case FLAT:
-                flat(paths, toStringPath, this.treePrinter);
+                flat(paths, toStringPath, this.debug);
                 break;
             case TREE:
-                tree(paths, toStringPath, this.treePrinter);
+                tree(paths, toStringPath, this.debug);
                 break;
             default:
                 NeverError.unhandledEnum(format, TreeFormat.values());
@@ -284,7 +278,7 @@ final public class TreeLogger {
     }
 
     public void log(final CharSequence line) {
-        this.printer.print(line);
+        this.info.print(line);
     }
 
     public void indentedLine(final CharSequence line) {
@@ -296,7 +290,7 @@ final public class TreeLogger {
     }
 
     public void line(final CharSequence line) {
-        line0(line, this.printer);
+        line0(line, this.info);
     }
 
     static void line0(final CharSequence line, final IndentingPrinter printer) {
@@ -305,12 +299,12 @@ final public class TreeLogger {
     }
 
     public void emptyLine() {
-        this.printer.lineStart();
-        this.printer.print(this.printer.lineEnding());
+        this.info.lineStart();
+        this.info.print(this.info.lineEnding());
     }
 
     public void lineStart() {
-        this.printer.lineStart();
+        this.info.lineStart();
     }
 
     public void endOfList() {
@@ -318,25 +312,20 @@ final public class TreeLogger {
     }
 
     public void outdent() {
-        this.printer.outdent();
-
-        if (this.indentOutdentBothPrinters) {
-            this.treePrinter.outdent();
-        }
+        this.info.outdent();
+        this.debug.outdent();
     }
 
     public void flush() {
-        this.printer.flush();
+        this.info.flush();
     }
 
-    private final IndentingPrinter printer;
+    private final IndentingPrinter info;
 
-    private final IndentingPrinter treePrinter;
-
-    private final boolean indentOutdentBothPrinters;
+    private final IndentingPrinter debug;
 
     @Override
     public String toString() {
-        return this.printer.toString();
+        return this.info.toString();
     }
 }

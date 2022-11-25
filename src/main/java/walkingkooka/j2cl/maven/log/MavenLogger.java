@@ -43,16 +43,15 @@ public interface MavenLogger {
         return BasicMavenLogger.with(log);
     }
 
-    default TreeLogger treeLogger(final Consumer<CharSequence> info,
-                                  final Consumer<CharSequence> debug) {
+    default TreeLogger treeLogger(final Consumer<CharSequence> debug,
+                                  final Consumer<CharSequence> info) {
         return TreeLogger.with(
-                this.printer(this::info)
-                        .printedLine(
-                                (final CharSequence line, final LineEnding lineEnding, final Printer printer) -> info.accept(line)
-                        ),
                 this.printer(this::debug)
                         .printedLine(
                                 (final CharSequence line, final LineEnding lineEnding, final Printer printer) -> debug.accept(line)
+                        ), this.printer(this::info)
+                        .printedLine(
+                                (final CharSequence line, final LineEnding lineEnding, final Printer printer) -> info.accept(line)
                         )
         );
     }
