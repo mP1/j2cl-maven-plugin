@@ -61,8 +61,8 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
 
                 this.executeTests(
                         mavenLogger.treeLogger(
-                                mavenLogger::info,
-                                mavenLogger::debug
+                                mavenLogger::debug,
+                                mavenLogger::info
                         )
                 );
             } catch (final MojoExecutionException cause) {

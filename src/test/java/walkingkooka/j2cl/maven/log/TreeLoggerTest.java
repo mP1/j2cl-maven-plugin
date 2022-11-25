@@ -223,16 +223,15 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
 
     private TreeLogger logger(final StringBuilder b) {
         return TreeLogger.with(
-                Printers.stringBuilder(b, EOL),
-                null
+                Printers.fake(),
+                Printers.stringBuilder(b, EOL)
         );
     }
 
     private TreeLogger logger2(final StringBuilder b) {
         return TreeLogger.with(
-                Printers.stringBuilder(b, EOL),
                 Printers.stringBuilder(b, EOL)
-                        .printedLine((line, lineEnding, logger) -> b.append(line + "<" + lineEnding))
+                        .printedLine((line, lineEnding, logger) -> b.append(line + "<" + lineEnding)), Printers.stringBuilder(b, EOL)
         );
     }
 
@@ -255,7 +254,7 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
     public void testToString() {
         final Printer logger = Printers.fake();
         this.toStringAndCheck(
-                TreeLogger.with(logger, Printers.fake()),
+                TreeLogger.with(Printers.fake(), logger),
                 logger.toString()
         );
     }

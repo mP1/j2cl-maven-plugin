@@ -79,8 +79,8 @@ public final class J2clDependency implements Comparable<J2clDependency> {
                                  final J2clMavenContext context) {
         final MavenLogger mavenLogger = context.mavenLogger();
         final TreeLogger logger = mavenLogger.treeLogger(
-                mavenLogger::info,
-                mavenLogger::debug
+                mavenLogger::debug,
+                mavenLogger::info
         );
 
         final J2clDependency root;

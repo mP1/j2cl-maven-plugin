@@ -210,11 +210,10 @@ public enum J2clStep {
 
         final TreeLogger logger = mavenLogger.treeLogger(
                 (line) -> {
-                    mavenLogger.info(line);
-                    lines.add(line);
-                },
-                (line) -> {
                     mavenLogger.debug(line);
+                    lines.add(line);
+                }, (line) -> {
+                    mavenLogger.info(line);
                     lines.add(line);
                 }
         );
