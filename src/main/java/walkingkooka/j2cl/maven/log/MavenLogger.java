@@ -21,7 +21,6 @@ import org.apache.maven.plugin.logging.Log;
 import walkingkooka.text.Indentation;
 import walkingkooka.text.LineEnding;
 import walkingkooka.text.printer.IndentingPrinter;
-import walkingkooka.text.printer.PrintedLineHandler;
 import walkingkooka.text.printer.Printer;
 import walkingkooka.text.printer.PrinterException;
 
@@ -44,11 +43,17 @@ public interface MavenLogger {
         return BasicMavenLogger.with(log);
     }
 
-    default TreeLogger output(final PrintedLineHandler info,
-                              final PrintedLineHandler debug) {
+    default TreeLogger output(final Consumer<CharSequence> info,
+                              final Consumer<CharSequence> debug) {
         return TreeLogger.with(
-                this.printer(this::info).printedLine(info),
-                this.printer(this::debug).printedLine(debug)
+                this.printer(this::info)
+                        .printedLine(
+                                (final CharSequence line, final LineEnding lineEnding, final Printer printer) -> info.accept(line)
+                        ),
+                this.printer(this::debug)
+                        .printedLine(
+                                (final CharSequence line, final LineEnding lineEnding, final Printer printer) -> debug.accept(line)
+                        )
         );
     }
 

@@ -21,7 +21,6 @@ import walkingkooka.Cast;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.j2cl.maven.log.MavenLogger;
 import walkingkooka.j2cl.maven.log.TreeLogger;
-import walkingkooka.text.printer.PrintedLineHandler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -209,15 +208,15 @@ public enum J2clStep {
         final List<CharSequence> lines = Lists.array(); // these lines will be written to a log file.
         final String prefix = artifact.coords() + "-" + this;
 
-        final PrintedLineHandler lineHandler = (line, eol, p) -> {
-            p.print(line);
-            p.flush();
-            lines.add(line);
-        };
-
         final TreeLogger logger = mavenLogger.output(
-                lineHandler,
-                lineHandler
+                (line) -> {
+                    mavenLogger.info(line);
+                    lines.add(line);
+                },
+                (line) -> {
+                    mavenLogger.debug(line);
+                    lines.add(line);
+                }
         );
 
         try {
