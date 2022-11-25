@@ -302,7 +302,7 @@ public abstract class J2clMavenContext implements Context {
      */
     private int trySubmitJobs() {
         final MavenLogger mavenLogger = this.mavenLogger();
-        final TreeLogger logger = mavenLogger.output(
+        final TreeLogger logger = mavenLogger.treeLogger(
                 mavenLogger::info,
                 mavenLogger::debug
         );

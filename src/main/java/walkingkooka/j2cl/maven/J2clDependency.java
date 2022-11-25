@@ -78,7 +78,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     static J2clDependency gather(final MavenProject mavenProject,
                                  final J2clMavenContext context) {
         final MavenLogger mavenLogger = context.mavenLogger();
-        final TreeLogger logger = mavenLogger.output(
+        final TreeLogger logger = mavenLogger.treeLogger(
                 mavenLogger::info,
                 mavenLogger::debug
         );
