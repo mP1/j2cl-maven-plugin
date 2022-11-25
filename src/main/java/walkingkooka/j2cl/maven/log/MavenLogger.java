@@ -57,13 +57,6 @@ public interface MavenLogger {
         );
     }
 
-    default TreeLogger output() {
-        return TreeLogger.with(
-                this.printer(this::info),
-                null
-        );
-    }
-
     /**
      * Returns an {@link IndentingPrinter} which writes to the given {@link Consumer} which is assumed to be a {@link MavenLogger} method.
      */
