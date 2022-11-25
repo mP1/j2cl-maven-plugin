@@ -60,7 +60,7 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
                 final MavenLogger mavenLogger = this.logger();
 
                 this.executeTests(
-                        mavenLogger.output(
+                        mavenLogger.treeLogger(
                                 mavenLogger::info,
                                 mavenLogger::debug
                         )

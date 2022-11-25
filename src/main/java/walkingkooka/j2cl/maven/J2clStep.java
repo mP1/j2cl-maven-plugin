@@ -208,7 +208,7 @@ public enum J2clStep {
         final List<CharSequence> lines = Lists.array(); // these lines will be written to a log file.
         final String prefix = artifact.coords() + "-" + this;
 
-        final TreeLogger logger = mavenLogger.output(
+        final TreeLogger logger = mavenLogger.treeLogger(
                 (line) -> {
                     mavenLogger.info(line);
                     lines.add(line);
