@@ -25,6 +25,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.log.BrowserLogLevel;
+import walkingkooka.j2cl.maven.log.MavenLogger;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.j2cl.maven.test.J2clStepWorkerWebDriverUnitTestRunner;
 import walkingkooka.j2cl.maven.test.J2clStepWorkerWebDriverUnitTestRunnerBrowser;
@@ -56,9 +57,13 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
     public void execute() throws MojoExecutionException {
         if (false == this.skipTests()) {
             try {
+                final MavenLogger mavenLogger = this.logger();
+
                 this.executeTests(
-                        this.logger()
-                                .output()
+                        mavenLogger.output(
+                                mavenLogger::info,
+                                mavenLogger::debug
+                        )
                 );
             } catch (final MojoExecutionException cause) {
                 throw cause;

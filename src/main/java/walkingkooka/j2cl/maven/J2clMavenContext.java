@@ -301,8 +301,11 @@ public abstract class J2clMavenContext implements Context {
      * Loops over all {@link #jobs} submitting a job for each that has no required artifacts aka the value is an empty {@link Set}.
      */
     private int trySubmitJobs() {
-        final TreeLogger logger = this.mavenLogger()
-                .output();
+        final MavenLogger mavenLogger = this.mavenLogger();
+        final TreeLogger logger = mavenLogger.output(
+                mavenLogger::info,
+                mavenLogger::debug
+        );
 
         final List<J2clDependency> submits = Lists.array();
 

@@ -29,6 +29,7 @@ import org.objectweb.asm.Opcodes;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.j2cl.maven.log.MavenLogger;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.predicate.Predicates;
 import walkingkooka.text.CharSequences;
@@ -76,8 +77,12 @@ public final class J2clDependency implements Comparable<J2clDependency> {
      */
     static J2clDependency gather(final MavenProject mavenProject,
                                  final J2clMavenContext context) {
-        final TreeLogger logger = context.mavenLogger()
-                .output();
+        final MavenLogger mavenLogger = context.mavenLogger();
+        final TreeLogger logger = mavenLogger.output(
+                mavenLogger::info,
+                mavenLogger::debug
+        );
+
         final J2clDependency root;
         {
             root = gatherSubTask(
