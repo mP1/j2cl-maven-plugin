@@ -221,14 +221,11 @@ public enum J2clStep {
         );
 
         try {
-            final J2clStepResult result;
-            if (artifact.isDependency() && this.skipIfDependency()) {
-                result = J2clStepResult.SUCCESS;
-            } else {
+            if (!artifact.isDependency() || !this.skipIfDependency()) {
                 logger.line(prefix);
                 logger.indent();
 
-                result = this.execute0()
+                final J2clStepResult result = this.execute0()
                         .execute(
                                 artifact,
                                 this,
