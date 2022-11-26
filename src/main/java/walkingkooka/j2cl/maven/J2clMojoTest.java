@@ -60,10 +60,7 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
                 final MavenLogger mavenLogger = this.logger();
 
                 this.executeTests(
-                        mavenLogger.treeLogger(
-                                mavenLogger::debug,
-                                mavenLogger::info
-                        )
+                        mavenLogger.treeLogger()
                 );
             } catch (final MojoExecutionException cause) {
                 throw cause;
@@ -87,11 +84,17 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
                 logger.indent();
                 {
                     final J2clMojoTestMavenContext context = this.context(test);
-                    final J2clDependency project = this.gatherDependencies(context);
+                    final J2clDependency project = this.gatherDependencies(
+                            logger,
+                            context
+                    );
 
                     try {
                         context.setProject(project);
-                        context.execute(project);
+                        context.execute(
+                                project,
+                                logger
+                        );
                     } catch (final Throwable cause) {
                         throw new MojoExecutionException("Failed to build project, check logs above", cause);
                     }

@@ -22,6 +22,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import walkingkooka.j2cl.maven.log.TreeLogger;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -41,8 +42,16 @@ public final class J2clMojoBuild extends J2clMojoBuildTest {
                     this.entryPoints(),
                     this.initialScriptFilename()
             );
-            final J2clDependency project = this.gatherDependencies(context);
-            context.execute(project);
+            final TreeLogger logger = context.mavenLogger()
+                    .treeLogger();
+            final J2clDependency project = this.gatherDependencies(
+                    logger,
+                    context
+            );
+            context.execute(
+                    project,
+                    logger
+            );
         } catch (final Throwable e) {
             throw new MojoExecutionException("Failed to build project, check logs above", e);
         }

@@ -31,6 +31,7 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.closure.ClosureFormattingOption;
+import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;
@@ -130,9 +131,11 @@ abstract class J2clMojoBuildTest extends J2clMojo {
     /**
      * Gathers the all the dependencies.
      */
-    final J2clDependency gatherDependencies(final J2clMavenContext context) {
+    final J2clDependency gatherDependencies(final TreeLogger logger,
+                                            final J2clMavenContext context) {
         return J2clDependency.gather(
                 this.mavenProject(),
+                logger,
                 context
         );
     }

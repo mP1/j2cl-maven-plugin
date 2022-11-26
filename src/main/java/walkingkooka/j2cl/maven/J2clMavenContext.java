@@ -236,10 +236,11 @@ public abstract class J2clMavenContext implements Context {
     /**
      * Executes the given project.
      */
-    final void execute(final J2clDependency project) throws Throwable {
+    final void execute(final J2clDependency project,
+                       final TreeLogger logger) throws Throwable {
         this.prepareJobs(project);
 
-        if (0 == this.trySubmitJobs()) {
+        if (0 == this.trySubmitJobs(logger)) {
             throw new J2clException("Unable to find a leaf dependencies(dependency without dependencies), job failed.");
         }
         this.await();
@@ -300,13 +301,7 @@ public abstract class J2clMavenContext implements Context {
     /**
      * Loops over all {@link #jobs} submitting a job for each that has no required artifacts aka the value is an empty {@link Set}.
      */
-    private int trySubmitJobs() {
-        final MavenLogger mavenLogger = this.mavenLogger();
-        final TreeLogger logger = mavenLogger.treeLogger(
-                mavenLogger::debug,
-                mavenLogger::info
-        );
-
+    private int trySubmitJobs(final TreeLogger logger) {
         final List<J2clDependency> submits = Lists.array();
 
         this.executeWithLock(() -> {
@@ -360,23 +355,35 @@ public abstract class J2clMavenContext implements Context {
             logger.line(message);
             logger.flush();
 
-            submits.forEach(this::submitTask);
+            submits.forEach(
+                    (d) -> this.submitTask(
+                            d,
+                            logger
+                    )
+            );
         });
 
         return submits.size();
     }
 
-    private void submitTask(final J2clDependency task) {
-        this.completionService.submit(() -> this.callable(task));
+    private void submitTask(final J2clDependency task,
+                            final TreeLogger logger) {
+        this.completionService.submit(
+                () -> this.callable(
+                        task,
+                        logger
+                )
+        );
         this.running.incrementAndGet();
     }
 
-    final Void callable(final J2clDependency task) throws Exception {
-        final MavenLogger logger = this.mavenLogger();
+    final Void callable(final J2clDependency task,
+                        final TreeLogger logger) throws Exception {
         final String coords = task.coords().toString();
         final Instant start = Instant.now();
 
-        logger.info(coords);
+        logger.line(coords);
+        logger.indent();
         {
             J2clStep step = this.firstStep();
             do {
@@ -385,11 +392,13 @@ public abstract class J2clMavenContext implements Context {
 
                 step = step.execute(
                         task,
+                        logger,
                         this
                 ).orElse(null);
             } while (null != step);
         }
-        logger.info(
+        logger.outdent();
+        logger.line(
                 coords +
                         " completed, " +
                         TreeLogger.prettyTimeTaken(
@@ -400,7 +409,10 @@ public abstract class J2clMavenContext implements Context {
                         )
         );
 
-        this.taskCompleted(task);
+        this.taskCompleted(
+                task,
+                logger
+        );
 
         return null;
     }
@@ -410,7 +422,8 @@ public abstract class J2clMavenContext implements Context {
     /**
      * Finds all jobs that have the given artifact as a dependency and remove that dependency from the waiting list.
      */
-    final J2clMavenContext taskCompleted(final J2clDependency completed) {
+    final J2clMavenContext taskCompleted(final J2clDependency completed,
+                                         final TreeLogger logger) {
         this.executeWithLock(() -> {
             this.jobs.remove(completed);
 
@@ -418,7 +431,7 @@ public abstract class J2clMavenContext implements Context {
                 dependencies.remove(completed);
             }
 
-            this.trySubmitJobs();
+            this.trySubmitJobs(logger);
         });
         return this;
     }
@@ -437,7 +450,7 @@ public abstract class J2clMavenContext implements Context {
     }
 
     /**
-     * A lock used to by {@link #trySubmitJobs()} to avoid concurrent modification of {@link #jobs}.
+     * A lock used to by {@link #trySubmitJobs(TreeLogger)} to avoid concurrent modification of {@link #jobs}.
      */
     private final Lock jobsLock = new ReentrantLock();
 
