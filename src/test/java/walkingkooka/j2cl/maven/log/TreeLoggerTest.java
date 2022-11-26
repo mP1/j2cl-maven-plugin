@@ -18,18 +18,15 @@
 package walkingkooka.j2cl.maven.log;
 
 import org.junit.jupiter.api.Test;
-import walkingkooka.ToStringTesting;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.reflect.ClassTesting2;
 import walkingkooka.reflect.JavaVisibility;
 import walkingkooka.text.LineEnding;
-import walkingkooka.text.printer.Printer;
-import walkingkooka.text.printer.Printers;
 
 import java.nio.file.Paths;
 import java.util.List;
 
-public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToStringTesting<TreeLogger> {
+public final class TreeLoggerTest implements ClassTesting2<TreeLogger> {
 
     private final static LineEnding EOL = LineEnding.NL;
 
@@ -39,9 +36,12 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
         final TreeLogger logger = this.logger(b);
 
         logger.emptyLine();
-        logger.flush();
 
-        this.check(EOL, b);
+        this.check(
+                logger,
+                EOL,
+                b
+        );
     }
 
     @Test
@@ -52,9 +52,13 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
         logger.log("1");
         logger.lineStart();
         logger.log("2");
-        logger.flush();
 
-        this.check("1" + EOL + "2", b);
+        this.check(
+                logger,
+                "1" + EOL +
+                        "2" + EOL,
+                b
+        );
     }
 
     @Test
@@ -65,7 +69,11 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
         final String text = "abc123";
         logger.log(text);
 
-        this.check(text, b);
+        this.check(
+                logger,
+                text + EOL,
+                b
+        );
     }
 
     @Test
@@ -76,7 +84,11 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
         final String text = "abc123";
         logger.line(text);
 
-        this.check(text, b);
+        this.check(
+                logger,
+                text + EOL,
+                b
+        );
     }
 
     @Test
@@ -90,7 +102,12 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
         final String text2 = "text2";
         logger.line(text2);
 
-        this.check(text1 + EOL + text2, b);
+        this.check(
+                logger,
+                text1 + EOL +
+                        text2 + EOL,
+                b
+        );
     }
 
     @Test
@@ -100,7 +117,11 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
 
         logger.endOfList();
 
-        this.check("*** END ***", b);
+        this.check(
+                logger,
+                "*** END ***" + EOL,
+                b
+        );
     }
 
     @Test
@@ -111,7 +132,12 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
         logger.log("before1");
         logger.endOfList();
 
-        this.check("before1" + EOL + "*** END ***", b);
+        this.check(
+                logger,
+                "before1" + EOL +
+                        "*** END ***" + EOL,
+                b
+        );
     }
 
     @Test
@@ -124,7 +150,12 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
         logger.outdent();
         logger.line("line2");
 
-        this.check("  line1" + EOL + "line2", b);
+        this.check(
+                logger,
+                "  line1" + EOL +
+                        "line2" + EOL,
+                b
+        );
     }
 
     @Test
@@ -135,8 +166,14 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
         logger.line("line1");
         logger.indentedLine("line2");
         logger.line("line3");
-
-        this.check("line1" + EOL + "  line2" + EOL + "line3", b);
+        
+        this.check(
+                logger,
+                "line1" + EOL +
+                        "  line2" + EOL +
+                        "line3" + EOL,
+                b
+        );
     }
 
     @Test
@@ -146,7 +183,12 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
 
         logger.path("label1", path("/path/to"));
 
-        this.check("label1" + EOL + "  /path/to", b);
+        this.check(
+                logger,
+                "label1" + EOL +
+                        "  /path/to" + EOL,
+                b
+        );
     }
 
     @Test
@@ -154,13 +196,18 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
         final StringBuilder b = new StringBuilder();
         final TreeLogger logger = this.logger2(b);
 
-        logger.paths("label1", List.of(path("/path/2"), path("/path/1"), path("/path/3")), TreeFormat.FLAT);
+        logger.paths(
+                "label1",
+                List.of(path("/path/2"), path("/path/1"), path("/path/3")),
+                TreeFormat.FLAT
+        );
 
         this.check(
-                "label1\n" +
-                        "  /path/2<\n" +
-                        "  /path/1<\n" +
-                        "  /path/3<\n",
+                logger,
+                "label1" + EOL +
+                        "  /path/2<" + EOL +
+                        "  /path/1<" + EOL +
+                        "  /path/3<" + EOL,
                 b
         );
     }
@@ -170,12 +217,17 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
         final StringBuilder b = new StringBuilder();
         final TreeLogger logger = this.logger2(b);
 
-        logger.paths("label1", List.of(path("/path/to")), TreeFormat.TREE);
+        logger.paths(
+                "label1",
+                List.of(path("/path/to")),
+                TreeFormat.TREE
+        );
 
         this.check(
-                "label1\n" +
-                        "  /path<\n" +
-                        "    to<\n",
+                logger,
+                "label1" + EOL +
+                        "  /path<" + EOL +
+                        "    to<" + EOL,
                 b
         );
     }
@@ -185,12 +237,17 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
         final StringBuilder b = new StringBuilder();
         final TreeLogger logger = this.logger2(b);
 
-        logger.paths("label1", List.of(path("/path/to"), path("/path/to2")), TreeFormat.TREE);
+        logger.paths(
+                "label1",
+                List.of(path("/path/to"), path("/path/to2")),
+                TreeFormat.TREE
+        );
 
         this.check(
-                "label1\n" +
-                        "  /path<\n" +
-                        "    to                                                           to2<\n",
+                logger,
+                "label1" + EOL +
+                        "  /path<" + EOL +
+                        "    to                                                           to2<" + EOL,
                 b
         );
     }
@@ -202,8 +259,10 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
 
         logger.strings("label1", List.of("a1"));
 
-        this.check("1 label1\n" +
-                        "  a1",
+        this.check(
+                logger,
+                "1 label1" + EOL +
+                        "  a1" + EOL,
                 b);
     }
 
@@ -214,28 +273,43 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
 
         logger.strings("label1", List.of("a1", "b2", "c3"));
 
-        this.check("3 label1\n" +
-                        "  a1\n" +
-                        "  b2\n" +
-                        "  c3",
-                b);
+        this.check(
+                logger,
+                "3 label1" + EOL +
+                        "  a1" + EOL +
+                        "  b2" + EOL +
+                        "  c3" + EOL,
+                b
+        );
     }
 
     private TreeLogger logger(final StringBuilder b) {
         return TreeLogger.with(
-                Printers.fake(),
-                Printers.stringBuilder(b, EOL)
+                (line) -> {
+                },
+                (line) -> b.append(line)
+                        .append(EOL),
+                (line, cause) -> {
+                    throw new UnsupportedOperationException();
+                }
         );
     }
 
     private TreeLogger logger2(final StringBuilder b) {
         return TreeLogger.with(
-                Printers.stringBuilder(b, EOL)
-                        .printedLine((line, lineEnding, logger) -> b.append(line + "<" + lineEnding)), Printers.stringBuilder(b, EOL)
+                (line) -> b.append(line + "<" + EOL),
+                (line) -> b.append(line).append(EOL),
+                (line, cause) -> {
+                    throw new UnsupportedOperationException();
+                }
         );
     }
 
-    private void check(final CharSequence expected, final StringBuilder b) {
+    private void check(final TreeLogger logger,
+                       final CharSequence expected,
+                       final StringBuilder b) {
+        logger.flush();
+
         this.checkEquals(
                 expected.toString(),
                 b.toString()
@@ -245,17 +319,6 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger>, ToString
     private J2clPath path(final String path) {
         return J2clPath.with(
                 Paths.get(path)
-        );
-    }
-
-    // toString.........................................................................................................
-
-    @Test
-    public void testToString() {
-        final Printer logger = Printers.fake();
-        this.toStringAndCheck(
-                TreeLogger.with(Printers.fake(), logger),
-                logger.toString()
         );
     }
 

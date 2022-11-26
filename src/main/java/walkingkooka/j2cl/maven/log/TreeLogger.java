@@ -23,6 +23,7 @@ import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.naming.StringName;
 import walkingkooka.naming.StringPath;
+import walkingkooka.text.Indentation;
 import walkingkooka.text.LineEnding;
 import walkingkooka.text.pretty.Table;
 import walkingkooka.text.pretty.TextPretty;
@@ -30,6 +31,7 @@ import walkingkooka.text.pretty.TreePrinting;
 import walkingkooka.text.pretty.TreePrintingBranches;
 import walkingkooka.text.printer.IndentingPrinter;
 import walkingkooka.text.printer.Printer;
+import walkingkooka.text.printer.Printers;
 
 import java.io.File;
 import java.time.Duration;
@@ -38,6 +40,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -48,11 +52,17 @@ import java.util.stream.Collectors;
  */
 final public class TreeLogger {
 
-    static TreeLogger with(final Printer debug,
-                           final Printer info) {
+    static TreeLogger with(final Consumer<CharSequence> debug,
+                           final Consumer<CharSequence> info,
+                           final BiConsumer<CharSequence, Throwable> error) {
+        Objects.requireNonNull(debug, "debug");
+        Objects.requireNonNull(info, "info");
+        Objects.requireNonNull(error, "error");
+
         return new TreeLogger(
-                debug.indenting(MavenLogger.INDENTATION),
-                info.indenting(MavenLogger.INDENTATION)
+                debug,
+                info,
+                error
         );
     }
 
@@ -63,17 +73,38 @@ final public class TreeLogger {
                 " seconds";
     }
 
-    private TreeLogger(final IndentingPrinter debug,
-                       final IndentingPrinter info) {
+    private TreeLogger(final Consumer<CharSequence> debug,
+                       final Consumer<CharSequence> info,
+                       final BiConsumer<CharSequence, Throwable> error) {
         super();
 
-        this.debug = debug;
-        this.info = info;
+        this.debug = Printers.sink(LineEnding.SYSTEM)
+                .printedLine(
+                        (
+                                final CharSequence line,
+                                final LineEnding lineEnding,
+                                final Printer printer) -> {
+                            TreeLogger.this.debug(line);
+                        }
+                ).indenting(MavenLogger.INDENTATION);
+        this.info = Printers.sink(LineEnding.SYSTEM)
+                .printedLine(
+                        (
+                                final CharSequence line,
+                                final LineEnding lineEnding,
+                                final Printer printer) -> {
+                            TreeLogger.this.info(line);
+                        }
+                ).indenting(MavenLogger.INDENTATION);
+        this.error = error;
+
+        this.debugConsumer = debug;
+        this.infoConsumer = info;
     }
 
     public void indent() {
-        this.info.indent();
         this.debug.indent();
+        this.info.indent();
     }
 
     public void path(final String label,
@@ -312,17 +343,57 @@ final public class TreeLogger {
     }
 
     public void outdent() {
-        this.info.outdent();
         this.debug.outdent();
+        this.info.outdent();
     }
 
     public void flush() {
+        this.debug.flush();
         this.info.flush();
     }
 
+    private final IndentingPrinter debug;
+
     private final IndentingPrinter info;
 
-    private final IndentingPrinter debug;
+
+    public void debug(final CharSequence line) {
+        this.debugConsumer.accept(line);
+    }
+
+    private final Consumer<CharSequence> debugConsumer;
+
+    public void info(final CharSequence line) {
+        this.infoConsumer.accept(line);
+    }
+
+    private final Consumer<CharSequence> infoConsumer;
+
+    public void error(final CharSequence line,
+                      final Throwable cause) {
+        this.error.accept(line, cause);
+    }
+
+    private final BiConsumer<CharSequence, Throwable> error;
+
+    public TreeLogger childTreeLogger(final Consumer<CharSequence> lines,
+                                      final BiConsumer<CharSequence, Throwable> error) {
+        final Indentation indentation = this.debug.indentation();
+
+        return TreeLogger.with(
+                (line) -> {
+                    this.debug("" + indentation + MavenLogger.INDENTATION + line);
+                    lines.accept(line);
+                }, (line) -> {
+                    this.info("" + indentation + MavenLogger.INDENTATION + line);
+                    lines.accept(line);
+                },
+                (line, thrown) -> {
+                    this.error("" + indentation + MavenLogger.INDENTATION + line, thrown);
+                    error.accept(line, thrown);
+                }
+        );
+    }
 
     @Override
     public String toString() {

@@ -21,10 +21,10 @@ import walkingkooka.Cast;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.j2cl.maven.log.MavenLogger;
 import walkingkooka.j2cl.maven.log.TreeLogger;
+import walkingkooka.text.LineEnding;
+import walkingkooka.text.printer.Printer;
+import walkingkooka.text.printer.Printers;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -201,20 +201,26 @@ public enum J2clStep {
      * throwing) or logs as errors to the output anything printed during execution.
      */
     final <C extends J2clMavenContext> Optional<J2clStep> execute(final J2clDependency artifact,
+                                                                  final TreeLogger parentLogger,
                                                                   final C context) throws Exception {
         final Instant start = Instant.now();
 
-        final MavenLogger mavenLogger = context.mavenLogger();
         final List<CharSequence> lines = Lists.array(); // these lines will be written to a log file.
         final String prefix = artifact.coords() + "-" + this;
 
-        final TreeLogger logger = mavenLogger.treeLogger(
-                (line) -> {
-                    mavenLogger.debug(line);
+        final TreeLogger logger = parentLogger.childTreeLogger(
+                (line) -> lines.add(line),
+                (line, thrown) -> {
                     lines.add(line);
-                }, (line) -> {
-                    mavenLogger.info(line);
-                    lines.add(line);
+                    if (null != thrown) {
+                        final Printer printer = Printers.sink(LineEnding.SYSTEM)
+                                .printedLine(
+                                        (final CharSequence l,
+                                         final LineEnding lineEnding,
+                                         final Printer p) -> lines.add(l)
+                                );
+                        thrown.printStackTrace(printer.asPrintWriter());
+                    }
                 }
         );
 
@@ -245,22 +251,8 @@ public enum J2clStep {
             }
             return context.nextStep(this);
         } catch (final Exception cause) {
+            logger.error("Failed to execute " + prefix + " message: " + cause.getMessage(), cause);
             logger.flush();
-
-            mavenLogger.error("Failed to execute " + prefix + " message: " + cause.getMessage(), cause);
-            lines.forEach(l -> mavenLogger.error(prefix + " " + l));
-
-            // capture stack trace into $lines
-            final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-            final String charset = Charset.defaultCharset().name();
-            cause.printStackTrace(new PrintStream(bytes, true, charset));
-            logger.emptyLine();
-            logger.log(
-                    new String(
-                            bytes.toByteArray(),
-                            charset
-                    )
-            );
 
             final J2clStepDirectory directory = artifact.step(this);
             directory.failed()
@@ -283,8 +275,9 @@ public enum J2clStep {
                                 DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
                 );
 
-                mavenLogger.error("Log file");
-                mavenLogger.error(MavenLogger.INDENTATION + base.toString());
+                logger.error("Log file", null);
+                logger.error(MavenLogger.INDENTATION + base.toString(), null);
+                logger.flush();
 
                 Files.write(base, lines);
             }

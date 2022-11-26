@@ -19,12 +19,6 @@ package walkingkooka.j2cl.maven.log;
 
 import org.apache.maven.plugin.logging.Log;
 import walkingkooka.text.Indentation;
-import walkingkooka.text.LineEnding;
-import walkingkooka.text.printer.IndentingPrinter;
-import walkingkooka.text.printer.Printer;
-import walkingkooka.text.printer.PrinterException;
-
-import java.util.function.Consumer;
 
 /**
  * Logger interface used by tasks & steps.
@@ -41,53 +35,6 @@ public interface MavenLogger {
      */
     static MavenLogger maven(final Log log) {
         return BasicMavenLogger.with(log);
-    }
-
-    default TreeLogger treeLogger(final Consumer<CharSequence> debug,
-                                  final Consumer<CharSequence> info) {
-        return TreeLogger.with(
-                this.printer(this::debug)
-                        .printedLine(
-                                (final CharSequence line, final LineEnding lineEnding, final Printer printer) -> debug.accept(line)
-                        ), this.printer(this::info)
-                        .printedLine(
-                                (final CharSequence line, final LineEnding lineEnding, final Printer printer) -> info.accept(line)
-                        )
-        );
-    }
-
-    /**
-     * Returns an {@link IndentingPrinter} which writes to the given {@link Consumer} which is assumed to be a {@link MavenLogger} method.
-     */
-    default Printer printer(final Consumer<CharSequence> log) {
-        return new Printer() {
-            @Override
-            public void print(final CharSequence text) throws PrinterException {
-                log.accept(text);
-            }
-
-            @Override
-            public LineEnding lineEnding() {
-                return LineEnding.SYSTEM;
-            }
-
-            @Override
-            public void flush() {
-                // nop
-            }
-
-            @Override
-            public void close() {
-                // nop
-            }
-
-            @Override
-            public String toString() {
-                return MavenLogger.this.toString();
-            }
-        }.printedLine((final CharSequence line,
-                       final LineEnding lineEnding,
-                       final Printer printer) -> printer.print(line));
     }
 
     void debug(final CharSequence message);
@@ -109,4 +56,12 @@ public interface MavenLogger {
 
     void error(final CharSequence message,
                final Throwable cause);
+
+    default TreeLogger treeLogger() {
+        return TreeLogger.with(
+                this::debug,
+                this::info,
+                (line, thrown) -> this.error(line, thrown)
+        );
+    }
 }
