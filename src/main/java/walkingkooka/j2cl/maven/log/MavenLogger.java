@@ -61,7 +61,7 @@ public interface MavenLogger {
         return TreeLogger.with(
                 this::debug,
                 this::info,
-                (line, thrown) -> this.error(line, thrown)
+                this::error
         );
     }
 }
