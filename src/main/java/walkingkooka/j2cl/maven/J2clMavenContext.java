@@ -312,43 +312,46 @@ public abstract class J2clMavenContext implements Context {
             {
                 logger.line("Queue");
                 logger.indent();
+                {
 
-                //for readability sort jobs alphabetically as they will be printed and possibly submitted.....................
-                final SortedMap<J2clDependency, Set<J2clDependency>> alphaSortedJobs = Maps.sorted();
-                alphaSortedJobs.putAll(this.jobs);
+                    //for readability sort jobs alphabetically as they will be printed and possibly submitted.....................
+                    final SortedMap<J2clDependency, Set<J2clDependency>> alphaSortedJobs = Maps.sorted();
+                    alphaSortedJobs.putAll(this.jobs);
 
-                for (final Entry<J2clDependency, Set<J2clDependency>> artifactAndDependencies : alphaSortedJobs.entrySet()) {
-                    final J2clDependency artifact = artifactAndDependencies.getKey();
-                    final Set<J2clDependency> required = artifactAndDependencies.getValue();
+                    for (final Entry<J2clDependency, Set<J2clDependency>> artifactAndDependencies : alphaSortedJobs.entrySet()) {
+                        final J2clDependency artifact = artifactAndDependencies.getKey();
+                        final Set<J2clDependency> required = artifactAndDependencies.getValue();
 
-                    logger.line(artifact.toString());
-                    logger.indent();
-                    {
-                        if (required.isEmpty()) {
-                            this.jobs.remove(artifact);
-                            submits.add(artifact);
-                            logger.line("Queued " + artifact + " for submission " + submits.size());
-                        } else {
-                            logger.line("Waiting for " + required.size() + " dependencies");
-                            logger.indent();
-
-                            required.forEach(r -> logger.line(r.toString()));
-
-                            logger.outdent();
+                        logger.line(artifact.toString());
+                        logger.indent();
+                        {
+                            if (required.isEmpty()) {
+                                this.jobs.remove(artifact);
+                                submits.add(artifact);
+                                logger.line("Queued " + artifact + " for submission " + submits.size());
+                            } else {
+                                logger.line("Waiting for " + required.size() + " dependencies");
+                                logger.indent();
+                                {
+                                    required.forEach(r -> logger.line(r.toString()));
+                                }
+                                logger.outdent();
+                            }
                         }
+                        logger.outdent();
                     }
-                    logger.outdent();
+
+                    final int submitCount = submits.size();
+                    final int waiting = alphaSortedJobs.size() - submits.size();
+                    final int running = this.running.get();
+
+                    if (0 == submitCount && waiting > 0 && 0 == running) {
+                        throw new J2clException(submitCount + " jobs submitted with " + waiting + " several waiting and " + running + " running.");
+                    }
+
+                    message = submitCount + " job(s) submitted, " + running + " running " + waiting + " waiting.";
                 }
-
-                final int submitCount = submits.size();
-                final int waiting = alphaSortedJobs.size() - submits.size();
-                final int running = this.running.get();
-
-                if (0 == submitCount && waiting > 0 && 0 == running) {
-                    throw new J2clException(submitCount + " jobs submitted with " + waiting + " several waiting and " + running + " running.");
-                }
-
-                message = submitCount + " job(s) submitted, " + running + " running " + waiting + " waiting.";
+                logger.outdent();
             }
             logger.outdent();
 
