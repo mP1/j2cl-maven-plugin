@@ -29,8 +29,13 @@ public enum J2clStepResult {
             return directory.aborted();
         }
 
+        /**
+         * NOT a fail but skip remaining steps for this dependency. Used by HASH when the computed hash is the same as previous,
+         * and theres no point redoing tasks.
+         */
         @Override
-        Optional<J2clStep> next(final Optional<J2clStep> next) {
+        Optional<J2clStep> next(final J2clStep current,
+                                final J2clMavenContext context) {
             return Optional.empty();
         }
     },
@@ -43,8 +48,12 @@ public enum J2clStepResult {
             return directory.failed();
         }
 
+        /**
+         * An error occurred, eg a java compile error no point trying further steps for this dependency.
+         */
         @Override
-        Optional<J2clStep> next(final Optional<J2clStep> next) {
+        Optional<J2clStep> next(final J2clStep current,
+                                final J2clMavenContext context) {
             return Optional.empty();
         }
     },
@@ -58,8 +67,9 @@ public enum J2clStepResult {
         }
 
         @Override
-        Optional<J2clStep> next(final Optional<J2clStep> next) {
-            return next;
+        Optional<J2clStep> next(final J2clStep current,
+                                final J2clMavenContext context) {
+            return context.nextStep(current);
         }
     },
     /**
@@ -72,8 +82,9 @@ public enum J2clStepResult {
         }
 
         @Override
-        Optional<J2clStep> next(final Optional<J2clStep> next) {
-            return next;
+        Optional<J2clStep> next(final J2clStep current,
+                                final J2clMavenContext context) {
+            return context.nextStep(current);
         }
     };
 
@@ -89,5 +100,6 @@ public enum J2clStepResult {
         }
     }
 
-    abstract Optional<J2clStep> next(final Optional<J2clStep> next);
+    abstract Optional<J2clStep> next(final J2clStep current,
+                                     final J2clMavenContext context);
 }

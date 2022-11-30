@@ -225,11 +225,13 @@ public enum J2clStep {
         );
 
         try {
+            J2clStepResult result = J2clStepResult.ABORTED;
+
             if (!artifact.isDependency() || !this.skipIfDependency()) {
                 logger.line(prefix);
                 logger.indent();
 
-                final J2clStepResult result = this.execute0()
+                result = this.execute0()
                         .execute(
                                 artifact,
                                 this,
@@ -249,7 +251,7 @@ public enum J2clStep {
 
                 result.reportIfFailure(artifact, this);
             }
-            return context.nextStep(this);
+            return result.next(this, context);
         } catch (final Exception cause) {
             logger.error("Failed to execute " + prefix + " message: " + cause.getMessage(), cause);
             logger.flush();
