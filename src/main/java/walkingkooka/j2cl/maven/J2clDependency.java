@@ -1195,25 +1195,19 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Sets the directory for this dependency, assumes the hash has been computed
      */
-    public J2clDependency setDirectory(final String hash) throws IOException {
+    public J2clDependency setDirectory(final String hash) {
         final J2clPath create = this.context.cache()
                 .append(
                         this.coords.directorySafeName() + "-" + hash
                 );
-        final J2clPath previous = this.directory.compareAndExchange(null, create);
-        if (null != previous) {
-            throw new IllegalStateException("Hash already set for this artifact: " + CharSequences.quote(create.toString()));
-        }
-
-        create.append(this.context.directoryName(J2clStep.HASH))
-                .createIfNecessary();
+        this.directory.set(create);
         return this;
     }
 
     /**
      * Getter that returns the base directory for this artifact which includes the output for after preparation.
      */
-    J2clPath directory() {
+    public J2clPath directory() {
         final J2clPath directory = this.directory.get();
         if (null == directory) {
             throw new IllegalStateException(
@@ -1232,7 +1226,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     private final AtomicReference<J2clPath> directory = new AtomicReference<>();
 
     /**
-     * Returns a compile step directory, creating it if necessary.
+     * Returns a compile step directory, assuming the directory has already been created.
      */
     public J2clStepDirectory step(final J2clStep step) {
         return J2clStepDirectory.with(

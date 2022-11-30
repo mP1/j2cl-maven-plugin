@@ -74,23 +74,38 @@ public final class J2clStepWorkerHash<C extends J2clMavenContext> implements J2c
         this.hashDependencies(artifact, hash, hashItemNames, logger);
         this.hashArtifactSources(artifact, hash, hashItemNames, logger);
 
-        final J2clStepDirectory directory = artifact.setDirectory(hash.toString())
-                .step(J2clStep.HASH);
+        final J2clStepResult result;
 
-        final String txt = hashItemNames.stream()
-                .map(t -> {
-                    if (t.startsWith(DEPENDENCIES)) {
-                        // remove any run on leading zeroes...added by hashDependencies
-                        final int colon = t.indexOf(':');
-                        t = DEPENDENCIES + Integer.parseInt(t.substring(DEPENDENCIES.length(), colon)) + t.substring(colon);
-                    }
-                    return t;
-                })
-                .collect(Collectors.joining("\n"));
+        final J2clPath directory = artifact.setDirectory(
+                hash.toString()
+        ).directory();
+        if (directory.exists().isPresent()) {
+            result = J2clStepResult.ABORTED; // computed hash must not have changed dir already exists so skip remaining tasks.
+        } else {
+            // create the dir that will have hash step so the file can be written...
+            directory.append(context.directoryName(J2clStep.HASH))
+                    .createIfNecessary();
 
-        directory.hashFile()
-                .writeFile(txt.getBytes(Charset.defaultCharset()));
-        return J2clStepResult.SUCCESS;
+            final J2clStepDirectory hashDirectory = artifact.step(J2clStep.HASH);
+            final String txt = hashItemNames.stream()
+                    .map(t -> {
+                        if (t.startsWith(DEPENDENCIES)) {
+                            // remove any run on leading zeroes...added by hashDependencies
+                            final int colon = t.indexOf(':');
+                            t = DEPENDENCIES + Integer.parseInt(t.substring(DEPENDENCIES.length(), colon)) + t.substring(colon);
+                        }
+                        return t;
+                    })
+                    .collect(Collectors.joining("\n"));
+
+            hashDirectory.hashFile()
+                    .writeFile(
+                            txt.getBytes(Charset.defaultCharset())
+                    );
+            result = J2clStepResult.SUCCESS;
+        }
+
+        return result;
     }
 
     private void hashDependencies(final J2clDependency artifact,

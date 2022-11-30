@@ -201,7 +201,7 @@ public abstract class J2clMavenContext implements Context {
 
     // steps............................................................................................................
 
-    final String directoryName(final J2clStep step) {
+    public final String directoryName(final J2clStep step) {
         return step.directoryName(
                 this.steps()
                         .indexOf(step)
