@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 
 /**
  * A {@link J2clMavenContext} that accompanies a test. The entry points and initial-script-filename are NOT taken from the pom,
@@ -56,7 +55,7 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
                                          final String testClassName,
                                          final int testTimeout,
                                          final J2clMavenMiddleware middleware,
-                                         final ExecutorService executor,
+                                         final int threadPoolSize,
                                          final MavenLogger logger) {
         return new J2clMojoTestMavenContext(
                 cache,
@@ -77,7 +76,7 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
                 testClassName,
                 testTimeout,
                 middleware,
-                executor,
+                threadPoolSize,
                 logger
         );
     }
@@ -100,7 +99,7 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
                                      final String testClassName,
                                      final int testTimeout,
                                      final J2clMavenMiddleware middleware,
-                                     final ExecutorService executor,
+                                     final int threadPoolSize,
                                      final MavenLogger logger) {
         super(
                 cache,
@@ -117,7 +116,7 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
                 languageOut,
                 sourceMaps,
                 middleware,
-                executor,
+                threadPoolSize,
                 logger
         );
         this.browsers = browsers;

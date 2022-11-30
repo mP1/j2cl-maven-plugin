@@ -43,8 +43,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -264,17 +262,6 @@ abstract class J2clMojoBuildTest extends J2clMojo {
 
     // threadPool.......................................................................................................
 
-    final ExecutorService executor() {
-        final int threadPoolSize = this.threadPoolSize;
-        if (threadPoolSize < 0) {
-            throw new IllegalStateException("Invalid threadPoolSize expected 0 to select CPU cores *2, or a positive value but got " + threadPoolSize);
-        }
-
-        return Executors.newFixedThreadPool(0 != threadPoolSize ?
-                threadPoolSize :
-                Runtime.getRuntime().availableProcessors() * 2);
-    }
-
     /**
      * If a value of zero is passed or defaulted the a thread pool equal to the CPU core count * 2 is created.
      * <br>
@@ -285,6 +272,15 @@ abstract class J2clMojoBuildTest extends J2clMojo {
             readonly = true,
             required = true)
     private int threadPoolSize;
+
+    final int threadPoolSize() {
+        final int threadPoolSize = this.threadPoolSize;
+        if (threadPoolSize < 0) {
+            throw new IllegalStateException("Invalid threadPoolSize expected 0 to select CPU cores *2, or a positive value but got " + threadPoolSize);
+        }
+
+        return threadPoolSize;
+    }
 
     // mavenMiddleware..................................................................................................
 
