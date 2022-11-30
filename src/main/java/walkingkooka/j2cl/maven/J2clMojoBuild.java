@@ -79,7 +79,7 @@ public final class J2clMojoBuild extends J2clMojoBuildTest {
                 this.languageOut(),
                 this.sourceMaps(),
                 this.mavenMiddleware(),
-                this.executor(),
+                this.threadPoolSize(),
                 this.logger()
         );
     }

@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 
 /**
  * A {@link J2clMavenContext} that accompanies a build. The entry points and initial-script-filename are taken from the pom.
@@ -51,7 +50,7 @@ final class J2clMojoBuildMavenContext extends J2clMavenContext {
                                           final LanguageMode languageOut,
                                           final Optional<String> sourceMaps,
                                           final J2clMavenMiddleware middleware,
-                                          final ExecutorService executor,
+                                          final int threadPoolSize,
                                           final MavenLogger logger) {
         return new J2clMojoBuildMavenContext(
                 cache,
@@ -70,7 +69,7 @@ final class J2clMojoBuildMavenContext extends J2clMavenContext {
                 languageOut,
                 sourceMaps,
                 middleware,
-                executor,
+                threadPoolSize,
                 logger
         );
     }
@@ -91,7 +90,7 @@ final class J2clMojoBuildMavenContext extends J2clMavenContext {
                                       final LanguageMode languageOut,
                                       final Optional<String> sourceMaps,
                                       final J2clMavenMiddleware middleware,
-                                      final ExecutorService executor,
+                                      final int threadPoolSize,
                                       final MavenLogger logger) {
         super(
                 cache,
@@ -108,7 +107,7 @@ final class J2clMojoBuildMavenContext extends J2clMavenContext {
                 languageOut,
                 sourceMaps,
                 middleware,
-                executor,
+                threadPoolSize,
                 logger
         );
         this.entryPoints = entryPoints;

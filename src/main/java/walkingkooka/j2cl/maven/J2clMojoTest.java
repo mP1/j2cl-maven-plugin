@@ -127,7 +127,7 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
                 testClassName,
                 this.testTimeout(),
                 this.mavenMiddleware(),
-                this.executor(),
+                this.threadPoolSize(),
                 this.logger());
     }
 

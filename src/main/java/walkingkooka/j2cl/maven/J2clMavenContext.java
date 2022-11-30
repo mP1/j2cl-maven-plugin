@@ -40,6 +40,7 @@ import java.util.SortedMap;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -68,7 +69,7 @@ public abstract class J2clMavenContext implements Context {
                      final LanguageMode languageOut,
                      final Optional<String> sourceMaps,
                      final J2clMavenMiddleware middleware,
-                     final ExecutorService executor,
+                     final int threadPoolSize,
                      final MavenLogger logger) {
         super();
 
@@ -89,8 +90,7 @@ public abstract class J2clMavenContext implements Context {
         this.sourceMaps = sourceMaps;
 
         this.middleware = middleware;
-        this.executor = executor;
-        this.completionService = new ExecutorCompletionService<>(executor);
+        this.threadPoolSize = threadPoolSize;
         this.logger = logger;
     }
 
@@ -238,12 +238,26 @@ public abstract class J2clMavenContext implements Context {
      */
     final void execute(final J2clDependency project,
                        final TreeLogger logger) throws Throwable {
+        this.jobs.clear();
+
         this.prepareJobs(project);
+
+        final ExecutorService executorService = this.executor();
+        this.executorService = executorService;
+        this.completionService = new ExecutorCompletionService<>(executorService);
 
         if (0 == this.trySubmitJobs(logger)) {
             throw new J2clException("Unable to find a leaf dependencies(dependency without dependencies), job failed.");
         }
         this.await();
+    }
+
+    private ExecutorService executor() {
+        final int threadPoolSize = this.threadPoolSize;
+
+        return Executors.newFixedThreadPool(0 != threadPoolSize ?
+                threadPoolSize :
+                Runtime.getRuntime().availableProcessors() * 2);
     }
 
     private void prepareJobs(final J2clDependency artifact) {
@@ -457,19 +471,17 @@ public abstract class J2clMavenContext implements Context {
      */
     private final Lock jobsLock = new ReentrantLock();
 
-    private final CompletionService<Void> completionService;
-
     /**
      * Waits (aka Blocks) for all outstanding tasks to complete.
      */
     private void await() throws Throwable {
-        while (false == this.executor.isTerminated()) {
+        while (false == this.executorService.isTerminated()) {
             try {
                 final Future<?> task = this.completionService.poll(1, TimeUnit.SECONDS);
                 if (null != task) {
                     task.get();
                     if (0 == this.running.decrementAndGet()) {
-                        this.executor.shutdown();
+                        this.executorService.shutdown();
                     }
                 }
             } catch (final Exception cause) {
@@ -478,6 +490,9 @@ public abstract class J2clMavenContext implements Context {
                 throw cause;
             }
         }
+
+        this.executorService = null;
+        this.completionService = null;
 
         final Throwable cause = this.cause.get();
         if (null != cause) {
@@ -496,11 +511,25 @@ public abstract class J2clMavenContext implements Context {
         logger.warn("Killing all running tasks");
 
         // TODO might be able to give Callable#toString and hope that is used by Runnable returned.
-        this.executor.shutdownNow()
+        this.executorService.shutdownNow()
                 .forEach(task -> logger.warn("" + MavenLogger.INDENTATION + task));
     }
 
-    private final ExecutorService executor;
+    /**
+     * This value is used when creating a {@link ExecutorService}
+     */
+    private final int threadPoolSize;
+
+    /**
+     * The build and test goals only create a single {@link ExecutorService}, while the watch goal will create
+     * a new {@link ExecutorService} each time it runs.
+     */
+    private ExecutorService executorService;
+
+    /**
+     * An instance is created when a new {@link ExecutorService} is created.
+     */
+    private CompletionService<Void> completionService;
 
     private final AtomicReference<Throwable> cause = new AtomicReference<>();
 
