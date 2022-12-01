@@ -396,40 +396,48 @@ public abstract class J2clMavenContext implements Context {
 
     final Void callable(final J2clDependency task,
                         final TreeLogger logger) throws Exception {
-        final String coords = task.coords().toString();
-        final Instant start = Instant.now();
+        final Thread thread = Thread.currentThread();
+        final String threadName = thread.getName();
 
-        logger.line(coords);
-        logger.indent();
-        {
-            J2clStep step = this.firstStep();
-            do {
-                Thread.currentThread()
-                        .setName(coords + "-" + step);
+        try {
+            final String coords = task.coords().toString();
+            final Instant start = Instant.now();
 
-                step = step.execute(
-                        task,
-                        logger,
-                        this
-                ).orElse(null);
-            } while (null != step);
+            logger.line(coords);
+            logger.indent();
+            {
+                J2clStep step = this.firstStep();
+                do {
+                    thread.setName(coords + "-" + step);
+
+                    step = step.execute(
+                            task,
+                            logger,
+                            this
+                    ).orElse(null);
+
+                    thread.setName(threadName);
+                } while (null != step);
+            }
+            logger.outdent();
+            logger.line(
+                    coords +
+                            " completed, " +
+                            TreeLogger.prettyTimeTaken(
+                                    Duration.between(
+                                            start,
+                                            Instant.now()
+                                    )
+                            )
+            );
+
+            this.taskCompleted(
+                    task,
+                    logger
+            );
+        } finally {
+            thread.setName(threadName);
         }
-        logger.outdent();
-        logger.line(
-                coords +
-                        " completed, " +
-                        TreeLogger.prettyTimeTaken(
-                                Duration.between(
-                                        start,
-                                        Instant.now()
-                                )
-                        )
-        );
-
-        this.taskCompleted(
-                task,
-                logger
-        );
 
         return null;
     }
