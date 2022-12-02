@@ -267,8 +267,11 @@ final public class TreeLogger {
 
                 table = TABLE_TRANSFORMER.apply(table);
 
-                for (int r = 0; r < table.maxRow(); r++) {
-                    TreeLogger.line0(TextPretty.rowColumnsToLine((column -> 1), LineEnding.SYSTEM).apply(table.row(r)), printer);
+                for (int r = 0; r < table.height(); r++) {
+                    TreeLogger.line0(
+                            TextPretty.rowColumnsToLine((column -> 1), LineEnding.SYSTEM).apply(table.row(r)),
+                            printer
+                    );
                 }
             }
         }.biConsumer()
