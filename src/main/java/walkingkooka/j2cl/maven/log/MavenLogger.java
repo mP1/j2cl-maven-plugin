@@ -37,6 +37,8 @@ public interface MavenLogger {
         return BasicMavenLogger.with(log);
     }
 
+    boolean isDebugEnabled();
+
     void debug(final CharSequence message);
 
     void debug(final CharSequence message,

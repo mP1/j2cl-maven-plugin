@@ -36,6 +36,11 @@ final class BasicMavenLogger implements MavenLogger {
     }
 
     @Override
+    public boolean isDebugEnabled() {
+        return this.log.isDebugEnabled();
+    }
+
+    @Override
     public void debug(final CharSequence message) {
         this.log.debug(message);
     }
