@@ -291,7 +291,8 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger> {
                         .append(EOL),
                 (line, cause) -> {
                     throw new UnsupportedOperationException();
-                }
+                },
+                true // isDebugEnabled
         );
     }
 
@@ -301,7 +302,8 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger> {
                 (line) -> b.append(line).append(EOL),
                 (line, cause) -> {
                     throw new UnsupportedOperationException();
-                }
+                },
+                true // isDebugEnabled
         );
     }
 

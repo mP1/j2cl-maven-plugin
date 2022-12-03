@@ -54,7 +54,8 @@ final public class TreeLogger {
 
     static TreeLogger with(final Consumer<CharSequence> debug,
                            final Consumer<CharSequence> info,
-                           final BiConsumer<CharSequence, Throwable> error) {
+                           final BiConsumer<CharSequence, Throwable> error,
+                           final boolean isDebugEnabled) {
         Objects.requireNonNull(debug, "debug");
         Objects.requireNonNull(info, "info");
         Objects.requireNonNull(error, "error");
@@ -62,7 +63,8 @@ final public class TreeLogger {
         return new TreeLogger(
                 debug,
                 info,
-                error
+                error,
+                isDebugEnabled
         );
     }
 
@@ -75,7 +77,8 @@ final public class TreeLogger {
 
     private TreeLogger(final Consumer<CharSequence> debug,
                        final Consumer<CharSequence> info,
-                       final BiConsumer<CharSequence, Throwable> error) {
+                       final BiConsumer<CharSequence, Throwable> error,
+                       final boolean isDebugEnabled) {
         super();
 
         this.debug = Printers.sink(LineEnding.SYSTEM)
@@ -100,6 +103,8 @@ final public class TreeLogger {
 
         this.debugConsumer = debug;
         this.infoConsumer = info;
+
+        this.isDebugEnabled = isDebugEnabled;
     }
 
     public void indent() {
@@ -109,10 +114,12 @@ final public class TreeLogger {
 
     public void path(final String label,
                      final J2clPath file) {
-        this.line(label);
-        this.indentedLine(
-                file.toString()
-        );
+        if (this.isDebugEnabled) {
+            this.line(label);
+            this.indentedLine(
+                    file.toString()
+            );
+        }
     }
 
     public void path(final J2clPath file) {
@@ -127,10 +134,12 @@ final public class TreeLogger {
     public void paths(final String label,
                       final Collection<J2clPath> paths,
                       final TreeFormat format) {
-        this.stringPath(label,
+        this.stringPath(
+                label,
                 paths,
                 this::toStringPath,
-                format);
+                format
+        );
     }
 
     private StringPath toStringPath(final J2clPath path) {
@@ -147,10 +156,12 @@ final public class TreeLogger {
     public void fileInfos(final String label,
                           final Collection<FileInfo> paths,
                           final TreeFormat format) {
-        this.stringPath(label,
+        this.stringPath(
+                label,
                 paths,
                 this::toStringPath,
-                format);
+                format
+        );
     }
 
     private StringPath toStringPath(final FileInfo fileInfo) {
@@ -163,17 +174,19 @@ final public class TreeLogger {
                                 final Collection<T> paths,
                                 final Function<T, StringPath> toStringPath,
                                 final TreeFormat format) {
-        this.lineStart();
-        if (label.isEmpty()) {
-            this.stringPath0(paths, toStringPath, format);
-        } else {
-            this.line(label);
+        if (this.isDebugEnabled) {
             this.lineStart();
-            this.indent();
-            {
+            if (label.isEmpty()) {
                 this.stringPath0(paths, toStringPath, format);
+            } else {
+                this.line(label);
+                this.lineStart();
+                this.indent();
+                {
+                    this.stringPath0(paths, toStringPath, format);
+                }
+                this.outdent();
             }
-            this.outdent();
         }
     }
 
@@ -299,15 +312,18 @@ final public class TreeLogger {
     public void strings(final String label,
                         final Collection<String> values) {
         Objects.requireNonNull(values, "values");
-        this.line(values.size() + " " + label);
 
-        //noinspection ConstantConditions
-        if (null != values) {
-            this.indent();
-            {
-                values.forEach(this::line);
+        if (this.isDebugEnabled) {
+            this.line(values.size() + " " + label);
+
+            //noinspection ConstantConditions
+            if (null != values) {
+                this.indent();
+                {
+                    values.forEach(this::line);
+                }
+                this.outdent();
             }
-            this.outdent();
         }
     }
 
@@ -394,9 +410,12 @@ final public class TreeLogger {
                 (line, thrown) -> {
                     this.error("" + indentation + MavenLogger.INDENTATION + line, thrown);
                     error.accept(line, thrown);
-                }
+                },
+                this.isDebugEnabled
         );
     }
+
+    private final boolean isDebugEnabled;
 
     @Override
     public String toString() {
