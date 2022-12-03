@@ -63,7 +63,8 @@ public interface MavenLogger {
         return TreeLogger.with(
                 this::debug,
                 this::info,
-                this::error
+                this::error,
+                this.isDebugEnabled()
         );
     }
 }
