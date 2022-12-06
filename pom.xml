@@ -525,6 +525,13 @@
             <artifactId>qdox</artifactId>
             <version>2.0-M9</version>
         </dependency>
+
+        <!-- Adds recursive dir watching-->
+        <dependency>
+            <groupId>io.methvin</groupId>
+            <artifactId>directory-watcher</artifactId>
+            <version>0.17.1</version>
+        </dependency>
     </dependencies>
 
     <build>

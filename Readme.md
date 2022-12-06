@@ -52,7 +52,7 @@ The plugin supports three out of the four following goals
 
 3. `test`: executes junit 3 tests.
 
-4. 'watch': aka DEVMODE TODO
+4. 'watch': builds the project and then watches for file changes and rebuilds
 
 Some pieces of the `vertispan/j2clmavenplugin` are currently missing:
 

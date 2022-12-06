@@ -20,20 +20,16 @@ package walkingkooka.j2cl.maven;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Builds the given project and all of its dependencies in the correct order producing a single JS file.
  */
 @Mojo(name = "build", requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
-public final class J2clMojoBuild extends J2clMojoBuildTest {
+public final class J2clMojoBuild extends J2clMojoBuildWatch {
 
     @Override
     public void execute() throws MojoExecutionException {
@@ -83,26 +79,4 @@ public final class J2clMojoBuild extends J2clMojoBuildTest {
                 this.logger()
         );
     }
-
-    // entry-points.....................................................................................................
-
-    private List<String> entryPoints() {
-        return this.entryPoints.stream()
-                .map(String::trim)
-                .collect(Collectors.toList());
-    }
-
-    @Parameter(alias = "entry-points", required = true)
-    private final List<String> entryPoints = new ArrayList<>();
-
-    // initial-script-filename..........................................................................................
-
-    private J2clPath initialScriptFilename() {
-        return J2clPath.with(Paths.get(this.initialScriptFilename));
-    }
-
-    @Parameter(alias = "initial-script-filename",
-            defaultValue = "${project.build.directory}/${project.build.finalName}/${project.groupId}-${project.artifactId}.js",
-            required = true)
-    private String initialScriptFilename;
 }

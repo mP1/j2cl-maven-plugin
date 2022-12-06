@@ -48,9 +48,9 @@ import java.util.stream.Collectors;
 /**
  * Base class that captures maven plugin parameters and methods common to both build and test.
  */
-abstract class J2clMojoBuildTest extends J2clMojo {
+abstract class J2clMojoBuildTestWatch extends J2clMojo {
 
-    J2clMojoBuildTest() {
+    J2clMojoBuildTestWatch() {
         super();
     }
 
@@ -87,8 +87,11 @@ abstract class J2clMojoBuildTest extends J2clMojo {
         return J2clPath.with(this.output.toPath());
     }
 
-    @Parameter(defaultValue = "${project.build.directory}/${project.build.finalName}",
-            required = true)
+    @Parameter(
+            alias = "output",
+            defaultValue = "${project.build.directory}/${project.build.finalName}",
+            required = true
+    )
     private File output;
 
 
@@ -225,7 +228,7 @@ abstract class J2clMojoBuildTest extends J2clMojo {
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     @Parameter(alias = "java-compiler-arguments", required = true)
     private final List<String> javaCompilerArguments = new ArrayList<>();
-    
+
     // language-out.....................................................................................................
 
     final LanguageMode languageOut() {
@@ -268,8 +271,8 @@ abstract class J2clMojoBuildTest extends J2clMojo {
      * It may be useful to set this value to 1 to aide ordering and have console output in an ordered non interrupted
      * single thread.
      */
-    @Parameter(alias = "thread-pool-size",
-            readonly = true,
+    @Parameter(
+            alias = "thread-pool-size",
             required = true)
     private int threadPoolSize;
 
