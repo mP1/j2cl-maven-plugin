@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
  * and will be executed by webdriver.
  */
 @Mojo(name = "test", requiresDependencyResolution = ResolutionScope.TEST)
-public final class J2clMojoTest extends J2clMojoBuildTest {
+public final class J2clMojoTest extends J2clMojoBuildTestWatch {
 
     @Override
     public void execute() throws MojoExecutionException {
@@ -175,7 +175,11 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
 
     // skipTests........................................................................................................
 
-    @Parameter(alias = "skip-tests", defaultValue = "false", property = "maven.test.skip")
+    @Parameter(
+            property = "maven.skip-tests",
+            alias = "test.skip",
+            defaultValue = "false"
+    )
     private boolean skipTests;
 
     private boolean skipTests() {
@@ -188,7 +192,10 @@ public final class J2clMojoTest extends J2clMojoBuildTest {
         return BrowserLogLevel.fromCommandLine(this.browserLogLevel);
     }
 
-    @Parameter(alias = "browser-log-level", required = true)
+    @Parameter(
+            alias = "browser-log-level",
+            required = true
+    )
     private String browserLogLevel;
 
     // browser..........................................................................................................
