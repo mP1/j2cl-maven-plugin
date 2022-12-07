@@ -113,7 +113,7 @@
                             <ignored-dependencies/>
                             <javascript-source-required/>
 
-                            <skip-tests>false</skip-tests>
+                            <skip>false</skip>
                             <tests>
                                 <test>test.JunitTest</test>
                             </tests>

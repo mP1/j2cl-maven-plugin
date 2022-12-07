@@ -175,7 +175,7 @@
                                 <param>group-id-1:artifact-id-2:*</param>
                             </javascript-source-required>
 
-                            <skip-tests>false</skip-tests>
+                            <skip>false</skip>
                             <tests>
                                 <test>example.AbcTest</test>
                             </tests>

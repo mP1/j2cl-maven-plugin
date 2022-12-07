@@ -159,7 +159,7 @@
                             <ignored-dependencies/>
                             <javascript-source-required/>
 
-                            <skip-tests>false</skip-tests>
+                            <skip>false</skip>
                             <tests>
                                 <test>org.gwtproject.timer.client.TimerJ2clTest</test>
                                 <test>org.gwtproject.timer.client.TimerJ2clTest2</test>
