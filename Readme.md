@@ -520,13 +520,15 @@ files and how source maps work.
 ```
 
 
-## skip-tests
+## skip
 
-This is only available when executing tests, and provides an easy switch to turn tests on/off (`classpathscope=test`).
+This is only available when executing tests, and provides an easy switch to turn tests on/off (`skip=true`).
 ```xml
-<skip-tests>false</skip-tests>
+
+<skip>false</skip>
 ```
 
+From the command line the property may be set `-Dwalkingkooka.j2cl.maven.plugin.test.skip=true`.
 
 
 ## tests

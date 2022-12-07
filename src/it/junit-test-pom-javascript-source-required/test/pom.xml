@@ -106,7 +106,7 @@
                                 <param>walkingkooka:j2cl-maven-plugin-it-junit-test-pom-javascript-source-required-dependency:*</param>
                             </javascript-source-required>
 
-                            <skip-tests>false</skip-tests>
+                            <skip>false</skip>
                             <tests>
                                 <test>test.JunitTest</test>
                             </tests>

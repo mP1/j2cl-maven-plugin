@@ -55,7 +55,7 @@ public final class J2clMojoTest extends J2clMojoBuildTestWatch {
 
     @Override
     public void execute() throws MojoExecutionException {
-        if (false == this.skipTests()) {
+        if (false == this.skip()) {
             try {
                 final MavenLogger mavenLogger = this.logger();
 
@@ -176,14 +176,14 @@ public final class J2clMojoTest extends J2clMojoBuildTestWatch {
     // skipTests........................................................................................................
 
     @Parameter(
-            property = "maven.skip-tests",
-            alias = "test.skip",
+            property = "walkingkooka.j2cl.maven.plugin.test.skip",
+            alias = "skip",
             defaultValue = "false"
     )
-    private boolean skipTests;
+    private boolean skip;
 
-    private boolean skipTests() {
-        return this.skipTests;
+    private boolean skip() {
+        return this.skip;
     }
 
     // browserLogLevel...................................................................................................
