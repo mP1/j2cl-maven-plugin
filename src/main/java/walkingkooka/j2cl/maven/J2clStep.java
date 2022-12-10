@@ -209,7 +209,7 @@ public enum J2clStep {
         final String prefix = artifact.coords() + "-" + this;
 
         final TreeLogger logger = parentLogger.childTreeLogger(
-                (line) -> lines.add(line),
+                lines::add,
                 (line, thrown) -> {
                     lines.add(line);
                     if (null != thrown) {

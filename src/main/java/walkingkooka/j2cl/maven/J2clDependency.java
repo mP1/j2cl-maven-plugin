@@ -601,7 +601,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
 
             final List<J2clArtifactCoords> duplicates = all.stream()
                     .map(J2clDependency::coords)
-                    .filter(possible -> coords.isSameGroupArtifactDifferentVersion(possible))
+                    .filter(coords::isSameGroupArtifactDifferentVersion)
                     .collect(Collectors.toList());
 
             if (duplicates.size() > 0) {

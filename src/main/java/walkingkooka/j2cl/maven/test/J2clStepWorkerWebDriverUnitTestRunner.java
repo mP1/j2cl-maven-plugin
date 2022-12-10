@@ -152,7 +152,7 @@ public final class J2clStepWorkerWebDriverUnitTestRunner implements J2clStepWork
                                 .withTimeout(Duration.ofSeconds(timeout))
                                 .withMessage("Tests failed to finish in timeout")
                                 .pollingEvery(Duration.ofMillis(100))
-                                .until(d -> isFinished(d));
+                                .until(J2clStepWorkerWebDriverUnitTestRunner::isFinished);
 
                         final String testReport = testReport(driver);
                         logger.indent();
