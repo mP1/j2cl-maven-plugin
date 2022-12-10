@@ -66,6 +66,7 @@ public enum J2clSourcesKind {
     abstract List<J2clPath> compileSourceRoots(final MavenProject project,
                                                final J2clPath base);
 
+    @SafeVarargs
     private static List<J2clPath> sources(final J2clPath base,
                                           final List<String>... sources) {
         return concat(
@@ -75,8 +76,8 @@ public enum J2clSourcesKind {
         );
     }
 
-    private static List<J2clPath> resources(final J2clPath base,
-                                            final List<Resource>... sources) {
+    @SafeVarargs private static List<J2clPath> resources(final J2clPath base,
+                                                         final List<Resource>... sources) {
         return concat(
                 Resource::getDirectory,
                 base,
@@ -84,6 +85,7 @@ public enum J2clSourcesKind {
         );
     }
 
+    @SafeVarargs
     private static <T> List<J2clPath> concat(final Function<T, String> mapper,
                                              final J2clPath base,
                                              final List<T>... sources) {
@@ -105,6 +107,7 @@ public enum J2clSourcesKind {
 
     private final static String SEPARATOR = "/";
 
+    @SafeVarargs
     private static List<J2clPath> concat(final List<J2clPath>... sources) {
         return Arrays.stream(sources)
                 .flatMap(Collection::stream)
