@@ -34,6 +34,7 @@ import walkingkooka.text.printer.Printer;
 import walkingkooka.text.printer.Printers;
 
 import java.io.File;
+import java.nio.file.WatchEvent;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
@@ -325,6 +326,22 @@ final public class TreeLogger {
                 this.outdent();
             }
         }
+    }
+
+    public void fileWatchEvents(final List<WatchEvent<?>> events) {
+        this.info("File event(s)");
+        this.indent();
+        {
+            for (final WatchEvent<?> event : events) {
+                this.line(
+                        event.kind()
+                                .name()
+                                .replace("ENTRY_", "")
+                                .toLowerCase() + " " + event.context()
+                );
+            }
+        }
+        this.outdent();
     }
 
     public void log(final CharSequence line) {

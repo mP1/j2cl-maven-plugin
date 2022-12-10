@@ -173,8 +173,9 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
             if (null != key) {
                 final List<WatchEvent<?>> events = key.pollEvents();
                 if (!events.isEmpty()) {
-                    build(
-                            events,
+                    logger.fileWatchEvents(events);
+
+                    this.build(
                             project,
                             logger,
                             context
@@ -185,51 +186,35 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
         }
     }
 
-    private void build(final List<WatchEvent<?>> events,
-                       final J2clDependency project,
+    private void build(final J2clDependency project,
                        final TreeLogger logger,
                        final J2clMojoWatchMavenContext context) {
         final Instant start = Instant.now();
 
+        logger.info("Build");
         logger.indent();
         {
-            logger.info("File event(s)");
-            logger.indent();
-            {
-                for (final WatchEvent<?> event : events) {
-                    logger.line(
-                            event.kind() + " " + event.context()
-                    );
-                }
+            try {
+                context.execute(
+                        project,
+                        logger
+                );
+            } catch (final Throwable cause) {
+                logger.error("Build failed", cause);
             }
-            logger.outdent();
-
-            logger.info("Build");
-            logger.indent();
-            {
-                try {
-                    context.execute(
-                            project,
-                            logger
-                    );
-                } catch (final Throwable cause) {
-                    logger.error("Build failed", cause);
-                }
-            }
-            logger.outdent();
-
-            final Duration timeTaken = Duration.between(
-                    start,
-                    Instant.now()
-            );
-
-            logger.line("Time taken");
-            logger.indentedLine(
-                    TreeLogger.prettyTimeTaken(timeTaken)
-            );
-            logger.emptyLine();
-            logger.flush();
         }
         logger.outdent();
+
+        final Duration timeTaken = Duration.between(
+                start,
+                Instant.now()
+        );
+
+        logger.line("Time taken");
+        logger.indentedLine(
+                TreeLogger.prettyTimeTaken(timeTaken)
+        );
+        logger.emptyLine();
+        logger.flush();
     }
 }
