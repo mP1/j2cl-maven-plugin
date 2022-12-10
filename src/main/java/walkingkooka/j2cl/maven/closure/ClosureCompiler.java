@@ -96,7 +96,7 @@ class ClosureCompiler {
         int fileCount = 0;
 
         final J2clPath unitedSourceRoot = sourceMaps
-                .map(s -> output.append(s))
+                .map(output::append)
                 .orElse(output.parent().append("sources"));
 
         logger.line(sources.size() + " Source(s)");

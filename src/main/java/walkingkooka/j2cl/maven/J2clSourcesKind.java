@@ -24,7 +24,9 @@ import org.apache.maven.project.MavenProject;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -86,8 +88,8 @@ public enum J2clSourcesKind {
                                              final J2clPath base,
                                              final List<T>... sources) {
         return Arrays.stream(sources)
-                .filter(i -> null != i)
-                .flatMap(s -> s.stream())
+                .filter(Objects::nonNull)
+                .flatMap(Collection::stream)
                 .map(mapper)
                 .map(p -> {
                     return p.startsWith(SEPARATOR) ?
@@ -105,7 +107,7 @@ public enum J2clSourcesKind {
 
     private static List<J2clPath> concat(final List<J2clPath>... sources) {
         return Arrays.stream(sources)
-                .flatMap(s -> s.stream())
+                .flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }
 }

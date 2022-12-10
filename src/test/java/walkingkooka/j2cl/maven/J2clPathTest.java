@@ -66,9 +66,10 @@ public final class J2clPathTest implements ComparableTesting2<J2clPath>, HashCod
         final J2clPath path = this.createObject();
         path.append("sub").createIfNecessary();
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            path.absentOrFail();
-        });
+        assertThrows(
+                IllegalArgumentException.class,
+                path::absentOrFail
+        );
     }
 
     @Test
@@ -158,7 +159,11 @@ public final class J2clPathTest implements ComparableTesting2<J2clPath>, HashCod
     }
 
     private void isFileAndCheck(final J2clPath path, final boolean expected) {
-        this.checkEquals(expected, path.isFile(), () -> path.toString());
+        this.checkEquals(
+                expected,
+                path.isFile(),
+                path::toString
+        );
     }
 
     @Test
@@ -192,7 +197,10 @@ public final class J2clPathTest implements ComparableTesting2<J2clPath>, HashCod
     }
 
     private void isJavaAndCheck(final J2clPath path, final boolean expected) {
-        this.checkEquals(expected, path.isJava(), () -> path.toString());
+        this.checkEquals(
+                expected,
+                path.isJava(),
+                () -> "isJava " + path);
     }
 
     @Test
