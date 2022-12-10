@@ -485,7 +485,7 @@ public abstract class J2clMavenContext implements Context {
     private void await() throws Throwable {
         while (false == this.executorService.isTerminated()) {
             try {
-                final Future<?> task = this.completionService.poll(1, TimeUnit.SECONDS);
+                final Future<?> task = this.completionService.poll(50, TimeUnit.MILLISECONDS);
                 if (null != task) {
                     task.get();
                     if (0 == this.running.decrementAndGet()) {
