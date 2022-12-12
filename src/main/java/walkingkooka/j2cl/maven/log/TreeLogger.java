@@ -350,6 +350,13 @@ final public class TreeLogger {
         this.info.print(line);
     }
 
+    public void debugLine(final CharSequence line) {
+        line0(
+                line,
+                this.debug
+        );
+    }
+
     public void indentedLine(final CharSequence line) {
         this.indent();
         {
@@ -432,6 +439,10 @@ final public class TreeLogger {
                 },
                 this.isDebugEnabled
         );
+    }
+
+    public boolean isDebugEnabled() {
+        return this.isDebugEnabled;
     }
 
     private final boolean isDebugEnabled;
