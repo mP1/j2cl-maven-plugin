@@ -261,7 +261,7 @@ public abstract class J2clMavenContext implements Context {
     }
 
     private void prepareJobs(final J2clDependency artifact) {
-        if (false == shouldSkipDependency(artifact) && false == this.jobs.containsKey(artifact)) {
+        if (false == this.jobs.containsKey(artifact)) {
 
             // keep transitive dependencies alphabetical sorted for better readability when trySubmitJob pretty prints queue processing.
             final Set<J2clDependency> required = Sets.sorted();
