@@ -633,6 +633,19 @@ public final class J2clDependency implements Comparable<J2clDependency> {
         });
     }
 
+    /**
+     * Tests if the dependency should not have a job submitted.
+     */
+    boolean shouldSkipJobSubmit() {
+        return this.isAnnotationProcessor() ||
+                this.isAnnotationClassFiles() ||
+                this.isJreBootstrapClassFiles() ||
+                this.isJreClassFiles() ||
+                this.isJreJavascriptBootstrapFiles() ||
+                this.isJreJavascriptFiles() ||
+                this.isIgnored();
+    }
+
     // print............................................................................................................
 
     /**

@@ -183,6 +183,13 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
             J2clStep.JUNIT_TESTS
     );
 
+    // J2clMavenContext.................................................................................................
+
+    @Override
+    boolean shouldSkipSubmittingDependencyJobs() {
+        return false;
+    }
+
     // test only props..................................................................................................
 
     public List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers() {

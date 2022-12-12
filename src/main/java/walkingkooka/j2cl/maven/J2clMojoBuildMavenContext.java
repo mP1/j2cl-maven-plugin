@@ -168,4 +168,11 @@ final class J2clMojoBuildMavenContext extends J2clMavenContext {
             J2clStep.CLOSURE_COMPILE,
             J2clStep.OUTPUT_ASSEMBLE
     );
+
+    // J2clMavenContext.................................................................................................
+
+    @Override
+    boolean shouldSkipSubmittingDependencyJobs() {
+        return false;
+    }
 }

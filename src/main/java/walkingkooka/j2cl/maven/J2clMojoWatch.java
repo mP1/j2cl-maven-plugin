@@ -58,6 +58,14 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
     }
 
     /**
+     * During the file watch phase, where the {@link #buildOutputDirectory} is watched and the project rebuilt,
+     * dependencies are assumed not to have changed and only the project and its files will be processed.
+     */
+    @Parameter(alias = "file-watch-skip-dependencies",
+            required = true)
+    private boolean fileWatchSkipDependencies;
+
+    /**
      * Watches the output directory where the IDE places class files.
      */
     @Override
@@ -122,6 +130,13 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
     private void waitAndBuild(final Path buildOutputDirectory, final J2clDependency project,
                               final TreeLogger logger,
                               final J2clMojoWatchMavenContext context) {
+        final boolean fileWatchSkipDependencies = this.fileWatchSkipDependencies;
+        context.shouldSkipSubmittingJobs = fileWatchSkipDependencies;
+
+        if (fileWatchSkipDependencies) {
+            logger.line("All Dependencies will NOT be processed again following a file event.");
+        }
+
         for (; ; ) {
             try (final WatchService watchService = watchService(buildOutputDirectory)) {
                 new WatchablePath(buildOutputDirectory).register(

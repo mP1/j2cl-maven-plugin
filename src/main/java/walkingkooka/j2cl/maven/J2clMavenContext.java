@@ -268,49 +268,23 @@ public abstract class J2clMavenContext implements Context {
 
             this.jobs.put(artifact, required);
 
-            for (final J2clDependency dependency : artifact.dependencies()) {
-                if (shouldSkipDependency(dependency)) {
-                    continue;
-                }
+            if (!this.shouldSkipSubmittingDependencyJobs()) {
+                for (final J2clDependency dependency : artifact.dependencies()) {
+                    if (dependency.shouldSkipJobSubmit()) {
+                        continue;
+                    }
 
-                required.add(dependency);
-                this.prepareJobs(dependency);
+                    required.add(dependency);
+                    this.prepareJobs(dependency);
+                }
             }
         }
     }
 
     /**
-     * Tests if the dependency should not have a job submitted.
+     * Only watch during the file event watch phase will return true.
      */
-    private boolean shouldSkipDependency(final J2clDependency dependency) {
-        final boolean skip;
-
-        do {
-            if (dependency.isAnnotationProcessor() || dependency.isAnnotationClassFiles()) {
-                skip = true;
-                break;
-            }
-
-            if (dependency.isJreBootstrapClassFiles() || dependency.isJreClassFiles()) {
-                skip = true;
-                break;
-            }
-
-            if (dependency.isJreJavascriptBootstrapFiles() || dependency.isJreJavascriptFiles()) {
-                skip = true;
-                break;
-            }
-
-            if (dependency.isIgnored()) {
-                skip = true;
-                break;
-            }
-
-            skip = false;
-        } while (false);
-
-        return skip;
-    }
+    abstract boolean shouldSkipSubmittingDependencyJobs();
 
     /**
      * Loops over all {@link #jobs} submitting a job for each that has no required artifacts aka the value is an empty {@link Set}.
