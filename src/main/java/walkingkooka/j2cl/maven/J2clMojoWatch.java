@@ -135,6 +135,8 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
 
         if (fileWatchSkipDependencies) {
             logger.line("All Dependencies will NOT be processed again following a file event.");
+            logger.lineStart();
+            logger.flush();
         }
 
         for (; ; ) {
