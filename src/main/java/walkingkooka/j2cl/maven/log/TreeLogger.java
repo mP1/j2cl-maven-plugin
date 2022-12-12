@@ -342,6 +342,8 @@ final public class TreeLogger {
             }
         }
         this.outdent();
+
+        this.flush();
     }
 
     public void log(final CharSequence line) {
