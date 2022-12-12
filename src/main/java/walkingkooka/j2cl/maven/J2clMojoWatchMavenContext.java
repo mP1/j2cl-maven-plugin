@@ -174,4 +174,14 @@ final class J2clMojoWatchMavenContext extends J2clMavenContext {
             J2clStep.CLOSURE_COMPILE,
             J2clStep.OUTPUT_ASSEMBLE
     );
+
+    // J2clMavenContext.................................................................................................
+
+    @Override
+    boolean shouldSkipSubmittingDependencyJobs() {
+        return this.shouldSkipSubmittingJobs;
+    }
+
+    // initially false but will take the watch-task.fileWatchSkipDependencies
+    boolean shouldSkipSubmittingJobs = false;
 }
