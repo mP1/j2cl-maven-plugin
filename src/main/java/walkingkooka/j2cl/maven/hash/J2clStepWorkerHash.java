@@ -172,12 +172,16 @@ public final class J2clStepWorkerHash<C extends J2clMavenContext> implements J2c
                                         final HashBuilder hash,
                                         final Set<String> hashItemNames,
                                         final TreeLogger logger) throws IOException {
-        logger.line(Lists.newArrayList(roots).size() + " Source root(s)");
+        logger.line(Lists.newArrayList(roots).size() + " Source root(s)@@@@");
         logger.indent();
 
         for (final Path root : roots) {
             hashItemNames.add("compile-source-root: " + root.getFileName());
-            this.hashDirectoryTree(root, hash, logger);
+            this.hashDirectoryTree(
+                    root,
+                    hash,
+                    logger
+            );
         }
 
         logger.endOfList();
@@ -190,37 +194,44 @@ public final class J2clStepWorkerHash<C extends J2clMavenContext> implements J2c
         logger.line(root.toString());
         logger.indent();
 
-        Files.walkFileTree(root, new FileVisitor<>() {
-            @Override
-            public FileVisitResult preVisitDirectory(final Path path,
-                                                     final BasicFileAttributes basicFileAttributes) {
-                logger.line(path.getFileName() + " (dir)");
-                logger.indent();
-                return FileVisitResult.CONTINUE;
-            }
+        Files.walkFileTree(
+                root,
+                new FileVisitor<>() {
+                    @Override
+                    public FileVisitResult preVisitDirectory(final Path path,
+                                                             final BasicFileAttributes basicFileAttributes) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debugLine(path.getFileName() + " (dir)");
+                            logger.indent();
+                        }
+                        return FileVisitResult.CONTINUE;
+                    }
 
-            @Override
-            public FileVisitResult visitFile(final Path path,
-                                             final BasicFileAttributes basicFileAttributes) throws IOException {
-                hash.append(path);
-                return FileVisitResult.CONTINUE;
-            }
+                    @Override
+                    public FileVisitResult visitFile(final Path path,
+                                                     final BasicFileAttributes basicFileAttributes) throws IOException {
+                        hash.append(path);
+                        return FileVisitResult.CONTINUE;
+                    }
 
-            @Override
-            public FileVisitResult visitFileFailed(final Path path,
-                                                   final IOException cause) {
-                return FileVisitResult.CONTINUE;
-            }
+                    @Override
+                    public FileVisitResult visitFileFailed(final Path path,
+                                                           final IOException cause) {
+                        return FileVisitResult.CONTINUE;
+                    }
 
-            @Override
-            public FileVisitResult postVisitDirectory(final Path path,
-                                                      final IOException cause) {
-                logger.outdent();
-                return FileVisitResult.CONTINUE;
-            }
-        });
+                    @Override
+                    public FileVisitResult postVisitDirectory(final Path path,
+                                                              final IOException cause) {
+                        if (logger.isDebugEnabled()) {
+                            logger.outdent();
+                        }
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
 
         logger.outdent();
+        logger.flush();
     }
 
     @Override
