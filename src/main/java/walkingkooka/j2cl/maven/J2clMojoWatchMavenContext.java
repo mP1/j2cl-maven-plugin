@@ -179,9 +179,8 @@ final class J2clMojoWatchMavenContext extends J2clMavenContext {
 
     @Override
     boolean shouldSkipSubmittingDependencyJobs() {
-        return this.shouldSkipSubmittingJobs;
+        return this.fileEventPhase;
     }
 
-    // initially false but will take the watch-task.fileWatchSkipDependencies
-    boolean shouldSkipSubmittingJobs = false;
+    boolean fileEventPhase = false;
 }
