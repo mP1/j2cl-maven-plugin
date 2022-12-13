@@ -42,6 +42,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
@@ -115,23 +116,25 @@ public final class J2clStepWorkerHash<C extends J2clMavenContext> implements J2c
         final Set<J2clDependency> dependencies = artifact.dependencies(); // dependencies();
         logger.line(dependencies.size() + " Dependencies");
         logger.indent();
+        {
+            int i = 0;
 
-        int i = 0;
-        for (final J2clDependency dependency : dependencies) {
-            logger.line(dependency.toString());
-            logger.indent();
-            {
-                // leading zeroes added to keep keys in numeric order, so dependencies-0 is followed by dependencies-1 not dependencies-10
-                final J2clPath dependencyFile = dependency.artifactFileOrFail();
-                hashItemNames.add(DEPENDENCIES + CharSequences.padLeft("" + i, 10, '0') + ": " + dependency.coords());
-                hash.append(dependencyFile.path());
+            for (final J2clDependency dependency : new TreeSet<>(dependencies)) {
+                logger.line(dependency.toString());
+                logger.indent();
+                {
+                    // leading zeroes added to keep keys in numeric order, so dependencies-0 is followed by dependencies-1 not dependencies-10
+                    final J2clPath dependencyFile = dependency.artifactFileOrFail();
+                    hashItemNames.add(DEPENDENCIES + CharSequences.padLeft("" + i, 10, '0') + ": " + dependency.coords());
+                    hash.append(dependencyFile.path());
 
-                i++;
+                    i++;
+                }
+                logger.outdent();
             }
-            logger.outdent();
-        }
 
-        logger.endOfList();
+            logger.endOfList();
+        }
         logger.outdent();
         logger.emptyLine();
     }
