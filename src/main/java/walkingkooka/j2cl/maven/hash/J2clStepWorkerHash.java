@@ -172,7 +172,7 @@ public final class J2clStepWorkerHash<C extends J2clMavenContext> implements J2c
                                         final HashBuilder hash,
                                         final Set<String> hashItemNames,
                                         final TreeLogger logger) throws IOException {
-        logger.line(Lists.newArrayList(roots).size() + " Source root(s)@@@@");
+        logger.line(Lists.newArrayList(roots).size() + " Source root(s)");
         logger.indent();
 
         for (final Path root : roots) {
