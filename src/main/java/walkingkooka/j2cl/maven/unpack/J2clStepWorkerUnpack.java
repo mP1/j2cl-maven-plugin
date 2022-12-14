@@ -142,7 +142,7 @@ public final class J2clStepWorkerUnpack<C extends J2clMavenContext> implements J
                                     logger
                             );
 
-                            filesFound = extractedFiles.size() > 0;
+                            filesFound |= extractedFiles.size() > 0;
                         }
                         logger.outdent();
 
@@ -161,7 +161,7 @@ public final class J2clStepWorkerUnpack<C extends J2clMavenContext> implements J
                                 TreeFormat.TREE
                         );
 
-                        filesFound = sourceFiles.size() > 0;
+                        filesFound |= sourceFiles.size() > 0;
                     }
                 }
             }
