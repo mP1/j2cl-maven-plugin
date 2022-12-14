@@ -227,16 +227,11 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
         }
         logger.outdent();
 
-        final Duration timeTaken = Duration.between(
-                start,
-                Instant.now()
+        logger.timeTaken(
+                Duration.between(
+                        start,
+                        Instant.now()
+                )
         );
-
-        logger.line("Time taken");
-        logger.indentedLine(
-                TreeLogger.prettyTimeTaken(timeTaken)
-        );
-        logger.emptyLine();
-        logger.flush();
     }
 }

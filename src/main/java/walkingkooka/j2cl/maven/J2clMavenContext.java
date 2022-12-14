@@ -28,7 +28,6 @@ import walkingkooka.j2cl.maven.hash.HashBuilder;
 import walkingkooka.j2cl.maven.log.MavenLogger;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
@@ -417,19 +416,12 @@ public abstract class J2clMavenContext implements Context {
             logger.outdent();
 
             logger.line(coords + " completed.");
-            logger.indent();
-            {
-                logger.line("Time Taken");
-                logger.indentedLine(
-                        TreeLogger.prettyTimeTaken(
-                                Duration.between(
-                                        start,
-                                        Instant.now()
-                                )
-                        )
-                );
-            }
-            logger.outdent();
+            logger.timeTaken(
+                    Duration.between(
+                            start,
+                            Instant.now()
+                    )
+            );
 
             this.taskCompleted(
                     task,
