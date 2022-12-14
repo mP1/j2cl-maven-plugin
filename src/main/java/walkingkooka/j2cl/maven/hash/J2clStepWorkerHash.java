@@ -80,7 +80,7 @@ public final class J2clStepWorkerHash<C extends J2clMavenContext> implements J2c
         final J2clPath directory = artifact.setDirectory(
                 hash.build()
         ).directory();
-        if (directory.exists().isPresent()) {
+        if (context.shouldCheckCache() && directory.exists().isPresent()) {
             result = J2clStepResult.ABORTED; // computed hash must not have changed dir already exists so skip remaining tasks.
         } else {
             // create the dir that will have hash step so the file can be written...

@@ -247,7 +247,8 @@ public enum J2clStep {
                         logger
                 );
 
-                result.path(directory).createIfNecessary();
+                result.path(directory)
+                        .createIfNecessary();
 
                 result.reportIfFailure(artifact, this);
             }
@@ -283,7 +284,6 @@ public enum J2clStep {
 
                 Files.write(base, lines);
             }
-            context.cancel(cause);
 
             throw cause;
         }

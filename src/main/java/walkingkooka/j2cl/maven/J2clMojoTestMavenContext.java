@@ -26,6 +26,7 @@ import walkingkooka.j2cl.maven.log.BrowserLogLevel;
 import walkingkooka.j2cl.maven.log.MavenLogger;
 import walkingkooka.j2cl.maven.test.J2clStepWorkerWebDriverUnitTestRunnerBrowser;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -182,6 +183,11 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
             J2clStep.CLOSURE_COMPILE,
             J2clStep.JUNIT_TESTS
     );
+
+    @Override
+    public boolean shouldCheckCache() {
+        return true;
+    }
 
     // J2clMavenContext.................................................................................................
 

@@ -24,6 +24,7 @@ import walkingkooka.j2cl.maven.closure.ClosureFormattingOption;
 import walkingkooka.j2cl.maven.hash.HashBuilder;
 import walkingkooka.j2cl.maven.log.MavenLogger;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -174,6 +175,11 @@ final class J2clMojoWatchMavenContext extends J2clMavenContext {
             J2clStep.CLOSURE_COMPILE,
             J2clStep.OUTPUT_ASSEMBLE
     );
+
+    @Override
+    public boolean shouldCheckCache() {
+        return false == this.fileEventPhase;
+    }
 
     // J2clMavenContext.................................................................................................
 
