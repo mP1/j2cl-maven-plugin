@@ -169,21 +169,12 @@ public final class J2clDependency implements Comparable<J2clDependency> {
             final Instant start = Instant.now();
             result = run.get();
 
-            logger.indent();
-            {
-                logger.line("Time Taken");
-                logger.indentedLine(
-                        TreeLogger.prettyTimeTaken(
-                                Duration.between(
-                                        start,
-                                        Instant.now()
-                                )
-                        )
-                );
-
-            }
-            logger.outdent();
-            logger.flush();
+            logger.timeTaken(
+                    Duration.between(
+                            start,
+                            Instant.now()
+                    )
+            );
         } finally {
             thread.setName(threadNameBackup);
         }

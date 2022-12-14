@@ -69,11 +69,21 @@ final public class TreeLogger {
         );
     }
 
-    public static String prettyTimeTaken(final Duration timeTaken) {
-        return timeTaken.getSeconds() +
-                "." +
-                timeTaken.getNano() +
-                " seconds";
+    public void timeTaken(final Duration timeTaken) {
+        this.indent();
+        {
+            this.line("Time Taken");
+            this.indentedLine(
+                    timeTaken.getSeconds() +
+                            "." +
+                            timeTaken.getNano() +
+                            " seconds"
+            );
+
+        }
+        this.outdent();
+
+        this.flush();
     }
 
     private TreeLogger(final Consumer<CharSequence> debug,

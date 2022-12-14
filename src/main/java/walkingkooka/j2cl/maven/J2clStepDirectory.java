@@ -101,12 +101,7 @@ public final class J2clStepDirectory {
         logger.line(logFile.toString());
         logger.outdent();
 
-        logger.line("Time taken");
-        logger.indentedLine(
-                TreeLogger.prettyTimeTaken(timeTaken)
-        );
-        logger.emptyLine();
-        logger.flush();
+        logger.timeTaken(timeTaken);
 
         Files.write(logFile.path(), lines);
         return this;
