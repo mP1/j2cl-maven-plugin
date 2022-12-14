@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven.hash;
 
 import org.apache.commons.codec.binary.Hex;
+import walkingkooka.build.Builder;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -29,7 +30,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Builds a SHA1 composed of several inputs, such as dependencies & maven parameters.
  */
-public final class HashBuilder {
+public final class HashBuilder implements Builder<String> {
 
     private final MessageDigest digest;
     private String hash;
@@ -72,10 +73,19 @@ public final class HashBuilder {
      * The builder that returns the SHA as hex digits.
      */
     @Override
-    public String toString() {
+    public String build() {
         if (null == this.hash) {
-            this.hash = Hex.encodeHexString(digest.digest());
+            this.hash = this.computeHash();
         }
         return this.hash;
+    }
+
+    @Override
+    public String toString() {
+        return this.computeHash();
+    }
+
+    private String computeHash() {
+        return Hex.encodeHexString(this.digest.digest());
     }
 }
