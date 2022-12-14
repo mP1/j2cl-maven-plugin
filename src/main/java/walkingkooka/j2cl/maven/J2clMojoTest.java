@@ -91,10 +91,11 @@ public final class J2clMojoTest extends J2clMojoBuildTestWatch {
 
                     try {
                         context.setProject(project);
-                        context.execute(
+                        context.prepareAndStart(
                                 project,
                                 logger
                         );
+                        context.waitUntilCompletion();
                     } catch (final Throwable cause) {
                         throw new MojoExecutionException("Failed to build project, check logs above", cause);
                     }

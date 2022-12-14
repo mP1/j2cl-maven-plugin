@@ -28,6 +28,7 @@ import walkingkooka.j2cl.maven.hash.HashBuilder;
 import walkingkooka.j2cl.maven.log.MavenLogger;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
@@ -37,6 +38,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -225,6 +227,14 @@ public abstract class J2clMavenContext implements Context {
 
     abstract List<J2clStep> steps();
 
+    /**
+     * When true directories like !SUCCESS should be checked and honoured.
+     * This will be false when running the file event watching phase of the watch task. It is necessary to skip
+     * this check because it is possible for a build to be interrupted and then need to be restarted as in the case
+     * of multiple file events such as the deletion of a class file and recreation by the IDE.
+     */
+    abstract public boolean shouldCheckCache();
+
     // tasks............................................................................................................
 
     /**
@@ -236,20 +246,15 @@ public abstract class J2clMavenContext implements Context {
     /**
      * Executes the given project.
      */
-    final void execute(final J2clDependency project,
-                       final TreeLogger logger) throws Throwable {
+    final void prepareAndStart(final J2clDependency project,
+                               final TreeLogger logger) throws Throwable {
         this.jobs.clear();
 
         this.prepareJobs(project);
 
-        final ExecutorService executorService = this.executor();
-        this.executorService = executorService;
-        this.completionService = new ExecutorCompletionService<>(executorService);
-
         if (0 == this.trySubmitJobs(logger)) {
             throw new J2clException("Unable to find a leaf dependencies(dependency without dependencies), job failed.");
         }
-        this.await();
     }
 
     private ExecutorService executor() {
@@ -348,8 +353,10 @@ public abstract class J2clMavenContext implements Context {
 
             submits.forEach(
                     (d) -> this.submitTask(
-                            d,
-                            logger
+                            () -> this.callable(
+                                    d,
+                                    logger
+                            )
                     )
             );
         });
@@ -357,19 +364,29 @@ public abstract class J2clMavenContext implements Context {
         return submits.size();
     }
 
-    private void submitTask(final J2clDependency task,
-                            final TreeLogger logger) {
-        this.completionService.submit(
-                () -> this.callable(
-                        task,
-                        logger
-                )
-        );
-        this.running.incrementAndGet();
+    /**
+     * Lazily create {@link ExecutorService} and {@link CompletionService}, this helps support the watch task which
+     * creates a new instance of each for each file event.
+     */
+    public void submitTask(final Callable<Void> task) {
+        // lazily create ExecutorService, the watch service will clear any ExecutorService & CompletionService after each build run.
+        if (null == this.executorService.get()) {
+            final ExecutorService executorService = this.executor();
+            this.executorService.set(executorService);
+            this.completionService.set(
+                    new ExecutorCompletionService<>(executorService)
+            );
+            this.running.set(0);
+        }
+
+        this.completionService.get()
+                .submit(task);
+
+        this.running.incrementAndGet(); // increment here because watch task will submit a Callable and it shouldnt be counted by await()
     }
 
-    final Void callable(final J2clDependency task,
-                        final TreeLogger logger) throws Exception {
+    private Void callable(final J2clDependency task,
+                          final TreeLogger logger) throws Exception {
         final Thread thread = Thread.currentThread();
         final String threadName = thread.getName();
 
@@ -382,6 +399,10 @@ public abstract class J2clMavenContext implements Context {
             {
                 J2clStep step = this.firstStep();
                 do {
+                    // skip this and any more steps, watch task probably issued a shutdown because of a new file watch event.
+                    if (!this.isRunning()) {
+                        break;
+                    }
                     thread.setName(coords + "-" + step);
 
                     step = step.execute(
@@ -461,45 +482,82 @@ public abstract class J2clMavenContext implements Context {
     /**
      * Waits (aka Blocks) for all outstanding tasks to complete.
      */
-    private void await() throws Throwable {
-        while (false == this.executorService.isTerminated()) {
-            try {
-                final Future<?> task = this.completionService.poll(50, TimeUnit.MILLISECONDS);
-                if (null != task) {
-                    task.get();
-                    if (0 == this.running.decrementAndGet()) {
-                        this.executorService.shutdown();
+    public void waitUntilCompletion() throws Throwable {
+        final ExecutorService executorService = this.executorService.get();
+        final CompletionService<?> completionService = this.completionService.get();
+
+        if (null != executorService && null != completionService) {
+            while (false == executorService.isTerminated()) {
+                try {
+                    final Future<?> task = completionService.poll(
+                            AWAIT_POLL_TIMEOUT,
+                            TimeUnit.MILLISECONDS
+                    );
+                    if (null != task) {
+                        task.get();
+                        if (0 == this.running.decrementAndGet()) {
+                            this.executorService.set(null);
+                            this.completionService.set(null);
+
+                            executorService.shutdown();
+                        }
                     }
+                } catch (final Exception cause) {
+                    cause.printStackTrace();
+                    this.cancel(cause);
+                    throw cause;
                 }
-            } catch (final Exception cause) {
-                cause.printStackTrace();
-                this.cancel(cause);
+            }
+
+            final Throwable cause = this.cause.get();
+            if (null != cause) {
                 throw cause;
             }
         }
-
-        this.executorService = null;
-        this.completionService = null;
-
-        final Throwable cause = this.cause.get();
-        if (null != cause) {
-            throw cause;
-        }
     }
+
+    private final static int AWAIT_POLL_TIMEOUT = 50;
 
     /**
      * Used to cancel any outstanding tasks typically done because one step has failed and any future work is pointless
      * and should be immediately aborted.
      */
     final void cancel(final Throwable cause) {
-        this.cause.compareAndSet(null, cause);
+        final ExecutorService executorService = this.executorService.get();
 
-        final MavenLogger logger = this.mavenLogger();
-        logger.warn("Killing all running tasks");
+        if (this.isRunning()) {
+            this.cause.compareAndSet(null, cause);
 
-        // TODO might be able to give Callable#toString and hope that is used by Runnable returned.
-        this.executorService.shutdownNow()
-                .forEach(task -> logger.warn("" + MavenLogger.INDENTATION + task));
+            final MavenLogger logger = this.mavenLogger();
+            logger.warn("Killing all running tasks");
+
+            executorService.shutdown();
+
+            while (!executorService.isTerminated()) {
+                try {
+                    executorService.awaitTermination(
+                            AWAIT_POLL_TIMEOUT,
+                            TimeUnit.MILLISECONDS
+                    );
+                } catch (final InterruptedException interrupted) {
+                    interrupted.printStackTrace();
+                }
+            }
+
+            logger.warn("Cancelled tasks completed");
+        }
+
+        this.executorService.set(null);
+        this.completionService.set(null);
+        this.running.set(0);
+    }
+
+    /**
+     * Returns true if the {@link ExecutorService} is still alive and executing new or pending jobs.
+     */
+    private boolean isRunning() {
+        final ExecutorService executorService = this.executorService.get();
+        return null != executorService && !executorService.isShutdown();
     }
 
     /**
@@ -511,12 +569,12 @@ public abstract class J2clMavenContext implements Context {
      * The build and test goals only create a single {@link ExecutorService}, while the watch goal will create
      * a new {@link ExecutorService} each time it runs.
      */
-    private ExecutorService executorService;
+    private final AtomicReference<ExecutorService> executorService = new AtomicReference<>();
 
     /**
      * An instance is created when a new {@link ExecutorService} is created.
      */
-    private CompletionService<Void> completionService;
+    private final AtomicReference<CompletionService<Void>> completionService = new AtomicReference<>();
 
     private final AtomicReference<Throwable> cause = new AtomicReference<>();
 

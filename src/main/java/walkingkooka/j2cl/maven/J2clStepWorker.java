@@ -41,47 +41,80 @@ public interface J2clStepWorker<C extends J2clMavenContext> {
             logger.line(directory.toString());
             logger.indent();
             {
-                if (directory.successful().exists().isPresent()) {
-                    logger.indentedLine("Cache success result present and will be kept");
-
-                    result = J2clStepResult.SUCCESS;
+                if (context.shouldCheckCache()) {
+                    result = executeIfNecessary0(
+                            artifact,
+                            directory,
+                            context,
+                            logger
+                    );
                 } else {
-                    if (directory.aborted().exists().isPresent()) {
-                        logger.indentedLine("Cache abort result present and will be kept");
+                    final J2clPath path = directory.path();
+                    if (path.exists().isPresent()) {
+                        path.removeAll();
 
-                        result = J2clStepResult.ABORTED;
-                    } else {
-                        if (directory.skipped().exists().isPresent()) {
-                            logger.indentedLine("Cache skip result present and will be kept");
-
-                            result = J2clStepResult.SKIPPED;
-                        } else {
-                            final J2clPath path = directory.path();
-                            if (path.exists().isPresent()) {
-                                path.removeAll();
-
-                                logger.indentedLine("Removed all files");
-                            }
-                            path.createIfNecessary();
-
-                            // aborted steps for the project are transformed into skipped.
-                            final J2clStepResult result1 = this.executeWithDirectory(
-                                    artifact,
-                                    directory,
-                                    context,
-                                    logger
-                            );
-                            result = J2clStepResult.ABORTED == result1 && false == artifact.isDependency() ?
-                                    J2clStepResult.SKIPPED :
-                                    result1;
-                        }
+                        logger.indentedLine("Removed all files");
                     }
+                    path.createIfNecessary();
+
+                    // aborted steps for the project are transformed into skipped.
+                    final J2clStepResult nextResult = this.executeWithDirectory(
+                            artifact,
+                            directory,
+                            context,
+                            logger
+                    );
+                    result = nextResult;
                 }
             }
             logger.outdent();
         }
         logger.outdent();
 
+        return result;
+    }
+
+    private J2clStepResult executeIfNecessary0(final J2clDependency artifact,
+                                               final J2clStepDirectory directory,
+                                               final C context,
+                                               final TreeLogger logger) throws Exception {
+        final J2clStepResult result;
+        if (directory.successful().exists().isPresent()) {
+            logger.indentedLine("Cache success result present and will be kept");
+
+            result = J2clStepResult.SUCCESS;
+        } else {
+            if (directory.aborted().exists().isPresent()) {
+                logger.indentedLine("Cache abort result present and will be kept");
+
+                result = J2clStepResult.ABORTED;
+            } else {
+                if (directory.skipped().exists().isPresent()) {
+                    logger.indentedLine("Cache skip result present and will be kept");
+
+                    result = J2clStepResult.SKIPPED;
+                } else {
+                    final J2clPath path = directory.path();
+                    if (path.exists().isPresent()) {
+                        path.removeAll();
+
+                        logger.indentedLine("Removed all files");
+                    }
+                    path.createIfNecessary();
+
+                    // aborted steps for the project are transformed into skipped.
+                    final J2clStepResult nextResult = this.executeWithDirectory(
+                            artifact,
+                            directory,
+                            context,
+                            logger
+                    );
+                    result = J2clStepResult.ABORTED == nextResult && false == artifact.isDependency() ?
+                            J2clStepResult.SKIPPED :
+                            nextResult;
+                }
+            }
+        }
         return result;
     }
 

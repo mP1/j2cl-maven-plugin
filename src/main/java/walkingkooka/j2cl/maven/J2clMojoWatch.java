@@ -36,6 +36,7 @@ import java.nio.file.WatchService;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The watch task watches the output directory for class file changes. For each change it then analyzes the class file
@@ -77,10 +78,11 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
                     logger,
                     context
             );
-            context.execute(
+            context.prepareAndStart(
                     project,
                     logger
             );
+            context.waitUntilCompletion();
 
             this.waitAndBuild(
                     buildOutputDirectory,
@@ -169,18 +171,36 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
     private void watchServiceTakeAndPullLoop(final WatchService watchService,
                                              final J2clDependency project,
                                              final TreeLogger logger,
-                                             final J2clMojoWatchMavenContext context) throws InterruptedException, MojoExecutionException {
+                                             final J2clMojoWatchMavenContext context) throws InterruptedException {
+        final AtomicInteger fileEventCounter = new AtomicInteger();
+
         for (; ; ) {
             final WatchKey key = watchService.take();
             if (null != key) {
                 final List<WatchEvent<?>> events = key.pollEvents();
                 if (!events.isEmpty()) {
+                    final int fileEventCounterSnapshot = fileEventCounter.incrementAndGet();
+
                     logger.fileWatchEvents(events);
 
-                    this.build(
-                            project,
-                            logger,
-                            context
+                    context.cancel(null);
+
+                    context.submitTask(
+                            () -> {
+                                // wait a bit until the last file event arrives.
+                                this.sleep();
+
+                                // if $fileEventCounter hasnt changed, probably the last of multiple file events.
+                                if (fileEventCounter.get() == fileEventCounterSnapshot) {
+                                    this.build(
+                                            project,
+                                            logger,
+                                            context
+                                    );
+                                }
+
+                                return (Void) null;
+                            }
                     );
                 }
                 key.reset();
@@ -197,7 +217,7 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
         logger.indent();
         {
             try {
-                context.execute(
+                context.prepareAndStart(
                         project,
                         logger
                 );

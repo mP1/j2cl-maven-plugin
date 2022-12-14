@@ -44,10 +44,11 @@ public final class J2clMojoBuild extends J2clMojoBuildWatch {
                     logger,
                     context
             );
-            context.execute(
+            context.prepareAndStart(
                     project,
                     logger
             );
+            context.waitUntilCompletion();
         } catch (final Throwable e) {
             throw new MojoExecutionException("Failed to build project, check logs above", e);
         }
