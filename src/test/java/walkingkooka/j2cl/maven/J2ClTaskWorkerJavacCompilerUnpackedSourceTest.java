@@ -18,18 +18,18 @@
 package walkingkooka.j2cl.maven;
 
 import org.junit.Test;
-import walkingkooka.j2cl.maven.javac.J2clStepWorkerJavacCompilerUnpackedSource;
+import walkingkooka.j2cl.maven.javac.J2clTaskJavacCompilerUnpackedSource;
 import walkingkooka.test.Testing;
 
-public final class J2clStepWorkerJavacCompilerUnpackedSourceTest implements Testing {
+public final class J2ClTaskWorkerJavacCompilerUnpackedSourceTest implements Testing {
 
     // // 'javatests.org.gwtproject.timer.client.TimerJ2clTest_AdapterSuite' -> org.gwtproject.timer.client.TimerJ2clTest
     @Test
     public void testExtractTestClassName() {
         final String testClassName = "javatests.org.gwtproject.timer.client.TimerJ2clTest_AdapterSuite";
         this.checkEquals("org.gwtproject.timer.client.TimerJ2clTest",
-                J2clStepWorkerJavacCompilerUnpackedSource.extractTestClassName(testClassName),
-                () -> "J2clStepWorkerJavacCompilerUnpackedSource.extractTestClassName " + testClassName
+                J2clTaskJavacCompilerUnpackedSource.extractTestClassName(testClassName),
+                () -> "J2clTaskJavacCompilerUnpackedSource.extractTestClassName " + testClassName
         );
     }
 }

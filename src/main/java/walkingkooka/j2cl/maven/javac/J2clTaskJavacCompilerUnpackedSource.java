@@ -22,9 +22,9 @@ import walkingkooka.j2cl.maven.J2clDependency;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clSourcesKind;
-import walkingkooka.j2cl.maven.J2clStep;
-import walkingkooka.j2cl.maven.J2clStepDirectory;
-import walkingkooka.j2cl.maven.J2clStepWorker;
+import walkingkooka.j2cl.maven.J2clTask;
+import walkingkooka.j2cl.maven.J2clTaskDirectory;
+import walkingkooka.j2cl.maven.J2clTaskKind;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.CharSequences;
 
@@ -32,32 +32,32 @@ import java.nio.file.Files;
 import java.util.List;
 
 /**
- * Compiles the java source to the target {@link J2clStepDirectory#output()}, with annotation processors enabled.
+ * Compiles the java source to the target {@link J2clTaskDirectory#output()}, with annotation processors enabled.
  */
-public final class J2clStepWorkerJavacCompilerUnpackedSource<C extends J2clMavenContext> extends J2clStepWorkerJavacCompiler<C> {
+public final class J2clTaskJavacCompilerUnpackedSource<C extends J2clMavenContext> extends J2clTaskJavacCompiler<C> {
 
     /**
      * Singleton
      */
-    public static <C extends J2clMavenContext> J2clStepWorker<C> instance() {
-        return new J2clStepWorkerJavacCompilerUnpackedSource<>();
+    public static <C extends J2clMavenContext> J2clTask<C> instance() {
+        return new J2clTaskJavacCompilerUnpackedSource<>();
     }
 
     /**
      * Use singleton
      */
-    private J2clStepWorkerJavacCompilerUnpackedSource() {
+    private J2clTaskJavacCompilerUnpackedSource() {
         super();
     }
 
     @Override
-    J2clStep sourcesStep() {
-        return J2clStep.UNPACK;
+    J2clTaskKind sourceTask() {
+        return J2clTaskKind.UNPACK;
     }
 
     @Override
-    List<J2clStep> compiledStep() {
-        return Lists.of(J2clStep.JAVAC_COMPILE);
+    List<J2clTaskKind> compileTask() {
+        return Lists.of(J2clTaskKind.JAVAC_COMPILE);
     }
 
     @Override
@@ -78,7 +78,7 @@ public final class J2clStepWorkerJavacCompilerUnpackedSource<C extends J2clMaven
      */
     @Override
     void postCompile(final J2clDependency artifact,
-                     final J2clStepDirectory directory,
+                     final J2clTaskDirectory directory,
                      final C context,
                      final TreeLogger logger) throws Exception {
         if (false == artifact.isDependency() && J2clSourcesKind.TEST == context.sourcesKind()) {
@@ -90,7 +90,7 @@ public final class J2clStepWorkerJavacCompilerUnpackedSource<C extends J2clMaven
         }
     }
 
-    private void postCompileJunitProcessorFix(final J2clStepDirectory directory,
+    private void postCompileJunitProcessorFix(final J2clTaskDirectory directory,
                                               final C context,
                                               final TreeLogger logger) throws Exception {
         logger.indent();

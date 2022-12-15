@@ -22,10 +22,10 @@ import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.J2clDependency;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
-import walkingkooka.j2cl.maven.J2clStep;
-import walkingkooka.j2cl.maven.J2clStepDirectory;
-import walkingkooka.j2cl.maven.J2clStepResult;
-import walkingkooka.j2cl.maven.J2clStepWorker;
+import walkingkooka.j2cl.maven.J2clTask;
+import walkingkooka.j2cl.maven.J2clTaskDirectory;
+import walkingkooka.j2cl.maven.J2clTaskKind;
+import walkingkooka.j2cl.maven.J2clTaskResult;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.CharSequences;
 
@@ -48,25 +48,25 @@ import java.util.stream.Collectors;
 /**
  * Takes a {@link J2clDependency} and computes the hash for the files directly belonging to the artifact and then its dependencies.
  */
-public final class J2clStepWorkerHash<C extends J2clMavenContext> implements J2clStepWorker<C> {
+public final class J2clTaskHash<C extends J2clMavenContext> implements J2clTask<C> {
 
     /**
      * Singleton
      */
-    public static <C extends J2clMavenContext> J2clStepWorker<C> instance() {
-        return new J2clStepWorkerHash<>();
+    public static <C extends J2clMavenContext> J2clTask<C> instance() {
+        return new J2clTaskHash<>();
     }
 
     /**
      * Use singleton
      */
-    private J2clStepWorkerHash() {
+    private J2clTaskHash() {
         super();
     }
 
     @Override
-    public J2clStepResult execute(final J2clDependency artifact,
-                                  final J2clStep step,
+    public J2clTaskResult execute(final J2clDependency artifact,
+                                  final J2clTaskKind kind,
                                   final C context,
                                   final TreeLogger logger) throws Exception {
         final Set<String> hashItemNames = Sets.sorted();
@@ -75,19 +75,19 @@ public final class J2clStepWorkerHash<C extends J2clMavenContext> implements J2c
         this.hashDependencies(artifact, hash, hashItemNames, logger);
         this.hashArtifactSources(artifact, hash, hashItemNames, logger);
 
-        final J2clStepResult result;
+        final J2clTaskResult result;
 
         final J2clPath directory = artifact.setDirectory(
                 hash.build()
         ).directory();
         if (context.shouldCheckCache() && directory.exists().isPresent()) {
-            result = J2clStepResult.ABORTED; // computed hash must not have changed dir already exists so skip remaining tasks.
+            result = J2clTaskResult.ABORTED; // computed hash must not have changed dir already exists so skip remaining tasks.
         } else {
-            // create the dir that will have hash step so the file can be written...
-            directory.append(context.directoryName(J2clStep.HASH))
+            // create the dir that will have hash task so the file can be written...
+            directory.append(context.directoryName(J2clTaskKind.HASH))
                     .createIfNecessary();
 
-            final J2clStepDirectory hashDirectory = artifact.step(J2clStep.HASH);
+            final J2clTaskDirectory hashDirectory = artifact.task(J2clTaskKind.HASH);
             final String txt = hashItemNames.stream()
                     .map(t -> {
                         if (t.startsWith(DEPENDENCIES)) {
@@ -103,7 +103,7 @@ public final class J2clStepWorkerHash<C extends J2clMavenContext> implements J2c
                     .writeFile(
                             txt.getBytes(Charset.defaultCharset())
                     );
-            result = J2clStepResult.SUCCESS;
+            result = J2clTaskResult.SUCCESS;
         }
 
         return result;
@@ -238,16 +238,16 @@ public final class J2clStepWorkerHash<C extends J2clMavenContext> implements J2c
     }
 
     @Override
-    public J2clStepResult executeWithDirectory(final J2clDependency artifact,
-                                               final J2clStepDirectory directory,
+    public J2clTaskResult executeWithDirectory(final J2clDependency artifact,
+                                               final J2clTaskDirectory directory,
                                                final C context,
                                                final TreeLogger logger) throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public J2clStepResult executeIfNecessary(final J2clDependency artifact,
-                                             final J2clStep step,
+    public J2clTaskResult executeIfNecessary(final J2clDependency artifact,
+                                             final J2clTaskKind kind,
                                              final C context,
                                              final TreeLogger logger) {
         throw new UnsupportedOperationException();

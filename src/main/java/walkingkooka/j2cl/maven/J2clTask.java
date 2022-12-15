@@ -20,20 +20,20 @@ package walkingkooka.j2cl.maven;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
 @SuppressWarnings("StaticInitializerReferencesSubClass")
-public interface J2clStepWorker<C extends J2clMavenContext> {
+public interface J2clTask<C extends J2clMavenContext> {
 
-    J2clStepResult execute(final J2clDependency artifact,
-                           final J2clStep step,
+    J2clTaskResult execute(final J2clDependency artifact,
+                           final J2clTaskKind kind,
                            final C context,
                            final TreeLogger logger) throws Exception;
 
-    default J2clStepResult executeIfNecessary(final J2clDependency artifact,
-                                              final J2clStep step,
+    default J2clTaskResult executeIfNecessary(final J2clDependency artifact,
+                                              final J2clTaskKind kind,
                                               final C context,
                                               final TreeLogger logger) throws Exception {
-        final J2clStepResult result;
+        final J2clTaskResult result;
 
-        final J2clStepDirectory directory = artifact.step(step);
+        final J2clTaskDirectory directory = artifact.task(kind);
 
         logger.line("Directory");
         logger.indent();
@@ -57,8 +57,8 @@ public interface J2clStepWorker<C extends J2clMavenContext> {
                     }
                     path.createIfNecessary();
 
-                    // aborted steps for the project are transformed into skipped.
-                    final J2clStepResult nextResult = this.executeWithDirectory(
+                    // aborted tasks for the project are transformed into skipped.
+                    final J2clTaskResult nextResult = this.executeWithDirectory(
                             artifact,
                             directory,
                             context,
@@ -74,25 +74,25 @@ public interface J2clStepWorker<C extends J2clMavenContext> {
         return result;
     }
 
-    private J2clStepResult executeIfNecessary0(final J2clDependency artifact,
-                                               final J2clStepDirectory directory,
+    private J2clTaskResult executeIfNecessary0(final J2clDependency artifact,
+                                               final J2clTaskDirectory directory,
                                                final C context,
                                                final TreeLogger logger) throws Exception {
-        final J2clStepResult result;
+        final J2clTaskResult result;
         if (directory.successful().exists().isPresent()) {
             logger.indentedLine("Cache success result present and will be kept");
 
-            result = J2clStepResult.SUCCESS;
+            result = J2clTaskResult.SUCCESS;
         } else {
             if (directory.aborted().exists().isPresent()) {
                 logger.indentedLine("Cache abort result present and will be kept");
 
-                result = J2clStepResult.ABORTED;
+                result = J2clTaskResult.ABORTED;
             } else {
                 if (directory.skipped().exists().isPresent()) {
                     logger.indentedLine("Cache skip result present and will be kept");
 
-                    result = J2clStepResult.SKIPPED;
+                    result = J2clTaskResult.SKIPPED;
                 } else {
                     final J2clPath path = directory.path();
                     if (path.exists().isPresent()) {
@@ -102,15 +102,15 @@ public interface J2clStepWorker<C extends J2clMavenContext> {
                     }
                     path.createIfNecessary();
 
-                    // aborted steps for the project are transformed into skipped.
-                    final J2clStepResult nextResult = this.executeWithDirectory(
+                    // aborted tasks for the project are transformed into skipped.
+                    final J2clTaskResult nextResult = this.executeWithDirectory(
                             artifact,
                             directory,
                             context,
                             logger
                     );
-                    result = J2clStepResult.ABORTED == nextResult && false == artifact.isDependency() ?
-                            J2clStepResult.SKIPPED :
+                    result = J2clTaskResult.ABORTED == nextResult && false == artifact.isDependency() ?
+                            J2clTaskResult.SKIPPED :
                             nextResult;
                 }
             }
@@ -118,8 +118,8 @@ public interface J2clStepWorker<C extends J2clMavenContext> {
         return result;
     }
 
-    J2clStepResult executeWithDirectory(final J2clDependency artifact,
-                                        final J2clStepDirectory directory,
+    J2clTaskResult executeWithDirectory(final J2clDependency artifact,
+                                        final J2clTaskDirectory directory,
                                         final C context,
                                         final TreeLogger logger) throws Exception;
 }

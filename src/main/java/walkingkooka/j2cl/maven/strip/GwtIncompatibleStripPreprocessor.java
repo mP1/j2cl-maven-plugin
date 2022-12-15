@@ -24,7 +24,7 @@ import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.J2clPath;
-import walkingkooka.j2cl.maven.J2clStepResult;
+import walkingkooka.j2cl.maven.J2clTaskResult;
 import walkingkooka.j2cl.maven.log.TreeFormat;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.CharSequences;
@@ -51,13 +51,13 @@ import java.util.function.Predicate;
  */
 final class GwtIncompatibleStripPreprocessor {
 
-    static J2clStepResult execute(final List<J2clPath> sourceRoots,
+    static J2clTaskResult execute(final List<J2clPath> sourceRoots,
                                   final J2clPath output,
                                   final TreeLogger logger) throws IOException {
         output.exists()
                 .orElseThrow(() -> new IllegalArgumentException("Output not a directory or does not exist: " + CharSequences.quote(output.toString())));
 
-        J2clStepResult result;
+        J2clTaskResult result;
 
         // FileInfo must have the source path otherwise stripper will write files to the wrong place.
         final List<FileInfo> javaFiles = prepareJavaFiles(sourceRoots, output, logger);
@@ -78,7 +78,7 @@ final class GwtIncompatibleStripPreprocessor {
             logger.indentedLine("No files found");
 
             output.removeAll(); // dont want to leave empty output directory when its empty.
-            result = J2clStepResult.ABORTED;
+            result = J2clTaskResult.ABORTED;
         }
 
         return result;
@@ -130,13 +130,13 @@ final class GwtIncompatibleStripPreprocessor {
 
     /**
      * Invokes the java preprocesor which use annotations to discover classes, methods and fields to remove from the actual source files.
-     * Because the source files are modified a previous step will have taken copied and place them in this output ready for modification if necessary.
+     * Because the source files are modified a previous task will have taken copied and place them in this output ready for modification if necessary.
      * Errors will also be logged.
      */
-    private static J2clStepResult processStripAnnotationsFiles(final List<FileInfo> javaFilesInput,
+    private static J2clTaskResult processStripAnnotationsFiles(final List<FileInfo> javaFilesInput,
                                                                final J2clPath output,
                                                                final TreeLogger logger) {
-        J2clStepResult result;
+        J2clTaskResult result;
 
         logger.line("GwtIncompatibleStripper");
         {
@@ -156,8 +156,8 @@ final class GwtIncompatibleStripPreprocessor {
                 logger.strings("Warning(s)", problems.getWarnings());
 
                 result = errors.isEmpty() ?
-                        J2clStepResult.SUCCESS :
-                        J2clStepResult.FAILED;
+                        J2clTaskResult.SUCCESS :
+                        J2clTaskResult.FAILED;
             }
             logger.outdent();
         }

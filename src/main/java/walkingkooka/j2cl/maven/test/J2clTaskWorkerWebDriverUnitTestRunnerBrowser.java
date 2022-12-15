@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 /**
  * Lists all available or supported browsers, with a single factory method for each to create a {@link WebDriver} instance.
  */
-public enum J2clStepWorkerWebDriverUnitTestRunnerBrowser {
+public enum J2clTaskWorkerWebDriverUnitTestRunnerBrowser {
     CHROME {
         @Override
         public WebDriver webDriver(final BrowserLogLevel logLevel) {
@@ -71,11 +71,11 @@ public enum J2clStepWorkerWebDriverUnitTestRunnerBrowser {
 
     public abstract WebDriver webDriver(final BrowserLogLevel logLevel);
 
-    public static J2clStepWorkerWebDriverUnitTestRunnerBrowser fromCommandLine(final String option) {
+    public static J2clTaskWorkerWebDriverUnitTestRunnerBrowser fromCommandLine(final String option) {
         return Arrays.stream(values())
                 .filter(e -> e.name().equals(option) || e.name().toLowerCase().equals(option))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unknown browser option " + CharSequences.quote(option) + " expected one of " +
-                        Arrays.stream(J2clStepWorkerWebDriverUnitTestRunnerBrowser.values()).map(Enum::name).collect(Collectors.joining(", "))));
+                        Arrays.stream(J2clTaskWorkerWebDriverUnitTestRunnerBrowser.values()).map(Enum::name).collect(Collectors.joining(", "))));
     }
 }

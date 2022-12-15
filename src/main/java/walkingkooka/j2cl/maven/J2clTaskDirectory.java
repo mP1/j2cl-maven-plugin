@@ -26,22 +26,22 @@ import java.time.Duration;
 import java.util.List;
 
 /**
- * Represents a single compile step directory. Each and every dependency will have multiple steps and each step will
+ * Represents a single compile task directory. Each and every dependency will have multiple tasks and each task will
  * have its own directory holding a log and possibly other related local files.
  */
-public final class J2clStepDirectory {
+public final class J2clTaskDirectory {
 
-    static J2clStepDirectory with(final Path path) {
-        return new J2clStepDirectory(J2clPath.with(path));
+    static J2clTaskDirectory with(final Path path) {
+        return new J2clTaskDirectory(J2clPath.with(path));
     }
 
-    private J2clStepDirectory(final J2clPath path) {
+    private J2clTaskDirectory(final J2clPath path) {
         super();
         this.path = path;
     }
 
     /**
-     * An abort is not a failure, its simply notes that a step has completed successfully and future steps need not be executed.
+     * An abort is not a failure, its simply notes that a task has completed successfully and future tasks need not be executed.
      */
     public J2clPath aborted() {
         return this.path.append("!ABORTED");
@@ -85,10 +85,10 @@ public final class J2clStepDirectory {
     }
 
     /**
-     * Writes the given lines to a log file under this task step directory.
-     * Each step is given its own directory and will also have its own local log file showing the output for a particular single step.
+     * Writes the given lines to a log file under this task directory.
+     * Each task is given its own directory and will also have its own local log file showing the output for a particular single task.
      */
-    public J2clStepDirectory writeLog(final List<CharSequence> lines,
+    public J2clTaskDirectory writeLog(final List<CharSequence> lines,
                                       final Duration timeTaken,
                                       final TreeLogger logger) throws IOException {
         logger.emptyLine();

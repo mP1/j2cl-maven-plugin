@@ -24,7 +24,7 @@ import walkingkooka.j2cl.maven.closure.ClosureFormattingOption;
 import walkingkooka.j2cl.maven.hash.HashBuilder;
 import walkingkooka.j2cl.maven.log.BrowserLogLevel;
 import walkingkooka.j2cl.maven.log.MavenLogger;
-import walkingkooka.j2cl.maven.test.J2clStepWorkerWebDriverUnitTestRunnerBrowser;
+import walkingkooka.j2cl.maven.test.J2clTaskWorkerWebDriverUnitTestRunnerBrowser;
 
 import java.util.List;
 import java.util.Map;
@@ -50,7 +50,7 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
                                          final Set<String> javaCompilerArguments,
                                          final LanguageMode languageOut,
                                          final Optional<String> sourceMaps,
-                                         final List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers,
+                                         final List<J2clTaskWorkerWebDriverUnitTestRunnerBrowser> browsers,
                                          final BrowserLogLevel browserLogLevel,
                                          final String testClassName,
                                          final int testTimeout,
@@ -94,7 +94,7 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
                                      final Set<String> javaCompilerArguments,
                                      final LanguageMode languageOut,
                                      final Optional<String> sourceMaps,
-                                     final List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers,
+                                     final List<J2clTaskWorkerWebDriverUnitTestRunnerBrowser> browsers,
                                      final BrowserLogLevel browserLogLevel,
                                      final String testClassName,
                                      final int testTimeout,
@@ -139,7 +139,7 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
     @Override
     public J2clPath initialScriptFilename() {
         return this.project.directory()
-                .append(this.directoryName(J2clStep.CLOSURE_COMPILE))
+                .append(this.directoryName(J2clTaskKind.CLOSURE_COMPILE))
                 .output()
                 .append(this.testClassName + ".js");
     }
@@ -163,24 +163,24 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
 
     private J2clDependency project;
 
-    // steps............................................................................................................
+    // tasks............................................................................................................
 
     @Override
-    List<J2clStep> steps() {
-        return STEPS;
+    List<J2clTaskKind> tasks() {
+        return TASKS;
     }
 
-    private final List<J2clStep> STEPS = Lists.of(
-            J2clStep.HASH,
-            J2clStep.UNPACK,
-            J2clStep.JAVAC_COMPILE,
-            J2clStep.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE,
-            J2clStep.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE,
-            J2clStep.SHADE_JAVA_SOURCE,
-            J2clStep.SHADE_CLASS_FILES,
-            J2clStep.TRANSPILE_JAVA_TO_JAVASCRIPT,
-            J2clStep.CLOSURE_COMPILE,
-            J2clStep.JUNIT_TESTS
+    private final List<J2clTaskKind> TASKS = Lists.of(
+            J2clTaskKind.HASH,
+            J2clTaskKind.UNPACK,
+            J2clTaskKind.JAVAC_COMPILE,
+            J2clTaskKind.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE,
+            J2clTaskKind.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE,
+            J2clTaskKind.SHADE_JAVA_SOURCE,
+            J2clTaskKind.SHADE_CLASS_FILES,
+            J2clTaskKind.TRANSPILE_JAVA_TO_JAVASCRIPT,
+            J2clTaskKind.CLOSURE_COMPILE,
+            J2clTaskKind.JUNIT_TESTS
     );
 
     @Override
@@ -197,11 +197,11 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
 
     // test only props..................................................................................................
 
-    public List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers() {
+    public List<J2clTaskWorkerWebDriverUnitTestRunnerBrowser> browsers() {
         return this.browsers;
     }
 
-    private final List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers;
+    private final List<J2clTaskWorkerWebDriverUnitTestRunnerBrowser> browsers;
 
     public BrowserLogLevel browserLogLevel() {
         return this.browserLogLevel;

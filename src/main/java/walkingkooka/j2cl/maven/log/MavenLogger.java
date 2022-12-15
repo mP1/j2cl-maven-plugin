@@ -21,7 +21,7 @@ import org.apache.maven.plugin.logging.Log;
 import walkingkooka.text.Indentation;
 
 /**
- * Logger interface used by tasks & steps.
+ * Logger interface used by tasks.
  */
 public interface MavenLogger {
 

@@ -21,10 +21,10 @@ import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.J2clDependency;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
-import walkingkooka.j2cl.maven.J2clStep;
-import walkingkooka.j2cl.maven.J2clStepDirectory;
-import walkingkooka.j2cl.maven.J2clStepResult;
-import walkingkooka.j2cl.maven.J2clStepWorker;
+import walkingkooka.j2cl.maven.J2clTask;
+import walkingkooka.j2cl.maven.J2clTaskDirectory;
+import walkingkooka.j2cl.maven.J2clTaskKind;
+import walkingkooka.j2cl.maven.J2clTaskResult;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
 import java.util.List;
@@ -33,41 +33,41 @@ import java.util.Set;
 /**
  * Compiles the java source from sources and the given target.
  */
-abstract class J2clStepWorkerJavacCompiler<C extends J2clMavenContext> implements J2clStepWorker<C> {
+abstract class J2clTaskJavacCompiler<C extends J2clMavenContext> implements J2clTask<C> {
 
     /**
      * Package private to limit sub classing.
      */
-    J2clStepWorkerJavacCompiler() {
+    J2clTaskJavacCompiler() {
         super();
     }
 
     @Override
-    public J2clStepResult execute(final J2clDependency artifact,
-                                  final J2clStep step,
+    public J2clTaskResult execute(final J2clDependency artifact,
+                                  final J2clTaskKind kind,
                                   final C context,
                                   final TreeLogger logger) throws Exception {
         return this.executeIfNecessary(
                 artifact,
-                step,
+                kind,
                 context,
                 logger
         );
     }
 
     @Override
-    public final J2clStepResult executeWithDirectory(final J2clDependency artifact,
-                                                     final J2clStepDirectory directory,
+    public final J2clTaskResult executeWithDirectory(final J2clDependency artifact,
+                                                     final J2clTaskDirectory directory,
                                                      final C context,
                                                      final TreeLogger logger) throws Exception {
-        J2clStepResult result = null;
-        final J2clStep sourceStep = this.sourcesStep();
+        J2clTaskResult result = null;
+        final J2clTaskKind sourceTask = this.sourceTask();
 
-        J2clPath source = artifact.step(sourceStep).output().exists().orElse(null);
+        J2clPath source = artifact.task(sourceTask).output().exists().orElse(null);
         if (null != source) {
             final Set<J2clPath> javaSourceFiles = Sets.ordered();
 
-            final J2clPath output = artifact.step(sourceStep).output();
+            final J2clPath output = artifact.task(sourceTask).output();
 
             javaSourceFiles.addAll(output.gatherFiles((path) -> false == output.isSuperSource(path) && J2clPath.JAVA_FILES.test(path)));
             if (javaSourceFiles.isEmpty()) {
@@ -86,7 +86,7 @@ abstract class J2clStepWorkerJavacCompiler<C extends J2clMavenContext> implement
                 this.buildBootstrapAndClasspath(artifact, shouldRunAnnotationProcessors, bootstrap, classpath);
 
                 if (classpath.isEmpty()) {
-                    result = J2clStepResult.SKIPPED; // project could have no source files.
+                    result = J2clTaskResult.SKIPPED; // project could have no source files.
                 } else {
                     result = JavacCompiler.execute(bootstrap,
                             classpath,
@@ -95,9 +95,9 @@ abstract class J2clStepWorkerJavacCompiler<C extends J2clMavenContext> implement
                             context.javaCompilerArguments(),
                             shouldRunAnnotationProcessors,
                             logger) ?
-                            J2clStepResult.SUCCESS :
-                            J2clStepResult.FAILED;
-                    if (J2clStepResult.SUCCESS == result) {
+                            J2clTaskResult.SUCCESS :
+                            J2clTaskResult.FAILED;
+                    if (J2clTaskResult.SUCCESS == result) {
                         this.postCompile(
                                 artifact,
                                 directory,
@@ -111,21 +111,21 @@ abstract class J2clStepWorkerJavacCompiler<C extends J2clMavenContext> implement
 
         if (null == source) {
             logger.indentedLine("No files found");
-            result = J2clStepResult.ABORTED;
+            result = J2clTaskResult.ABORTED;
         }
 
         return result;
     }
 
     /**
-     * A previous step that has source in its output ready for compiling
+     * A previous task that has source in its output ready for compiling
      */
-    abstract J2clStep sourcesStep();
+    abstract J2clTaskKind sourceTask();
 
     /**
-     * This step this is used to build the classpath for the java compiler.
+     * This task this is used to build the classpath for the java compiler.
      */
-    abstract List<J2clStep> compiledStep();
+    abstract List<J2clTaskKind> compileTask();
 
     /**
      * Returns whether annotations processors should be run.
@@ -139,8 +139,6 @@ abstract class J2clStepWorkerJavacCompiler<C extends J2clMavenContext> implement
                                           final boolean shouldRunAnnotationProcessors,
                                           final Set<J2clPath> bootstrap,
                                           final Set<J2clPath> classpath) {
-        //final J2clStep compiledStep = this.compiledStep();
-
         for (final J2clDependency dependency : artifact.dependencies()) {
             if (dependency.isAnnotationClassFiles()) {
                 classpath.add(dependency.artifactFileOrFail());
@@ -188,7 +186,7 @@ abstract class J2clStepWorkerJavacCompiler<C extends J2clMavenContext> implement
      * This is called after the compile
      */
     abstract void postCompile(final J2clDependency artifact,
-                              final J2clStepDirectory directory,
+                              final J2clTaskDirectory directory,
                               final C context,
                               final TreeLogger logger) throws Exception;
 }
