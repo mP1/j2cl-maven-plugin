@@ -646,7 +646,7 @@ example.java.util=java.util
 
 Note that java source and their matching class files are both shaded using the same rules.
 
-The sample below shows an example of the source before step 5, after that completes, the package and type references
+The sample below shows an example of the source before task 5, after that completes, the package and type references
 will have the example removed.
 
 ```java
@@ -663,7 +663,7 @@ class Base64 {
 }
 ```
 
-The source after step 5 processing.
+The source after task 5 processing.
 ```java
 package java.util;
 
@@ -691,7 +691,7 @@ index.html
 images/*.gif
 ``` 
 
-# Building steps or phases.
+# Building tasks or phases.
 
 The build process involves transforming the parent project and dependencies including transitives from java into
 javascript, in reverse order. Reverse order here means that if the project is the root of the dependency tree, then for
@@ -699,40 +699,40 @@ all operations to complete successfully dependencies that are leaves of this tre
 leaves are completed successfully dependencies or the project only requiring them can be attempted. Eventually the only
 outstanding artifact or dependency is the project itself.
 
-The plugin will create a separate directory for each artifact, using the maven coordinates and a HASH of all dependencies.
-This means any time a dependency changes for any reason, any artifacts that reference it will also change and they will
-be processed once more which is the desired so that changes are included in the final output. Processing a single dependency
-potentially involves numerous steps, as each is performed a directory which includes a number prefix is created. These sub
-directories will include a log file including all output for that step along with further files and directories. These logs
-will be useful if anything goes wrong.
+The plugin will create a separate directory for each artifact, using the maven coordinates and a HASH of all
+dependencies. This means any time a dependency changes for any reason, any artifacts that reference it will also change
+and they will be processed once more which is the desired so that changes are included in the final output. Processing a
+single dependency potentially involves numerous tasks, as each is performed a directory which includes a number prefix
+is created. These sub directories will include a log file including all output for that task along with further files
+and directories. These logs will be useful if anything goes wrong.
 
-Every single step for every single artifact will have its own log file under its own step directory under the directory
+Every single task for every single artifact will have its own log file under its own task directory under the directory
 for that artifact named according to the scheme mentioned above.
 
-Note that the directory for each step will only include an empty directory indicating the status or outcome of that particular
-step. Possible outcomes include
+Note that the directory for each task will only include an empty directory indicating the status or outcome of that
+particular task. Possible outcomes include
 
 - !ABORTED
 - !FAILED
 - !SKIPPED
 - !SUCCESSFUL
 
-These are useful as a quick mechanism to find the individual failing step, with the `log.txt` containing further details.
+These are useful as a quick mechanism to find the individual failing task, with the `log.txt` containing further
+details.
 
+## Task 0 Hashing
 
-
-## Step 0 Hashing
-
-The first step whenever a dependency processing begins is to compute the hash which is then combined with the maven
+The first task whenever a dependency processing begins is to compute the hash which is then combined with the maven
 coordinates and used to create a directory if one did not previously exist.
 
 
 
 ### hash.txt
 
-The hash step directory will also include a `hash.txt` file which contains all the items used to produce the hash.
-The contents are also useful as a reference to discover which other dependencies were required by this particular dependency,
-note the order of this listing matches the order dependencies are declared in the POM in a depth first ordering.
+The hash task directory will also include a `hash.txt` file which contains all the items used to produce the hash. The
+contents are also useful as a reference to discover which other dependencies were required by this particular
+dependency, note the order of this listing matches the order dependencies are declared in the POM in a depth first
+ordering.
 
 ```txt
 compile-source-root: annotations
@@ -757,63 +757,48 @@ scope: RUNTIME
 sources-kind: SRC
 ```
 
-
-
-## Step 1 Unpack
+## Task 1 Unpack
 
 An attempt will be made to locate the sources jar and unpack if found. If no java source files (`*.java`) are found the
-original artifact itself will be unpacked over the first unpack. If no java source files are found in either the remaining
-steps will be aborted, otherwise the next step will be attemped trying to eventually transpile the unpacked java to
-javascript.
+original artifact itself will be unpacked over the first unpack. If no java source files are found in either the
+remaining tasks will be aborted, otherwise the next task will be attemped trying to eventually transpile the unpacked
+java to javascript.
 
+## Task 2 Javac Compile
 
+The source extracted in task 2 will then be compiled by javac.
 
-## Step 2 Javac Compile
+## Task 3 Gwt incompatible stripped source
 
-The source extracted in step 2 will then be compiled by javac.
+The goal of this task is to remove classes and class members such as methods or fields that have been marked with the
+`@Gwt-incompatible` annotation with the "output" directory of this task containing the final result AFTER these classes
+and members have been removed. Most of this work is done by the Google `JavaPreprocessor`.
 
+This task also removes entire classes that have been matched by the ignore files mentioned above.
 
+## Task 4 Javac Compile Gwt incompatible stripped source
 
-## Step 3 Gwt incompatible stripped source
+This task invokes javac on the output produced by task 4.
 
-The goal of this step is to remove classes and class members such as methods or fields that have been marked with the
-`@Gwt-incompatible` annotation with the "output" directory of this step containing the final result AFTER these classes and
-members have been removed. Most of this work is done by the Google `JavaPreprocessor`.
+## Task 5 shade java source.
 
-This step also removes entire classes that have been matched by the ignore files mentioned above.
+This task will execute if a `.walkingkooka-j2cl-maven-plugin-shade.txt` file is present. All the mapped java source
+files will be shaded so they appear in the new package.
 
+## Task 6 shade classfiles.
 
+This task will execute if a `.walkingkooka-j2cl-maven-plugin-shade.txt` file is present. All the mapped class files will
+be shaded so they appear in the new package. The files modified here will be the class files of the java source modified
+in task 5.
 
-## Step 4 Javac Compile Gwt incompatible stripped source
+## Task 7 Transpile
 
-This step invokes javac on the output produced by step 4.
+This task accepts the output from task 4 and transpile that java source into javascript.
 
+## Task 8 Closure compile
 
-
-## Step 5 shade java source.
-
-This step will execute if a `.walkingkooka-j2cl-maven-plugin-shade.txt` file is present. All the mapped java source files
-will be shaded so they appear in the new package. 
-
-
-
-## Step 6 shade classfiles.
-
-This step will execute if a `.walkingkooka-j2cl-maven-plugin-shade.txt` file is present. All the mapped class files
-will be shaded so they appear in the new package. The files modified here will be the class files of the java source
-modified in step 5.
-
-
-
-## Step 7 Transpile 
-
-This step accepts the output from step 4 and transpile that java source into javascript.
-
-
-
-## Step 8 Closure compile
-
-This is the final step and only run for the project, it uses the Closure compiler to produce the final javascript file(s).
+This is the final task and only run for the project, it uses the Closure compiler to produce the final javascript file(
+s).
 
 
 
@@ -826,15 +811,13 @@ It might also be useful to set the `threadpool-size=1` so messages are not mixed
 
 `../walkingkooka-j2cl-maven-plugin-cache/walkingkooka--j2cl-maven-plugin-it-junit-test--jar--1.0-db1ecd80f01db349f97454549ba798c71e4283fb`
 
-All the steps for each artifact are also given a directory and log with all debug statements. Each log file will only
-contain output for the owning step, concurrent steps produce independent log files. 
-
-
+All the tasks for each artifact are also given a directory and log with all debug statements. Each log file will only
+contain output for the owning task, concurrent tasks produce independent log files.
 
 ## log.txt
 
-Each component will include several of the steps mentioned in the previous section, and a log file will be present
-with messages and other output concerning that particular step.
+Each component will include several of the tasks mentioned in the previous section, and a log file will be present with
+messages and other output concerning that particular task.
 
 ```txt
 walkingkooka:j2cl-maven-plugin-it-junit-test:jar:1.0-TRANSPILE
