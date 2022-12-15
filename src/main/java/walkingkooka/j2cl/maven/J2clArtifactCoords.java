@@ -46,7 +46,7 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
     /**
      * A comparator that compares two coords ignoring the version.
      */
-    static Comparator<J2clArtifactCoords> IGNORE_VERSION_COMPARATOR = J2clArtifactCoordsComparator.INSTANCE;
+    static final Comparator<J2clArtifactCoords> IGNORE_VERSION_COMPARATOR = J2clArtifactCoordsComparator.INSTANCE;
 
     static J2clArtifactCoords parse(final String coords) {
         final org.eclipse.aether.artifact.DefaultArtifact artifact = new org.eclipse.aether.artifact.DefaultArtifact(coords);

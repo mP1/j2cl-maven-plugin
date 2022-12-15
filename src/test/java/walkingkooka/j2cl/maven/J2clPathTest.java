@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public final class J2clPathTest implements ComparableTesting2<J2clPath>, HashCodeEqualsDefinedTesting2<J2clPath> {
 
     @Rule
-    public TemporaryFolder base = new TemporaryFolder();
+    public final TemporaryFolder base = new TemporaryFolder();
 
     @BeforeEach
     public void beforeEach() throws IOException {

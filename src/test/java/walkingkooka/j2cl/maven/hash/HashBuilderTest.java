@@ -35,7 +35,7 @@ import java.nio.file.Path;
 public final class HashBuilderTest implements ClassTesting2<HashBuilder>, ToStringTesting<HashBuilder> {
 
     @Rule
-    public TemporaryFolder base = new TemporaryFolder();
+    public final TemporaryFolder base = new TemporaryFolder();
 
     @BeforeEach
     public void beforeEach() throws IOException {

@@ -215,5 +215,5 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
         return this.testTimeout;
     }
 
-    int testTimeout;
+    final int testTimeout;
 }
