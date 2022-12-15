@@ -43,7 +43,8 @@ public enum J2clTaskKind {
      * Computes the hash for the given {@link J2clDependency} including its dependencies.
      */
     HASH {
-        @Override J2clTask<? super J2clMavenContext> execute0() {
+        @Override
+        J2clTask<? super J2clMavenContext> execute0() {
             return J2clTasks.hash();
         }
 
@@ -57,7 +58,8 @@ public enum J2clTaskKind {
      * For archives (dependencies) unpack the accompanying sources.
      */
     UNPACK {
-        @Override J2clTask<? super J2clMavenContext> execute0() {
+        @Override
+        J2clTask<? super J2clMavenContext> execute0() {
             return J2clTasks.unpack();
         }
 
@@ -71,7 +73,8 @@ public enum J2clTaskKind {
      * Calls javac on the unpack directory along with its dependencies on the classpath.
      */
     JAVAC_COMPILE {
-        @Override J2clTask<? super J2clMavenContext> execute0() {
+        @Override
+        J2clTask<? super J2clMavenContext> execute0() {
             return J2clTasks.compileJavaSource();
         }
 
@@ -85,7 +88,8 @@ public enum J2clTaskKind {
      * Calls the @GwtIncompatible stripper on /compile saving into /gwt-incompatible-strip
      */
     GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE {
-        @Override J2clTask<? super J2clMavenContext> execute0() {
+        @Override
+        J2clTask<? super J2clMavenContext> execute0() {
             return J2clTasks.gwtIncompatStrip();
         }
 
@@ -99,7 +103,8 @@ public enum J2clTaskKind {
      * Compiles /gwt-incompatible-strip along with dependencies on the classpath into /gwt-incompatible-strip-compiled
      */
     JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE {
-        @Override J2clTask<? super J2clMavenContext> execute0() {
+        @Override
+        J2clTask<? super J2clMavenContext> execute0() {
             return J2clTasks.compileGwtIncompatStripped();
         }
 
@@ -114,7 +119,8 @@ public enum J2clTaskKind {
      * shade java source files.
      */
     SHADE_JAVA_SOURCE {
-        @Override J2clTask<? super J2clMavenContext> execute0() {
+        @Override
+        J2clTask<? super J2clMavenContext> execute0() {
             return J2clTasks.shadeJavaSource();
         }
 
@@ -129,7 +135,8 @@ public enum J2clTaskKind {
      * shares matching files.
      */
     SHADE_CLASS_FILES {
-        @Override J2clTask<? super J2clMavenContext> execute0() {
+        @Override
+        J2clTask<? super J2clMavenContext> execute0() {
             return J2clTasks.shadeClassFiles();
         }
 
@@ -143,7 +150,8 @@ public enum J2clTaskKind {
      * Calls the transpiler on the output of previous tasks.
      */
     TRANSPILE_JAVA_TO_JAVASCRIPT {
-        @Override J2clTask<? super J2clMavenContext> execute0() {
+        @Override
+        J2clTask<? super J2clMavenContext> execute0() {
             return J2clTasks.transpiler();
         }
 
@@ -156,7 +164,8 @@ public enum J2clTaskKind {
      * Calls the closure compiler on the /transpiler along with other "files" into /closure-compiled.
      */
     CLOSURE_COMPILE {
-        @Override J2clTask<? super J2clMavenContext> execute0() {
+        @Override
+        J2clTask<? super J2clMavenContext> execute0() {
             return J2clTasks.closure();
         }
 
@@ -169,7 +178,8 @@ public enum J2clTaskKind {
      * Assembles the output and copies files to that place.
      */
     OUTPUT_ASSEMBLE {
-        @Override J2clTask<? super J2clMavenContext> execute0() {
+        @Override
+        J2clTask<? super J2clMavenContext> execute0() {
             return J2clTasks.outputAssembler();
         }
 
@@ -182,7 +192,8 @@ public enum J2clTaskKind {
      * Uses webdriver to execute a junit test.
      */
     JUNIT_TESTS {
-        @Override J2clTask<? super J2clMavenContext> execute0() {
+        @Override
+        J2clTask<? super J2clMavenContext> execute0() {
             return Cast.to(
                     J2clTasks.unitTests()
             );
