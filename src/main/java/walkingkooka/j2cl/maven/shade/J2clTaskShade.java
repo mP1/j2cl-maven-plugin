@@ -21,10 +21,10 @@ import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.J2clDependency;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
-import walkingkooka.j2cl.maven.J2clStep;
-import walkingkooka.j2cl.maven.J2clStepDirectory;
-import walkingkooka.j2cl.maven.J2clStepResult;
-import walkingkooka.j2cl.maven.J2clStepWorker;
+import walkingkooka.j2cl.maven.J2clTask;
+import walkingkooka.j2cl.maven.J2clTaskDirectory;
+import walkingkooka.j2cl.maven.J2clTaskKind;
+import walkingkooka.j2cl.maven.J2clTaskResult;
 import walkingkooka.j2cl.maven.log.TreeFormat;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.CharSequences;
@@ -41,37 +41,37 @@ import java.util.function.Predicate;
  * If the dependency source has a shade file, create an output directory with selected shaded class files combined
  * with the other class files changed.
  */
-abstract class J2clStepWorkerShade<C extends J2clMavenContext> implements J2clStepWorker<C> {
+abstract class J2clTaskShade<C extends J2clMavenContext> implements J2clTask<C> {
 
     /**
      * Package private to limit sub classing.
      */
-    J2clStepWorkerShade() {
+    J2clTaskShade() {
         super();
     }
 
     @Override
-    public J2clStepResult execute(final J2clDependency artifact,
-                                  final J2clStep step,
+    public J2clTaskResult execute(final J2clDependency artifact,
+                                  final J2clTaskKind kind,
                                   final C context,
                                   final TreeLogger logger) throws Exception {
         return this.executeIfNecessary(
                 artifact,
-                step,
+                kind,
                 context,
                 logger
         );
     }
 
     @Override
-    public final J2clStepResult executeWithDirectory(final J2clDependency artifact,
-                                                     final J2clStepDirectory directory,
+    public final J2clTaskResult executeWithDirectory(final J2clDependency artifact,
+                                                     final J2clTaskDirectory directory,
                                                      final C context,
                                                      final TreeLogger logger) throws Exception {
-        final J2clStepResult result;
+        final J2clTaskResult result;
 
         if (artifact.isIgnored()) {
-            result = J2clStepResult.SKIPPED;
+            result = J2clTaskResult.SKIPPED;
         } else {
             logger.line(J2clPath.SHADE_FILE);
             logger.indent();
@@ -80,14 +80,14 @@ abstract class J2clStepWorkerShade<C extends J2clMavenContext> implements J2clSt
 
                 if (!shadeMappings.isEmpty()) {
                     this.copyAndShade(artifact,
-                            artifact.step(this.step()).output(),
+                            artifact.task(this.kind()).output(),
                             shadeMappings,
                             directory.output(),
                             logger);
-                    result = J2clStepResult.SUCCESS;
+                    result = J2clTaskResult.SUCCESS;
                 } else {
                     logger.line("Not found");
-                    result = J2clStepResult.SKIPPED;
+                    result = J2clTaskResult.SKIPPED;
                 }
             }
             logger.outdent();
@@ -96,7 +96,7 @@ abstract class J2clStepWorkerShade<C extends J2clMavenContext> implements J2clSt
         return result;
     }
 
-    abstract J2clStep step();
+    abstract J2clTaskKind kind();
 
     /**
      * Performs two copy passes, the first will shade any files during the copy process, the second will simply

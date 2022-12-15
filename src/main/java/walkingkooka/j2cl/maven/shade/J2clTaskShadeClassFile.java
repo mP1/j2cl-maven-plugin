@@ -20,8 +20,8 @@ package walkingkooka.j2cl.maven.shade;
 import walkingkooka.j2cl.maven.J2clDependency;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
-import walkingkooka.j2cl.maven.J2clStep;
-import walkingkooka.j2cl.maven.J2clStepWorker;
+import walkingkooka.j2cl.maven.J2clTask;
+import walkingkooka.j2cl.maven.J2clTaskKind;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.javashader.JavaShaders;
 
@@ -30,27 +30,27 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 /**
- * Scans the output of the previous step for any shade java class files and if any are found writes the result to an output directory.
+ * Scans the output of the previous task for any shade java class files and if any are found writes the result to an output directory.
  */
-public final class J2clStepWorkerShadeClassFile<C extends J2clMavenContext> extends J2clStepWorkerShade<C> {
+public final class J2clTaskShadeClassFile<C extends J2clMavenContext> extends J2clTaskShade<C> {
 
     /**
      * Singleton
      */
-    public static <C extends J2clMavenContext> J2clStepWorker<C> instance() {
-        return new J2clStepWorkerShadeClassFile<>();
+    public static <C extends J2clMavenContext> J2clTask<C> instance() {
+        return new J2clTaskShadeClassFile<>();
     }
 
     /**
      * Use singleton
      */
-    private J2clStepWorkerShadeClassFile() {
+    private J2clTaskShadeClassFile() {
         super();
     }
 
     @Override
-    J2clStep step() {
-        return J2clStep.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE;
+    J2clTaskKind kind() {
+        return J2clTaskKind.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE;
     }
 
     @Override

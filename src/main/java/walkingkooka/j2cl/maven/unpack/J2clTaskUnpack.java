@@ -20,10 +20,10 @@ package walkingkooka.j2cl.maven.unpack;
 import walkingkooka.j2cl.maven.J2clDependency;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
-import walkingkooka.j2cl.maven.J2clStep;
-import walkingkooka.j2cl.maven.J2clStepDirectory;
-import walkingkooka.j2cl.maven.J2clStepResult;
-import walkingkooka.j2cl.maven.J2clStepWorker;
+import walkingkooka.j2cl.maven.J2clTask;
+import walkingkooka.j2cl.maven.J2clTaskDirectory;
+import walkingkooka.j2cl.maven.J2clTaskKind;
+import walkingkooka.j2cl.maven.J2clTaskResult;
 import walkingkooka.j2cl.maven.log.TreeFormat;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
@@ -33,44 +33,44 @@ import java.util.Set;
 
 /**
  * Unpacks the source from the sources artifact (jar with sources) and if no java files are present tries
- * the binary (jar) to {@link J2clStepDirectory#output()}. If no java source files are present processing of this
+ * the binary (jar) to {@link J2clTaskDirectory#output()}. If no java source files are present processing of this
  * artifact is aborted and no attempt will be made to transpile java to javascript.
  */
-public final class J2clStepWorkerUnpack<C extends J2clMavenContext> implements J2clStepWorker<C> {
+public final class J2clTaskUnpack<C extends J2clMavenContext> implements J2clTask<C> {
 
     /**
      * Singleton
      */
-    public static <C extends J2clMavenContext> J2clStepWorker<C> instance() {
-        return new J2clStepWorkerUnpack<>();
+    public static <C extends J2clMavenContext> J2clTask<C> instance() {
+        return new J2clTaskUnpack<>();
     }
 
     /**
      * Use singleton
      */
-    private J2clStepWorkerUnpack() {
+    private J2clTaskUnpack() {
         super();
     }
 
     @Override
-    public J2clStepResult execute(final J2clDependency artifact,
-                                  final J2clStep step,
+    public J2clTaskResult execute(final J2clDependency artifact,
+                                  final J2clTaskKind kind,
                                   final C context,
                                   final TreeLogger logger) throws Exception {
         return this.executeIfNecessary(
                 artifact,
-                step,
+                kind,
                 context,
                 logger
         );
     }
 
     @Override
-    public J2clStepResult executeWithDirectory(final J2clDependency artifact,
-                                               final J2clStepDirectory directory,
+    public J2clTaskResult executeWithDirectory(final J2clDependency artifact,
+                                               final J2clTaskDirectory directory,
                                                final C context,
                                                final TreeLogger logger) throws Exception {
-        J2clStepResult result;
+        J2clTaskResult result;
 
         final J2clPath dest = directory.output().absentOrFail();
 
@@ -98,10 +98,10 @@ public final class J2clStepWorkerUnpack<C extends J2clMavenContext> implements J
             logger.path("Destination", dest);
 
             logger.line("Source files found, transpiling will happen");
-            result = J2clStepResult.SUCCESS;
+            result = J2clTaskResult.SUCCESS;
         } else {
             logger.line("No source files found, transpiling will not be attempted");
-            result = J2clStepResult.ABORTED;
+            result = J2clTaskResult.ABORTED;
         }
 
         return result;

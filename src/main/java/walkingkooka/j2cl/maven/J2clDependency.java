@@ -1186,7 +1186,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     private Map<String, String> shadeMappings;
 
     private Map<String, String> loadShadeFile() throws IOException {
-        final J2clPath file = this.step(J2clStep.UNPACK)
+        final J2clPath file = this.task(J2clTaskKind.UNPACK)
                 .output()
                 .shadeFile();
         return file.exists().isPresent() ?
@@ -1230,30 +1230,30 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     private final AtomicReference<J2clPath> directory = new AtomicReference<>();
 
     /**
-     * Returns a compile step directory, assuming the directory has already been created.
+     * Returns a compile task directory, assuming the directory has already been created.
      */
-    public J2clStepDirectory step(final J2clStep step) {
-        return J2clStepDirectory.with(
+    public J2clTaskDirectory task(final J2clTaskKind kind) {
+        return J2clTaskDirectory.with(
                 Paths.get(
                         this.directory().toString(),
-                        this.context.directoryName(step)
+                        this.context.directoryName(kind)
                 )
         );
     }
 
     /**
-     * Tries to find the output directory for the given {@link J2clStep} stopping when one is found or returns
+     * Tries to find the output directory for the given {@link J2clTaskKind} stopping when one is found or returns
      * the archive file for this dependency.
      */
-    public J2clPath stepSourcesOrArchiveFile(final List<J2clStep> steps) {
-        Objects.requireNonNull(steps, "steps");
+    public J2clPath sourcesOrArchiveFile(final List<J2clTaskKind> tasks) {
+        Objects.requireNonNull(tasks, "tasks");
 
         J2clPath result = null;
 
         final J2clPath directory = this.directory.get();
         if (null != directory) {
-            result = steps.stream()
-                    .flatMap(s -> this.step(s).output().exists().stream())
+            result = tasks.stream()
+                    .flatMap(s -> this.task(s).output().exists().stream())
                     .findFirst()
                     .orElse(null);
         }

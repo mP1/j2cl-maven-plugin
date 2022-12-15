@@ -21,10 +21,10 @@ import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.J2clDependency;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
-import walkingkooka.j2cl.maven.J2clStep;
-import walkingkooka.j2cl.maven.J2clStepDirectory;
-import walkingkooka.j2cl.maven.J2clStepResult;
-import walkingkooka.j2cl.maven.J2clStepWorker;
+import walkingkooka.j2cl.maven.J2clTask;
+import walkingkooka.j2cl.maven.J2clTaskDirectory;
+import walkingkooka.j2cl.maven.J2clTaskKind;
+import walkingkooka.j2cl.maven.J2clTaskResult;
 import walkingkooka.j2cl.maven.log.TreeFormat;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
@@ -36,35 +36,35 @@ import java.util.Set;
 /**
  * Calls the closure compiler and assembles the final Javascript output.
  */
-public final class J2clStepWorkerOutputAssembler<C extends J2clMavenContext> implements J2clStepWorker<C> {
+public final class J2clTaskOutputAssembler<C extends J2clMavenContext> implements J2clTask<C> {
 
     /**
      * Singleton
      */
-    public static <C extends J2clMavenContext> J2clStepWorker<C> instance() {
-        return new J2clStepWorkerOutputAssembler<>();
+    public static <C extends J2clMavenContext> J2clTask<C> instance() {
+        return new J2clTaskOutputAssembler<>();
     }
 
-    private J2clStepWorkerOutputAssembler() {
+    private J2clTaskOutputAssembler() {
         super();
     }
 
     @Override
-    public J2clStepResult execute(final J2clDependency artifact,
-                                  final J2clStep step,
+    public J2clTaskResult execute(final J2clDependency artifact,
+                                  final J2clTaskKind kind,
                                   final C context,
                                   final TreeLogger logger) throws Exception {
         return this.executeIfNecessary(
                 artifact,
-                step,
+                kind,
                 context,
                 logger
         );
     }
 
     @Override
-    public J2clStepResult executeWithDirectory(final J2clDependency artifact,
-                                               final J2clStepDirectory directory,
+    public J2clTaskResult executeWithDirectory(final J2clDependency artifact,
+                                               final J2clTaskDirectory directory,
                                                final C context,
                                                final TreeLogger logger) throws Exception {
         final Collection<J2clPath> closureCompileDestinationFiles;
@@ -73,7 +73,7 @@ public final class J2clStepWorkerOutputAssembler<C extends J2clMavenContext> imp
         logger.line("Sources");
         logger.indent();
         {
-            final J2clPath closureCompile = artifact.step(J2clStep.CLOSURE_COMPILE).output();
+            final J2clPath closureCompile = artifact.task(J2clTaskKind.CLOSURE_COMPILE).output();
             final Set<J2clPath> closureCompileFiles = closureCompile.gatherFiles(J2clPath.ALL_FILES);
 
             logger.paths(
@@ -82,7 +82,7 @@ public final class J2clStepWorkerOutputAssembler<C extends J2clMavenContext> imp
                     TreeFormat.TREE
             );
 
-            final J2clPath unpackPublic = artifact.step(J2clStep.UNPACK).output();
+            final J2clPath unpackPublic = artifact.task(J2clTaskKind.UNPACK).output();
             final Optional<PathMatcher> unpackPublicPathMatcher = unpackPublic.publicFiles();
             final Set<J2clPath> unpackPublicFiles;
 
@@ -127,13 +127,13 @@ public final class J2clStepWorkerOutputAssembler<C extends J2clMavenContext> imp
                 TreeFormat.TREE
         );
 
-        final J2clStepResult result;
+        final J2clTaskResult result;
 
         if (destinationFiles.isEmpty()) {
-            logger.line("No files copied, transpile step likely failed with warnings that are actually errors.");
-            result = J2clStepResult.FAILED;
+            logger.line("No files copied, transpile task likely failed with warnings that are actually errors.");
+            result = J2clTaskResult.FAILED;
         } else {
-            result = J2clStepResult.SUCCESS;
+            result = J2clTaskResult.SUCCESS;
         }
 
         return result;

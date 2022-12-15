@@ -27,8 +27,8 @@ import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.log.BrowserLogLevel;
 import walkingkooka.j2cl.maven.log.MavenLogger;
 import walkingkooka.j2cl.maven.log.TreeLogger;
-import walkingkooka.j2cl.maven.test.J2clStepWorkerWebDriverUnitTestRunner;
-import walkingkooka.j2cl.maven.test.J2clStepWorkerWebDriverUnitTestRunnerBrowser;
+import walkingkooka.j2cl.maven.test.J2clTaskWebDriverUnitTestRunner;
+import walkingkooka.j2cl.maven.test.J2clTaskWorkerWebDriverUnitTestRunnerBrowser;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;
@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
 
 /**
  * Runs all tests that are matched by `<tests>` as defined in the POM. The junit annotation processor will
- * create several files and {@link J2clStepWorkerWebDriverUnitTestRunner} will prepare a HTML which will run all tests
+ * create several files and {@link J2clTaskWebDriverUnitTestRunner} will prepare a HTML which will run all tests
  * and will be executed by webdriver.
  */
 @Mojo(name = "test", requiresDependencyResolution = ResolutionScope.TEST)
@@ -207,9 +207,9 @@ public final class J2clMojoTest extends J2clMojoBuildTestWatch {
     @Parameter(alias = "browsers", required = true)
     private List<String> browsers;
 
-    private List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers() {
+    private List<J2clTaskWorkerWebDriverUnitTestRunnerBrowser> browsers() {
         return this.browsers.stream()
-                .map(J2clStepWorkerWebDriverUnitTestRunnerBrowser::fromCommandLine)
+                .map(J2clTaskWorkerWebDriverUnitTestRunnerBrowser::fromCommandLine)
                 .collect(Collectors.toList());
     }
 

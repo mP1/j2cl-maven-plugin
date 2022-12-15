@@ -149,24 +149,24 @@ final class J2clMojoBuildMavenContext extends J2clMavenContext {
         return hash;
     }
 
-    // steps....................................................................................................
+    // tasks....................................................................................................
 
     @Override
-    List<J2clStep> steps() {
-        return STEPS;
+    List<J2clTaskKind> tasks() {
+        return TASKS;
     }
 
-    private final List<J2clStep> STEPS = Lists.of(
-            J2clStep.HASH,
-            J2clStep.UNPACK,
-            J2clStep.JAVAC_COMPILE,
-            J2clStep.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE,
-            J2clStep.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE,
-            J2clStep.SHADE_JAVA_SOURCE,
-            J2clStep.SHADE_CLASS_FILES,
-            J2clStep.TRANSPILE_JAVA_TO_JAVASCRIPT,
-            J2clStep.CLOSURE_COMPILE,
-            J2clStep.OUTPUT_ASSEMBLE
+    private final List<J2clTaskKind> TASKS = Lists.of(
+            J2clTaskKind.HASH,
+            J2clTaskKind.UNPACK,
+            J2clTaskKind.JAVAC_COMPILE,
+            J2clTaskKind.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE,
+            J2clTaskKind.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE,
+            J2clTaskKind.SHADE_JAVA_SOURCE,
+            J2clTaskKind.SHADE_CLASS_FILES,
+            J2clTaskKind.TRANSPILE_JAVA_TO_JAVASCRIPT,
+            J2clTaskKind.CLOSURE_COMPILE,
+            J2clTaskKind.OUTPUT_ASSEMBLE
     );
 
     @Override

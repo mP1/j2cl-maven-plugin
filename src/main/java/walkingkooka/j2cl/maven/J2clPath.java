@@ -352,7 +352,7 @@ public final class J2clPath implements Comparable<J2clPath> {
                         .getParent()
                         .getFileName()
                         .toString()
-                        .equals(context.directoryName(J2clStep.UNPACK));
+                        .equals(context.directoryName(J2clTaskKind.UNPACK));
     }
 
     private final static String OUTPUT = "output";
@@ -369,7 +369,7 @@ public final class J2clPath implements Comparable<J2clPath> {
 
     /**
      * A text file that contains zero or more paths/file patterns that will be used to copy matching files during
-     * the {@link J2clStep#OUTPUT_ASSEMBLE} step. This will probably match assets like images, supporting javascript and so on.
+     * the {@link J2clTaskKind#OUTPUT_ASSEMBLE} task. This will probably match assets like images, supporting javascript and so on.
      */
     private static final String PUBLIC_FILES = FILE_PREFIX + "-public-files.txt";
 
@@ -422,7 +422,7 @@ public final class J2clPath implements Comparable<J2clPath> {
     }
 
     /**
-     * The name of the shade file used during {@link J2clStep#SHADE_JAVA_SOURCE} and the package prefix to be removed.
+     * The name of the shade file used during {@link J2clTaskKind#SHADE_JAVA_SOURCE} and the package prefix to be removed.
      */
     public static final String SHADE_FILE = FILE_PREFIX + "-shade.txt";
 

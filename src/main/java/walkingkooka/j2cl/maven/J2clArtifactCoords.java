@@ -22,7 +22,7 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.model.Dependency;
 import walkingkooka.collect.set.Sets;
-import walkingkooka.j2cl.maven.unpack.J2clStepWorkerUnpack;
+import walkingkooka.j2cl.maven.unpack.J2clTaskUnpack;
 import walkingkooka.text.CharSequences;
 
 import java.util.Comparator;
@@ -97,7 +97,7 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
     }
 
     /**
-     * Used to form source coordinates so {@link J2clStepWorkerUnpack} can fetch the accompany sources.jar for any dependency.
+     * Used to form source coordinates so {@link J2clTaskUnpack} can fetch the accompany sources.jar for any dependency.
      */
     J2clArtifactCoords source() {
         return this.isSources() ?

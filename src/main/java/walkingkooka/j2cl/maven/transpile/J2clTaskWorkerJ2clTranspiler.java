@@ -21,10 +21,10 @@ import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.J2clDependency;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
-import walkingkooka.j2cl.maven.J2clStep;
-import walkingkooka.j2cl.maven.J2clStepDirectory;
-import walkingkooka.j2cl.maven.J2clStepResult;
-import walkingkooka.j2cl.maven.J2clStepWorker;
+import walkingkooka.j2cl.maven.J2clTask;
+import walkingkooka.j2cl.maven.J2clTaskDirectory;
+import walkingkooka.j2cl.maven.J2clTaskKind;
+import walkingkooka.j2cl.maven.J2clTaskResult;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
 import java.util.Optional;
@@ -33,35 +33,35 @@ import java.util.Set;
 /**
  * Transpiles the stripped source into javascript equivalents.
  */
-public final class J2clStepWorkerJ2clTranspiler<C extends J2clMavenContext> implements J2clStepWorker<C> {
+public final class J2clTaskWorkerJ2clTranspiler<C extends J2clMavenContext> implements J2clTask<C> {
 
     /**
      * Singleton
      */
-    public static <C extends J2clMavenContext> J2clStepWorker<C> instance() {
-        return new J2clStepWorkerJ2clTranspiler<>();
+    public static <C extends J2clMavenContext> J2clTask<C> instance() {
+        return new J2clTaskWorkerJ2clTranspiler<>();
     }
 
-    private J2clStepWorkerJ2clTranspiler() {
+    private J2clTaskWorkerJ2clTranspiler() {
         super();
     }
 
     @Override
-    public J2clStepResult execute(final J2clDependency artifact,
-                                  final J2clStep step,
+    public J2clTaskResult execute(final J2clDependency artifact,
+                                  final J2clTaskKind kind,
                                   final C context,
                                   final TreeLogger logger) throws Exception {
         return this.executeIfNecessary(
                 artifact,
-                step,
+                kind,
                 context,
                 logger
         );
     }
 
     @Override
-    public J2clStepResult executeWithDirectory(final J2clDependency artifact,
-                                               final J2clStepDirectory directory,
+    public J2clTaskResult executeWithDirectory(final J2clDependency artifact,
+                                               final J2clTaskDirectory directory,
                                                final C context,
                                                final TreeLogger logger) throws Exception {
         final J2clPath sourceRoot = this.sourceRoot(artifact);
@@ -71,14 +71,14 @@ public final class J2clStepWorkerJ2clTranspiler<C extends J2clMavenContext> impl
                 sourceRoot,
                 directory.output().absentOrFail(),
                 logger) ?
-                J2clStepResult.SUCCESS :
-                J2clStepResult.FAILED;
+                J2clTaskResult.SUCCESS :
+                J2clTaskResult.FAILED;
     }
 
     private J2clPath sourceRoot(final J2clDependency artifact) {
-        final J2clStep first = J2clStep.SHADE_JAVA_SOURCE;
-        final J2clStep second = J2clStep.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE;
-        final J2clStep third = J2clStep.UNPACK;
+        final J2clTaskKind first = J2clTaskKind.SHADE_JAVA_SOURCE;
+        final J2clTaskKind second = J2clTaskKind.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE;
+        final J2clTaskKind third = J2clTaskKind.UNPACK;
 
         final J2clPath sourceRoot;
 
@@ -132,12 +132,12 @@ public final class J2clStepWorkerJ2clTranspiler<C extends J2clMavenContext> impl
             }
 
             if (dependency.isClasspathRequired()) {
-                final Optional<J2clPath> shadeClassFiles = output(dependency, J2clStep.SHADE_CLASS_FILES);
+                final Optional<J2clPath> shadeClassFiles = output(dependency, J2clTaskKind.SHADE_CLASS_FILES);
                 if (shadeClassFiles.isPresent()) {
                     classpath.add(shadeClassFiles.get());
                     continue;
                 }
-                final Optional<J2clPath> compileGwtIncompatibleStripped = output(dependency, J2clStep.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE);
+                final Optional<J2clPath> compileGwtIncompatibleStripped = output(dependency, J2clTaskKind.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE);
                 compileGwtIncompatibleStripped.map(classpath::add);
             }
 
@@ -147,8 +147,9 @@ public final class J2clStepWorkerJ2clTranspiler<C extends J2clMavenContext> impl
         return classpath;
     }
 
-    private static Optional<J2clPath> output(final J2clDependency dependency, final J2clStep step) {
-        return dependency.step(step)
+    private static Optional<J2clPath> output(final J2clDependency dependency,
+                                             final J2clTaskKind kind) {
+        return dependency.task(kind)
                 .output()
                 .exists();
     }

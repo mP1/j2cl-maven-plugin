@@ -18,32 +18,32 @@
 package walkingkooka.j2cl.maven;
 
 import org.junit.Test;
-import walkingkooka.j2cl.maven.test.J2clStepWorkerWebDriverUnitTestRunnerBrowser;
+import walkingkooka.j2cl.maven.test.J2clTaskWorkerWebDriverUnitTestRunnerBrowser;
 
 import static org.junit.Assert.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class J2clStepWorkerWebDriverUnitTestRunnerBrowserTest {
+public final class J2ClTaskWorkerWebDriverUnitTestRunnerBrowserTest {
 
     @Test
     public void testFromUnknown() {
         assertThrows(IllegalArgumentException.class, () -> {
-            J2clStepWorkerWebDriverUnitTestRunnerBrowser.fromCommandLine("unknown");
+            J2clTaskWorkerWebDriverUnitTestRunnerBrowser.fromCommandLine("unknown");
         });
     }
 
     @Test
     public void testChromeUpperCase() {
-        assertSame(J2clStepWorkerWebDriverUnitTestRunnerBrowser.CHROME, J2clStepWorkerWebDriverUnitTestRunnerBrowser.fromCommandLine("CHROME"));
+        assertSame(J2clTaskWorkerWebDriverUnitTestRunnerBrowser.CHROME, J2clTaskWorkerWebDriverUnitTestRunnerBrowser.fromCommandLine("CHROME"));
     }
 
     @Test
     public void testChromeLowerCase() {
-        assertSame(J2clStepWorkerWebDriverUnitTestRunnerBrowser.CHROME, J2clStepWorkerWebDriverUnitTestRunnerBrowser.fromCommandLine("chrome"));
+        assertSame(J2clTaskWorkerWebDriverUnitTestRunnerBrowser.CHROME, J2clTaskWorkerWebDriverUnitTestRunnerBrowser.fromCommandLine("chrome"));
     }
 
     @Test
     public void testHtmlUnit() {
-        assertSame(J2clStepWorkerWebDriverUnitTestRunnerBrowser.HTML_UNIT, J2clStepWorkerWebDriverUnitTestRunnerBrowser.fromCommandLine("html_unit"));
+        assertSame(J2clTaskWorkerWebDriverUnitTestRunnerBrowser.HTML_UNIT, J2clTaskWorkerWebDriverUnitTestRunnerBrowser.fromCommandLine("html_unit"));
     }
 }

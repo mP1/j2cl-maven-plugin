@@ -21,40 +21,40 @@ import walkingkooka.collect.list.Lists;
 import walkingkooka.j2cl.maven.J2clDependency;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
-import walkingkooka.j2cl.maven.J2clStep;
-import walkingkooka.j2cl.maven.J2clStepDirectory;
-import walkingkooka.j2cl.maven.J2clStepWorker;
+import walkingkooka.j2cl.maven.J2clTask;
+import walkingkooka.j2cl.maven.J2clTaskDirectory;
+import walkingkooka.j2cl.maven.J2clTaskKind;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
 import java.util.List;
 
 /**
- * Compiles the java source to the target {@link J2clStepDirectory#output()}.
+ * Compiles the java source to the target {@link J2clTaskDirectory#output()}.
  */
-public final class J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource<C extends J2clMavenContext> extends J2clStepWorkerJavacCompiler<C> {
+public final class J2clTaskJavacCompilerGwtIncompatibleStrippedSource<C extends J2clMavenContext> extends J2clTaskJavacCompiler<C> {
 
     /**
      * Singleton
      */
-    public static <C extends J2clMavenContext> J2clStepWorker<C> instance() {
-        return new J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource<>();
+    public static <C extends J2clMavenContext> J2clTask<C> instance() {
+        return new J2clTaskJavacCompilerGwtIncompatibleStrippedSource<>();
     }
 
     /**
      * Use singleton
      */
-    private J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource() {
+    private J2clTaskJavacCompilerGwtIncompatibleStrippedSource() {
         super();
     }
 
     @Override
-    J2clStep sourcesStep() {
-        return J2clStep.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE;
+    J2clTaskKind sourceTask() {
+        return J2clTaskKind.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE;
     }
 
     @Override
-    List<J2clStep> compiledStep() {
-        return Lists.of(J2clStep.SHADE_CLASS_FILES, J2clStep.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE);
+    List<J2clTaskKind> compileTask() {
+        return Lists.of(J2clTaskKind.SHADE_CLASS_FILES, J2clTaskKind.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE);
     }
 
     @Override
@@ -67,12 +67,12 @@ public final class J2clStepWorkerJavacCompilerGwtIncompatibleStrippedSource<C ex
      */
     @Override
     J2clPath selectClassFiles(final J2clDependency dependency) {
-        return dependency.stepSourcesOrArchiveFile(this.compiledStep());
+        return dependency.sourcesOrArchiveFile(this.compileTask());
     }
 
     @Override
     void postCompile(final J2clDependency artifact,
-                     final J2clStepDirectory directory,
+                     final J2clTaskDirectory directory,
                      final C context,
                      final TreeLogger logger) {
         // nop

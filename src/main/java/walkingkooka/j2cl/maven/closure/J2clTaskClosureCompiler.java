@@ -22,10 +22,10 @@ import walkingkooka.j2cl.maven.J2clDependency;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clSourcesKind;
-import walkingkooka.j2cl.maven.J2clStep;
-import walkingkooka.j2cl.maven.J2clStepDirectory;
-import walkingkooka.j2cl.maven.J2clStepResult;
-import walkingkooka.j2cl.maven.J2clStepWorker;
+import walkingkooka.j2cl.maven.J2clTask;
+import walkingkooka.j2cl.maven.J2clTaskDirectory;
+import walkingkooka.j2cl.maven.J2clTaskKind;
+import walkingkooka.j2cl.maven.J2clTaskResult;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
 import java.util.Set;
@@ -33,35 +33,35 @@ import java.util.Set;
 /**
  * Calls the closure compiler and assembles the final Javascript output.
  */
-public final class J2clStepWorkerClosureCompiler<C extends J2clMavenContext> implements J2clStepWorker<C> {
+public final class J2clTaskClosureCompiler<C extends J2clMavenContext> implements J2clTask<C> {
 
     /**
      * Singleton
      */
-    public static <C extends J2clMavenContext> J2clStepWorker<C> instance() {
-        return new J2clStepWorkerClosureCompiler<>();
+    public static <C extends J2clMavenContext> J2clTask<C> instance() {
+        return new J2clTaskClosureCompiler<>();
     }
 
-    private J2clStepWorkerClosureCompiler() {
+    private J2clTaskClosureCompiler() {
         super();
     }
 
     @Override
-    public J2clStepResult execute(final J2clDependency artifact,
-                                  final J2clStep step,
+    public J2clTaskResult execute(final J2clDependency artifact,
+                                  final J2clTaskKind kind,
                                   final C context,
                                   final TreeLogger logger) throws Exception {
         return this.executeIfNecessary(
                 artifact,
-                step,
+                kind,
                 context,
                 logger
         );
     }
 
     @Override
-    public J2clStepResult executeWithDirectory(final J2clDependency artifact,
-                                               final J2clStepDirectory directory,
+    public J2clTaskResult executeWithDirectory(final J2clDependency artifact,
+                                               final J2clTaskDirectory directory,
                                                final C context,
                                                final TreeLogger logger) throws Exception {
         final Set<J2clPath> sources = Sets.ordered();
@@ -121,19 +121,19 @@ public final class J2clStepWorkerClosureCompiler<C extends J2clMavenContext> imp
                 context,
                 logger
         ) ?
-                J2clStepResult.SUCCESS :
-                J2clStepResult.FAILED;
+                J2clTaskResult.SUCCESS :
+                J2clTaskResult.FAILED;
     }
 
     private void addSources(final J2clDependency artifact,
                             final Set<J2clPath> sources) {
-        final J2clPath transpiled = artifact.step(J2clStep.TRANSPILE_JAVA_TO_JAVASCRIPT).output();
+        final J2clPath transpiled = artifact.task(J2clTaskKind.TRANSPILE_JAVA_TO_JAVASCRIPT).output();
         if (transpiled.exists().isPresent()) {
             sources.add(transpiled);
         }
 
         // add unpack anyway as it might contain js originally accompanying java source.
-        final J2clPath unpack = artifact.step(J2clStep.UNPACK).output();
+        final J2clPath unpack = artifact.task(J2clTaskKind.UNPACK).output();
         if (unpack.exists().isPresent()) {
             sources.add(unpack);
         } else {

@@ -200,31 +200,31 @@ public abstract class J2clMavenContext implements Context {
 
     private final Optional<String> sourceMaps;
 
-    // steps............................................................................................................
+    // tasks............................................................................................................
 
-    public final String directoryName(final J2clStep step) {
-        return step.directoryName(
-                this.steps()
-                        .indexOf(step)
+    public final String directoryName(final J2clTaskKind kind) {
+        return kind.directoryName(
+                this.tasks()
+                        .indexOf(kind)
         );
     }
 
-    final J2clStep firstStep() {
-        return this.steps().get(0);
+    final J2clTaskKind firstTaskKind() {
+        return this.tasks().get(0);
     }
 
-    final Optional<J2clStep> nextStep(final J2clStep current) {
-        final List<J2clStep> steps = this.steps();
+    final Optional<J2clTaskKind> nextTask(final J2clTaskKind current) {
+        final List<J2clTaskKind> tasks = this.tasks();
 
-        final int index = steps.indexOf(current);
+        final int index = tasks.indexOf(current);
         return Optional.ofNullable(
-                index + 1 < steps.size() ?
-                        steps.get(index + 1) :
+                index + 1 < tasks.size() ?
+                        tasks.get(index + 1) :
                         null
         );
     }
 
-    abstract List<J2clStep> steps();
+    abstract List<J2clTaskKind> tasks();
 
     /**
      * When true directories like !SUCCESS should be checked and honoured.
@@ -237,8 +237,8 @@ public abstract class J2clMavenContext implements Context {
     // tasks............................................................................................................
 
     /**
-     * Holds of artifacts and the artifacts it requires to complete before it can start with its own first step.
-     * When the {link Set} of required (the map value) becomes empty the {@link J2clDependency coords} can have its steps started.
+     * Holds of artifacts and the artifacts it requires to complete before it can start with its own first task.
+     * When the {link Set} of required (the map value) becomes empty the {@link J2clDependency coords} can have its tasks started.
      */
     private final Map<J2clDependency, Set<J2clDependency>> tasks = Maps.concurrent();
 
@@ -384,34 +384,34 @@ public abstract class J2clMavenContext implements Context {
         this.running.incrementAndGet(); // increment here because watch task will submit a Callable and it shouldnt be counted by await()
     }
 
-    private Void callable(final J2clDependency task,
+    private Void callable(final J2clDependency dependency,
                           final TreeLogger logger) throws Exception {
         final Thread thread = Thread.currentThread();
         final String threadName = thread.getName();
 
         try {
-            final String coords = task.coords().toString();
+            final String coords = dependency.coords().toString();
             final Instant start = Instant.now();
 
             logger.line(coords);
             logger.indent();
             {
-                J2clStep step = this.firstStep();
+                J2clTaskKind kind = this.firstTaskKind();
                 do {
-                    // skip this and any more steps, watch task probably issued a shutdown because of a new file watch event.
+                    // skip this and any more tasks, watch task probably issued a shutdown because of a new file watch event.
                     if (!this.isRunning()) {
                         break;
                     }
-                    thread.setName(coords + "-" + step);
+                    thread.setName(coords + "-" + kind);
 
-                    step = step.execute(
-                            task,
+                    kind = kind.execute(
+                            dependency,
                             logger,
                             this
                     ).orElse(null);
 
                     thread.setName(threadName);
-                } while (null != step);
+                } while (null != kind);
             }
             logger.outdent();
 
@@ -424,7 +424,7 @@ public abstract class J2clMavenContext implements Context {
             );
 
             this.taskCompleted(
-                    task,
+                    dependency,
                     logger
             );
         } finally {
@@ -511,7 +511,7 @@ public abstract class J2clMavenContext implements Context {
     private final static int AWAIT_POLL_TIMEOUT = 50;
 
     /**
-     * Used to cancel any outstanding tasks typically done because one step has failed and any future work is pointless
+     * Used to cancel any outstanding tasks typically done because one task has failed and any future work is pointless
      * and should be immediately aborted.
      */
     final void cancel(final Throwable cause) {

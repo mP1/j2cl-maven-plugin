@@ -28,10 +28,10 @@ import walkingkooka.j2cl.maven.J2clException;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clMojoTestMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
-import walkingkooka.j2cl.maven.J2clStep;
-import walkingkooka.j2cl.maven.J2clStepDirectory;
-import walkingkooka.j2cl.maven.J2clStepResult;
-import walkingkooka.j2cl.maven.J2clStepWorker;
+import walkingkooka.j2cl.maven.J2clTask;
+import walkingkooka.j2cl.maven.J2clTaskDirectory;
+import walkingkooka.j2cl.maven.J2clTaskKind;
+import walkingkooka.j2cl.maven.J2clTaskResult;
 import walkingkooka.j2cl.maven.log.BrowserLogLevel;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.CharSequences;
@@ -48,35 +48,35 @@ import java.util.List;
  * Assumes that the closure compiler has completed successfully and then invokes web driver to execute the prepared
  * js file containing the tests.
  */
-public final class J2clStepWorkerWebDriverUnitTestRunner implements J2clStepWorker<J2clMojoTestMavenContext> {
+public final class J2clTaskWebDriverUnitTestRunner implements J2clTask<J2clMojoTestMavenContext> {
 
     /**
      * Singleton
      */
-    public static J2clStepWorker<J2clMojoTestMavenContext> instance() {
-        return new J2clStepWorkerWebDriverUnitTestRunner();
+    public static J2clTask<J2clMojoTestMavenContext> instance() {
+        return new J2clTaskWebDriverUnitTestRunner();
     }
 
-    private J2clStepWorkerWebDriverUnitTestRunner() {
+    private J2clTaskWebDriverUnitTestRunner() {
         super();
     }
 
     @Override
-    public J2clStepResult execute(final J2clDependency artifact,
-                                  final J2clStep step,
+    public J2clTaskResult execute(final J2clDependency artifact,
+                                  final J2clTaskKind kind,
                                   final J2clMojoTestMavenContext context,
                                   final TreeLogger logger) throws Exception {
         return this.executeIfNecessary(
                 artifact,
-                step,
+                kind,
                 context,
                 logger
         );
     }
 
     @Override
-    public J2clStepResult executeWithDirectory(final J2clDependency artifact,
-                                               final J2clStepDirectory directory,
+    public J2clTaskResult executeWithDirectory(final J2clDependency artifact,
+                                               final J2clTaskDirectory directory,
                                                final J2clMojoTestMavenContext context,
                                                final TreeLogger logger) throws Exception {
         logger.line("Junit Tests");
@@ -92,7 +92,7 @@ public final class J2clStepWorkerWebDriverUnitTestRunner implements J2clStepWork
         }
         logger.outdent();
 
-        return J2clStepResult.SUCCESS;
+        return J2clTaskResult.SUCCESS;
     }
 
     /**
@@ -130,7 +130,7 @@ public final class J2clStepWorkerWebDriverUnitTestRunner implements J2clStepWork
      * Starts up webdriver and loads the javascript host file which will run all the tests.
      */
     private void executeTestSuite(final J2clPath startupHostFile,
-                                  final List<J2clStepWorkerWebDriverUnitTestRunnerBrowser> browsers,
+                                  final List<J2clTaskWorkerWebDriverUnitTestRunnerBrowser> browsers,
                                   final BrowserLogLevel logLevel,
                                   final int timeout,
                                   final TreeLogger logger) throws Exception {
@@ -138,7 +138,7 @@ public final class J2clStepWorkerWebDriverUnitTestRunner implements J2clStepWork
         logger.line("Test " + startupHostFile);
         logger.indent();
         {
-            for (final J2clStepWorkerWebDriverUnitTestRunnerBrowser browser : browsers) {
+            for (final J2clTaskWorkerWebDriverUnitTestRunnerBrowser browser : browsers) {
                 logger.line(browser.name());
                 logger.indent();
                 {
@@ -152,7 +152,7 @@ public final class J2clStepWorkerWebDriverUnitTestRunner implements J2clStepWork
                                 .withTimeout(Duration.ofSeconds(timeout))
                                 .withMessage("Tests failed to finish in timeout")
                                 .pollingEvery(Duration.ofMillis(100))
-                                .until(J2clStepWorkerWebDriverUnitTestRunner::isFinished);
+                                .until(J2clTaskWebDriverUnitTestRunner::isFinished);
 
                         final String testReport = testReport(driver);
                         logger.indent();
