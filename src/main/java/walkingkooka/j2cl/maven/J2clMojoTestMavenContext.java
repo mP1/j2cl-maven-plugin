@@ -24,7 +24,7 @@ import walkingkooka.j2cl.maven.closure.ClosureFormattingOption;
 import walkingkooka.j2cl.maven.hash.HashBuilder;
 import walkingkooka.j2cl.maven.log.BrowserLogLevel;
 import walkingkooka.j2cl.maven.log.MavenLogger;
-import walkingkooka.j2cl.maven.test.J2clTaskWorkerWebDriverUnitTestRunnerBrowser;
+import walkingkooka.j2cl.maven.test.J2clTaskWebDriverUnitTestRunnerBrowser;
 
 import java.util.List;
 import java.util.Map;
@@ -50,7 +50,7 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
                                          final Set<String> javaCompilerArguments,
                                          final LanguageMode languageOut,
                                          final Optional<String> sourceMaps,
-                                         final List<J2clTaskWorkerWebDriverUnitTestRunnerBrowser> browsers,
+                                         final List<J2clTaskWebDriverUnitTestRunnerBrowser> browsers,
                                          final BrowserLogLevel browserLogLevel,
                                          final String testClassName,
                                          final int testTimeout,
@@ -94,7 +94,7 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
                                      final Set<String> javaCompilerArguments,
                                      final LanguageMode languageOut,
                                      final Optional<String> sourceMaps,
-                                     final List<J2clTaskWorkerWebDriverUnitTestRunnerBrowser> browsers,
+                                     final List<J2clTaskWebDriverUnitTestRunnerBrowser> browsers,
                                      final BrowserLogLevel browserLogLevel,
                                      final String testClassName,
                                      final int testTimeout,
@@ -197,11 +197,11 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
 
     // test only props..................................................................................................
 
-    public List<J2clTaskWorkerWebDriverUnitTestRunnerBrowser> browsers() {
+    public List<J2clTaskWebDriverUnitTestRunnerBrowser> browsers() {
         return this.browsers;
     }
 
-    private final List<J2clTaskWorkerWebDriverUnitTestRunnerBrowser> browsers;
+    private final List<J2clTaskWebDriverUnitTestRunnerBrowser> browsers;
 
     public BrowserLogLevel browserLogLevel() {
         return this.browserLogLevel;

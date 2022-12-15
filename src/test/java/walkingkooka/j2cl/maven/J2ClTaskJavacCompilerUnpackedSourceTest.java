@@ -21,7 +21,7 @@ import org.junit.Test;
 import walkingkooka.j2cl.maven.javac.J2clTaskJavacCompilerUnpackedSource;
 import walkingkooka.test.Testing;
 
-public final class J2ClTaskWorkerJavacCompilerUnpackedSourceTest implements Testing {
+public final class J2ClTaskJavacCompilerUnpackedSourceTest implements Testing {
 
     // // 'javatests.org.gwtproject.timer.client.TimerJ2clTest_AdapterSuite' -> org.gwtproject.timer.client.TimerJ2clTest
     @Test
