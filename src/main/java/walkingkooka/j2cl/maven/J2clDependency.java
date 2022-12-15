@@ -504,9 +504,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
         this.dependencies()
                 .stream()
                 .filter(d -> false == d.isJreBootstrapClassFiles())
-                .forEach(d -> {
-                    d.add(bootstrapAndJreDependencies);
-                });
+                .forEach(d -> d.add(bootstrapAndJreDependencies));
     }
 
     /**
@@ -619,9 +617,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
      * Updates the field returned by {@link #dependencies()} so it returns a read only {@link Set}.
      */
     private static void makeDependenciesGetterReadOnly(final Collection<J2clDependency> all) {
-        all.forEach(d -> {
-            d.dependencies = Sets.readOnly(d.dependencies);
-        });
+        all.forEach(d -> d.dependencies = Sets.readOnly(d.dependencies));
     }
 
     /**

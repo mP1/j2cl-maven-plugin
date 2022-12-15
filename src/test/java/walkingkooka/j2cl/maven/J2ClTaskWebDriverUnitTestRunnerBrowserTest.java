@@ -27,9 +27,10 @@ public final class J2ClTaskWebDriverUnitTestRunnerBrowserTest {
 
     @Test
     public void testFromUnknown() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            J2clTaskWebDriverUnitTestRunnerBrowser.fromCommandLine("unknown");
-        });
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> J2clTaskWebDriverUnitTestRunnerBrowser.fromCommandLine("unknown")
+        );
     }
 
     @Test

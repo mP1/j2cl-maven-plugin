@@ -49,9 +49,10 @@ public final class J2clDependencyGraphCalculatorTest implements ClassTesting2<J2
         final Map<String, String> flat = Maps.of(A1, "group1:artifact2:*");
         final String required = "group4:artifact5:version6";
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            J2clDependencyGraphCalculator.with(transform(flat), transformCsv(required));
-        });
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> J2clDependencyGraphCalculator.with(transform(flat), transformCsv(required))
+        );
     }
 
     @Test
@@ -59,9 +60,10 @@ public final class J2clDependencyGraphCalculatorTest implements ClassTesting2<J2
         final Map<String, String> flat = Maps.of(A1, "group1:artifact2:version3");
         final String required = "group4:artifact5:*";
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            J2clDependencyGraphCalculator.with(transform(flat), transformCsv(required));
-        });
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> J2clDependencyGraphCalculator.with(transform(flat), transformCsv(required))
+        );
     }
 
     @Test
