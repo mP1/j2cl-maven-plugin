@@ -74,35 +74,35 @@ public final class J2clStepWorkerUnpack<C extends J2clMavenContext> implements J
 
         final J2clPath dest = directory.output().absentOrFail();
 
-            boolean filesFound = this.extractSourceRoots(artifact, dest, logger);
+        boolean filesFound = this.extractSourceRoots(artifact, dest, logger);
 
-            if (false == filesFound) {
-                // if no source is available unpack the binary might be a jszip.
-                final Optional<J2clPath> archive = artifact.artifactFile();
-                if (archive.isPresent()) {
-                    final J2clPath path = archive.get();
-                    logger.path("Archive", path);
-                    logger.indent();
-                    {
-                        filesFound = archive.get()
-                                .extractArchiveFiles(J2clPath.WITHOUT_META_INF,
-                                        dest,
-                                        logger)
-                                .size() > 0;
-                    }
-                    logger.outdent();
+        if (false == filesFound) {
+            // if no source is available unpack the binary might be a jszip.
+            final Optional<J2clPath> archive = artifact.artifactFile();
+            if (archive.isPresent()) {
+                final J2clPath path = archive.get();
+                logger.path("Archive", path);
+                logger.indent();
+                {
+                    filesFound = archive.get()
+                            .extractArchiveFiles(J2clPath.WITHOUT_META_INF,
+                                    dest,
+                                    logger)
+                            .size() > 0;
                 }
+                logger.outdent();
             }
+        }
 
-            if(filesFound) {
-                logger.path("Destination", dest);
+        if (filesFound) {
+            logger.path("Destination", dest);
 
-                logger.line("Source files found, transpiling will happen");
-                result = J2clStepResult.SUCCESS;
-            } else {
-                logger.line("No source files found, transpiling will not be attempted");
-                result = J2clStepResult.ABORTED;
-            }
+            logger.line("Source files found, transpiling will happen");
+            result = J2clStepResult.SUCCESS;
+        } else {
+            logger.line("No source files found, transpiling will not be attempted");
+            result = J2clStepResult.ABORTED;
+        }
 
         return result;
     }
