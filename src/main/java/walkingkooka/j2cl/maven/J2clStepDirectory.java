@@ -85,7 +85,7 @@ public final class J2clStepDirectory {
     }
 
     /**
-     * Writes the given lines to a log file under this job step directory.
+     * Writes the given lines to a log file under this task step directory.
      * Each step is given its own directory and will also have its own local log file showing the output for a particular single step.
      */
     public J2clStepDirectory writeLog(final List<CharSequence> lines,

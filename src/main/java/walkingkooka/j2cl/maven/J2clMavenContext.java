@@ -240,19 +240,19 @@ public abstract class J2clMavenContext implements Context {
      * Holds of artifacts and the artifacts it requires to complete before it can start with its own first step.
      * When the {link Set} of required (the map value) becomes empty the {@link J2clDependency coords} can have its steps started.
      */
-    private final Map<J2clDependency, Set<J2clDependency>> jobs = Maps.concurrent();
+    private final Map<J2clDependency, Set<J2clDependency>> tasks = Maps.concurrent();
 
     /**
      * Executes the given project.
      */
     final void prepareAndStart(final J2clDependency project,
                                final TreeLogger logger) throws Throwable {
-        this.jobs.clear();
+        this.tasks.clear();
 
-        this.prepareJobs(project);
+        this.prepareTasks(project);
 
-        if (0 == this.trySubmitJobs(logger)) {
-            throw new J2clException("Unable to find a leaf dependencies(dependency without dependencies), job failed.");
+        if (0 == this.trySubmitTasks(logger)) {
+            throw new J2clException("Unable to find a leaf dependencies(dependency without dependencies), task failed.");
         }
     }
 
@@ -264,22 +264,22 @@ public abstract class J2clMavenContext implements Context {
                 Runtime.getRuntime().availableProcessors() * 2);
     }
 
-    private void prepareJobs(final J2clDependency artifact) {
-        if (false == this.jobs.containsKey(artifact)) {
+    private void prepareTasks(final J2clDependency artifact) {
+        if (false == this.tasks.containsKey(artifact)) {
 
-            // keep transitive dependencies alphabetical sorted for better readability when trySubmitJob pretty prints queue processing.
+            // keep transitive dependencies alphabetical sorted for better readability when trySubmitTasks pretty prints queue processing.
             final Set<J2clDependency> required = Sets.sorted();
 
-            this.jobs.put(artifact, required);
+            this.tasks.put(artifact, required);
 
-            if (!this.shouldSkipSubmittingDependencyJobs()) {
+            if (!this.shouldSkipSubmittingDependencyTasks()) {
                 for (final J2clDependency dependency : artifact.dependencies()) {
-                    if (dependency.shouldSkipJobSubmit()) {
+                    if (dependency.shouldSkipTaskSubmit()) {
                         continue;
                     }
 
                     required.add(dependency);
-                    this.prepareJobs(dependency);
+                    this.prepareTasks(dependency);
                 }
             }
         }
@@ -288,29 +288,29 @@ public abstract class J2clMavenContext implements Context {
     /**
      * Only watch during the file event watch phase will return true.
      */
-    abstract boolean shouldSkipSubmittingDependencyJobs();
+    abstract boolean shouldSkipSubmittingDependencyTasks();
 
     /**
-     * Loops over all {@link #jobs} submitting a job for each that has no required artifacts aka the value is an empty {@link Set}.
+     * Loops over all {@link #tasks} submitting a task for each that has no required artifacts aka the value is an empty {@link Set}.
      */
-    private int trySubmitJobs(final TreeLogger logger) {
+    private int trySubmitTasks(final TreeLogger logger) {
         final List<J2clDependency> submits = Lists.array();
 
         this.executeWithLock(() -> {
             final String message;
 
-            logger.line("Submitting jobs");
+            logger.line("Submitting tasks");
             logger.indent();
             {
                 logger.line("Queue");
                 logger.indent();
                 {
 
-                    //for readability sort jobs alphabetically as they will be printed and possibly submitted.....................
-                    final SortedMap<J2clDependency, Set<J2clDependency>> alphaSortedJobs = Maps.sorted();
-                    alphaSortedJobs.putAll(this.jobs);
+                    //for readability sort tasks alphabetically as they will be printed and possibly submitted.....................
+                    final SortedMap<J2clDependency, Set<J2clDependency>> tasksAlphaSorted = Maps.sorted();
+                    tasksAlphaSorted.putAll(this.tasks);
 
-                    for (final Entry<J2clDependency, Set<J2clDependency>> artifactAndDependencies : alphaSortedJobs.entrySet()) {
+                    for (final Entry<J2clDependency, Set<J2clDependency>> artifactAndDependencies : tasksAlphaSorted.entrySet()) {
                         final J2clDependency artifact = artifactAndDependencies.getKey();
                         final Set<J2clDependency> required = artifactAndDependencies.getValue();
 
@@ -318,7 +318,7 @@ public abstract class J2clMavenContext implements Context {
                         logger.indent();
                         {
                             if (required.isEmpty()) {
-                                this.jobs.remove(artifact);
+                                this.tasks.remove(artifact);
                                 submits.add(artifact);
                                 logger.line("Queued " + artifact + " for submission " + submits.size());
                             } else {
@@ -334,14 +334,14 @@ public abstract class J2clMavenContext implements Context {
                     }
 
                     final int submitCount = submits.size();
-                    final int waiting = alphaSortedJobs.size() - submits.size();
+                    final int waiting = tasksAlphaSorted.size() - submits.size();
                     final int running = this.running.get();
 
                     if (0 == submitCount && waiting > 0 && 0 == running) {
-                        throw new J2clException(submitCount + " jobs submitted with " + waiting + " several waiting and " + running + " running.");
+                        throw new J2clException(submitCount + " tasks submitted with " + waiting + " several waiting and " + running + " running.");
                     }
 
-                    message = submitCount + " job(s) submitted, " + running + " running " + waiting + " waiting.";
+                    message = submitCount + " task(s) submitted, " + running + " running " + waiting + " waiting.";
                 }
                 logger.outdent();
             }
@@ -437,39 +437,39 @@ public abstract class J2clMavenContext implements Context {
     private final AtomicInteger running = new AtomicInteger();
 
     /**
-     * Finds all jobs that have the given artifact as a dependency and remove that dependency from the waiting list.
+     * Finds all tasks that have the given artifact as a dependency and remove that dependency from the waiting list.
      */
     final J2clMavenContext taskCompleted(final J2clDependency completed,
                                          final TreeLogger logger) {
         this.executeWithLock(() -> {
-            this.jobs.remove(completed);
+            this.tasks.remove(completed);
 
-            for (final Set<J2clDependency> dependencies : this.jobs.values()) {
+            for (final Set<J2clDependency> dependencies : this.tasks.values()) {
                 dependencies.remove(completed);
             }
 
-            this.trySubmitJobs(logger);
+            this.trySubmitTasks(logger);
         });
         return this;
     }
 
     private void executeWithLock(final Runnable execute) {
         try {
-            if (false == this.jobsLock.tryLock(3, TimeUnit.SECONDS)) {
-                throw new J2clException("Failed to get job lock");
+            if (false == this.tasksLock.tryLock(3, TimeUnit.SECONDS)) {
+                throw new J2clException("Failed to get tasks lock");
             }
             execute.run();
         } catch (final InterruptedException fail) {
-            throw new J2clException("Failed to get job lock: " + fail.getMessage(), fail);
+            throw new J2clException("Failed to get tasks lock: " + fail.getMessage(), fail);
         } finally {
-            this.jobsLock.unlock();
+            this.tasksLock.unlock();
         }
     }
 
     /**
-     * A lock used to by {@link #trySubmitJobs(TreeLogger)} to avoid concurrent modification of {@link #jobs}.
+     * A lock used to by {@link #trySubmitTasks(TreeLogger)} to avoid concurrent modification of {@link #tasks}.
      */
-    private final Lock jobsLock = new ReentrantLock();
+    private final Lock tasksLock = new ReentrantLock();
 
     /**
      * Waits (aka Blocks) for all outstanding tasks to complete.
@@ -545,7 +545,7 @@ public abstract class J2clMavenContext implements Context {
     }
 
     /**
-     * Returns true if the {@link ExecutorService} is still alive and executing new or pending jobs.
+     * Returns true if the {@link ExecutorService} is still alive and executing new or pending tasks.
      */
     private boolean isRunning() {
         final ExecutorService executorService = this.executorService.get();
