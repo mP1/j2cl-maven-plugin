@@ -33,16 +33,16 @@ import java.util.Set;
 /**
  * Transpiles the stripped source into javascript equivalents.
  */
-public final class J2clTaskWorkerJ2clTranspiler<C extends J2clMavenContext> implements J2clTask<C> {
+public final class J2clTask2clTranspiler<C extends J2clMavenContext> implements J2clTask<C> {
 
     /**
      * Singleton
      */
     public static <C extends J2clMavenContext> J2clTask<C> instance() {
-        return new J2clTaskWorkerJ2clTranspiler<>();
+        return new J2clTask2clTranspiler<>();
     }
 
-    private J2clTaskWorkerJ2clTranspiler() {
+    private J2clTask2clTranspiler() {
         super();
     }
 

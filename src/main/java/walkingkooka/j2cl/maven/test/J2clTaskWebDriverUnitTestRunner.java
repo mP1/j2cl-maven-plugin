@@ -130,7 +130,7 @@ public final class J2clTaskWebDriverUnitTestRunner implements J2clTask<J2clMojoT
      * Starts up webdriver and loads the javascript host file which will run all the tests.
      */
     private void executeTestSuite(final J2clPath startupHostFile,
-                                  final List<J2clTaskWorkerWebDriverUnitTestRunnerBrowser> browsers,
+                                  final List<J2clTaskWebDriverUnitTestRunnerBrowser> browsers,
                                   final BrowserLogLevel logLevel,
                                   final int timeout,
                                   final TreeLogger logger) throws Exception {
@@ -138,7 +138,7 @@ public final class J2clTaskWebDriverUnitTestRunner implements J2clTask<J2clMojoT
         logger.line("Test " + startupHostFile);
         logger.indent();
         {
-            for (final J2clTaskWorkerWebDriverUnitTestRunnerBrowser browser : browsers) {
+            for (final J2clTaskWebDriverUnitTestRunnerBrowser browser : browsers) {
                 logger.line(browser.name());
                 logger.indent();
                 {

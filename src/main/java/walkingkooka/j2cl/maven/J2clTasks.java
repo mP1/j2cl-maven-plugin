@@ -26,7 +26,7 @@ import walkingkooka.j2cl.maven.shade.J2clTaskShadeClassFile;
 import walkingkooka.j2cl.maven.shade.J2clTaskShadeJavaSource;
 import walkingkooka.j2cl.maven.strip.J2clTaskGwtIncompatibleStripPreprocessor;
 import walkingkooka.j2cl.maven.test.J2clTaskWebDriverUnitTestRunner;
-import walkingkooka.j2cl.maven.transpile.J2clTaskWorkerJ2clTranspiler;
+import walkingkooka.j2cl.maven.transpile.J2clTask2clTranspiler;
 import walkingkooka.j2cl.maven.unpack.J2clTaskUnpack;
 import walkingkooka.reflect.PublicStaticHelper;
 
@@ -61,7 +61,7 @@ public final class J2clTasks implements PublicStaticHelper {
     }
 
     static <C extends J2clMavenContext> J2clTask<C> transpiler() {
-        return J2clTaskWorkerJ2clTranspiler.instance();
+        return J2clTask2clTranspiler.instance();
     }
 
     static <C extends J2clMavenContext> J2clTask<C> closure() {

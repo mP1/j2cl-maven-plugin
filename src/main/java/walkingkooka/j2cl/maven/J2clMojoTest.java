@@ -28,7 +28,7 @@ import walkingkooka.j2cl.maven.log.BrowserLogLevel;
 import walkingkooka.j2cl.maven.log.MavenLogger;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.j2cl.maven.test.J2clTaskWebDriverUnitTestRunner;
-import walkingkooka.j2cl.maven.test.J2clTaskWorkerWebDriverUnitTestRunnerBrowser;
+import walkingkooka.j2cl.maven.test.J2clTaskWebDriverUnitTestRunnerBrowser;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;
@@ -207,9 +207,9 @@ public final class J2clMojoTest extends J2clMojoBuildTestWatch {
     @Parameter(alias = "browsers", required = true)
     private List<String> browsers;
 
-    private List<J2clTaskWorkerWebDriverUnitTestRunnerBrowser> browsers() {
+    private List<J2clTaskWebDriverUnitTestRunnerBrowser> browsers() {
         return this.browsers.stream()
-                .map(J2clTaskWorkerWebDriverUnitTestRunnerBrowser::fromCommandLine)
+                .map(J2clTaskWebDriverUnitTestRunnerBrowser::fromCommandLine)
                 .collect(Collectors.toList());
     }
 
