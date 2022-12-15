@@ -22,5 +22,5 @@ public enum TreeFormat {
     FLAT,
 
     // Useful for printing a tree of files which will appear lexicagraphically(???) sorted
-    TREE;
+    TREE
 }
