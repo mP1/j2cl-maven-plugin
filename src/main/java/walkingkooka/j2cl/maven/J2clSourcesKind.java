@@ -93,12 +93,10 @@ public enum J2clSourcesKind {
                 .filter(Objects::nonNull)
                 .flatMap(Collection::stream)
                 .map(mapper)
-                .map(p -> {
-                    return p.startsWith(SEPARATOR) ?
-                            p :
-                            base + SEPARATOR + p;
-                })
-                .map(Paths::get)
+                .map(p -> p.startsWith(SEPARATOR) ?
+                        p :
+                        base + SEPARATOR + p
+                ).map(Paths::get)
                 .filter(Files::exists)
                 .map(J2clPath::with)
                 .distinct()

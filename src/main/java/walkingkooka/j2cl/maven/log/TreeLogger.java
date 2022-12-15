@@ -97,18 +97,14 @@ final public class TreeLogger {
                         (
                                 final CharSequence line,
                                 final LineEnding lineEnding,
-                                final Printer printer) -> {
-                            TreeLogger.this.debug(line);
-                        }
+                                final Printer printer) -> TreeLogger.this.debug(line)
                 ).indenting(MavenLogger.INDENTATION);
         this.info = Printers.sink(LineEnding.SYSTEM)
                 .printedLine(
                         (
                                 final CharSequence line,
                                 final LineEnding lineEnding,
-                                final Printer printer) -> {
-                            TreeLogger.this.info(line);
-                        }
+                                final Printer printer) -> TreeLogger.this.info(line)
                 ).indenting(MavenLogger.INDENTATION);
         this.error = error;
 
@@ -225,9 +221,7 @@ final public class TreeLogger {
         paths.stream()
                 .map(toStringPath)
                 .map(StringPath::toString)
-                .forEach(s -> {
-                    TreeLogger.line0(s, printer);
-                });
+                .forEach(s -> TreeLogger.line0(s, printer));
         printer.lineStart();
         printer.flush();
     }

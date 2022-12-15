@@ -25,10 +25,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public final class ClosureFormattingOptionTest {
 
     @Test
-    public void testFromUnknown() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            ClosureFormattingOption.fromCommandLine("unknown");
-        });
+    public void testFromUnknownFails() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> ClosureFormattingOption.fromCommandLine("unknown")
+        );
     }
 
     @Test
