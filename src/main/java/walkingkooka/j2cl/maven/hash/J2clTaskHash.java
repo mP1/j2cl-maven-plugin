@@ -241,7 +241,7 @@ public final class J2clTaskHash<C extends J2clMavenContext> implements J2clTask<
     public J2clTaskResult executeWithDirectory(final J2clDependency artifact,
                                                final J2clTaskDirectory directory,
                                                final C context,
-                                               final TreeLogger logger) throws Exception {
+                                               final TreeLogger logger) {
         throw new UnsupportedOperationException();
     }
 
