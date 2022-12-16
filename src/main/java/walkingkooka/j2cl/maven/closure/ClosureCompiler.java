@@ -31,11 +31,11 @@ import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.log.TreeFormat;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.LineEnding;
+import walkingkooka.text.printer.Printer;
+import walkingkooka.text.printer.Printers;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -166,45 +166,52 @@ class ClosureCompiler {
             logger.line("Closure compiler");
             logger.indent();
             {
-                final String charset = Charset.defaultCharset().name();
+                final PrintStream debug = Printers.sink(LineEnding.SYSTEM)
+                        .printedLine(
+                                (final CharSequence l,
+                                 final LineEnding lineEnding,
+                                 final Printer p) -> {
+                                    if (l.length() > 0) {
+                                        logger.debug(l);
+                                    }
+                                }
+                        ).asPrintStream();
 
-                try(final ByteArrayOutputStream outputBytes = new ByteArrayOutputStream()) {
-                    final PrintStream outputPrintStream = new PrintStream(outputBytes,
-                            true,
-                            charset);
+                final PrintStream error = Printers.sink(LineEnding.SYSTEM)
+                        .printedLine(
+                                (final CharSequence l,
+                                 final LineEnding lineEnding,
+                                 final Printer p) -> {
+                                    if (l.length() > 0) {
+                                        logger.error(l, null);
+                                    }
+                                }
+                        ).asPrintStream();
 
-                    final Compiler compiler = new Compiler(outputPrintStream);
+                final Compiler compiler = new Compiler(debug);
 
-                    final ClosureCompilerCommandLineRunner runner = new ClosureCompilerCommandLineRunner(compiler,
-                            argumentsToArray(arguments),
-                            exportTestFunctions,
-                            outputPrintStream,
-                            outputPrintStream);
-                    if (!runner.shouldRunCompiler()) {
-                        throw new IllegalStateException("Closure Compiler setup has error(s), check recently logged messages");
-                    }
-                    runner.run();
-
-                    final int exitCode = runner.exitCode;
-
-                    logger.line("Exit code");
-                    logger.indentedLine("" + exitCode);
-
-                    logger.line("Messages");
-                    logger.indent();
-                    {
-                        logger.lineStart(); // https://github.com/mP1/j2cl-maven-plugin/issues/254
-                        logger.log(
-                                removeEmptyLines(
-                                        new String(outputBytes.toByteArray(), charset)
-                                )
-                        ); // the captured output will already have line endings.
-                    }
-                    logger.outdent();
-
-                    // anything but zero means errors and initial file must also exist and is a FAIL.
-                    success = 0 == exitCode && initialScriptFilenamePath.exists().isPresent();
+                final ClosureCompilerCommandLineRunner runner = new ClosureCompilerCommandLineRunner(
+                        compiler,
+                        argumentsToArray(arguments),
+                        exportTestFunctions,
+                        debug,
+                        error
+                );
+                if (!runner.shouldRunCompiler()) {
+                    throw new IllegalStateException("Closure Compiler setup has error(s), check recently logged messages");
                 }
+                runner.run();
+
+                debug.flush();
+                error.flush();
+
+                final int exitCode = runner.exitCode;
+
+                logger.line("Exit code");
+                logger.indentedLine("" + exitCode);
+
+                // anything but zero means errors and initial file must also exist and is a FAIL.
+                success = 0 == exitCode && initialScriptFilenamePath.exists().isPresent();
             }
             logger.outdent();
             logger.flush();
