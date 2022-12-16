@@ -684,17 +684,17 @@ public final class J2clDependency implements Comparable<J2clDependency> {
         logger.line("Metadata");
         logger.indent();
         {
-            this.logDependencies("Annotation processor", J2clDependency::isAnnotationProcessor, logger);
+            this.logDependencies("Annotation processor(s)", J2clDependency::isAnnotationProcessor, logger);
 
-            this.logDependencies("Annotation only class files", J2clDependency::isAnnotationClassFiles, logger);
-            this.logDependencies("JRE bootstrap class files", J2clDependency::isJreBootstrapClassFiles, logger);
-            this.logDependencies("JRE class files", J2clDependency::isJreClassFiles, logger);
-            this.logDependencies("Javascript bootstrap class files", J2clDependency::isJreJavascriptBootstrapFiles, logger);
-            this.logDependencies("Javascript class files", J2clDependency::isJreJavascriptFiles, logger);
+            this.logDependencies("Annotation only class file(s)", J2clDependency::isAnnotationClassFiles, logger);
+            this.logDependencies("JRE bootstrap class file(s)", J2clDependency::isJreBootstrapClassFiles, logger);
+            this.logDependencies("JRE class file(s)", J2clDependency::isJreClassFiles, logger);
+            this.logDependencies("Javascript bootstrap class file(s)", J2clDependency::isJreJavascriptBootstrapFiles, logger);
+            this.logDependencies("Javascript class file(s)", J2clDependency::isJreJavascriptFiles, logger);
 
-            this.logDependencies("Classpath required", J2clDependency::isClasspathRequired, logger);
+            this.logDependencies("Classpath required file(s)", J2clDependency::isClasspathRequired, logger);
             this.logDependencies("Ignored dependencies", J2clDependency::isIgnored, logger);
-            this.logDependencies("Javascript source required", J2clDependency::isJavascriptSourceRequired, logger);
+            this.logDependencies("Javascript source required file(s)", J2clDependency::isJavascriptSourceRequired, logger);
         }
         logger.outdent();
         logger.flush();
