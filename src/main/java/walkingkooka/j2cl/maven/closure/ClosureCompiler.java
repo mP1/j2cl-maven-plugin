@@ -358,14 +358,4 @@ class ClosureCompiler {
 
         private final boolean exportTestFunctions;
     }
-
-    private static CharSequence removeEmptyLines(final String text) {
-        return text.replace(CRCR, LineEnding.CR.toString())
-                .replace(NLCR, LineEnding.NL.toString())
-                .replace(NLNL, LineEnding.NL.toString());
-    }
-
-    private final static String CRCR = "" + LineEnding.CR + LineEnding.CR;
-    private final static String NLCR = "" + LineEnding.NL + LineEnding.CR;
-    private final static String NLNL = "" + LineEnding.NL + LineEnding.NL;
 }
