@@ -243,17 +243,17 @@ public final class J2clPathTest implements ComparableTesting2<J2clPath>, HashCod
     }
 
     @Test
-    public void testShadeFileInvalidPropertyKeyFails() throws Exception {
+    public void testShadeFileInvalidPropertyKeyFails() {
         this.readShadeFileFails("*package1=package2");
     }
 
     @Test
-    public void testShadeFileInvalidPropertyKeyFails2() throws Exception {
+    public void testShadeFileInvalidPropertyKeyFails2() {
         this.readShadeFileFails("package1=package2\n*package3=package4");
     }
 
     @Test
-    public void testShadeFileInvalidPropertyValueFails() throws Exception {
+    public void testShadeFileInvalidPropertyValueFails() {
         this.readShadeFileFails("package1=*package2");
     }
 

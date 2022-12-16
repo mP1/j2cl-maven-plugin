@@ -246,7 +246,7 @@ public abstract class J2clMavenContext implements Context {
      * Executes the given project.
      */
     final void prepareAndStart(final J2clDependency project,
-                               final TreeLogger logger) throws Throwable {
+                               final TreeLogger logger) {
         this.tasks.clear();
 
         this.prepareTasks(project);
