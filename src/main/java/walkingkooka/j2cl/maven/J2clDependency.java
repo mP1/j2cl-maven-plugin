@@ -381,11 +381,10 @@ public final class J2clDependency implements Comparable<J2clDependency> {
                 logger.line("Marking ignored transitive dependencies");
                 logger.indent();
                 {
-                    childToParents.entrySet()
-                            .forEach(e -> {
-                                final Set<J2clDependency> parents = e.getValue();
+                    childToParents.forEach(
+                            (key, parents) -> {
                                 if (null != parents) {
-                                    e.getKey()
+                                    key
                                             .markIgnoredTransitiveDependencies0(
                                                     parents,
                                                     childToParents,
