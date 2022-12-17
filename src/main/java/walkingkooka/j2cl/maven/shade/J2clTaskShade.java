@@ -80,7 +80,7 @@ abstract class J2clTaskShade<C extends J2clMavenContext> implements J2clTask<C> 
 
                 if (!shadeMappings.isEmpty()) {
                     this.copyAndShade(artifact,
-                            artifact.task(this.kind()).output(),
+                            artifact.taskDirectory(this.kind()).output(),
                             shadeMappings,
                             directory.output(),
                             logger);

@@ -73,7 +73,7 @@ public final class J2clTaskOutputAssembler<C extends J2clMavenContext> implement
         logger.line("Sources");
         logger.indent();
         {
-            final J2clPath closureCompile = artifact.task(J2clTaskKind.CLOSURE_COMPILE).output();
+            final J2clPath closureCompile = artifact.taskDirectory(J2clTaskKind.CLOSURE_COMPILE).output();
             final Set<J2clPath> closureCompileFiles = closureCompile.gatherFiles(J2clPath.ALL_FILES);
 
             logger.paths(
@@ -82,7 +82,7 @@ public final class J2clTaskOutputAssembler<C extends J2clMavenContext> implement
                     TreeFormat.TREE
             );
 
-            final J2clPath unpackPublic = artifact.task(J2clTaskKind.UNPACK).output();
+            final J2clPath unpackPublic = artifact.taskDirectory(J2clTaskKind.UNPACK).output();
             final Optional<PathMatcher> unpackPublicPathMatcher = unpackPublic.publicFiles();
             final Set<J2clPath> unpackPublicFiles;
 

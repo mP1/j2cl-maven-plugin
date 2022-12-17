@@ -63,11 +63,11 @@ abstract class J2clTaskJavacCompiler<C extends J2clMavenContext> implements J2cl
         J2clTaskResult result = null;
         final J2clTaskKind sourceTask = this.sourceTask();
 
-        J2clPath source = artifact.task(sourceTask).output().exists().orElse(null);
+        J2clPath source = artifact.taskDirectory(sourceTask).output().exists().orElse(null);
         if (null != source) {
             final Set<J2clPath> javaSourceFiles = Sets.ordered();
 
-            final J2clPath output = artifact.task(sourceTask).output();
+            final J2clPath output = artifact.taskDirectory(sourceTask).output();
 
             javaSourceFiles.addAll(output.gatherFiles((path) -> false == output.isSuperSource(path) && J2clPath.JAVA_FILES.test(path)));
             if (javaSourceFiles.isEmpty()) {

@@ -127,13 +127,13 @@ public final class J2clTaskClosureCompiler<C extends J2clMavenContext> implement
 
     private void addSources(final J2clDependency artifact,
                             final Set<J2clPath> sources) {
-        final J2clPath transpiled = artifact.task(J2clTaskKind.TRANSPILE_JAVA_TO_JAVASCRIPT).output();
+        final J2clPath transpiled = artifact.taskDirectory(J2clTaskKind.TRANSPILE_JAVA_TO_JAVASCRIPT).output();
         if (transpiled.exists().isPresent()) {
             sources.add(transpiled);
         }
 
         // add unpack anyway as it might contain js originally accompanying java source.
-        final J2clPath unpack = artifact.task(J2clTaskKind.UNPACK).output();
+        final J2clPath unpack = artifact.taskDirectory(J2clTaskKind.UNPACK).output();
         if (unpack.exists().isPresent()) {
             sources.add(unpack);
         } else {

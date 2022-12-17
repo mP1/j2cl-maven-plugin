@@ -33,7 +33,7 @@ public interface J2clTask<C extends J2clMavenContext> {
                                               final TreeLogger logger) throws Exception {
         final J2clTaskResult result;
 
-        final J2clTaskDirectory directory = artifact.task(kind);
+        final J2clTaskDirectory directory = artifact.taskDirectory(kind);
 
         logger.line("Directory");
         logger.indent();

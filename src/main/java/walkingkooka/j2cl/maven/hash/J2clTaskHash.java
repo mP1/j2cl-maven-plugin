@@ -87,7 +87,7 @@ public final class J2clTaskHash<C extends J2clMavenContext> implements J2clTask<
             directory.append(context.directoryName(J2clTaskKind.HASH))
                     .createIfNecessary();
 
-            final J2clTaskDirectory hashDirectory = artifact.task(J2clTaskKind.HASH);
+            final J2clTaskDirectory hashDirectory = artifact.taskDirectory(J2clTaskKind.HASH);
             final String txt = hashItemNames.stream()
                     .map(t -> {
                         if (t.startsWith(DEPENDENCIES)) {

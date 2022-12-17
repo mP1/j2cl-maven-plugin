@@ -1181,7 +1181,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     private Map<String, String> shadeMappings;
 
     private Map<String, String> loadShadeFile() throws IOException {
-        final J2clPath file = this.task(J2clTaskKind.UNPACK)
+        final J2clPath file = this.taskDirectory(J2clTaskKind.UNPACK)
                 .output()
                 .shadeFile();
         return file.exists().isPresent() ?
@@ -1227,7 +1227,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Returns a compile task directory, assuming the directory has already been created.
      */
-    public J2clTaskDirectory task(final J2clTaskKind kind) {
+    public J2clTaskDirectory taskDirectory(final J2clTaskKind kind) {
         return J2clTaskDirectory.with(
                 Paths.get(
                         this.directory().toString(),
@@ -1248,7 +1248,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
         final J2clPath directory = this.directory.get();
         if (null != directory) {
             result = tasks.stream()
-                    .flatMap(s -> this.task(s).output().exists().stream())
+                    .flatMap(s -> this.taskDirectory(s).output().exists().stream())
                     .findFirst()
                     .orElse(null);
         }

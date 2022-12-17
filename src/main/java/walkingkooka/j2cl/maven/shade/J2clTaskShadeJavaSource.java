@@ -80,7 +80,7 @@ public final class J2clTaskShadeJavaSource<C extends J2clMavenContext> extends J
     void postCopyAndShade(final J2clDependency artifact,
                           final J2clPath output,
                           final TreeLogger logger) throws Exception {
-        copyJavascriptFiles(Lists.of(artifact.task(J2clTaskKind.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE).output(), artifact.task(J2clTaskKind.UNPACK).output()),
+        copyJavascriptFiles(Lists.of(artifact.taskDirectory(J2clTaskKind.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE).output(), artifact.taskDirectory(J2clTaskKind.UNPACK).output()),
                 output,
                 logger);
     }
