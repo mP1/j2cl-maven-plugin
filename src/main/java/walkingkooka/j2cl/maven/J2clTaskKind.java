@@ -44,7 +44,7 @@ public enum J2clTaskKind {
      */
     HASH {
         @Override
-        J2clTask<? super J2clMavenContext> execute0() {
+        J2clTask<? super J2clMavenContext> task() {
             return J2clTasks.hash();
         }
 
@@ -59,7 +59,7 @@ public enum J2clTaskKind {
      */
     UNPACK {
         @Override
-        J2clTask<? super J2clMavenContext> execute0() {
+        J2clTask<? super J2clMavenContext> task() {
             return J2clTasks.unpack();
         }
 
@@ -74,7 +74,7 @@ public enum J2clTaskKind {
      */
     JAVAC_COMPILE {
         @Override
-        J2clTask<? super J2clMavenContext> execute0() {
+        J2clTask<? super J2clMavenContext> task() {
             return J2clTasks.compileJavaSource();
         }
 
@@ -89,7 +89,7 @@ public enum J2clTaskKind {
      */
     GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE {
         @Override
-        J2clTask<? super J2clMavenContext> execute0() {
+        J2clTask<? super J2clMavenContext> task() {
             return J2clTasks.gwtIncompatStrip();
         }
 
@@ -104,7 +104,7 @@ public enum J2clTaskKind {
      */
     JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE {
         @Override
-        J2clTask<? super J2clMavenContext> execute0() {
+        J2clTask<? super J2clMavenContext> task() {
             return J2clTasks.compileGwtIncompatStripped();
         }
 
@@ -120,7 +120,7 @@ public enum J2clTaskKind {
      */
     SHADE_JAVA_SOURCE {
         @Override
-        J2clTask<? super J2clMavenContext> execute0() {
+        J2clTask<? super J2clMavenContext> task() {
             return J2clTasks.shadeJavaSource();
         }
 
@@ -136,7 +136,7 @@ public enum J2clTaskKind {
      */
     SHADE_CLASS_FILES {
         @Override
-        J2clTask<? super J2clMavenContext> execute0() {
+        J2clTask<? super J2clMavenContext> task() {
             return J2clTasks.shadeClassFiles();
         }
 
@@ -151,7 +151,7 @@ public enum J2clTaskKind {
      */
     TRANSPILE_JAVA_TO_JAVASCRIPT {
         @Override
-        J2clTask<? super J2clMavenContext> execute0() {
+        J2clTask<? super J2clMavenContext> task() {
             return J2clTasks.transpiler();
         }
 
@@ -165,7 +165,7 @@ public enum J2clTaskKind {
      */
     CLOSURE_COMPILE {
         @Override
-        J2clTask<? super J2clMavenContext> execute0() {
+        J2clTask<? super J2clMavenContext> task() {
             return J2clTasks.closure();
         }
 
@@ -179,7 +179,7 @@ public enum J2clTaskKind {
      */
     OUTPUT_ASSEMBLE {
         @Override
-        J2clTask<? super J2clMavenContext> execute0() {
+        J2clTask<? super J2clMavenContext> task() {
             return J2clTasks.outputAssembler();
         }
 
@@ -193,7 +193,7 @@ public enum J2clTaskKind {
      */
     JUNIT_TESTS {
         @Override
-        J2clTask<? super J2clMavenContext> execute0() {
+        J2clTask<? super J2clMavenContext> task() {
             return Cast.to(
                     J2clTasks.unitTests()
             );
@@ -242,7 +242,7 @@ public enum J2clTaskKind {
                 logger.line(prefix);
                 logger.indent();
 
-                result = this.execute0()
+                result = this.task()
                         .execute(
                                 artifact,
                                 this,
@@ -315,7 +315,7 @@ public enum J2clTaskKind {
                         .replace('_', '-');
     }
 
-    abstract J2clTask<? super J2clMavenContext> execute0();
+    abstract J2clTask<? super J2clMavenContext> task();
 
     /**
      * Some tasks should not be attempted by dependencies.
