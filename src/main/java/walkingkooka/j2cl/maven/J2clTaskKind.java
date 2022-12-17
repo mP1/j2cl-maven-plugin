@@ -250,7 +250,7 @@ public enum J2clTaskKind {
                                 logger
                         );
 
-                final J2clTaskDirectory directory = artifact.task(this);
+                final J2clTaskDirectory directory = artifact.taskDirectory(this);
 
                 directory.writeLog(
                         lines,
@@ -268,7 +268,7 @@ public enum J2clTaskKind {
             logger.error("Failed to execute " + prefix + " message: " + cause.getMessage(), cause);
             logger.flush();
 
-            final J2clTaskDirectory directory = artifact.task(this);
+            final J2clTaskDirectory directory = artifact.taskDirectory(this);
             directory.failed()
                     .createIfNecessary();
 

@@ -65,8 +65,8 @@ public final class J2clTaskGwtIncompatibleStripPreprocessor<C extends J2clMavenC
                                                final TreeLogger logger) throws Exception {
         return GwtIncompatibleStripPreprocessor.execute(
                 Lists.of(
-                        artifact.task(J2clTaskKind.JAVAC_COMPILE).output(),
-                        artifact.task(J2clTaskKind.UNPACK).output()
+                        artifact.taskDirectory(J2clTaskKind.JAVAC_COMPILE).output(),
+                        artifact.taskDirectory(J2clTaskKind.UNPACK).output()
                 ),
                 directory.output().absentOrFail(),
                 logger

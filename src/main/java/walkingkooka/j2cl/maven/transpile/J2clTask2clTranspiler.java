@@ -149,7 +149,7 @@ public final class J2clTask2clTranspiler<C extends J2clMavenContext> implements 
 
     private static Optional<J2clPath> output(final J2clDependency dependency,
                                              final J2clTaskKind kind) {
-        return dependency.task(kind)
+        return dependency.taskDirectory(kind)
                 .output()
                 .exists();
     }
