@@ -1181,12 +1181,17 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     private Map<String, String> shadeMappings;
 
     private Map<String, String> loadShadeFile() throws IOException {
-        final J2clPath file = this.taskDirectory(J2clTaskKind.UNPACK)
-                .output()
-                .shadeFile();
-        return file.exists().isPresent() ?
-                file.readShadeFile() :
-                Maps.empty();
+        Map<String, String> mappings = Maps.empty();
+
+        for (final J2clPath path : this.context.sources(this)) {
+            final J2clPath shadeFile = path.shadeFile();
+            if (shadeFile.isFile()) {
+                mappings = shadeFile.readShadeFile();
+                break;
+            }
+        }
+
+        return mappings;
     }
 
     // directories......................................................................................................

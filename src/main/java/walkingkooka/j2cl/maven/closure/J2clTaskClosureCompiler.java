@@ -28,6 +28,7 @@ import walkingkooka.j2cl.maven.J2clTaskKind;
 import walkingkooka.j2cl.maven.J2clTaskResult;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -66,7 +67,11 @@ public final class J2clTaskClosureCompiler<C extends J2clMavenContext> implement
                                                final TreeLogger logger) throws Exception {
         final Set<J2clPath> sources = Sets.ordered();
 
-        this.addSources(artifact, sources);
+        this.addSources(
+                artifact,
+                sources,
+                context
+        );
         {
             for (final J2clDependency dependency : artifact.dependencies()) {
                 if (dependency.isAnnotationClassFiles()) {
@@ -100,7 +105,11 @@ public final class J2clTaskClosureCompiler<C extends J2clMavenContext> implement
                 }
 
                 if (dependency.isJavascriptSourceRequired()) {
-                    this.addSources(dependency, sources);
+                    this.addSources(
+                            dependency,
+                            sources,
+                            context
+                    );
                     continue;
                 }
             }
@@ -126,18 +135,20 @@ public final class J2clTaskClosureCompiler<C extends J2clMavenContext> implement
     }
 
     private void addSources(final J2clDependency artifact,
-                            final Set<J2clPath> sources) {
+                            final Set<J2clPath> sources,
+                            final C context) {
         final J2clPath transpiled = artifact.taskDirectory(J2clTaskKind.TRANSPILE_JAVA_TO_JAVASCRIPT).output();
         if (transpiled.exists().isPresent()) {
             sources.add(transpiled);
         }
 
         // add unpack anyway as it might contain js originally accompanying java source.
-        final J2clPath unpack = artifact.taskDirectory(J2clTaskKind.UNPACK).output();
-        if (unpack.exists().isPresent()) {
-            sources.add(unpack);
+        final List<J2clPath> javaSources = context.sources(artifact);
+        if (javaSources.isEmpty()) {
+            artifact.artifactFile()
+                    .map(sources::add);
         } else {
-            artifact.artifactFile().map(sources::add);
+            sources.addAll(javaSources);
         }
     }
 }

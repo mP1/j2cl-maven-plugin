@@ -79,11 +79,14 @@ abstract class J2clTaskShade<C extends J2clMavenContext> implements J2clTask<C> 
                 final Map<String, String> shadeMappings = artifact.shadeMappings();
 
                 if (!shadeMappings.isEmpty()) {
-                    this.copyAndShade(artifact,
+                    this.copyAndShade(
+                            artifact,
                             artifact.taskDirectory(this.kind()).output(),
                             shadeMappings,
                             directory.output(),
-                            logger);
+                            context,
+                            logger
+                    );
                     result = J2clTaskResult.SUCCESS;
                 } else {
                     logger.line("Not found");
@@ -106,6 +109,7 @@ abstract class J2clTaskShade<C extends J2clMavenContext> implements J2clTask<C> 
                               final J2clPath root,
                               final Map<String, String> shade,
                               final J2clPath output,
+                              final C context,
                               final TreeLogger logger) throws Exception {
         final BiFunction<byte[], J2clPath, byte[]> contentShader = (content, path) -> shade(content, shade);
         final Predicate<Path> filter = this.fileExtensionFilter();
@@ -182,6 +186,7 @@ abstract class J2clTaskShade<C extends J2clMavenContext> implements J2clTask<C> 
             this.postCopyAndShade(
                     artifact,
                     output,
+                    context,
                     logger
             );
         }
@@ -205,5 +210,6 @@ abstract class J2clTaskShade<C extends J2clMavenContext> implements J2clTask<C> 
      */
     abstract void postCopyAndShade(final J2clDependency artifact,
                                    final J2clPath output,
+                                   final C context,
                                    final TreeLogger logger) throws Exception;
 }

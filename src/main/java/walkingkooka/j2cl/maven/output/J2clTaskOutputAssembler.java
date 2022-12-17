@@ -29,7 +29,6 @@ import walkingkooka.j2cl.maven.log.TreeFormat;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
 import java.nio.file.PathMatcher;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
@@ -67,8 +66,8 @@ public final class J2clTaskOutputAssembler<C extends J2clMavenContext> implement
                                                final J2clTaskDirectory directory,
                                                final C context,
                                                final TreeLogger logger) throws Exception {
-        final Collection<J2clPath> closureCompileDestinationFiles;
-        final Collection<J2clPath> unpackPublicDestinationFiles;
+        final Set<J2clPath> closureCompileDestinationFiles = Sets.ordered();
+        final Set<J2clPath> unpackPublicDestinationFiles = Sets.ordered();
 
         logger.line("Sources");
         logger.indent();
@@ -82,38 +81,43 @@ public final class J2clTaskOutputAssembler<C extends J2clMavenContext> implement
                     TreeFormat.TREE
             );
 
-            final J2clPath unpackPublic = artifact.taskDirectory(J2clTaskKind.UNPACK).output();
-            final Optional<PathMatcher> unpackPublicPathMatcher = unpackPublic.publicFiles();
-            final Set<J2clPath> unpackPublicFiles;
+            for (final J2clPath unpackPublic : context.sources(artifact)) {
+                final Optional<PathMatcher> unpackPublicPathMatcher = unpackPublic.publicFiles();
+                final Set<J2clPath> unpackPublicFiles;
 
-            if (unpackPublicPathMatcher.isPresent()) {
-                unpackPublicFiles = unpackPublic.gatherFiles(
-                        (p) -> unpackPublicPathMatcher.get().matches(p)
+                if (unpackPublicPathMatcher.isPresent()) {
+                    unpackPublicFiles = unpackPublic.gatherFiles(
+                            (p) -> unpackPublicPathMatcher.get().matches(p)
+                    );
+
+                    logger.paths(
+                            "",
+                            unpackPublicFiles,
+                            TreeFormat.TREE
+                    );
+                } else {
+                    unpackPublicFiles = Sets.empty();
+                }
+
+                final J2clPath destination = context.target()
+                        .createIfNecessary();
+
+                closureCompileDestinationFiles.addAll(
+                        destination.copyFiles(
+                                closureCompile,
+                                closureCompileFiles,
+                                J2clPath.COPY_FILE_CONTENT_VERBATIM
+                        )
                 );
 
-                logger.paths(
-                        "",
-                        unpackPublicFiles,
-                        TreeFormat.TREE
+                unpackPublicDestinationFiles.addAll(
+                        destination.copyFiles(
+                                unpackPublic,
+                                unpackPublicFiles,
+                                J2clPath.COPY_FILE_CONTENT_VERBATIM
+                        )
                 );
-            } else {
-                unpackPublicFiles = Sets.empty();
             }
-
-            final J2clPath destination = context.target()
-                    .createIfNecessary();
-
-            closureCompileDestinationFiles = destination.copyFiles(
-                    closureCompile,
-                    closureCompileFiles,
-                    J2clPath.COPY_FILE_CONTENT_VERBATIM
-            );
-
-            unpackPublicDestinationFiles = destination.copyFiles(
-                    unpackPublic,
-                    unpackPublicFiles,
-                    J2clPath.COPY_FILE_CONTENT_VERBATIM
-            );
         }
         logger.outdent();
 

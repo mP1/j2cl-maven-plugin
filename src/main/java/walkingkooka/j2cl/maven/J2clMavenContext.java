@@ -202,6 +202,13 @@ public abstract class J2clMavenContext implements Context {
 
     // tasks............................................................................................................
 
+    public final List<J2clPath> sources(final J2clDependency dependency) {
+        return Lists.of(
+                dependency.taskDirectory(J2clTaskKind.UNPACK)
+                        .output()
+        );
+    }
+
     public final String directoryName(final J2clTaskKind kind) {
         return kind.directoryName(
                 this.tasks()
