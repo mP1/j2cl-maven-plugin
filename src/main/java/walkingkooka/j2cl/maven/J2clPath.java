@@ -127,13 +127,6 @@ public final class J2clPath implements Comparable<J2clPath> {
                 .collect(Collectors.toList());
     }
 
-    public static List<FileInfo> toFileInfo(final Collection<J2clPath> files,
-                                            final J2clPath base) {
-        return files.stream()
-                .map(p -> p.toFileInfo(base))
-                .collect(Collectors.toList());
-    }
-
     public static J2clPath with(final Path path) {
         return new J2clPath(path);
     }
