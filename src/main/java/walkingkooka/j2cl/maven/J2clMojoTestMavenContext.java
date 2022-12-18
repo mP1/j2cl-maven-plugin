@@ -155,13 +155,13 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
         return hash;
     }
 
-    J2clMojoTestMavenContext setProject(final J2clDependency project) {
+    J2clMojoTestMavenContext setProject(final J2clArtifact project) {
         this.project = project;
 
         return this;
     }
 
-    private J2clDependency project;
+    private J2clArtifact project;
 
     // tasks............................................................................................................
 

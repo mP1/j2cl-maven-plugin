@@ -18,7 +18,7 @@
 package walkingkooka.j2cl.maven.javac;
 
 import walkingkooka.collect.list.Lists;
-import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clArtifact;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clTask;
@@ -66,12 +66,12 @@ public final class J2clTaskJavacCompilerGwtIncompatibleStrippedSource<C extends 
      * Try adding the SHADED_CLASS_FILES then COMPILE_GWT_INCOMPATIBLE_STRIPPED then default to the original archive file.
      */
     @Override
-    J2clPath selectClassFiles(final J2clDependency dependency) {
+    J2clPath selectClassFiles(final J2clArtifact dependency) {
         return dependency.sourcesOrArchiveFile(this.compileTask());
     }
 
     @Override
-    void postCompile(final J2clDependency artifact,
+    void postCompile(final J2clArtifact artifact,
                      final J2clTaskDirectory directory,
                      final C context,
                      final TreeLogger logger) {

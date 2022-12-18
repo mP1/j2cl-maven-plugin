@@ -132,9 +132,9 @@ abstract class J2clMojoBuildTestWatch extends J2clMojo {
     /**
      * Gathers the all the dependencies.
      */
-    final J2clDependency gatherDependencies(final TreeLogger logger,
-                                            final J2clMavenContext context) {
-        return J2clDependency.gather(
+    final J2clArtifact gatherDependencies(final TreeLogger logger,
+                                          final J2clMavenContext context) {
+        return J2clArtifact.gather(
                 this.mavenProject(),
                 logger,
                 context

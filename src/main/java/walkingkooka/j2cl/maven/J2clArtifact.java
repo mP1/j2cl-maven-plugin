@@ -65,24 +65,24 @@ import java.util.stream.Stream;
 /**
  * Represents a single artifact including the project or any of its dependencies. These will in turn have java files etc.
  */
-public final class J2clDependency implements Comparable<J2clDependency> {
+public final class J2clArtifact implements Comparable<J2clArtifact> {
 
-    static Set<J2clDependency> set() {
+    static Set<J2clArtifact> set() {
         return Sets.ordered();
     }
 
     /**
      * Gathers all dependencies honouring excludes and dependencyManagement entries in POMs.
      */
-    static J2clDependency gather(final MavenProject mavenProject,
-                                 final TreeLogger logger,
-                                 final J2clMavenContext context) {
-        final J2clDependency root;
+    static J2clArtifact gather(final MavenProject mavenProject,
+                               final TreeLogger logger,
+                               final J2clMavenContext context) {
+        final J2clArtifact root;
         {
             root = gatherSubTask(
                     "Gather dependencies",
                     () -> {
-                        final J2clDependency d = new J2clDependency(
+                        final J2clArtifact d = new J2clArtifact(
                                 J2clArtifactCoords.with(
                                         mavenProject.getArtifact()
                                 ),
@@ -183,10 +183,10 @@ public final class J2clDependency implements Comparable<J2clDependency> {
 
     // ctor.............................................................................................................
 
-    private J2clDependency(final J2clArtifactCoords coords,
-                           final MavenProject mavenProject,
-                           final Optional<J2clPath> artifactFile,
-                           final J2clMavenContext context) {
+    private J2clArtifact(final J2clArtifactCoords coords,
+                         final MavenProject mavenProject,
+                         final Optional<J2clPath> artifactFile,
+                         final J2clMavenContext context) {
         super();
         this.coords = coords;
         this.mavenProject = mavenProject;
@@ -248,7 +248,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
             }
 
             // transform the coords to the corrected version if any dependencyManagement entries exist.
-            final J2clDependency child = new J2clDependency(dependencyManagement.apply(coords),
+            final J2clArtifact child = new J2clArtifact(dependencyManagement.apply(coords),
                     null,
                     null,
                     context);
@@ -290,33 +290,33 @@ public final class J2clDependency implements Comparable<J2clDependency> {
      * being built. Because of this the same artifact coordinates may have different dependencies due to exclusions. The
      * one with less will be kept.
      */
-    private J2clDependency reduce() {
-        final Map<J2clArtifactCoords, J2clDependency> coordToDependency = Maps.sorted(J2clArtifactCoords.IGNORE_VERSION_COMPARATOR);
+    private J2clArtifact reduce() {
+        final Map<J2clArtifactCoords, J2clArtifact> coordToDependency = Maps.sorted(J2clArtifactCoords.IGNORE_VERSION_COMPARATOR);
         this.gatherCoordToDependency(coordToDependency);
         return this.reduce0(coordToDependency);
     }
 
-    private void gatherCoordToDependency(final Map<J2clArtifactCoords, J2clDependency> coordToDependency) {
+    private void gatherCoordToDependency(final Map<J2clArtifactCoords, J2clArtifact> coordToDependency) {
         final J2clArtifactCoords coords = this.coords();
 
-        final J2clDependency other = coordToDependency.get(coords);
+        final J2clArtifact other = coordToDependency.get(coords);
 
         // different dependency instance might have different child dependencies due to "different" exclusions.
-        if(false == this.equals(other)){
-            final Set<J2clDependency> dependencies = this.dependencies;
-            if(null == other || dependencies.size() < other.dependencies.size()) {
+        if (false == this.equals(other)) {
+            final Set<J2clArtifact> dependencies = this.dependencies;
+            if (null == other || dependencies.size() < other.dependencies.size()) {
                 coordToDependency.put(coords, this);
             }
-            for (final J2clDependency dependency : dependencies) {
+            for (final J2clArtifact dependency : dependencies) {
                 dependency.gatherCoordToDependency(coordToDependency);
             }
         }
     }
 
-    private J2clDependency reduce0(final Map<J2clArtifactCoords, J2clDependency> coordToDependency) {
+    private J2clArtifact reduce0(final Map<J2clArtifactCoords, J2clArtifact> coordToDependency) {
         this.dependencies = this.dependencies.stream()
                 .map(d -> coordToDependency.get(d.coords()).reduce0(coordToDependency))
-                .collect(Collectors.toCollection(J2clDependency::set));
+                .collect(Collectors.toCollection(J2clArtifact::set));
         return this;
     }
 
@@ -338,7 +338,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
      * </pre>
      */
     private void discoverAndMarkIgnoredTransitiveDependencies(final TreeLogger logger) {
-        final Map<J2clDependency, Set<J2clDependency>> childToParents = Maps.sorted();
+        final Map<J2clArtifact, Set<J2clArtifact>> childToParents = Maps.sorted();
 
         this.discoverAndRecordParents(
                 childToParents,
@@ -353,12 +353,12 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Builds a {@link Map} of child to parent.
      */
-    private void discoverAndRecordParents(final Map<J2clDependency, Set<J2clDependency>> childToParents,
+    private void discoverAndRecordParents(final Map<J2clArtifact, Set<J2clArtifact>> childToParents,
                                           final TreeLogger logger) {
         this.dependencies.stream()
                 .filter(c -> false == c.isAnnotationsBootstrapOrJreFiles())
                 .forEach(c -> {
-                    Set<J2clDependency> parents = childToParents.get(c);
+                    Set<J2clArtifact> parents = childToParents.get(c);
                     if (null == parents) {
                         parents = set();
                         childToParents.put(c, parents);
@@ -372,7 +372,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
                 });
     }
 
-    private void markIgnoredTransitiveDependencies(final Map<J2clDependency, Set<J2clDependency>> childToParents,
+    private void markIgnoredTransitiveDependencies(final Map<J2clArtifact, Set<J2clArtifact>> childToParents,
                                                    final TreeLogger logger) {
         logger.indent();
         {
@@ -411,8 +411,8 @@ public final class J2clDependency implements Comparable<J2clDependency> {
      * </pre>
      * // stop walking if parent is ignored
      */
-    private void markIgnoredTransitiveDependencies0(final Set<J2clDependency> parents,
-                                                    final Map<J2clDependency, Set<J2clDependency>> childToParents,
+    private void markIgnoredTransitiveDependencies0(final Set<J2clArtifact> parents,
+                                                    final Map<J2clArtifact, Set<J2clArtifact>> childToParents,
                                                     final TreeLogger logger) {
         final boolean nonIgnored = this.findNonIgnoredParentDependencies(parents, childToParents);
         if (false == nonIgnored) {
@@ -425,13 +425,13 @@ public final class J2clDependency implements Comparable<J2clDependency> {
         }
     }
 
-    private boolean findNonIgnoredParentDependencies(final Set<J2clDependency> parents,
-                                                     final Map<J2clDependency, Set<J2clDependency>> childToParents) {
+    private boolean findNonIgnoredParentDependencies(final Set<J2clArtifact> parents,
+                                                     final Map<J2clArtifact, Set<J2clArtifact>> childToParents) {
         boolean nonIgnored = false;
 
         if (false == this.isIgnored()) {
-            for (final J2clDependency parent : parents) {
-                final Set<J2clDependency> childParents = childToParents.get(parent);
+            for (final J2clArtifact parent : parents) {
+                final Set<J2clArtifact> childParents = childToParents.get(parent);
                 if (null == childParents) {
                     nonIgnored = true;
                     break;
@@ -450,9 +450,9 @@ public final class J2clDependency implements Comparable<J2clDependency> {
      * Used to print a tree of ignored dependency to all its parents, which may be useful in debugging transpile failures
      * due to ignored dependencies.
      */
-    private void logParentDependencies(final Map<J2clDependency, Set<J2clDependency>> childToParents,
+    private void logParentDependencies(final Map<J2clArtifact, Set<J2clArtifact>> childToParents,
                                        final TreeLogger logger) {
-        final Set<J2clDependency> parents = childToParents.get(this);
+        final Set<J2clArtifact> parents = childToParents.get(this);
         if (null != parents) {
             logger.indent();
             {
@@ -472,13 +472,13 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     // expand dependencies..............................................................................................
 
     /**
-     * Before this is called, all {@link J2clDependency#dependencies} only contain their children, when this method
+     * Before this is called, all {@link J2clArtifact#dependencies} only contain their children, when this method
      * finishes it will all descendants
      */
-    private Set<J2clDependency> addTransitiveDependencies() {
-        final Set<J2clDependency> deep = set();
+    private Set<J2clArtifact> addTransitiveDependencies() {
+        final Set<J2clArtifact> deep = set();
 
-        for (final J2clDependency child : this.dependencies()) {
+        for (final J2clArtifact child : this.dependencies()) {
             if (false == deep.contains(child)) {
                 deep.add(child);
                 child.addTransitiveDependencies()
@@ -498,7 +498,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
      * Add the bootstrap and classpath dependencies to all other dependencies............................................
      */
     private void addBootstrapClasspath() {
-        final Collection<J2clDependency> bootstrapAndJreDependencies = this.collectBootstrapAndJreWithDependencies();
+        final Collection<J2clArtifact> bootstrapAndJreDependencies = this.collectBootstrapAndJreWithDependencies();
 
         this.dependencies()
                 .stream()
@@ -509,16 +509,16 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Returns all bootstrap and JRE and their dependencies.
      */
-    private Collection<J2clDependency> collectBootstrapAndJreWithDependencies() {
-        final Collection<J2clDependency> bootstrapAndJre = this.dependencies()
+    private Collection<J2clArtifact> collectBootstrapAndJreWithDependencies() {
+        final Collection<J2clArtifact> bootstrapAndJre = this.dependencies()
                 .stream()
-                .filter(J2clDependency::isAnnotationsBootstrapOrJreFiles)
-                .collect(Collectors.toCollection(J2clDependency::set));
+                .filter(J2clArtifact::isAnnotationsBootstrapOrJreFiles)
+                .collect(Collectors.toCollection(J2clArtifact::set));
 
-        final Collection<J2clDependency> dependencies = bootstrapAndJre.stream()
+        final Collection<J2clArtifact> dependencies = bootstrapAndJre.stream()
                 .flatMap(d -> d.dependencies.stream())
                 .filter(d -> false == d.isIgnored())
-                .collect(Collectors.toCollection(J2clDependency::set));
+                .collect(Collectors.toCollection(J2clArtifact::set));
         add(dependencies, bootstrapAndJre);
 
         bootstrapAndJre.addAll(dependencies);
@@ -528,7 +528,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Adds all the ifAbsents if they are absent from the all and includes sarts to avoid adding a dependency to itself.
      */
-    private static void add(final Collection<J2clDependency> all, final Collection<J2clDependency> ifAbsent) {
+    private static void add(final Collection<J2clArtifact> all, final Collection<J2clArtifact> ifAbsent) {
         all.stream()
                 .filter(d -> false == d.isIgnored() && false == ifAbsent.contains(d))
                 .forEach(d -> d.add(ifAbsent));
@@ -537,9 +537,9 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Adds any of the ifAbsent dependencies if they are new and not present in this, making a special case not to add itself.
      */
-    private void add(final Collection<J2clDependency> ifAbsent) {
-        for (final J2clDependency maybe : ifAbsent) {
-            if(this.equals(maybe)) {
+    private void add(final Collection<J2clArtifact> ifAbsent) {
+        for (final J2clArtifact maybe : ifAbsent) {
+            if (this.equals(maybe)) {
                 continue;
             }
             if (this.dependencies.contains(maybe)) {
@@ -556,7 +556,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
      * required and ignored dependency declarations.
      */
     private void verify(final TreeLogger logger) {
-        final Collection<J2clDependency> all = this.dependencies();
+        final Collection<J2clArtifact> all = this.dependencies();
         this.verifyWithoutConflictsOrDuplicates(
                 all,
                 logger
@@ -564,7 +564,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
 
         this.context.verifyClasspathRequiredJavascriptSourceRequiredIgnoredDependencies(
                 all.stream()
-                        .map(J2clDependency::coords)
+                        .map(J2clArtifact::coords)
                         .collect(Collectors.toCollection(Sets::sorted)),
                 this,
                 logger
@@ -574,12 +574,12 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Verifies there are not dependencies that share the same group and artifact id but differ in other components.
      */
-    private void verifyWithoutConflictsOrDuplicates(final Collection<J2clDependency> all,
+    private void verifyWithoutConflictsOrDuplicates(final Collection<J2clArtifact> all,
                                                     final TreeLogger logger) {
         final Set<J2clArtifactCoords> duplicateCoords = J2clArtifactCoords.set();
         final List<String> duplicatesText = Lists.array();
 
-        for (final J2clDependency dependency : all) {
+        for (final J2clArtifact dependency : all) {
             final J2clArtifactCoords coords = dependency.coords();
 
             // must have been the duplicate of another coord.
@@ -588,7 +588,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
             }
 
             final List<J2clArtifactCoords> duplicates = all.stream()
-                    .map(J2clDependency::coords)
+                    .map(J2clArtifact::coords)
                     .filter(coords::isSameGroupArtifactDifferentVersion)
                     .collect(Collectors.toList());
 
@@ -615,7 +615,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Updates the field returned by {@link #dependencies()} so it returns a read only {@link Set}.
      */
-    private static void makeDependenciesGetterReadOnly(final Collection<J2clDependency> all) {
+    private static void makeDependenciesGetterReadOnly(final Collection<J2clArtifact> all) {
         all.forEach(d -> d.dependencies = Sets.readOnly(d.dependencies));
     }
 
@@ -661,11 +661,11 @@ public final class J2clDependency implements Comparable<J2clDependency> {
         logger.indent();
         {
 
-            for (final J2clDependency artifact : this.dependencies()) {
+            for (final J2clArtifact artifact : this.dependencies()) {
                 logger.line(artifact.toString());
                 logger.indent();
                 {
-                    for (final J2clDependency dependency : artifact.dependencies()) {
+                    for (final J2clArtifact dependency : artifact.dependencies()) {
                         logger.line(dependency.toString());
                     }
                 }
@@ -683,30 +683,30 @@ public final class J2clDependency implements Comparable<J2clDependency> {
         logger.line("Metadata");
         logger.indent();
         {
-            this.logDependencies("Annotation processor(s)", J2clDependency::isAnnotationProcessor, logger);
+            this.logDependencies("Annotation processor(s)", J2clArtifact::isAnnotationProcessor, logger);
 
-            this.logDependencies("Annotation only class file(s)", J2clDependency::isAnnotationClassFiles, logger);
-            this.logDependencies("JRE bootstrap class file(s)", J2clDependency::isJreBootstrapClassFiles, logger);
-            this.logDependencies("JRE class file(s)", J2clDependency::isJreClassFiles, logger);
-            this.logDependencies("Javascript bootstrap class file(s)", J2clDependency::isJreJavascriptBootstrapFiles, logger);
-            this.logDependencies("Javascript class file(s)", J2clDependency::isJreJavascriptFiles, logger);
+            this.logDependencies("Annotation only class file(s)", J2clArtifact::isAnnotationClassFiles, logger);
+            this.logDependencies("JRE bootstrap class file(s)", J2clArtifact::isJreBootstrapClassFiles, logger);
+            this.logDependencies("JRE class file(s)", J2clArtifact::isJreClassFiles, logger);
+            this.logDependencies("Javascript bootstrap class file(s)", J2clArtifact::isJreJavascriptBootstrapFiles, logger);
+            this.logDependencies("Javascript class file(s)", J2clArtifact::isJreJavascriptFiles, logger);
 
-            this.logDependencies("Classpath required file(s)", J2clDependency::isClasspathRequired, logger);
-            this.logDependencies("Ignored dependencies", J2clDependency::isIgnored, logger);
-            this.logDependencies("Javascript source required file(s)", J2clDependency::isJavascriptSourceRequired, logger);
+            this.logDependencies("Classpath required file(s)", J2clArtifact::isClasspathRequired, logger);
+            this.logDependencies("Ignored dependencies", J2clArtifact::isIgnored, logger);
+            this.logDependencies("Javascript source required file(s)", J2clArtifact::isJavascriptSourceRequired, logger);
         }
         logger.outdent();
         logger.flush();
     }
 
     private void logDependencies(final String label,
-                                 final Predicate<J2clDependency> filter,
+                                 final Predicate<J2clArtifact> filter,
                                  final TreeLogger logger) {
         logger.strings(
                 label,
                 this.dependencies().stream()
                         .filter(filter)
-                        .map(J2clDependency::toString)
+                        .map(J2clArtifact::toString)
                         .collect(Collectors.toCollection(Sets::sorted))
         );
     }
@@ -777,11 +777,11 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Retrieves all dependencies including transients, and will include any required artifacts.
      */
-    public Set<J2clDependency> dependencies() {
+    public Set<J2clArtifact> dependencies() {
         return this.dependencies;
     }
 
-    private Set<J2clDependency> dependencies = set();
+    private Set<J2clArtifact> dependencies = set();
 
     // isDependency.....................................................................................................
 
@@ -1199,7 +1199,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     /**
      * Sets the directory for this dependency, assumes the hash has been computed
      */
-    public J2clDependency setDirectory(final String hash) {
+    public J2clArtifact setDirectory(final String hash) {
         final J2clPath create = this.context.cache()
                 .append(
                         this.coords.directorySafeName() + "-" + hash
@@ -1308,10 +1308,10 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     }
 
     public boolean equals(final Object other) {
-        return this == other || other instanceof J2clDependency && this.equals0((J2clDependency)other);
+        return this == other || other instanceof J2clArtifact && this.equals0((J2clArtifact) other);
     }
 
-    private boolean equals0(final J2clDependency other) {
+    private boolean equals0(final J2clArtifact other) {
         return this.coords().equals(other.coords());
     }
 
@@ -1324,7 +1324,7 @@ public final class J2clDependency implements Comparable<J2clDependency> {
     // Comparable.......................................................................................................
 
     @Override
-    public int compareTo(final J2clDependency other) {
+    public int compareTo(final J2clArtifact other) {
         return this.coords().compareTo(other.coords());
     }
 }

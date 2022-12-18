@@ -17,7 +17,7 @@
 
 package walkingkooka.j2cl.maven.unpack;
 
-import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clArtifact;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clTask;
@@ -53,7 +53,7 @@ public final class J2clTaskUnpack<C extends J2clMavenContext> implements J2clTas
     }
 
     @Override
-    public J2clTaskResult execute(final J2clDependency artifact,
+    public J2clTaskResult execute(final J2clArtifact artifact,
                                   final J2clTaskKind kind,
                                   final C context,
                                   final TreeLogger logger) throws Exception {
@@ -66,7 +66,7 @@ public final class J2clTaskUnpack<C extends J2clMavenContext> implements J2clTas
     }
 
     @Override
-    public J2clTaskResult executeWithDirectory(final J2clDependency artifact,
+    public J2clTaskResult executeWithDirectory(final J2clArtifact artifact,
                                                final J2clTaskDirectory directory,
                                                final C context,
                                                final TreeLogger logger) throws Exception {
@@ -107,7 +107,7 @@ public final class J2clTaskUnpack<C extends J2clMavenContext> implements J2clTas
         return result;
     }
 
-    private boolean extractSourceRoots(final J2clDependency artifact,
+    private boolean extractSourceRoots(final J2clArtifact artifact,
                                        final J2clPath dest,
                                        final TreeLogger logger) throws Exception {
         boolean filesFound = false;

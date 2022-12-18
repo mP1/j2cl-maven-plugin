@@ -18,7 +18,7 @@
 package walkingkooka.j2cl.maven.javac;
 
 import walkingkooka.collect.list.Lists;
-import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clArtifact;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clSourcesKind;
@@ -69,7 +69,7 @@ public final class J2clTaskJavacCompilerUnpackedSource<C extends J2clMavenContex
      * Always add the dependency jar file.
      */
     @Override
-    J2clPath selectClassFiles(final J2clDependency dependency) {
+    J2clPath selectClassFiles(final J2clArtifact dependency) {
         return dependency.artifactFileOrFail();
     }
 
@@ -77,7 +77,7 @@ public final class J2clTaskJavacCompilerUnpackedSource<C extends J2clMavenContex
      * If executing a test fixup the name of the generated javascript file.
      */
     @Override
-    void postCompile(final J2clDependency artifact,
+    void postCompile(final J2clArtifact artifact,
                      final J2clTaskDirectory directory,
                      final C context,
                      final TreeLogger logger) throws Exception {

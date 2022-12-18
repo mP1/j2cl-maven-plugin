@@ -18,7 +18,7 @@
 package walkingkooka.j2cl.maven.closure;
 
 import walkingkooka.collect.set.Sets;
-import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clArtifact;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clSourcesKind;
@@ -48,7 +48,7 @@ public final class J2clTaskClosureCompiler<C extends J2clMavenContext> implement
     }
 
     @Override
-    public J2clTaskResult execute(final J2clDependency artifact,
+    public J2clTaskResult execute(final J2clArtifact artifact,
                                   final J2clTaskKind kind,
                                   final C context,
                                   final TreeLogger logger) throws Exception {
@@ -61,7 +61,7 @@ public final class J2clTaskClosureCompiler<C extends J2clMavenContext> implement
     }
 
     @Override
-    public J2clTaskResult executeWithDirectory(final J2clDependency artifact,
+    public J2clTaskResult executeWithDirectory(final J2clArtifact artifact,
                                                final J2clTaskDirectory directory,
                                                final C context,
                                                final TreeLogger logger) throws Exception {
@@ -73,7 +73,7 @@ public final class J2clTaskClosureCompiler<C extends J2clMavenContext> implement
                 context
         );
         {
-            for (final J2clDependency dependency : artifact.dependencies()) {
+            for (final J2clArtifact dependency : artifact.dependencies()) {
                 if (dependency.isAnnotationClassFiles()) {
                     continue;
                 }
@@ -134,7 +134,7 @@ public final class J2clTaskClosureCompiler<C extends J2clMavenContext> implement
                 J2clTaskResult.FAILED;
     }
 
-    private void addSources(final J2clDependency artifact,
+    private void addSources(final J2clArtifact artifact,
                             final Set<J2clPath> sources,
                             final C context) {
         final J2clPath transpiled = artifact.taskDirectory(J2clTaskKind.TRANSPILE_JAVA_TO_JAVASCRIPT).output();

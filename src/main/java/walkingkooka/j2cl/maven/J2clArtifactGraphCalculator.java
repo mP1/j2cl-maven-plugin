@@ -28,15 +28,15 @@ import java.util.stream.Collectors;
 /**
  * A calculator that creates a {@link Map} where each artifact is mapped to all its descendants including the addition of the requireds.
  */
-final class J2clDependencyGraphCalculator {
+final class J2clArtifactGraphCalculator {
 
-    static J2clDependencyGraphCalculator with(final Map<J2clArtifactCoords, Set<J2clArtifactCoords>> flat,
-                                              final Set<J2clArtifactCoords> required) {
-        return new J2clDependencyGraphCalculator(flat, required);
+    static J2clArtifactGraphCalculator with(final Map<J2clArtifactCoords, Set<J2clArtifactCoords>> flat,
+                                            final Set<J2clArtifactCoords> required) {
+        return new J2clArtifactGraphCalculator(flat, required);
     }
 
-    private J2clDependencyGraphCalculator(final Map<J2clArtifactCoords, Set<J2clArtifactCoords>> flat,
-                                          final Set<J2clArtifactCoords> required) {
+    private J2clArtifactGraphCalculator(final Map<J2clArtifactCoords, Set<J2clArtifactCoords>> flat,
+                                        final Set<J2clArtifactCoords> required) {
         super();
         this.flat = Maps.sorted();
         flat.forEach((k, v) -> {

@@ -40,7 +40,7 @@ import java.util.concurrent.Callable;
  */
 public enum J2clTaskKind {
     /**
-     * Computes the hash for the given {@link J2clDependency} including its dependencies.
+     * Computes the hash for the given {@link J2clArtifact} including its dependencies.
      */
     HASH {
         @Override
@@ -211,7 +211,7 @@ public enum J2clTaskKind {
      * A {@link Callable} that creates a logger that is saved to a log file when the task is successful (completes without
      * throwing) or logs as errors to the output anything printed during execution.
      */
-    final <C extends J2clMavenContext> Optional<J2clTaskKind> execute(final J2clDependency artifact,
+    final <C extends J2clMavenContext> Optional<J2clTaskKind> execute(final J2clArtifact artifact,
                                                                       final TreeLogger parentLogger,
                                                                       final C context) throws Exception {
         final Instant start = Instant.now();

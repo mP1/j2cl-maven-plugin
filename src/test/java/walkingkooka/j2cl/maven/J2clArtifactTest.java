@@ -24,7 +24,7 @@ import walkingkooka.reflect.JavaVisibility;
 import java.io.IOException;
 import java.util.Collection;
 
-public final class J2clDependencyTest implements ClassTesting2<J2clDependency> {
+public final class J2clArtifactTest implements ClassTesting2<J2clArtifact> {
 
     @Test
     public void testIsAnnotationOrInterfaceAnnotation() throws Exception {
@@ -51,15 +51,15 @@ public final class J2clDependencyTest implements ClassTesting2<J2clDependency> {
                 .getResourceAsStream("/" + type.getName().replace('.', '/') + ".class")
                 .readAllBytes();
         this.checkEquals(expected,
-                J2clDependency.isAnnotationOrInterface(classFile),
+                J2clArtifact.isAnnotationOrInterface(classFile),
                 () -> "isAnnotationOrInterface " + type.getName());
     }
 
     // ClassTesting.....................................................................................................
 
     @Override
-    public Class<J2clDependency> type() {
-        return J2clDependency.class;
+    public Class<J2clArtifact> type() {
+        return J2clArtifact.class;
     }
 
     @Override

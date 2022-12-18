@@ -202,7 +202,7 @@ public abstract class J2clMavenContext implements Context {
 
     // tasks............................................................................................................
 
-    public final List<J2clPath> sources(final J2clDependency dependency) {
+    public final List<J2clPath> sources(final J2clArtifact dependency) {
         return Lists.of(
                 dependency.taskDirectory(J2clTaskKind.UNPACK)
                         .output()
@@ -245,14 +245,14 @@ public abstract class J2clMavenContext implements Context {
 
     /**
      * Holds of artifacts and the artifacts it requires to complete before it can start with its own first task.
-     * When the {link Set} of required (the map value) becomes empty the {@link J2clDependency coords} can have its tasks started.
+     * When the {link Set} of required (the map value) becomes empty the {@link J2clArtifact coords} can have its tasks started.
      */
-    private final Map<J2clDependency, Set<J2clDependency>> tasks = Maps.concurrent();
+    private final Map<J2clArtifact, Set<J2clArtifact>> tasks = Maps.concurrent();
 
     /**
      * Executes the given project.
      */
-    final void prepareAndStart(final J2clDependency project,
+    final void prepareAndStart(final J2clArtifact project,
                                final TreeLogger logger) {
         this.tasks.clear();
 
@@ -271,16 +271,16 @@ public abstract class J2clMavenContext implements Context {
                 Runtime.getRuntime().availableProcessors() * 2);
     }
 
-    private void prepareTasks(final J2clDependency artifact) {
+    private void prepareTasks(final J2clArtifact artifact) {
         if (false == this.tasks.containsKey(artifact)) {
 
             // keep transitive dependencies alphabetical sorted for better readability when trySubmitTasks pretty prints queue processing.
-            final Set<J2clDependency> required = Sets.sorted();
+            final Set<J2clArtifact> required = Sets.sorted();
 
             this.tasks.put(artifact, required);
 
             if (!this.shouldSkipSubmittingDependencyTasks()) {
-                for (final J2clDependency dependency : artifact.dependencies()) {
+                for (final J2clArtifact dependency : artifact.dependencies()) {
                     if (dependency.shouldSkipTaskSubmit()) {
                         continue;
                     }
@@ -301,7 +301,7 @@ public abstract class J2clMavenContext implements Context {
      * Loops over all {@link #tasks} submitting a task for each that has no required artifacts aka the value is an empty {@link Set}.
      */
     private int trySubmitTasks(final TreeLogger logger) {
-        final List<J2clDependency> submits = Lists.array();
+        final List<J2clArtifact> submits = Lists.array();
 
         this.executeWithLock(() -> {
             final String message;
@@ -314,12 +314,12 @@ public abstract class J2clMavenContext implements Context {
                 {
 
                     //for readability sort tasks alphabetically as they will be printed and possibly submitted.....................
-                    final SortedMap<J2clDependency, Set<J2clDependency>> tasksAlphaSorted = Maps.sorted();
+                    final SortedMap<J2clArtifact, Set<J2clArtifact>> tasksAlphaSorted = Maps.sorted();
                     tasksAlphaSorted.putAll(this.tasks);
 
-                    for (final Entry<J2clDependency, Set<J2clDependency>> artifactAndDependencies : tasksAlphaSorted.entrySet()) {
-                        final J2clDependency artifact = artifactAndDependencies.getKey();
-                        final Set<J2clDependency> required = artifactAndDependencies.getValue();
+                    for (final Entry<J2clArtifact, Set<J2clArtifact>> artifactAndDependencies : tasksAlphaSorted.entrySet()) {
+                        final J2clArtifact artifact = artifactAndDependencies.getKey();
+                        final Set<J2clArtifact> required = artifactAndDependencies.getValue();
 
                         logger.line(artifact.toString());
                         logger.indent();
@@ -391,7 +391,7 @@ public abstract class J2clMavenContext implements Context {
         this.running.incrementAndGet(); // increment here because watch task will submit a Callable and it shouldnt be counted by await()
     }
 
-    private Void callable(final J2clDependency dependency,
+    private Void callable(final J2clArtifact dependency,
                           final TreeLogger logger) throws Exception {
         final Thread thread = Thread.currentThread();
         final String threadName = thread.getName();
@@ -446,12 +446,12 @@ public abstract class J2clMavenContext implements Context {
     /**
      * Finds all tasks that have the given artifact as a dependency and remove that dependency from the waiting list.
      */
-    final J2clMavenContext taskCompleted(final J2clDependency completed,
+    final J2clMavenContext taskCompleted(final J2clArtifact completed,
                                          final TreeLogger logger) {
         this.executeWithLock(() -> {
             this.tasks.remove(completed);
 
-            for (final Set<J2clDependency> dependencies : this.tasks.values()) {
+            for (final Set<J2clArtifact> dependencies : this.tasks.values()) {
                 dependencies.remove(completed);
             }
 
@@ -653,7 +653,7 @@ public abstract class J2clMavenContext implements Context {
      * Verifies all 3 groups of coords using the project to print all dependencies if a test has failed.
      */
     final void verifyClasspathRequiredJavascriptSourceRequiredIgnoredDependencies(final Set<J2clArtifactCoords> all,
-                                                                                  final J2clDependency project,
+                                                                                  final J2clArtifact project,
                                                                                   final TreeLogger logger) {
         verify(this.classpathRequired, "classpath-required", all, project, logger);
         verify(this.javascriptSourceRequired, "javascript-required", all, project, logger);
@@ -663,7 +663,7 @@ public abstract class J2clMavenContext implements Context {
     private static void verify(final Collection<J2clArtifactCoords> filtered,
                                final String label,
                                final Set<J2clArtifactCoords> all,
-                               final J2clDependency project,
+                               final J2clArtifact project,
                                final TreeLogger logger) {
         final Collection<J2clArtifactCoords> unknown = filtered.stream()
                 .filter(c -> false == all.contains(c))
