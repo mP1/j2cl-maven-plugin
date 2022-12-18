@@ -72,6 +72,7 @@ public final class J2clTaskShadeClassFile<C extends J2clMavenContext> extends J2
     @Override
     void postCopyAndShade(final J2clDependency artifact,
                           final J2clPath output,
+                          final C context,
                           final TreeLogger logger) {
         // do nothing
     }

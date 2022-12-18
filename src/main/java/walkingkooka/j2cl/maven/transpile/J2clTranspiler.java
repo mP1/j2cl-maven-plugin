@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 final class J2clTranspiler {
 
     static boolean execute(final Collection<J2clPath> classpath,
-                           final J2clPath sourcePath,
+                           final List<J2clPath> sourcePaths,
                            final J2clPath output,
                            final TreeLogger logger) throws IOException {
         logger.line("J2clTranspiler");
@@ -48,23 +48,27 @@ final class J2clTranspiler {
             final List<J2clPath> jsInput = Lists.array();// probably js
             final List<J2clPath> nativeJsAndJsInput = Lists.array();
 
-            if (sourcePath.exists().isPresent()) {
-                sourcePath.gatherFiles(J2clPath.JAVA_FILES.or(J2clPath.JAVASCRIPT_FILES.or(J2clPath.NATIVE_JAVASCRIPT_FILES)))
-                        .forEach(f -> {
-                            final String filename = f.filename();
-                            if (CharSequences.endsWith(filename, ".java")) {
-                                javaInput.add(f.toFileInfo(sourcePath));
-                            } else {
-                                if (CharSequences.endsWith(filename, ".native.js")) {
-                                    nativeJsInput.add(f.toFileInfo(sourcePath));
+            for (final J2clPath sourcePath : sourcePaths) {
+                if (sourcePath.exists().isPresent()) {
+                    sourcePath.gatherFiles(
+                                    J2clPath.JAVA_FILES.or(J2clPath.JAVASCRIPT_FILES.or(J2clPath.NATIVE_JAVASCRIPT_FILES))
+                            )
+                            .forEach(f -> {
+                                final String filename = f.filename();
+                                if (CharSequences.endsWith(filename, ".java")) {
+                                    javaInput.add(f.toFileInfo(sourcePath));
                                 } else {
-                                    if (CharSequences.endsWith(filename, ".js")) {
-                                        jsInput.add(f);
+                                    if (CharSequences.endsWith(filename, ".native.js")) {
+                                        nativeJsInput.add(f.toFileInfo(sourcePath));
+                                    } else {
+                                        if (CharSequences.endsWith(filename, ".js")) {
+                                            jsInput.add(f);
+                                        }
                                     }
+                                    nativeJsAndJsInput.add(f);
                                 }
-                                nativeJsAndJsInput.add(f);
-                            }
-                        });
+                            });
+                }
             }
 
             logger.line("Parameters");
@@ -106,10 +110,13 @@ final class J2clTranspiler {
                     logger.line("Copy js to output");
                     logger.indent();
                     {
-                        output.copyFiles(
-                                sourcePath,
-                                jsInput,
-                                J2clPath.COPY_FILE_CONTENT_VERBATIM);
+                        for (final J2clPath sourcePath : sourcePaths) {
+                            output.copyFiles(
+                                    sourcePath,
+                                    jsInput,
+                                    J2clPath.COPY_FILE_CONTENT_VERBATIM
+                            );
+                        }
                     }
                     logger.outdent();
 

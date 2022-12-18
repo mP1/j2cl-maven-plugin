@@ -17,6 +17,7 @@
 
 package walkingkooka.j2cl.maven.transpile;
 
+import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.J2clDependency;
 import walkingkooka.j2cl.maven.J2clMavenContext;
@@ -27,6 +28,7 @@ import walkingkooka.j2cl.maven.J2clTaskKind;
 import walkingkooka.j2cl.maven.J2clTaskResult;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -64,42 +66,45 @@ public final class J2clTask2clTranspiler<C extends J2clMavenContext> implements 
                                                final J2clTaskDirectory directory,
                                                final C context,
                                                final TreeLogger logger) throws Exception {
-        final J2clPath sourceRoot = this.sourceRoot(artifact);
+        final List<J2clPath> sourceRoots = this.sourceRoots(
+                artifact,
+                context
+        );
         final Set<J2clPath> classpath = this.classpath(artifact);
 
-        return J2clTranspiler.execute(classpath,
-                sourceRoot,
+        return J2clTranspiler.execute(
+                classpath,
+                sourceRoots,
                 directory.output().absentOrFail(),
-                logger) ?
+                logger
+        ) ?
                 J2clTaskResult.SUCCESS :
                 J2clTaskResult.FAILED;
     }
 
-    private J2clPath sourceRoot(final J2clDependency artifact) {
+    private List<J2clPath> sourceRoots(final J2clDependency artifact,
+                                       final J2clMavenContext context) {
         final J2clTaskKind first = J2clTaskKind.SHADE_JAVA_SOURCE;
         final J2clTaskKind second = J2clTaskKind.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE;
-        final J2clTaskKind third = J2clTaskKind.UNPACK;
 
-        final J2clPath sourceRoot;
+        final List<J2clPath> sourceRoots;
 
         final Optional<J2clPath> shaded = output(artifact, first);
         if (shaded.isPresent()) {
-            sourceRoot = shaded.get();
+            sourceRoots = Lists.of(shaded.get());
         } else {
             final Optional<J2clPath> stripped = output(artifact, second);
             if (stripped.isPresent()) {
-                sourceRoot = stripped.get();
+                sourceRoots = Lists.of(stripped.get());
             } else {
-                final Optional<J2clPath> unpack = output(artifact, third);
-                if (unpack.isPresent()) {
-                    sourceRoot = unpack.get();
-                } else {
-                    throw new IllegalStateException("Missing " + first + ", " + second + ", " + third + " output for " + artifact);
+                sourceRoots = context.sources(artifact);
+                if (sourceRoots.isEmpty()) {
+                    throw new IllegalStateException("Missing " + first + "/output, " + second + "/output AND source root for " + artifact);
                 }
             }
         }
 
-        return sourceRoot;
+        return sourceRoots;
     }
 
     private Set<J2clPath> classpath(final J2clDependency artifact) {

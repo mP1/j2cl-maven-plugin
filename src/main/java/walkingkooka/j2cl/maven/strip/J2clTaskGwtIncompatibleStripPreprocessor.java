@@ -20,11 +20,14 @@ package walkingkooka.j2cl.maven.strip;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.j2cl.maven.J2clDependency;
 import walkingkooka.j2cl.maven.J2clMavenContext;
+import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clTask;
 import walkingkooka.j2cl.maven.J2clTaskDirectory;
 import walkingkooka.j2cl.maven.J2clTaskKind;
 import walkingkooka.j2cl.maven.J2clTaskResult;
 import walkingkooka.j2cl.maven.log.TreeLogger;
+
+import java.util.List;
 
 /**
  * Compiles the java source to the target {@link J2clTaskDirectory#output()}.
@@ -63,11 +66,18 @@ public final class J2clTaskGwtIncompatibleStripPreprocessor<C extends J2clMavenC
                                                final J2clTaskDirectory directory,
                                                final C context,
                                                final TreeLogger logger) throws Exception {
+        final List<J2clPath> stripSource = Lists.array();
+
+        stripSource.add(
+                artifact.taskDirectory(J2clTaskKind.JAVAC_COMPILE)
+                        .output()
+        );
+        stripSource.addAll(
+                context.sources(artifact)
+        );
+
         return GwtIncompatibleStripPreprocessor.execute(
-                Lists.of(
-                        artifact.taskDirectory(J2clTaskKind.JAVAC_COMPILE).output(),
-                        artifact.taskDirectory(J2clTaskKind.UNPACK).output()
-                ),
+                stripSource,
                 directory.output().absentOrFail(),
                 logger
         );
