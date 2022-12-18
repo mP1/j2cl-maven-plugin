@@ -44,6 +44,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Accepts a directory and removes any files marked with @GwtIncompatible.
@@ -115,7 +116,7 @@ final class GwtIncompatibleStripPreprocessor {
 
                     // necessary to prepare FileInfo with correct sourceRoot otherwise stripped files will be written back to the wrong place.
                     javaFiles.addAll(
-                            J2clPath.toFileInfo(
+                            toFileInfos(
                                     files,
                                     output
                             )
@@ -126,6 +127,13 @@ final class GwtIncompatibleStripPreprocessor {
         logger.outdent();
 
         return javaFiles;
+    }
+
+    private static List<FileInfo> toFileInfos(final Collection<J2clPath> files,
+                                              final J2clPath base) {
+        return files.stream()
+                .map(p -> p.toFileInfo(base))
+                .collect(Collectors.toList());
     }
 
     /**
