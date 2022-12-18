@@ -130,10 +130,7 @@ public final class J2clPath implements Comparable<J2clPath> {
     public static List<FileInfo> toFileInfo(final Collection<J2clPath> files,
                                             final J2clPath base) {
         return files.stream()
-                .map(p -> {
-                    final Path path = p.path();
-                    return FileInfo.create(path.toString(), base.path().relativize(path).toString());
-                })
+                .map(p -> p.toFileInfo(base))
                 .collect(Collectors.toList());
     }
 
@@ -496,6 +493,14 @@ public final class J2clPath implements Comparable<J2clPath> {
     }
 
     private final static String TESTSUITE_FILEEXTENSION = ".testsuite";
+
+    public FileInfo toFileInfo(final J2clPath base) {
+        final Path path = this.path();
+        return FileInfo.create(
+                path.toString(),
+                base.path().relativize(path).toString()
+        );
+    }
 
     /**
      * Writes the content to this path.
