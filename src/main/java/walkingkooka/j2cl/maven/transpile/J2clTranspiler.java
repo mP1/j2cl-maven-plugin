@@ -17,6 +17,7 @@
 
 package walkingkooka.j2cl.maven.transpile;
 
+import com.google.j2cl.common.FrontendUtils.FileInfo;
 import com.google.j2cl.common.Problems;
 import com.google.j2cl.frontend.Frontend;
 import com.google.j2cl.transpiler.J2clTranspilerOptions;
@@ -42,8 +43,8 @@ final class J2clTranspiler {
 
         boolean success;
         {
-            final List<J2clPath> javaInput = Lists.array();
-            final List<J2clPath> nativeJsInput = Lists.array();
+            final List<FileInfo> javaInput = Lists.array();
+            final List<FileInfo> nativeJsInput = Lists.array();
             final List<J2clPath> jsInput = Lists.array();// probably js
             final List<J2clPath> nativeJsAndJsInput = Lists.array();
 
@@ -52,10 +53,10 @@ final class J2clTranspiler {
                         .forEach(f -> {
                             final String filename = f.filename();
                             if (CharSequences.endsWith(filename, ".java")) {
-                                javaInput.add(f);
+                                javaInput.add(f.toFileInfo(sourcePath));
                             } else {
                                 if (CharSequences.endsWith(filename, ".native.js")) {
-                                    nativeJsInput.add(f);
+                                    nativeJsInput.add(f.toFileInfo(sourcePath));
                                 } else {
                                     if (CharSequences.endsWith(filename, ".js")) {
                                         jsInput.add(f);
@@ -70,8 +71,8 @@ final class J2clTranspiler {
             logger.indent();
             {
                 logger.paths("Classpath(s)", classpath, TreeFormat.FLAT);
-                logger.paths("*.java source(s)", javaInput, TreeFormat.TREE);
-                logger.paths("*.native.js source(s)", nativeJsInput, TreeFormat.TREE);
+                logger.fileInfos("*.java source(s)", javaInput, TreeFormat.TREE);
+                logger.fileInfos("*.native.js source(s)", nativeJsInput, TreeFormat.TREE);
                 logger.paths("*.js source(s)", jsInput, TreeFormat.TREE);
                 logger.path("Output", output);
             }
@@ -90,8 +91,8 @@ final class J2clTranspiler {
                         .setEmitReadableSourceMap(false)
                         .setFrontend(Frontend.JDT)
                         .setGenerateKytheIndexingMetadata(false)
-                        .setSources(J2clPath.toFileInfo(javaInput, sourcePath))
-                        .setNativeSources(J2clPath.toFileInfo(nativeJsInput, sourcePath))
+                        .setSources(javaInput)
+                        .setNativeSources(nativeJsInput)
                         .build();
 
                 final Problems problems = com.google.j2cl.transpiler.J2clTranspiler.transpile(options);
