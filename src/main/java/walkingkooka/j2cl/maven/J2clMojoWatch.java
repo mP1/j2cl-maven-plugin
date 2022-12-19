@@ -74,7 +74,7 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
                     J2clPath.with(buildOutputDirectory)
             );
 
-            final J2clDependency project = this.gatherDependencies(
+            final J2clArtifact project = this.gatherDependencies(
                     logger,
                     context
             );
@@ -121,7 +121,7 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
         );
     }
 
-    private void waitAndBuild(final Path buildOutputDirectory, final J2clDependency project,
+    private void waitAndBuild(final Path buildOutputDirectory, final J2clArtifact project,
                               final TreeLogger logger,
                               final J2clMojoWatchMavenContext context) {
         context.fileEventPhase = true;
@@ -169,7 +169,7 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
     }
 
     private void watchServiceTakeAndPullLoop(final WatchService watchService,
-                                             final J2clDependency project,
+                                             final J2clArtifact project,
                                              final TreeLogger logger,
                                              final J2clMojoWatchMavenContext context) throws InterruptedException {
         final AtomicInteger fileEventCounter = new AtomicInteger();
@@ -208,7 +208,7 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
         }
     }
 
-    private void build(final J2clDependency project,
+    private void build(final J2clArtifact project,
                        final TreeLogger logger,
                        final J2clMojoWatchMavenContext context) {
         final Instant start = Instant.now();

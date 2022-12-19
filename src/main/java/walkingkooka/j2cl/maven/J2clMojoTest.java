@@ -84,7 +84,7 @@ public final class J2clMojoTest extends J2clMojoBuildTestWatch {
                 logger.indent();
                 {
                     final J2clMojoTestMavenContext context = this.context(test);
-                    final J2clDependency project = this.gatherDependencies(
+                    final J2clArtifact project = this.gatherDependencies(
                             logger,
                             context
                     );

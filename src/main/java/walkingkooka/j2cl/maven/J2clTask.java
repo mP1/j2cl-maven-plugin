@@ -22,12 +22,12 @@ import walkingkooka.j2cl.maven.log.TreeLogger;
 @SuppressWarnings("StaticInitializerReferencesSubClass")
 public interface J2clTask<C extends J2clMavenContext> {
 
-    J2clTaskResult execute(final J2clDependency artifact,
+    J2clTaskResult execute(final J2clArtifact artifact,
                            final J2clTaskKind kind,
                            final C context,
                            final TreeLogger logger) throws Exception;
 
-    default J2clTaskResult executeIfNecessary(final J2clDependency artifact,
+    default J2clTaskResult executeIfNecessary(final J2clArtifact artifact,
                                               final J2clTaskKind kind,
                                               final C context,
                                               final TreeLogger logger) throws Exception {
@@ -74,7 +74,7 @@ public interface J2clTask<C extends J2clMavenContext> {
         return result;
     }
 
-    private J2clTaskResult executeIfNecessary0(final J2clDependency artifact,
+    private J2clTaskResult executeIfNecessary0(final J2clArtifact artifact,
                                                final J2clTaskDirectory directory,
                                                final C context,
                                                final TreeLogger logger) throws Exception {
@@ -118,7 +118,7 @@ public interface J2clTask<C extends J2clMavenContext> {
         return result;
     }
 
-    J2clTaskResult executeWithDirectory(final J2clDependency artifact,
+    J2clTaskResult executeWithDirectory(final J2clArtifact artifact,
                                         final J2clTaskDirectory directory,
                                         final C context,
                                         final TreeLogger logger) throws Exception;

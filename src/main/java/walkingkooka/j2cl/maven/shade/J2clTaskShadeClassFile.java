@@ -17,7 +17,7 @@
 
 package walkingkooka.j2cl.maven.shade;
 
-import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clArtifact;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clTask;
@@ -70,7 +70,7 @@ public final class J2clTaskShadeClassFile<C extends J2clMavenContext> extends J2
     }
 
     @Override
-    void postCopyAndShade(final J2clDependency artifact,
+    void postCopyAndShade(final J2clArtifact artifact,
                           final J2clPath output,
                           final C context,
                           final TreeLogger logger) {

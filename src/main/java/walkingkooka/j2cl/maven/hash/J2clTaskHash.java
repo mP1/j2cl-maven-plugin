@@ -19,7 +19,7 @@ package walkingkooka.j2cl.maven.hash;
 
 import com.google.common.collect.Lists;
 import walkingkooka.collect.set.Sets;
-import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clArtifact;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clTask;
@@ -46,7 +46,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
- * Takes a {@link J2clDependency} and computes the hash for the files directly belonging to the artifact and then its dependencies.
+ * Takes a {@link J2clArtifact} and computes the hash for the files directly belonging to the artifact and then its dependencies.
  */
 public final class J2clTaskHash<C extends J2clMavenContext> implements J2clTask<C> {
 
@@ -65,7 +65,7 @@ public final class J2clTaskHash<C extends J2clMavenContext> implements J2clTask<
     }
 
     @Override
-    public J2clTaskResult execute(final J2clDependency artifact,
+    public J2clTaskResult execute(final J2clArtifact artifact,
                                   final J2clTaskKind kind,
                                   final C context,
                                   final TreeLogger logger) throws Exception {
@@ -109,17 +109,17 @@ public final class J2clTaskHash<C extends J2clMavenContext> implements J2clTask<
         return result;
     }
 
-    private void hashDependencies(final J2clDependency artifact,
+    private void hashDependencies(final J2clArtifact artifact,
                                   final HashBuilder hash,
                                   final Set<String> hashItemNames,
                                   final TreeLogger logger) throws IOException {
-        final Set<J2clDependency> dependencies = artifact.dependencies(); // dependencies();
+        final Set<J2clArtifact> dependencies = artifact.dependencies(); // dependencies();
         logger.line(dependencies.size() + " Dependencies");
         logger.indent();
         {
             int i = 0;
 
-            for (final J2clDependency dependency : new TreeSet<>(dependencies)) {
+            for (final J2clArtifact dependency : new TreeSet<>(dependencies)) {
                 logger.line(dependency.toString());
                 logger.indent();
                 {
@@ -141,7 +141,7 @@ public final class J2clTaskHash<C extends J2clMavenContext> implements J2clTask<
 
     private final static String DEPENDENCIES = "dependencies-";
 
-    private void hashArtifactSources(final J2clDependency artifact,
+    private void hashArtifactSources(final J2clArtifact artifact,
                                      final HashBuilder hash,
                                      final Set<String> hashItemNames,
                                      final TreeLogger logger) throws IOException {
@@ -157,7 +157,7 @@ public final class J2clTaskHash<C extends J2clMavenContext> implements J2clTask<
         }
     }
 
-    private void hashArchiveFile(final J2clDependency artifact,
+    private void hashArchiveFile(final J2clArtifact artifact,
                                  final HashBuilder hash,
                                  final Set<String> hashItemNames,
                                  final TreeLogger logger) throws IOException {
@@ -238,7 +238,7 @@ public final class J2clTaskHash<C extends J2clMavenContext> implements J2clTask<
     }
 
     @Override
-    public J2clTaskResult executeWithDirectory(final J2clDependency artifact,
+    public J2clTaskResult executeWithDirectory(final J2clArtifact artifact,
                                                final J2clTaskDirectory directory,
                                                final C context,
                                                final TreeLogger logger) {
@@ -246,7 +246,7 @@ public final class J2clTaskHash<C extends J2clMavenContext> implements J2clTask<
     }
 
     @Override
-    public J2clTaskResult executeIfNecessary(final J2clDependency artifact,
+    public J2clTaskResult executeIfNecessary(final J2clArtifact artifact,
                                              final J2clTaskKind kind,
                                              final C context,
                                              final TreeLogger logger) {

@@ -19,7 +19,7 @@ package walkingkooka.j2cl.maven.transpile;
 
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.set.Sets;
-import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clArtifact;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clTask;
@@ -49,7 +49,7 @@ public final class J2clTask2clTranspiler<C extends J2clMavenContext> implements 
     }
 
     @Override
-    public J2clTaskResult execute(final J2clDependency artifact,
+    public J2clTaskResult execute(final J2clArtifact artifact,
                                   final J2clTaskKind kind,
                                   final C context,
                                   final TreeLogger logger) throws Exception {
@@ -62,7 +62,7 @@ public final class J2clTask2clTranspiler<C extends J2clMavenContext> implements 
     }
 
     @Override
-    public J2clTaskResult executeWithDirectory(final J2clDependency artifact,
+    public J2clTaskResult executeWithDirectory(final J2clArtifact artifact,
                                                final J2clTaskDirectory directory,
                                                final C context,
                                                final TreeLogger logger) throws Exception {
@@ -82,7 +82,7 @@ public final class J2clTask2clTranspiler<C extends J2clMavenContext> implements 
                 J2clTaskResult.FAILED;
     }
 
-    private List<J2clPath> sourceRoots(final J2clDependency artifact,
+    private List<J2clPath> sourceRoots(final J2clArtifact artifact,
                                        final J2clMavenContext context) {
         final J2clTaskKind first = J2clTaskKind.SHADE_JAVA_SOURCE;
         final J2clTaskKind second = J2clTaskKind.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE;
@@ -107,12 +107,12 @@ public final class J2clTask2clTranspiler<C extends J2clMavenContext> implements 
         return sourceRoots;
     }
 
-    private Set<J2clPath> classpath(final J2clDependency artifact) {
+    private Set<J2clPath> classpath(final J2clArtifact artifact) {
         final Set<J2clPath> classpath = Sets.ordered();
 
         // only transpile if class required incl annotations, but not ignored or jre........................................
 
-        for (final J2clDependency dependency : artifact.dependencies()) {
+        for (final J2clArtifact dependency : artifact.dependencies()) {
             if (dependency.isAnnotationClassFiles()) {
                 classpath.add(dependency.artifactFileOrFail());
                 continue;
@@ -152,7 +152,7 @@ public final class J2clTask2clTranspiler<C extends J2clMavenContext> implements 
         return classpath;
     }
 
-    private static Optional<J2clPath> output(final J2clDependency dependency,
+    private static Optional<J2clPath> output(final J2clArtifact dependency,
                                              final J2clTaskKind kind) {
         return dependency.taskDirectory(kind)
                 .output()

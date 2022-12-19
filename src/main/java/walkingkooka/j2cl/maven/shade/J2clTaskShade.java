@@ -18,7 +18,7 @@
 package walkingkooka.j2cl.maven.shade;
 
 import walkingkooka.collect.set.Sets;
-import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clArtifact;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clTask;
@@ -51,7 +51,7 @@ abstract class J2clTaskShade<C extends J2clMavenContext> implements J2clTask<C> 
     }
 
     @Override
-    public J2clTaskResult execute(final J2clDependency artifact,
+    public J2clTaskResult execute(final J2clArtifact artifact,
                                   final J2clTaskKind kind,
                                   final C context,
                                   final TreeLogger logger) throws Exception {
@@ -64,7 +64,7 @@ abstract class J2clTaskShade<C extends J2clMavenContext> implements J2clTask<C> 
     }
 
     @Override
-    public final J2clTaskResult executeWithDirectory(final J2clDependency artifact,
+    public final J2clTaskResult executeWithDirectory(final J2clArtifact artifact,
                                                      final J2clTaskDirectory directory,
                                                      final C context,
                                                      final TreeLogger logger) throws Exception {
@@ -105,7 +105,7 @@ abstract class J2clTaskShade<C extends J2clMavenContext> implements J2clTask<C> 
      * Performs two copy passes, the first will shade any files during the copy process, the second will simply
      * copy the files to the destination.
      */
-    private void copyAndShade(final J2clDependency artifact,
+    private void copyAndShade(final J2clArtifact artifact,
                               final J2clPath root,
                               final Map<String, String> shade,
                               final J2clPath output,
@@ -208,7 +208,7 @@ abstract class J2clTaskShade<C extends J2clMavenContext> implements J2clTask<C> 
      * This is invoked after and files are copy and shaded, the primary use case is copying javascript files
      * after java files have been shaded.
      */
-    abstract void postCopyAndShade(final J2clDependency artifact,
+    abstract void postCopyAndShade(final J2clArtifact artifact,
                                    final J2clPath output,
                                    final C context,
                                    final TreeLogger logger) throws Exception;

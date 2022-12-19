@@ -23,7 +23,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.support.ui.FluentWait;
-import walkingkooka.j2cl.maven.J2clDependency;
+import walkingkooka.j2cl.maven.J2clArtifact;
 import walkingkooka.j2cl.maven.J2clException;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clMojoTestMavenContext;
@@ -62,7 +62,7 @@ public final class J2clTaskWebDriverUnitTestRunner implements J2clTask<J2clMojoT
     }
 
     @Override
-    public J2clTaskResult execute(final J2clDependency artifact,
+    public J2clTaskResult execute(final J2clArtifact artifact,
                                   final J2clTaskKind kind,
                                   final J2clMojoTestMavenContext context,
                                   final TreeLogger logger) throws Exception {
@@ -75,7 +75,7 @@ public final class J2clTaskWebDriverUnitTestRunner implements J2clTask<J2clMojoT
     }
 
     @Override
-    public J2clTaskResult executeWithDirectory(final J2clDependency artifact,
+    public J2clTaskResult executeWithDirectory(final J2clArtifact artifact,
                                                final J2clTaskDirectory directory,
                                                final J2clMojoTestMavenContext context,
                                                final TreeLogger logger) throws Exception {

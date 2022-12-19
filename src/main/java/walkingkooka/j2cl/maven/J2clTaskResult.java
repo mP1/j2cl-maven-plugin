@@ -93,7 +93,7 @@ public enum J2clTaskResult {
     /**
      * Only the {@link J2clTaskResult#FAILED} will throw a {@link J2clException}
      */
-    final void reportIfFailure(final J2clDependency dependency,
+    final void reportIfFailure(final J2clArtifact dependency,
                                final J2clTaskKind kind) throws J2clException {
         if (FAILED == this) {
             throw new J2clException(kind + " for " + dependency + " failed, refer to log file or console output for more details.");

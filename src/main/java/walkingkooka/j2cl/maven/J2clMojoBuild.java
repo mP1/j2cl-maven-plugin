@@ -40,7 +40,7 @@ public final class J2clMojoBuild extends J2clMojoBuildWatch {
             );
             final TreeLogger logger = context.mavenLogger()
                     .treeLogger();
-            final J2clDependency project = this.gatherDependencies(
+            final J2clArtifact project = this.gatherDependencies(
                     logger,
                     context
             );

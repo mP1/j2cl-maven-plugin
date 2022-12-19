@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class J2clDependencyGraphCalculatorTest implements ClassTesting2<J2clDependencyGraphCalculator> {
+public final class J2clArtifactGraphCalculatorTest implements ClassTesting2<J2clArtifactGraphCalculator> {
 
     private final static String A1 = "group:a1:1.0";
     private final static String B2 = "group:b2:1.0";
@@ -51,7 +51,7 @@ public final class J2clDependencyGraphCalculatorTest implements ClassTesting2<J2
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> J2clDependencyGraphCalculator.with(transform(flat), transformCsv(required))
+                () -> J2clArtifactGraphCalculator.with(transform(flat), transformCsv(required))
         );
     }
 
@@ -62,7 +62,7 @@ public final class J2clDependencyGraphCalculatorTest implements ClassTesting2<J2
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> J2clDependencyGraphCalculator.with(transform(flat), transformCsv(required))
+                () -> J2clArtifactGraphCalculator.with(transform(flat), transformCsv(required))
         );
     }
 
@@ -186,7 +186,7 @@ public final class J2clDependencyGraphCalculatorTest implements ClassTesting2<J2
 
         this.checkEquals(flat.keySet(), tree.keySet(), "flat and tree keys must be the same");
 
-        final J2clDependencyGraphCalculator calculator = J2clDependencyGraphCalculator.with(flat, required);
+        final J2clArtifactGraphCalculator calculator = J2clArtifactGraphCalculator.with(flat, required);
         this.checkEquals(format(tree),
                 format(calculator.run()),
                 () -> "flat: " + flat + " required: " + required);
@@ -199,8 +199,8 @@ public final class J2clDependencyGraphCalculatorTest implements ClassTesting2<J2
     // ClassTesting.....................................................................................................
 
     @Override
-    public Class<J2clDependencyGraphCalculator> type() {
-        return J2clDependencyGraphCalculator.class;
+    public Class<J2clArtifactGraphCalculator> type() {
+        return J2clArtifactGraphCalculator.class;
     }
 
     @Override
