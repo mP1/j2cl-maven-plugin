@@ -166,10 +166,9 @@ abstract class J2clTaskShade<C extends J2clMavenContext> implements J2clTask<C> 
                 }
             }
 
-            logger.line("Copying other files");
-            logger.indent();
+        logger.line("Copying other files");
+        logger.indent();
         {
-
             // copy all other files verbatim.
             output.copyFiles(
                     root,
