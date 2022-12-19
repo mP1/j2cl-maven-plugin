@@ -66,8 +66,8 @@ public final class J2clTaskJavacCompilerGwtIncompatibleStrippedSource<C extends 
      * Try adding the SHADED_CLASS_FILES then COMPILE_GWT_INCOMPATIBLE_STRIPPED then default to the original archive file.
      */
     @Override
-    J2clPath selectClassFiles(final J2clArtifact dependency) {
-        return dependency.sourcesOrArchiveFile(this.compileTask());
+    J2clPath selectClassFiles(final J2clArtifact artifact) {
+        return artifact.sourcesOrArchiveFile(this.compileTask());
     }
 
     @Override

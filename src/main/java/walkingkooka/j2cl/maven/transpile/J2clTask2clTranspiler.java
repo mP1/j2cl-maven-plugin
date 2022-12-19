@@ -152,9 +152,9 @@ public final class J2clTask2clTranspiler<C extends J2clMavenContext> implements 
         return classpath;
     }
 
-    private static Optional<J2clPath> output(final J2clArtifact dependency,
+    private static Optional<J2clPath> output(final J2clArtifact artifact,
                                              final J2clTaskKind kind) {
-        return dependency.taskDirectory(kind)
+        return artifact.taskDirectory(kind)
                 .output()
                 .exists();
     }

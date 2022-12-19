@@ -202,9 +202,9 @@ public abstract class J2clMavenContext implements Context {
 
     // tasks............................................................................................................
 
-    public final List<J2clPath> sources(final J2clArtifact dependency) {
+    public final List<J2clPath> sources(final J2clArtifact artifact) {
         return Lists.of(
-                dependency.taskDirectory(J2clTaskKind.UNPACK)
+                artifact.taskDirectory(J2clTaskKind.UNPACK)
                         .output()
         );
     }
@@ -391,13 +391,13 @@ public abstract class J2clMavenContext implements Context {
         this.running.incrementAndGet(); // increment here because watch task will submit a Callable and it shouldnt be counted by await()
     }
 
-    private Void callable(final J2clArtifact dependency,
+    private Void callable(final J2clArtifact artifact,
                           final TreeLogger logger) throws Exception {
         final Thread thread = Thread.currentThread();
         final String threadName = thread.getName();
 
         try {
-            final String coords = dependency.coords().toString();
+            final String coords = artifact.coords().toString();
             final Instant start = Instant.now();
 
             logger.line(coords);
@@ -412,7 +412,7 @@ public abstract class J2clMavenContext implements Context {
                     thread.setName(coords + "-" + kind);
 
                     kind = kind.execute(
-                            dependency,
+                            artifact,
                             logger,
                             this
                     ).orElse(null);
@@ -431,7 +431,7 @@ public abstract class J2clMavenContext implements Context {
             );
 
             this.taskCompleted(
-                    dependency,
+                    artifact,
                     logger
             );
         } finally {
