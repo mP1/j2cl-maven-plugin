@@ -125,7 +125,7 @@ abstract class J2clTaskJavacCompiler<C extends J2clMavenContext> implements J2cl
     /**
      * This task this is used to build the classpath for the java compiler.
      */
-    abstract List<J2clTaskKind> compileTask();
+    abstract List<J2clTaskKind> compileBinaryTasks();
 
     /**
      * Returns whether annotations processors should be run.

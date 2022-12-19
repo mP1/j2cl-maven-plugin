@@ -53,8 +53,11 @@ public final class J2clTaskJavacCompilerGwtIncompatibleStrippedSource<C extends 
     }
 
     @Override
-    List<J2clTaskKind> compileTask() {
-        return Lists.of(J2clTaskKind.SHADE_CLASS_FILES, J2clTaskKind.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE);
+    List<J2clTaskKind> compileBinaryTasks() {
+        return Lists.of(
+                J2clTaskKind.SHADE_CLASS_FILES,
+                J2clTaskKind.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE
+        );
     }
 
     @Override
@@ -67,7 +70,7 @@ public final class J2clTaskJavacCompilerGwtIncompatibleStrippedSource<C extends 
      */
     @Override
     J2clPath selectClassFiles(final J2clArtifact artifact) {
-        return artifact.sourcesOrArchiveFile(this.compileTask());
+        return artifact.sourcesOrArchiveFile(this.compileBinaryTasks());
     }
 
     @Override
