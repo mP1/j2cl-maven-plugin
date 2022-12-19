@@ -180,7 +180,7 @@ abstract class J2clTaskJavacCompiler<C extends J2clMavenContext> implements J2cl
     /**
      * Sub classes implement two different ways of finding the right class files for the given {@link J2clArtifact}.
      */
-    abstract J2clPath selectClassFiles(final J2clArtifact dependency);
+    abstract J2clPath selectClassFiles(final J2clArtifact artifact);
 
     /**
      * This is called after the compile

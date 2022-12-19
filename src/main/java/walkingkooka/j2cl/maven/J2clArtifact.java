@@ -291,31 +291,31 @@ public final class J2clArtifact implements Comparable<J2clArtifact> {
      * one with less will be kept.
      */
     private J2clArtifact reduce() {
-        final Map<J2clArtifactCoords, J2clArtifact> coordToDependency = Maps.sorted(J2clArtifactCoords.IGNORE_VERSION_COMPARATOR);
-        this.gatherCoordToDependency(coordToDependency);
-        return this.reduce0(coordToDependency);
+        final Map<J2clArtifactCoords, J2clArtifact> coordToDependencies = Maps.sorted(J2clArtifactCoords.IGNORE_VERSION_COMPARATOR);
+        this.gatherCoordToDependencies(coordToDependencies);
+        return this.reduce0(coordToDependencies);
     }
 
-    private void gatherCoordToDependency(final Map<J2clArtifactCoords, J2clArtifact> coordToDependency) {
+    private void gatherCoordToDependencies(final Map<J2clArtifactCoords, J2clArtifact> coordToDependencies) {
         final J2clArtifactCoords coords = this.coords();
 
-        final J2clArtifact other = coordToDependency.get(coords);
+        final J2clArtifact other = coordToDependencies.get(coords);
 
         // different dependency instance might have different child dependencies due to "different" exclusions.
         if (false == this.equals(other)) {
             final Set<J2clArtifact> dependencies = this.dependencies;
             if (null == other || dependencies.size() < other.dependencies.size()) {
-                coordToDependency.put(coords, this);
+                coordToDependencies.put(coords, this);
             }
             for (final J2clArtifact dependency : dependencies) {
-                dependency.gatherCoordToDependency(coordToDependency);
+                dependency.gatherCoordToDependencies(coordToDependencies);
             }
         }
     }
 
-    private J2clArtifact reduce0(final Map<J2clArtifactCoords, J2clArtifact> coordToDependency) {
+    private J2clArtifact reduce0(final Map<J2clArtifactCoords, J2clArtifact> coordToDependencies) {
         this.dependencies = this.dependencies.stream()
-                .map(d -> coordToDependency.get(d.coords()).reduce0(coordToDependency))
+                .map(d -> coordToDependencies.get(d.coords()).reduce0(coordToDependencies))
                 .collect(Collectors.toCollection(J2clArtifact::set));
         return this;
     }
@@ -574,12 +574,12 @@ public final class J2clArtifact implements Comparable<J2clArtifact> {
     /**
      * Verifies there are not dependencies that share the same group and artifact id but differ in other components.
      */
-    private void verifyWithoutConflictsOrDuplicates(final Collection<J2clArtifact> all,
+    private void verifyWithoutConflictsOrDuplicates(final Collection<J2clArtifact> dependencies,
                                                     final TreeLogger logger) {
         final Set<J2clArtifactCoords> duplicateCoords = J2clArtifactCoords.set();
         final List<String> duplicatesText = Lists.array();
 
-        for (final J2clArtifact dependency : all) {
+        for (final J2clArtifact dependency : dependencies) {
             final J2clArtifactCoords coords = dependency.coords();
 
             // must have been the duplicate of another coord.
@@ -587,7 +587,7 @@ public final class J2clArtifact implements Comparable<J2clArtifact> {
                 continue;
             }
 
-            final List<J2clArtifactCoords> duplicates = all.stream()
+            final List<J2clArtifactCoords> duplicates = dependencies.stream()
                     .map(J2clArtifact::coords)
                     .filter(coords::isSameGroupArtifactDifferentVersion)
                     .collect(Collectors.toList());

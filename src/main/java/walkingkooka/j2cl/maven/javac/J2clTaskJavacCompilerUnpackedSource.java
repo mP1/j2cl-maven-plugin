@@ -69,8 +69,8 @@ public final class J2clTaskJavacCompilerUnpackedSource<C extends J2clMavenContex
      * Always add the dependency jar file.
      */
     @Override
-    J2clPath selectClassFiles(final J2clArtifact dependency) {
-        return dependency.artifactFileOrFail();
+    J2clPath selectClassFiles(final J2clArtifact artifact) {
+        return artifact.artifactFileOrFail();
     }
 
     /**
