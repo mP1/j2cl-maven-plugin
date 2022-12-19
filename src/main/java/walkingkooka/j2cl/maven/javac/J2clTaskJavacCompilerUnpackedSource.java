@@ -56,7 +56,7 @@ public final class J2clTaskJavacCompilerUnpackedSource<C extends J2clMavenContex
     }
 
     @Override
-    List<J2clTaskKind> compileTask() {
+    List<J2clTaskKind> compileBinaryTasks() {
         return Lists.of(J2clTaskKind.JAVAC_COMPILE);
     }
 
