@@ -69,8 +69,7 @@ public final class J2clTaskGwtIncompatibleStripPreprocessor<C extends J2clMavenC
         final List<J2clPath> stripSource = Lists.array();
 
         stripSource.add(
-                artifact.taskDirectory(J2clTaskKind.JAVAC_COMPILE)
-                        .output()
+                context.compiledBinaries(artifact)
         );
         stripSource.addAll(
                 context.sources(artifact)
