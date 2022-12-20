@@ -180,7 +180,7 @@ public abstract class J2clMavenContext implements Context {
 
     private final Set<ClosureFormattingOption> formatting;
 
-    public abstract J2clPath initialScriptFilename();
+    public abstract J2clPath initialScriptFilename(final J2clArtifact artifact);
 
     private final Set<String> javaCompilerArguments;
 
@@ -214,19 +214,22 @@ public abstract class J2clMavenContext implements Context {
                 .output();
     }
 
-    public final String directoryName(final J2clTaskKind kind) {
+    public final String directoryName(final J2clArtifact artifact,
+                                      final J2clTaskKind kind) {
         return kind.directoryName(
-                this.tasks()
+                this.tasks(artifact)
                         .indexOf(kind)
         );
     }
 
-    final J2clTaskKind firstTaskKind() {
-        return this.tasks().get(0);
+    final J2clTaskKind firstTaskKind(final J2clArtifact artifact) {
+        return this.tasks(artifact)
+                .get(0);
     }
 
-    final Optional<J2clTaskKind> nextTask(final J2clTaskKind current) {
-        final List<J2clTaskKind> tasks = this.tasks();
+    final Optional<J2clTaskKind> nextTask(final J2clArtifact artifact,
+                                          final J2clTaskKind current) {
+        final List<J2clTaskKind> tasks = this.tasks(artifact);
 
         final int index = tasks.indexOf(current);
         return Optional.ofNullable(
@@ -236,7 +239,7 @@ public abstract class J2clMavenContext implements Context {
         );
     }
 
-    abstract List<J2clTaskKind> tasks();
+    abstract List<J2clTaskKind> tasks(final J2clArtifact artifact);
 
     /**
      * When true directories like !SUCCESS should be checked and honoured.
@@ -408,7 +411,8 @@ public abstract class J2clMavenContext implements Context {
             logger.line(coords);
             logger.indent();
             {
-                J2clTaskKind kind = this.firstTaskKind();
+                J2clTaskKind kind = this.firstTaskKind(artifact);
+
                 do {
                     // skip this and any more tasks, watch task probably issued a shutdown because of a new file watch event.
                     if (!this.isRunning()) {
@@ -723,7 +727,6 @@ public abstract class J2clMavenContext implements Context {
                 this.entryPoints() + " " +
                 this.externs + " " +
                 this.formatting + " " +
-                this.initialScriptFilename() + " " +
                 this.languageOut + " " +
                 this.sourceMaps + " " +
                 this.level;

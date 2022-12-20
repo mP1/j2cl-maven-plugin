@@ -26,6 +26,7 @@ import com.google.javascript.jscomp.DependencyOptions;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.j2cl.maven.J2clArtifact;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.log.TreeFormat;
@@ -50,7 +51,8 @@ import java.util.stream.Collectors;
 
 class ClosureCompiler {
 
-    static boolean compile(final CompilationLevel compilationLevel,
+    static boolean compile(final J2clArtifact artifact,
+                           final CompilationLevel compilationLevel,
                            final Map<String, String> defines,
                            final List<String> entryPoints,
                            final Set<String> externs,
@@ -64,6 +66,7 @@ class ClosureCompiler {
                            final J2clMavenContext context,
                            final TreeLogger logger) throws Exception {
         return compile0(
+                artifact,
                 compilationLevel,
                 defines,
                 entryPoints,
@@ -80,7 +83,8 @@ class ClosureCompiler {
         );
     }
 
-    private static boolean compile0(final CompilationLevel compilationLevel,
+    private static boolean compile0(final J2clArtifact artifact,
+                                    final CompilationLevel compilationLevel,
                                     final Map<String, String> defines,
                                     final List<String> entryPoints,
                                     final SortedSet<String> externs,
@@ -118,7 +122,10 @@ class ClosureCompiler {
                     logger.outdent();
                 } else {
                     // if unpack/output dont want to copy java source.
-                    final Predicate<Path> filter = sourceRoot.isUnpackOutput(context) ?
+                    final Predicate<Path> filter = sourceRoot.isUnpackOutput(
+                            artifact,
+                            context
+                    ) ?
                             J2clPath.ALL_FILES_EXCEPT_JAVA :
                             J2clPath.ALL_FILES;
 

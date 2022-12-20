@@ -263,7 +263,11 @@ public enum J2clTaskKind {
 
                 result.reportIfFailure(artifact, this);
             }
-            return result.next(this, context);
+            return result.next(
+                    artifact,
+                    this,
+                    context
+            );
         } catch (final Exception cause) {
             logger.error("Failed to execute " + prefix + " message: " + cause.getMessage(), cause);
             logger.flush();

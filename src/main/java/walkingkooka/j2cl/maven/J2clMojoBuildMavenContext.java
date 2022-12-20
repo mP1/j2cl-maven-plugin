@@ -127,7 +127,7 @@ final class J2clMojoBuildMavenContext extends J2clMavenContext {
     private final List<String> entryPoints;
 
     @Override
-    public J2clPath initialScriptFilename() {
+    public J2clPath initialScriptFilename(final J2clArtifact artifact) {
         return this.initialScriptFilename;
     }
 
@@ -152,7 +152,7 @@ final class J2clMojoBuildMavenContext extends J2clMavenContext {
     // tasks....................................................................................................
 
     @Override
-    List<J2clTaskKind> tasks() {
+    List<J2clTaskKind> tasks(final J2clArtifact artifact) {
         return TASKS;
     }
 

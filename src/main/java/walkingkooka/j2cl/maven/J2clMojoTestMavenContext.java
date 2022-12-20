@@ -137,10 +137,14 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
     }
 
     @Override
-    public J2clPath initialScriptFilename() {
+    public J2clPath initialScriptFilename(final J2clArtifact artifact) {
         return this.project.directory()
-                .append(this.directoryName(J2clTaskKind.CLOSURE_COMPILE))
-                .output()
+                .append(
+                        this.directoryName(
+                                artifact,
+                                J2clTaskKind.CLOSURE_COMPILE
+                        )
+                ).output()
                 .append(this.testClassName + ".js");
     }
 
@@ -166,7 +170,7 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
     // tasks............................................................................................................
 
     @Override
-    List<J2clTaskKind> tasks() {
+    List<J2clTaskKind> tasks(final J2clArtifact artifact) {
         return TASKS;
     }
 

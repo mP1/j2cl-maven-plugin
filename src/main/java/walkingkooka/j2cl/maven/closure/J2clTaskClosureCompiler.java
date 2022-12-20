@@ -116,6 +116,7 @@ public final class J2clTaskClosureCompiler<C extends J2clMavenContext> implement
         }
 
         return ClosureCompiler.compile(
+                artifact,
                 context.level(),
                 context.defines(),
                 context.entryPoints(),
@@ -126,7 +127,8 @@ public final class J2clTaskClosureCompiler<C extends J2clMavenContext> implement
                 context.sourceMaps(),
                 sources,
                 directory.output().createIfNecessary(),
-                context.initialScriptFilename().filename(),
+                context.initialScriptFilename(artifact)
+                        .filename(),
                 context,
                 logger
         ) ?

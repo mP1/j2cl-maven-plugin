@@ -1236,7 +1236,10 @@ public final class J2clArtifact implements Comparable<J2clArtifact> {
         return J2clTaskDirectory.with(
                 Paths.get(
                         this.directory().toString(),
-                        this.context.directoryName(kind)
+                        this.context.directoryName(
+                                this,
+                                kind
+                        )
                 )
         );
     }
