@@ -34,7 +34,8 @@ public enum J2clTaskResult {
          * and theres no point redoing tasks.
          */
         @Override
-        Optional<J2clTaskKind> next(final J2clTaskKind current,
+        Optional<J2clTaskKind> next(final J2clArtifact artifact,
+                                    final J2clTaskKind current,
                                     final J2clMavenContext context) {
             return Optional.empty();
         }
@@ -52,7 +53,8 @@ public enum J2clTaskResult {
          * An error occurred, eg a java compile error no point trying further tasks for this dependency.
          */
         @Override
-        Optional<J2clTaskKind> next(final J2clTaskKind current,
+        Optional<J2clTaskKind> next(final J2clArtifact artifact,
+                                    final J2clTaskKind current,
                                     final J2clMavenContext context) {
             return Optional.empty();
         }
@@ -67,9 +69,13 @@ public enum J2clTaskResult {
         }
 
         @Override
-        Optional<J2clTaskKind> next(final J2clTaskKind current,
+        Optional<J2clTaskKind> next(final J2clArtifact artifact,
+                                    final J2clTaskKind current,
                                     final J2clMavenContext context) {
-            return context.nextTask(current);
+            return context.nextTask(
+                    artifact,
+                    current
+            );
         }
     },
     /**
@@ -82,9 +88,13 @@ public enum J2clTaskResult {
         }
 
         @Override
-        Optional<J2clTaskKind> next(final J2clTaskKind current,
+        Optional<J2clTaskKind> next(final J2clArtifact artifact,
+                                    final J2clTaskKind current,
                                     final J2clMavenContext context) {
-            return context.nextTask(current);
+            return context.nextTask(
+                    artifact,
+                    current
+            );
         }
     };
 
@@ -100,6 +110,7 @@ public enum J2clTaskResult {
         }
     }
 
-    abstract Optional<J2clTaskKind> next(final J2clTaskKind current,
+    abstract Optional<J2clTaskKind> next(final J2clArtifact artifact,
+                                         final J2clTaskKind current,
                                          final J2clMavenContext context);
 }

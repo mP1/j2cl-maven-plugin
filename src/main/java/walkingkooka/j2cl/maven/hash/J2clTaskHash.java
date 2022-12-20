@@ -84,8 +84,12 @@ public final class J2clTaskHash<C extends J2clMavenContext> implements J2clTask<
             result = J2clTaskResult.ABORTED; // computed hash must not have changed dir already exists so skip remaining tasks.
         } else {
             // create the dir that will have hash task so the file can be written...
-            directory.append(context.directoryName(J2clTaskKind.HASH))
-                    .createIfNecessary();
+            directory.append(
+                    context.directoryName(
+                            artifact,
+                            J2clTaskKind.HASH
+                    )
+            ).createIfNecessary();
 
             final J2clTaskDirectory hashDirectory = artifact.taskDirectory(J2clTaskKind.HASH);
             final String txt = hashItemNames.stream()

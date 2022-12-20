@@ -83,7 +83,11 @@ public final class J2clTaskWebDriverUnitTestRunner implements J2clTask<J2clMojoT
         logger.indent();
         {
             this.executeTestSuite(
-                    this.prepareJunitHostFileScriptPath(context, logger),
+                    this.prepareJunitHostFileScriptPath(
+                            artifact,
+                            context,
+                            logger
+                    ),
                     context.browsers(),
                     context.browserLogLevel(),
                     context.testTimeout(),
@@ -98,14 +102,15 @@ public final class J2clTaskWebDriverUnitTestRunner implements J2clTask<J2clMojoT
     /**
      * Loads the html file and replaces the script file with the closure compiled test file.
      */
-    private J2clPath prepareJunitHostFileScriptPath(final J2clMavenContext context,
+    private J2clPath prepareJunitHostFileScriptPath(final J2clArtifact artifact,
+                                                    final J2clMavenContext context,
                                                     final TreeLogger logger) throws IOException {
         final J2clPath hostHtml;
 
         logger.line("Prepare host file");
         logger.indent();
         {
-            final J2clPath file = context.initialScriptFilename();
+            final J2clPath file = context.initialScriptFilename(artifact);
             hostHtml = file.parent()
                     .append(CharSequences.subSequence(file.file().getName(), 0, -2) + "html");
 
