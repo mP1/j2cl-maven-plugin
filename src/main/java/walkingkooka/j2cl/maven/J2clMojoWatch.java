@@ -144,7 +144,7 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
                 );
 
             } catch (final Throwable e) {
-                // ignore and try again.
+                logger.error(e.getMessage(), e);
             }
 
             this.sleep();
