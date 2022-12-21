@@ -60,67 +60,67 @@ abstract class J2clTaskJavacCompiler<C extends J2clMavenContext> implements J2cl
                                                      final J2clTaskDirectory directory,
                                                      final C context,
                                                      final TreeLogger logger) throws Exception {
-        J2clTaskResult result = null;
-        final J2clTaskKind sourceTask = this.sourceTask();
+        J2clTaskResult result;
 
-        J2clPath source = artifact.taskDirectory(sourceTask).output().exists().orElse(null);
-        if (null != source) {
-            final Set<J2clPath> javaSourceFiles = Sets.ordered();
+        final boolean shouldRunAnnotationProcessors = this.shouldRunAnnotationProcessors();
 
-            final J2clPath output = artifact.taskDirectory(sourceTask).output();
+        final Set<J2clPath> javaSourceFiles = Sets.ordered();
+        final Set<J2clPath> classpath = Sets.ordered();
 
-            javaSourceFiles.addAll(output.gatherFiles((path) -> false == output.isSuperSource(path) && J2clPath.JAVA_FILES.test(path)));
-            if (javaSourceFiles.isEmpty()) {
-                source = null;
-            } else {
-                final boolean shouldRunAnnotationProcessors = this.shouldRunAnnotationProcessors();
-
-                final Set<J2clPath> bootstrap = Sets.ordered();
-                final Set<J2clPath> classpath = Sets.ordered();
+        for (final J2clPath source : this.sourceRoots(artifact, context, logger)) {
+            if (source.exists().isPresent()) {
+                javaSourceFiles.addAll(
+                        source.gatherFiles((path) -> false == source.isSuperSource(path) && J2clPath.JAVA_FILES.test(path))
+                );
 
                 // add source to classpath, might be useful as it may contain non java files that are needed by annotation processors.
-                if(shouldRunAnnotationProcessors) {
-                    classpath.add(output);
-                }
-
-                this.buildBootstrapAndClasspath(artifact, shouldRunAnnotationProcessors, bootstrap, classpath);
-
-                if (classpath.isEmpty()) {
-                    result = J2clTaskResult.SKIPPED; // project could have no source files.
-                } else {
-                    result = JavacCompiler.execute(bootstrap,
-                            classpath,
-                            javaSourceFiles,
-                            directory.output().absentOrFail(),
-                            context.javaCompilerArguments(),
-                            shouldRunAnnotationProcessors,
-                            logger) ?
-                            J2clTaskResult.SUCCESS :
-                            J2clTaskResult.FAILED;
-                    if (J2clTaskResult.SUCCESS == result) {
-                        this.postCompile(
-                                artifact,
-                                directory,
-                                context,
-                                logger
-                        );
-                    }
+                if (shouldRunAnnotationProcessors) {
+                    classpath.add(source);
                 }
             }
         }
 
-        if (null == source) {
+        if (javaSourceFiles.isEmpty()) {
             logger.indentedLine("No files found");
             result = J2clTaskResult.ABORTED;
+        } else {
+
+            final Set<J2clPath> bootstrap = Sets.ordered();
+            this.buildBootstrapAndClasspath(
+                    artifact,
+                    shouldRunAnnotationProcessors,
+                    bootstrap,
+                    classpath
+            );
+
+            result = JavacCompiler.execute(bootstrap,
+                    classpath,
+                    javaSourceFiles,
+                    directory.output().absentOrFail(),
+                    context.javaCompilerArguments(),
+                    shouldRunAnnotationProcessors,
+                    logger) ?
+                    J2clTaskResult.SUCCESS :
+                    J2clTaskResult.FAILED;
+            if (J2clTaskResult.SUCCESS == result) {
+                this.postCompile(
+                        artifact,
+                        directory,
+                        context,
+                        logger
+                );
+            }
         }
 
         return result;
     }
 
     /**
-     * A previous task that has source in its output ready for compiling
+     * Returns the source roots that will be given to javac.
      */
-    abstract J2clTaskKind sourceTask();
+    abstract List<J2clPath> sourceRoots(final J2clArtifact artifact,
+                                        final C context,
+                                        final TreeLogger logger);
 
     /**
      * This task this is used to build the classpath for the java compiler.
@@ -128,7 +128,7 @@ abstract class J2clTaskJavacCompiler<C extends J2clMavenContext> implements J2cl
     abstract List<J2clTaskKind> compiledBinaryTasks();
 
     /**
-     * Returns whether annotations processors should be run.
+     * Returns whether annotations processors should be run. Running on the original source will return YES and running on the gwt-stripped-source will return NO.
      */
     abstract boolean shouldRunAnnotationProcessors();
 
