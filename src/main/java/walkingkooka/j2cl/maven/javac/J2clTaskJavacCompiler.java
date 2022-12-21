@@ -68,9 +68,17 @@ abstract class J2clTaskJavacCompiler<C extends J2clMavenContext> implements J2cl
         final Set<J2clPath> classpath = Sets.ordered();
 
         for (final J2clPath source : this.sourceRoots(artifact, context, logger)) {
+            // /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/junit-test-dependency-graph/test/src/test/java
+            // /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/junit-test-dependency-graph/test/target/generated-test-sources/test-annotations
+            if (source.isGeneratedDirectory() || source.parent().isGeneratedDirectory()) {
+                continue;
+            }
+
             if (source.exists().isPresent()) {
                 javaSourceFiles.addAll(
-                        source.gatherFiles((path) -> false == source.isSuperSource(path) && J2clPath.JAVA_FILES.test(path))
+                        source.gatherFiles(
+                                (path) -> false == source.isSuperSource(path) && J2clPath.JAVA_FILES.test(path)
+                        )
                 );
 
                 // add source to classpath, might be useful as it may contain non java files that are needed by annotation processors.

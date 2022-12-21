@@ -153,12 +153,26 @@ final class J2clMojoBuildMavenContext extends J2clMavenContext {
 
     @Override
     List<J2clTaskKind> tasks(final J2clArtifact artifact) {
-        return TASKS;
+        return artifact.isDependency() ?
+                DEPENDENCY_TASKS :
+                PROJECT_TASKS;
     }
 
-    private final List<J2clTaskKind> TASKS = Lists.of(
+    private final List<J2clTaskKind> DEPENDENCY_TASKS = Lists.of(
             J2clTaskKind.HASH,
             J2clTaskKind.UNPACK,
+            J2clTaskKind.JAVAC_COMPILE,
+            J2clTaskKind.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE,
+            J2clTaskKind.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE,
+            J2clTaskKind.SHADE_JAVA_SOURCE,
+            J2clTaskKind.SHADE_CLASS_FILES,
+            J2clTaskKind.TRANSPILE_JAVA_TO_JAVASCRIPT,
+            J2clTaskKind.CLOSURE_COMPILE,
+            J2clTaskKind.OUTPUT_ASSEMBLE
+    );
+
+    private final List<J2clTaskKind> PROJECT_TASKS = Lists.of(
+            J2clTaskKind.HASH,
             J2clTaskKind.JAVAC_COMPILE,
             J2clTaskKind.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE,
             J2clTaskKind.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE,

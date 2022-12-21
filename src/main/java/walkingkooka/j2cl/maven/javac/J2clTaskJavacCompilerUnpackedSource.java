@@ -54,10 +54,8 @@ public final class J2clTaskJavacCompilerUnpackedSource<C extends J2clMavenContex
     List<J2clPath> sourceRoots(final J2clArtifact artifact,
                                final C context,
                                final TreeLogger logger) {
-        return Lists.of(
-                artifact.taskDirectory(
-                        J2clTaskKind.UNPACK
-                ).output()
+        return context.sources(
+                artifact
         );
     }
 
