@@ -51,8 +51,14 @@ public final class J2clTaskJavacCompilerUnpackedSource<C extends J2clMavenContex
     }
 
     @Override
-    J2clTaskKind sourceTask() {
-        return J2clTaskKind.UNPACK;
+    List<J2clPath> sourceRoots(final J2clArtifact artifact,
+                               final C context,
+                               final TreeLogger logger) {
+        return Lists.of(
+                artifact.taskDirectory(
+                        J2clTaskKind.UNPACK
+                ).output()
+        );
     }
 
     @Override

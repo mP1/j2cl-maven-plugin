@@ -48,8 +48,14 @@ public final class J2clTaskJavacCompilerGwtIncompatibleStrippedSource<C extends 
     }
 
     @Override
-    J2clTaskKind sourceTask() {
-        return J2clTaskKind.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE;
+    List<J2clPath> sourceRoots(final J2clArtifact artifact,
+                               final C context,
+                               final TreeLogger logger) {
+        return Lists.of(
+                artifact.taskDirectory(
+                        J2clTaskKind.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE
+                ).output()
+        );
     }
 
     @Override
