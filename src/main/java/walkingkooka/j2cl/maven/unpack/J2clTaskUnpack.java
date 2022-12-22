@@ -57,6 +57,8 @@ public final class J2clTaskUnpack<C extends J2clMavenContext> implements J2clTas
                                   final J2clTaskKind kind,
                                   final C context,
                                   final TreeLogger logger) throws Exception {
+        this.failIfArtifactNotDependency(artifact);
+
         return this.executeIfNecessary(
                 artifact,
                 kind,
@@ -70,6 +72,8 @@ public final class J2clTaskUnpack<C extends J2clMavenContext> implements J2clTas
                                                final J2clTaskDirectory directory,
                                                final C context,
                                                final TreeLogger logger) throws Exception {
+        this.failIfArtifactNotDependency(artifact);
+
         J2clTaskResult result;
 
         final J2clPath dest = directory.output().absentOrFail();
@@ -105,6 +109,12 @@ public final class J2clTaskUnpack<C extends J2clMavenContext> implements J2clTas
         }
 
         return result;
+    }
+
+    private void failIfArtifactNotDependency(final J2clArtifact artifact) {
+        if (!artifact.isDependency()) {
+            throw new IllegalArgumentException("Unpack only expects dependencies but got " + artifact);
+        }
     }
 
     private boolean extractSourceRoots(final J2clArtifact artifact,

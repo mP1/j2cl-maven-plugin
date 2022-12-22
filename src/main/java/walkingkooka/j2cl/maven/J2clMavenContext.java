@@ -203,6 +203,12 @@ public abstract class J2clMavenContext implements Context {
     // tasks............................................................................................................
 
     public final List<J2clPath> sources(final J2clArtifact artifact) {
+        return artifact.isDependency() ?
+                this.unpackOutputDirectory(artifact) :
+                artifact.sourcesRoot();
+    }
+
+    private List<J2clPath> unpackOutputDirectory(final J2clArtifact artifact) {
         return Lists.of(
                 artifact.taskDirectory(J2clTaskKind.UNPACK)
                         .output()

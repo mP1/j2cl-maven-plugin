@@ -346,7 +346,8 @@ public final class J2clPath implements Comparable<J2clPath> {
      */
     public boolean isUnpackOutput(final J2clArtifact artifact,
                                   final J2clMavenContext context) {
-        return this.filename().equals(OUTPUT) &&
+        return artifact.isDependency() &&
+                this.filename().equals(OUTPUT) &&
                 this.path()
                         .getParent()
                         .getFileName()
