@@ -199,6 +199,14 @@ public final class J2clPath implements Comparable<J2clPath> {
         return Optional.ofNullable(Files.exists(this.path()) ? this : null);
     }
 
+    /**
+     * This may be used to test if a path is a source root for a generated sources directory like generated-sources.
+     */
+    public boolean isGeneratedDirectory() {
+        final File file = this.file();
+        return file.isDirectory() && file.getName().startsWith("generated");
+    }
+
     // extract..........................................................................................................
 
     /**
