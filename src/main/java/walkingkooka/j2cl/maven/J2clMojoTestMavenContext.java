@@ -189,9 +189,7 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
             J2clTaskKind.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE,
             J2clTaskKind.SHADE_JAVA_SOURCE,
             J2clTaskKind.SHADE_CLASS_FILES,
-            J2clTaskKind.TRANSPILE_JAVA_TO_JAVASCRIPT,
-            J2clTaskKind.CLOSURE_COMPILE,
-            J2clTaskKind.JUNIT_TESTS
+            J2clTaskKind.TRANSPILE_JAVA_TO_JAVASCRIPT
     );
 
     private final List<J2clTaskKind> PROJECT_TASKS = Lists.of(

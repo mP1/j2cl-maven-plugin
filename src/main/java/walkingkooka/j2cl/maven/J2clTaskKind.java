@@ -47,11 +47,6 @@ public enum J2clTaskKind {
         J2clTask<? super J2clMavenContext> task() {
             return J2clTasks.hash();
         }
-
-        @Override
-        boolean skipIfDependency() {
-            return false;
-        }
     },
 
     /**
@@ -61,11 +56,6 @@ public enum J2clTaskKind {
         @Override
         J2clTask<? super J2clMavenContext> task() {
             return J2clTasks.unpack();
-        }
-
-        @Override
-        boolean skipIfDependency() {
-            return false;
         }
     },
 
@@ -77,11 +67,6 @@ public enum J2clTaskKind {
         J2clTask<? super J2clMavenContext> task() {
             return J2clTasks.compileJavaSource();
         }
-
-        @Override
-        boolean skipIfDependency() {
-            return false;
-        }
     },
 
     /**
@@ -91,11 +76,6 @@ public enum J2clTaskKind {
         @Override
         J2clTask<? super J2clMavenContext> task() {
             return J2clTasks.gwtIncompatStrip();
-        }
-
-        @Override
-        boolean skipIfDependency() {
-            return false;
         }
     },
 
@@ -107,11 +87,6 @@ public enum J2clTaskKind {
         J2clTask<? super J2clMavenContext> task() {
             return J2clTasks.compileGwtIncompatStripped();
         }
-
-        @Override
-        boolean skipIfDependency() {
-            return false;
-        }
     },
 
     /**
@@ -122,11 +97,6 @@ public enum J2clTaskKind {
         @Override
         J2clTask<? super J2clMavenContext> task() {
             return J2clTasks.shadeJavaSource();
-        }
-
-        @Override
-        boolean skipIfDependency() {
-            return false;
         }
     },
 
@@ -140,10 +110,6 @@ public enum J2clTaskKind {
             return J2clTasks.shadeClassFiles();
         }
 
-        @Override
-        boolean skipIfDependency() {
-            return false;
-        }
     },
 
     /**
@@ -154,11 +120,6 @@ public enum J2clTaskKind {
         J2clTask<? super J2clMavenContext> task() {
             return J2clTasks.transpiler();
         }
-
-        @Override
-        boolean skipIfDependency() {
-            return false;
-        }
     },
     /**
      * Calls the closure compiler on the /transpiler along with other "files" into /closure-compiled.
@@ -168,11 +129,6 @@ public enum J2clTaskKind {
         J2clTask<? super J2clMavenContext> task() {
             return J2clTasks.closure();
         }
-
-        @Override
-        boolean skipIfDependency() {
-            return true;
-        }
     },
     /**
      * Assembles the output and copies files to that place.
@@ -181,11 +137,6 @@ public enum J2clTaskKind {
         @Override
         J2clTask<? super J2clMavenContext> task() {
             return J2clTasks.outputAssembler();
-        }
-
-        @Override
-        boolean skipIfDependency() {
-            return true;
         }
     },
     /**
@@ -197,11 +148,6 @@ public enum J2clTaskKind {
             return Cast.to(
                     J2clTasks.unitTests()
             );
-        }
-
-        @Override
-        boolean skipIfDependency() {
-            return true;
         }
     };
 
@@ -236,12 +182,11 @@ public enum J2clTaskKind {
         );
 
         try {
-            J2clTaskResult result = J2clTaskResult.ABORTED;
+            J2clTaskResult result;
 
-            if (!artifact.isDependency() || !this.skipIfDependency()) {
-                logger.line(prefix);
-                logger.indent();
-
+            logger.line(prefix);
+            logger.indent();
+            {
                 result = this.task()
                         .execute(
                                 artifact,
@@ -320,10 +265,4 @@ public enum J2clTaskKind {
     }
 
     abstract J2clTask<? super J2clMavenContext> task();
-
-    /**
-     * Some tasks should not be attempted by dependencies.
-     */
-    abstract boolean skipIfDependency();
-
 }
