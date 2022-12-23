@@ -26,6 +26,7 @@ import walkingkooka.j2cl.maven.J2clTaskDirectory;
 import walkingkooka.j2cl.maven.J2clTaskKind;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -64,6 +65,14 @@ public final class J2clTaskJavacCompilerGwtIncompatibleStrippedSource<C extends 
                 J2clTaskKind.SHADE_CLASS_FILES,
                 J2clTaskKind.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE
         );
+    }
+
+    @Override
+    J2clPath compilerOutput(final J2clTaskDirectory directory,
+                            final J2clArtifact artifact,
+                            final C context) throws IOException {
+        return directory.output()
+                .absentOrFail();
     }
 
     @Override

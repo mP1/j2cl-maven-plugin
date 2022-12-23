@@ -28,6 +28,7 @@ import walkingkooka.j2cl.maven.J2clTaskKind;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.CharSequences;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
@@ -62,6 +63,15 @@ public final class J2clTaskJavacCompilerUnpackedSource<C extends J2clMavenContex
     @Override
     List<J2clTaskKind> compiledBinaryTasks() {
         return Lists.of(J2clTaskKind.JAVAC_COMPILE);
+    }
+
+    @Override
+    J2clPath compilerOutput(final J2clTaskDirectory directory,
+                            final J2clArtifact artifact,
+                            final C context) throws IOException {
+
+        return context.compiledBinaries(artifact)
+                .createIfNecessary();
     }
 
     @Override

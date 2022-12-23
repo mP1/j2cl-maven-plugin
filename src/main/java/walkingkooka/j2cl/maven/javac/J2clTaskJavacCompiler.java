@@ -27,6 +27,7 @@ import walkingkooka.j2cl.maven.J2clTaskKind;
 import walkingkooka.j2cl.maven.J2clTaskResult;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -101,13 +102,19 @@ abstract class J2clTaskJavacCompiler<C extends J2clMavenContext> implements J2cl
                     classpath
             );
 
-            result = JavacCompiler.execute(bootstrap,
+            result = JavacCompiler.execute(
+                    bootstrap,
                     classpath,
                     javaSourceFiles,
-                    directory.output().absentOrFail(),
+                    this.compilerOutput(
+                            directory,
+                            artifact,
+                            context
+                    ),
                     context.javaCompilerArguments(),
                     shouldRunAnnotationProcessors,
-                    logger) ?
+                    logger
+            ) ?
                     J2clTaskResult.SUCCESS :
                     J2clTaskResult.FAILED;
             if (J2clTaskResult.SUCCESS == result) {
@@ -134,6 +141,13 @@ abstract class J2clTaskJavacCompiler<C extends J2clMavenContext> implements J2cl
      * This task this is used to build the classpath for the java compiler.
      */
     abstract List<J2clTaskKind> compiledBinaryTasks();
+
+    /**
+     * Directory where the class files are written.
+     */
+    abstract J2clPath compilerOutput(final J2clTaskDirectory directory,
+                                     final J2clArtifact artifact,
+                                     final C context) throws IOException;
 
     /**
      * Returns whether annotations processors should be run. Running on the original source will return YES and running on the gwt-stripped-source will return NO.

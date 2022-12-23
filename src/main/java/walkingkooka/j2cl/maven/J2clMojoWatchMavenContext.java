@@ -35,6 +35,7 @@ import java.util.Set;
 final class J2clMojoWatchMavenContext extends J2clMavenContext {
 
     static J2clMojoWatchMavenContext with(final J2clPath cache,
+                                          final J2clPath buildOutputDirectory,
                                           final J2clPath target,
                                           final J2clClasspathScope scope,
                                           final List<J2clArtifactCoords> classpathRequired,
@@ -54,6 +55,7 @@ final class J2clMojoWatchMavenContext extends J2clMavenContext {
                                           final MavenLogger logger) {
         return new J2clMojoWatchMavenContext(
                 cache,
+                buildOutputDirectory,
                 target,
                 scope,
                 classpathRequired,
@@ -75,6 +77,7 @@ final class J2clMojoWatchMavenContext extends J2clMavenContext {
     }
 
     private J2clMojoWatchMavenContext(final J2clPath cache,
+                                      final J2clPath buildOutputDirectory,
                                       final J2clPath target,
                                       final J2clClasspathScope scope,
                                       final List<J2clArtifactCoords> classpathRequired,
@@ -110,6 +113,7 @@ final class J2clMojoWatchMavenContext extends J2clMavenContext {
                 threadPoolSize,
                 logger
         );
+        this.buildOutputDirectory = buildOutputDirectory;
         this.entryPoints = entryPoints;
         this.initialScriptFilename = initialScriptFilename;
     }
@@ -151,6 +155,23 @@ final class J2clMojoWatchMavenContext extends J2clMavenContext {
         return hash;
     }
 
+    /**
+     * Return the target directory if the artifact is the main project and in file event phase
+     */
+    @Override
+    public J2clPath compiledBinaries(final J2clArtifact artifact) {
+        return artifact.isDependency() ?
+                this.compiledBinariesTaskDirectory(artifact) :
+                this.buildOutputDirectory;
+    }
+
+    /**
+     * Where the IDE builds source and places the resulting class files.
+     * <br>
+     * /target/classes
+     */
+    private final J2clPath buildOutputDirectory;
+
     // tasks............................................................................................................
 
     @Override
@@ -179,7 +200,6 @@ final class J2clMojoWatchMavenContext extends J2clMavenContext {
 
     private final List<J2clTaskKind> PROJECT_TASKS = Lists.of(
             J2clTaskKind.HASH,
-            J2clTaskKind.JAVAC_COMPILE,
             J2clTaskKind.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE,
             J2clTaskKind.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE,
             J2clTaskKind.SHADE_JAVA_SOURCE,

@@ -101,6 +101,9 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
     private J2clMojoWatchMavenContext context() {
         return J2clMojoWatchMavenContext.with(
                 this.cache(),
+                J2clPath.with(
+                        this.buildOutputDirectory()
+                ),
                 this.output(),
                 this.classpathScope(),
                 this.classpathRequired(),
