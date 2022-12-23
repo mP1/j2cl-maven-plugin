@@ -149,6 +149,11 @@ final class J2clMojoBuildMavenContext extends J2clMavenContext {
         return hash;
     }
 
+    @Override
+    public J2clPath compiledBinaries(final J2clArtifact artifact) {
+        return this.compiledBinariesTaskDirectory(artifact);
+    }
+
     // tasks....................................................................................................
 
     @Override

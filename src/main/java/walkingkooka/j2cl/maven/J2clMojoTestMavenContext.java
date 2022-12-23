@@ -167,6 +167,11 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
 
     private J2clArtifact project;
 
+    @Override
+    public J2clPath compiledBinaries(final J2clArtifact artifact) {
+        return this.compiledBinariesTaskDirectory(artifact);
+    }
+
     // tasks............................................................................................................
 
     @Override
