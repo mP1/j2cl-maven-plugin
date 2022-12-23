@@ -149,12 +149,12 @@ public final class J2clTaskHash<C extends J2clMavenContext> implements J2clTask<
                                      final HashBuilder hash,
                                      final Set<String> hashItemNames,
                                      final TreeLogger logger) throws IOException {
-        final List<J2clPath> compileSourcesRoot = artifact.sourcesRoot();
+        final List<J2clPath> compileSourceRoots = artifact.sourceRoots();
 
-        if (compileSourcesRoot.isEmpty()) {
+        if (compileSourceRoots.isEmpty()) {
             this.hashArchiveFile(artifact, hash, hashItemNames, logger);
         } else {
-            this.hashCompileSourceRoots(compileSourcesRoot.stream().map(J2clPath::path).collect(Collectors.toList()),
+            this.hashCompileSourceRoots(compileSourceRoots.stream().map(J2clPath::path).collect(Collectors.toList()),
                     hash,
                     hashItemNames,
                     logger);

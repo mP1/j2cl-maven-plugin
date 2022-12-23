@@ -1271,7 +1271,7 @@ public final class J2clArtifact implements Comparable<J2clArtifact> {
     /**
      * Returns all source roots including resources which can be directories or archives.
      */
-    public List<J2clPath> sourcesRoot() {
+    public List<J2clPath> sourceRoots() {
         final J2clMavenContext context = this.context;
         final List<J2clPath> sources = Lists.array();
 
