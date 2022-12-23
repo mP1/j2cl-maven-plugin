@@ -122,7 +122,7 @@ public final class J2clTaskUnpack<C extends J2clMavenContext> implements J2clTas
                                        final TreeLogger logger) throws Exception {
         boolean filesFound = false;
 
-        final List<J2clPath> sourceRoots = artifact.sourcesRoot();
+        final List<J2clPath> sourceRoots = artifact.sourceRoots();
         logger.paths(
                 "Source root(s)",
                 sourceRoots,
