@@ -71,16 +71,18 @@ final class J2clTranspiler {
                 }
             }
 
-            logger.line("Parameters");
-            logger.indent();
-            {
-                logger.paths("Classpath(s)", classpath, TreeFormat.FLAT);
-                logger.fileInfos("*.java source(s)", javaInput, TreeFormat.TREE);
-                logger.fileInfos("*.native.js source(s)", nativeJsInput, TreeFormat.TREE);
-                logger.paths("*.js source(s)", jsInput, TreeFormat.TREE);
-                logger.path("Output", output);
+            if (logger.isDebugEnabled()) {
+                logger.line("Parameters");
+                logger.indent();
+                {
+                    logger.paths("Classpath(s)", classpath, TreeFormat.FLAT);
+                    logger.fileInfos("*.java source(s)", javaInput, TreeFormat.TREE);
+                    logger.fileInfos("*.native.js source(s)", nativeJsInput, TreeFormat.TREE);
+                    logger.paths("*.js source(s)", jsInput, TreeFormat.TREE);
+                    logger.path("Output", output);
+                }
+                logger.outdent();
             }
-            logger.outdent();
 
             logger.line("J2clTranspiler");
             logger.indent();
