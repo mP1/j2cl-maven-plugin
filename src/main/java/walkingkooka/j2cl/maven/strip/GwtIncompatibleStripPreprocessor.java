@@ -78,7 +78,6 @@ final class GwtIncompatibleStripPreprocessor {
         } else {
             logger.indentedLine("No files found");
 
-            output.removeAll(); // dont want to leave empty output directory when its empty.
             result = J2clTaskResult.ABORTED;
         }
 
