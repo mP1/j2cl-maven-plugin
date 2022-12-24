@@ -69,16 +69,18 @@ final class JavacCompiler {
 
         final boolean success;
         {
-            logger.line("Parameters");
-            logger.indent();
-            {
-                logger.paths("Bootstrap", bootstrap, TreeFormat.FLAT);
-                logger.paths("Classpath(s)", classpath, TreeFormat.FLAT);
-                logger.paths("New java file(s)", newSourceFiles, TreeFormat.TREE); // order should not be important so tree
-                logger.path("Output", newClassFilesOutput);
-                logger.strings("Option(s)", options);
+            if (logger.isDebugEnabled()) {
+                logger.line("Parameters");
+                logger.indent();
+                {
+                    logger.paths("Bootstrap", bootstrap, TreeFormat.FLAT);
+                    logger.paths("Classpath(s)", classpath, TreeFormat.FLAT);
+                    logger.paths("New java file(s)", newSourceFiles, TreeFormat.TREE); // order should not be important so tree
+                    logger.path("Output", newClassFilesOutput);
+                    logger.strings("Option(s)", options);
+                }
+                logger.outdent();
             }
-            logger.outdent();
 
             logger.line("Messages");
             logger.emptyLine();
