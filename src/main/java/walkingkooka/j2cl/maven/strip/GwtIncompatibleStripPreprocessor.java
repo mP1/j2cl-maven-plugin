@@ -89,8 +89,12 @@ final class GwtIncompatibleStripPreprocessor {
                                                    final TreeLogger logger) throws IOException {
         final List<FileInfo> javaFiles = Lists.array();
 
-        logger.line("Preparing java files");
-        logger.indent();
+        final boolean debugEnabled = logger.isDebugEnabled();
+
+        if (debugEnabled) {
+            logger.line("Preparing java files");
+            logger.indent();
+        }
         {
 
             for (final J2clPath sourceRoot : sourceRoots) {
@@ -123,7 +127,9 @@ final class GwtIncompatibleStripPreprocessor {
                 }
             }
         }
-        logger.outdent();
+        if (debugEnabled) {
+            logger.outdent();
+        }
 
         return javaFiles;
     }
