@@ -223,7 +223,7 @@ public final class J2clPathTest implements ComparableTesting2<J2clPath>, HashCod
 
         this.absentCheck(file);
         this.absentCheck(dir);
-        this.absentCheck(path);
+        this.existsCheck(path);
     }
 
     @Test

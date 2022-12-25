@@ -22,7 +22,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import java.io.IOException;
 
 /**
- * Cleans by deleting the ENTIRE cache directory.
+ * Cleans by deleting the ENTIRE cache directory leaving it empty.
  */
 @Mojo(name = "clean", aggregator = true)
 public class J2clMojoClean extends J2clMojo {

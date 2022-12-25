@@ -397,14 +397,27 @@ public final class J2clPath implements Comparable<J2clPath> {
      * Performs a recursive file delete on this path.
      */
     public J2clPath removeAll() throws IOException {
-        Files.walkFileTree(this.path(),
+        Files.walkFileTree(
+                this.path(),
                 new SimpleFileVisitor<>() {
+
+                    @Override
+                    public FileVisitResult preVisitDirectory(final Path dir,
+                                                             final BasicFileAttributes attrs) throws IOException {
+                        this.directoryDepth++;
+                        return super.preVisitDirectory(dir, attrs);
+                    }
+
                     @Override
                     public FileVisitResult postVisitDirectory(final Path dir,
                                                               final IOException cause) throws IOException {
-                        Files.delete(dir);
+                        if (this.directoryDepth-- > 1) {
+                            Files.delete(dir);
+                        }
                         return FileVisitResult.CONTINUE;
                     }
+
+                    private int directoryDepth = 0;
 
                     @Override
                     public FileVisitResult visitFile(final Path file,
@@ -412,7 +425,8 @@ public final class J2clPath implements Comparable<J2clPath> {
                         Files.delete(file);
                         return FileVisitResult.CONTINUE;
                     }
-                });
+                }
+        );
         return this;
     }
 
