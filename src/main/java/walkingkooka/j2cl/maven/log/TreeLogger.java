@@ -19,6 +19,7 @@ package walkingkooka.j2cl.maven.log;
 
 import com.google.j2cl.common.FrontendUtils.FileInfo;
 import walkingkooka.NeverError;
+import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.naming.StringName;
@@ -38,6 +39,7 @@ import java.nio.file.WatchEvent;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -269,29 +271,64 @@ final public class TreeLogger {
             private int level;
 
             @Override
-            public void children(final Set<StringPath> paths, final IndentingPrinter printer) {
-                Table table = TextPretty.table();
+            public void children(final Set<StringPath> paths,
+                                 final IndentingPrinter printer) {
+                this.children0(
+                        paths.iterator(),
+                        printer
+                );
+            }
 
-                int i = 0;
-                for (final StringPath path : paths) {
-                    final int column = i % COLUMN_COUNT;
-                    final int row = i / COLUMN_COUNT;
-                    table = table.setCell(column,
-                            row,
-                            path.name().toString());
+            private void children0(final Iterator<StringPath> paths,
+                                   final IndentingPrinter printer) {
+                // fill rows of text from paths
+                final List<List<CharSequence>> allRowsText = Lists.array();
 
-                    i++;
+                while (paths.hasNext()) {
+
+                    List<CharSequence> rowText = Lists.array();
+
+                    for (int c = 0; c < COLUMN_COUNT; c++) {
+                        if (!paths.hasNext()) {
+                            break;
+                        }
+
+                        rowText.add(
+                                paths.next()
+                                        .name()
+                                        .toString()
+                        );
+
+                        if (!paths.hasNext()) {
+                            break;
+                        }
+                    }
+
+                    allRowsText.add(rowText);
                 }
+
+                Table table = TextPretty.table()
+                        .setRows(
+                                0,
+                                0,
+                                allRowsText
+                        );
 
                 table = TABLE_TRANSFORMER.apply(table);
 
                 for (int r = 0; r < table.height(); r++) {
                     TreeLogger.line0(
-                            TextPretty.rowColumnsToLine((column -> 1), LineEnding.SYSTEM).apply(table.row(r)),
+                            TextPretty.rowColumnsToLine(
+                                    (column -> 1),
+                                    LineEnding.SYSTEM
+                            ).apply(
+                                    table.row(r)
+                            ),
                             printer
                     );
                 }
             }
+
         }.biConsumer()
                 .accept(paths.stream()
                                 .map(toStringPath)
