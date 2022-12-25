@@ -127,7 +127,7 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
     private void waitAndBuild(final Path buildOutputDirectory, final J2clArtifact project,
                               final TreeLogger logger,
                               final J2clMojoWatchMavenContext context) {
-        context.fileEventPhase = true;
+        context.fileEventRebuildPhase = true;
 
         for (; ; ) {
             try (final WatchService watchService = watchService(buildOutputDirectory)) {
@@ -213,8 +213,19 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
 
     private void build(final J2clArtifact project,
                        final TreeLogger logger,
-                       final J2clMojoWatchMavenContext context) {
+                       final J2clMojoWatchMavenContext context) throws IOException {
         final Instant start = Instant.now();
+
+        // the cache directory will not have a hash and will have a trailing "-watch"
+        final J2clPath output = project.setDirectory("watch")
+                .directory();
+
+        // empty the previous watch rebuild or create an empty dir
+        if (output.exists().isPresent()) {
+            output.removeAll();
+        } else {
+            output.createIfNecessary();
+        }
 
         logger.info("Build");
         logger.indent();
