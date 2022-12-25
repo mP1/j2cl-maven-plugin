@@ -25,6 +25,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import walkingkooka.j2cl.maven.log.TreeLogger;
+import walkingkooka.text.CharSequences;
+import walkingkooka.util.SystemProperty;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -124,7 +126,8 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
         );
     }
 
-    private void waitAndBuild(final Path buildOutputDirectory, final J2clArtifact project,
+    private void waitAndBuild(final Path buildOutputDirectory,
+                              final J2clArtifact project,
                               final TreeLogger logger,
                               final J2clMojoWatchMavenContext context) {
         context.fileEventRebuildPhase = true;
@@ -161,7 +164,10 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
                         watching.getFileSystem().newWatchService();
     }
 
-    private static final boolean IS_MAC = System.getProperty("os.name").toLowerCase().contains("mac");
+    private static final boolean IS_MAC = CharSequences.indexOf(
+            SystemProperty.OS_NAME.requiredPropertyValue(),
+            "mac"
+    ) != -1;
 
     private void sleep() {
         try {
