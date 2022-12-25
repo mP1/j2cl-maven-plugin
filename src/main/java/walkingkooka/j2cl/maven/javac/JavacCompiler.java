@@ -17,6 +17,7 @@
 
 package walkingkooka.j2cl.maven.javac;
 
+import walkingkooka.NeverError;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.j2cl.maven.J2clException;
 import walkingkooka.j2cl.maven.J2clPath;
@@ -24,6 +25,7 @@ import walkingkooka.j2cl.maven.log.TreeFormat;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.util.SystemProperty;
 
+import javax.tools.Diagnostic;
 import javax.tools.JavaCompiler;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
@@ -32,7 +34,9 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -92,10 +96,45 @@ final class JavacCompiler {
                 fileManager.setLocation(StandardLocation.CLASS_PATH, J2clPath.toFiles(classpath)); /// Location to search for user class files.
                 fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Collections.singleton(newClassFilesOutput.file())); /// Location of new class files
 
-                try(final Writer output = output(logger)) {
+                try (final Writer output = output(logger)) {
                     success = compiler.getTask(output,
                                     fileManager,
-                                    null,
+                                    diagnostic -> {
+                                        final Diagnostic.Kind kind = diagnostic.getKind();
+
+                                        Consumer<String> target = null;
+
+                                        switch (kind) {
+                                            case ERROR:
+                                                target = (line) -> logger.error(line, null);
+                                                break;
+                                            case WARNING:
+                                            case MANDATORY_WARNING:
+                                                target = logger::line; // TODO should use WARN not INFO
+                                                break;
+                                            case NOTE:
+                                            case OTHER:
+                                                target = logger::line;
+                                                break;
+                                            default:
+                                                NeverError.unhandledCase(
+                                                        kind,
+                                                        Diagnostic.Kind.values()
+                                                );
+                                        }
+
+                                        // /Users/miroslav/repos-github/vertispan-connected-2/src/main/java/com/vertispan/draw/connected/client/FlowChartEntryPoint.java:85:64
+                                        //java: not a statement
+
+                                        Lists.of(
+                                                diagnostic.getSource().getName() +
+                                                        ":" +
+                                                        diagnostic.getLineNumber() +
+                                                        ":" +
+                                                        diagnostic.getColumnNumber(),
+                                                diagnostic.getMessage(Locale.getDefault())
+                                        ).forEach(target);
+                                    },
                                     options,
                                     null,
                                     fileManager.getJavaFileObjectsFromFiles(J2clPath.toFiles(newSourceFiles)))
