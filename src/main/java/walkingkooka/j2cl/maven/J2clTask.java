@@ -78,43 +78,31 @@ public interface J2clTask<C extends J2clMavenContext> {
                                                final J2clTaskDirectory directory,
                                                final C context,
                                                final TreeLogger logger) throws Exception {
-        final J2clTaskResult result;
-        if (directory.successful().exists().isPresent()) {
-            logger.indentedLine("Cache success result present and will be kept");
+        J2clTaskResult result = directory.result()
+                .orElse(null);
+        if (null == result) {
+            final J2clPath path = directory.path();
+            if (path.exists().isPresent()) {
+                path.removeAll();
 
-            result = J2clTaskResult.SUCCESS;
-        } else {
-            if (directory.aborted().exists().isPresent()) {
-                logger.indentedLine("Cache abort result present and will be kept");
-
-                result = J2clTaskResult.ABORTED;
-            } else {
-                if (directory.skipped().exists().isPresent()) {
-                    logger.indentedLine("Cache skip result present and will be kept");
-
-                    result = J2clTaskResult.SKIPPED;
-                } else {
-                    final J2clPath path = directory.path();
-                    if (path.exists().isPresent()) {
-                        path.removeAll();
-
-                        logger.indentedLine("Removed all files");
-                    }
-                    path.createIfNecessary();
-
-                    // aborted tasks for the project are transformed into skipped.
-                    final J2clTaskResult nextResult = this.executeWithDirectory(
-                            artifact,
-                            directory,
-                            context,
-                            logger
-                    );
-                    result = J2clTaskResult.ABORTED == nextResult && false == artifact.isDependency() ?
-                            J2clTaskResult.SKIPPED :
-                            nextResult;
-                }
+                logger.indentedLine("Removed all files");
             }
+            path.createIfNecessary();
+
+            // aborted tasks for the project are transformed into skipped.
+            final J2clTaskResult nextResult = this.executeWithDirectory(
+                    artifact,
+                    directory,
+                    context,
+                    logger
+            );
+            result = J2clTaskResult.ABORTED == nextResult && false == artifact.isDependency() ?
+                    J2clTaskResult.SKIPPED :
+                    nextResult;
+        } else {
+            logger.indentedLine("Cache " + result + " result present and will be kept, task not executed again");
         }
+
         return result;
     }
 
