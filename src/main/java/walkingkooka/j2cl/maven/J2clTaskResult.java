@@ -17,6 +17,10 @@
 
 package walkingkooka.j2cl.maven;
 
+import walkingkooka.NeverError;
+import walkingkooka.collect.iterable.Iterables;
+
+import java.io.IOException;
 import java.util.Optional;
 
 public enum J2clTaskResult {
@@ -30,14 +34,57 @@ public enum J2clTaskResult {
         }
 
         /**
-         * NOT a fail but skip remaining tasks for this dependency. Used by HASH when the computed hash is the same as previous,
-         * and theres no point redoing tasks.
+         * Used by the HASH task, to note the artifact computed hash matches the artifact directory. Try and find the last
+         * task directory. If that is FAIL then retry otherwise return the result of task's next as the next.
          */
         @Override
         Optional<J2clTaskKind> next(final J2clArtifact artifact,
                                     final J2clTaskKind current,
-                                    final J2clMavenContext context) {
-            return Optional.empty();
+                                    final J2clMavenContext context) throws IOException {
+            Optional<J2clTaskKind> next = null;
+
+            for (final J2clTaskKind lastToFirst : Iterables.reverse(context.tasks(artifact))) {
+                if (current == lastToFirst) {
+                    next = Optional.empty();
+                    break;
+                }
+                final J2clTaskDirectory taskDirectory = artifact.taskDirectory(lastToFirst);
+
+                final Optional<J2clTaskResult> maybeResult = taskDirectory.result();
+                if (!maybeResult.isPresent()) {
+                    continue; // try previous task.
+                }
+
+                final J2clTaskResult result = maybeResult.get();
+                switch (result) {
+                    case ABORTED:
+                    case SKIPPED:
+                    case SUCCESS:
+                        next = result.next(
+                                artifact,
+                                lastToFirst,
+                                context
+                        );
+                        break;
+                    case FAILED:
+                        // last completed task FAILED, eg an artifact download failed, retry now
+                        taskDirectory.path()
+                                .removeAll();
+                        next = Optional.of(
+                                lastToFirst
+                        );
+                        break;
+                    default:
+                        NeverError.unhandledCase(
+                                result,
+                                J2clTaskResult.values()
+                        );
+                }
+
+                break;
+            }
+
+            return next;
         }
     },
     /**
@@ -56,7 +103,12 @@ public enum J2clTaskResult {
         Optional<J2clTaskKind> next(final J2clArtifact artifact,
                                     final J2clTaskKind current,
                                     final J2clMavenContext context) {
-            return Optional.empty();
+            throw new J2clException(
+                    this +
+                            " for " +
+                            artifact +
+                            " failed, refer to log file or console output for more details."
+            );
         }
     },
     /**
@@ -112,5 +164,5 @@ public enum J2clTaskResult {
 
     abstract Optional<J2clTaskKind> next(final J2clArtifact artifact,
                                          final J2clTaskKind current,
-                                         final J2clMavenContext context);
+                                         final J2clMavenContext context) throws IOException;
 }
