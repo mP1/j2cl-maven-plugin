@@ -25,7 +25,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import walkingkooka.j2cl.maven.log.TreeLogger;
-import walkingkooka.text.CharSequences;
+import walkingkooka.text.CaseSensitivity;
 import walkingkooka.util.SystemProperty;
 
 import java.io.IOException;
@@ -164,10 +164,10 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
                         watching.getFileSystem().newWatchService();
     }
 
-    private static final boolean IS_MAC = CharSequences.indexOf(
+    private static final boolean IS_MAC = CaseSensitivity.INSENSITIVE.contains(
             SystemProperty.OS_NAME.requiredPropertyValue(),
             "mac"
-    ) != -1;
+    );
 
     private void sleep() {
         try {
