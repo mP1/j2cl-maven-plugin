@@ -205,8 +205,6 @@ public enum J2clTaskKind {
 
                 result.path(directory)
                         .createIfNecessary();
-
-                result.reportIfFailure(artifact, this);
             }
             return result.next(
                     artifact,
