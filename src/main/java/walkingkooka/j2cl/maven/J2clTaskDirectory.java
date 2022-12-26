@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Represents a single compile task directory. Each and every dependency will have multiple tasks and each task will
@@ -38,6 +39,24 @@ public final class J2clTaskDirectory {
     private J2clTaskDirectory(final J2clPath path) {
         super();
         this.path = path;
+    }
+
+    /**
+     * Tests if this task directory has a marker directory that indicates it is one of the possible {@link J2clTaskResult}.
+     */
+    public Optional<J2clTaskResult> result() throws IOException {
+        J2clTaskResult result = null;
+
+        if (this.path().exists().isPresent()) {
+            for (final J2clTaskResult possible : J2clTaskResult.values()) {
+                if (possible.path(this).exists().isPresent()) {
+                    result = possible;
+                    break;
+                }
+            }
+        }
+
+        return Optional.ofNullable(result);
     }
 
     /**
