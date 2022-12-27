@@ -80,6 +80,9 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
                     logger,
                     context
             );
+
+            this.prepareWatchBuild(project);
+
             context.prepareAndStart(
                     project,
                     logger
@@ -222,16 +225,7 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
                        final J2clMojoWatchMavenContext context) throws IOException {
         final Instant start = Instant.now();
 
-        // the cache directory will not have a hash and will have a trailing "-watch"
-        final J2clPath output = project.setDirectory("watch")
-                .directory();
-
-        // empty the previous watch rebuild or create an empty dir
-        if (output.exists().isPresent()) {
-            output.removeAll();
-        } else {
-            output.createIfNecessary();
-        }
+        this.prepareWatchBuild(project);
 
         logger.info("Build");
         logger.indent();
@@ -253,5 +247,18 @@ public final class J2clMojoWatch extends J2clMojoBuildWatch {
                         Instant.now()
                 )
         );
+    }
+
+    private void prepareWatchBuild(final J2clArtifact project) throws IOException {
+        // the cache directory will not have a hash and will have a trailing "-watch"
+        final J2clPath output = project.setDirectory("watch")
+                .directory();
+
+        // empty the previous watch rebuild or create an empty dir
+        if (output.exists().isPresent()) {
+            output.removeAll();
+        } else {
+            output.createIfNecessary();
+        }
     }
 }

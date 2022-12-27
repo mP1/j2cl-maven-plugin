@@ -178,9 +178,7 @@ final class J2clMojoWatchMavenContext extends J2clMavenContext {
     List<J2clTaskKind> tasks(final J2clArtifact artifact) {
         return artifact.isDependency() ?
                 DEPENDENCY_TASKS :
-                this.fileEventRebuildPhase ?
-                        FILE_EVENT_REBUILD_PROJECT_TASKS :
-                        BUILD_PROJECT_TASKS;
+                PROJECT_TASKS;
     }
 
     /**
@@ -198,18 +196,7 @@ final class J2clMojoWatchMavenContext extends J2clMavenContext {
             J2clTaskKind.TRANSPILE_JAVA_TO_JAVASCRIPT
     );
 
-    private final List<J2clTaskKind> BUILD_PROJECT_TASKS = Lists.of(
-            J2clTaskKind.HASH,
-            J2clTaskKind.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE,
-            J2clTaskKind.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE,
-            J2clTaskKind.SHADE_JAVA_SOURCE,
-            J2clTaskKind.SHADE_CLASS_FILES,
-            J2clTaskKind.TRANSPILE_JAVA_TO_JAVASCRIPT,
-            J2clTaskKind.CLOSURE_COMPILE,
-            J2clTaskKind.OUTPUT_ASSEMBLE
-    );
-
-    private final List<J2clTaskKind> FILE_EVENT_REBUILD_PROJECT_TASKS = Lists.of(
+    private final List<J2clTaskKind> PROJECT_TASKS = Lists.of(
             J2clTaskKind.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE,
             J2clTaskKind.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE,
             J2clTaskKind.SHADE_JAVA_SOURCE,
