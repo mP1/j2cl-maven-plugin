@@ -44,8 +44,8 @@ import java.util.stream.Collectors;
  */
 final class JavacCompiler {
 
-    static boolean execute(final Set<J2clPath> bootstrap,
-                           final Set<J2clPath> classpath,
+    static boolean execute(final List<J2clPath> bootstrap,
+                           final List<J2clPath> classpath,
                            final Set<J2clPath> newSourceFiles, // files being compiled
                            final J2clPath newClassFilesOutput,
                            final Set<String> javaCompilerArguments,
