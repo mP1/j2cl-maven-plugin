@@ -18,7 +18,6 @@
 package walkingkooka.j2cl.maven.transpile;
 
 import walkingkooka.collect.list.Lists;
-import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.J2clArtifact;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
@@ -30,7 +29,6 @@ import walkingkooka.j2cl.maven.log.TreeLogger;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Transpiles the stripped source into javascript equivalents.
@@ -70,7 +68,7 @@ public final class J2clTask2clTranspiler<C extends J2clMavenContext> implements 
                 artifact,
                 context
         );
-        final Set<J2clPath> classpath = this.classpath(artifact);
+        final List<J2clPath> classpath = this.classpath(artifact);
 
         return J2clTranspiler.execute(
                 classpath,
@@ -107,8 +105,8 @@ public final class J2clTask2clTranspiler<C extends J2clMavenContext> implements 
         return sourceRoots;
     }
 
-    private Set<J2clPath> classpath(final J2clArtifact artifact) {
-        final Set<J2clPath> classpath = Sets.ordered();
+    private List<J2clPath> classpath(final J2clArtifact artifact) {
+        final List<J2clPath> classpath = Lists.array();
 
         // only transpile if class required incl annotations, but not ignored or jre........................................
 

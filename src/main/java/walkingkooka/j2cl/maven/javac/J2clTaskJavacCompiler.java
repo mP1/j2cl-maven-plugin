@@ -25,6 +25,7 @@ import walkingkooka.j2cl.maven.J2clTask;
 import walkingkooka.j2cl.maven.J2clTaskDirectory;
 import walkingkooka.j2cl.maven.J2clTaskKind;
 import walkingkooka.j2cl.maven.J2clTaskResult;
+import walkingkooka.j2cl.maven.UniqueList;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 
 import java.io.IOException;
@@ -66,7 +67,7 @@ abstract class J2clTaskJavacCompiler<C extends J2clMavenContext> implements J2cl
         final boolean shouldRunAnnotationProcessors = this.shouldRunAnnotationProcessors();
 
         final Set<J2clPath> javaSourceFiles = Sets.ordered();
-        final Set<J2clPath> classpath = Sets.ordered();
+        final List<J2clPath> classpath = UniqueList.empty();
 
         for (final J2clPath source : this.sourceRoots(artifact, context, logger)) {
             // /Users/miroslav/repos-github/j2cl-maven-plugin/target/it-tests/junit-test-dependency-graph/test/src/test/java
@@ -94,7 +95,7 @@ abstract class J2clTaskJavacCompiler<C extends J2clMavenContext> implements J2cl
             result = J2clTaskResult.ABORTED;
         } else {
 
-            final Set<J2clPath> bootstrap = Sets.ordered();
+            final List<J2clPath> bootstrap = UniqueList.empty();
             this.buildBootstrapAndClasspath(
                     artifact,
                     shouldRunAnnotationProcessors,
@@ -159,8 +160,8 @@ abstract class J2clTaskJavacCompiler<C extends J2clMavenContext> implements J2cl
      */
     final void buildBootstrapAndClasspath(final J2clArtifact artifact,
                                           final boolean shouldRunAnnotationProcessors,
-                                          final Set<J2clPath> bootstrap,
-                                          final Set<J2clPath> classpath) {
+                                          final List<J2clPath> bootstrap,
+                                          final List<J2clPath> classpath) {
         for (final J2clArtifact dependency : artifact.dependencies()) {
             if (dependency.isAnnotationClassFiles()) {
                 classpath.add(dependency.artifactFileOrFail());
@@ -191,11 +192,15 @@ abstract class J2clTaskJavacCompiler<C extends J2clMavenContext> implements J2cl
             }
 
             if (dependency.isJreClassFiles()) {
-                classpath.add(dependency.artifactFileOrFail());
+                classpath.add(
+                        dependency.artifactFileOrFail()
+                );
                 continue;
             }
 
-            classpath.add(this.selectClassFiles(dependency));
+            classpath.add(
+                    this.selectClassFiles(dependency)
+            );
         }
     }
 
