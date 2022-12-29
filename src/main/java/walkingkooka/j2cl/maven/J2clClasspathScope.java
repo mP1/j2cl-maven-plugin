@@ -63,9 +63,9 @@ enum J2clClasspathScope {
      */
     Predicate<String> scopeFilter() {
         return (s) ->
-                false == s.equalsIgnoreCase("system") &&
+                false == "system".equalsIgnoreCase(s) &&
                         (
-                                s.equalsIgnoreCase("provided") ||
+                                "provided".equalsIgnoreCase(s) ||
                                         this.filter.test(
                                                 new DefaultArtifact(
                                                         "groupId",

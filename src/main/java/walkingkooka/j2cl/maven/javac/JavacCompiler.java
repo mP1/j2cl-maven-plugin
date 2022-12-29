@@ -27,6 +27,7 @@ import walkingkooka.util.SystemProperty;
 
 import javax.tools.Diagnostic;
 import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
@@ -126,14 +127,20 @@ final class JavacCompiler {
                                         // /Users/miroslav/repos-github/vertispan-connected-2/src/main/java/com/vertispan/draw/connected/client/FlowChartEntryPoint.java:85:64
                                         //java: not a statement
 
-                                        Lists.of(
-                                                diagnostic.getSource().getName() +
-                                                        ":" +
-                                                        diagnostic.getLineNumber() +
-                                                        ":" +
-                                                        diagnostic.getColumnNumber(),
+                                        final JavaFileObject source = diagnostic.getSource();
+                                        if (null != source) {
+                                            target.accept(
+                                                    diagnostic.getSource().getName() +
+                                                            ":" +
+                                                            diagnostic.getLineNumber() +
+                                                            ":" +
+                                                            diagnostic.getColumnNumber()
+                                            );
+                                        }
+
+                                        target.accept(
                                                 diagnostic.getMessage(Locale.getDefault())
-                                        ).forEach(target);
+                                        );
                                     },
                                     options,
                                     null,
