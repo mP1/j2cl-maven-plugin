@@ -58,10 +58,26 @@ enum J2clClasspathScope {
      * Only the scope is important and used by the filter.
      * scope=provided is handled as scope=compile/runtime so j2cl-JRE dependencies are ignored by JRE at runtime, but
      * used as a COMPILE/RUNTIME time dependency during this build.
+     * <br>
+     * Note given a scope=SYSTEM will return false.
      */
     Predicate<String> scopeFilter() {
-        return (s) -> s.equalsIgnoreCase("provided") ||
-                this.filter.test(new DefaultArtifact("groupId", "artifactId", "version", s, "type", "class", null));
+        return (s) ->
+                false == s.equalsIgnoreCase("system") &&
+                        (
+                                s.equalsIgnoreCase("provided") ||
+                                        this.filter.test(
+                                                new DefaultArtifact(
+                                                        "groupId",
+                                                        "artifactId",
+                                                        "version",
+                                                        s,
+                                                        "type",
+                                                        "class",
+                                                        null
+                                                )
+                                        )
+                        );
     }
 
     private final Predicate<Artifact> filter;
