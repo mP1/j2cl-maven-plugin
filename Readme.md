@@ -44,7 +44,7 @@ version to use is Maven 3.6.3.
 
 # Goals
 
-The plugin supports three out of the four following goals
+The plugin supports the following goals
 
 1. `build`: executes a single compilation, typically to produce a JS application or library.
 
@@ -52,41 +52,9 @@ The plugin supports three out of the four following goals
 
 3. `test`: executes junit 3 tests.
 
-4. 'watch': builds the project and then watches for file changes and rebuilds
+4. `watch`: builds the project and then watches for file changes and rebuilds
 
-Some pieces of the `vertispan/j2clmavenplugin` are currently missing:
-
-- DevMode: Should not be too hard to watch the source directory and re-build.
-
-
-
-# Annotation processors
-
-Dependencies with an annotation processor are automatically detected as annotation processors and "run". Note these
-archives must not have any java source or javascript as it will always be ignored and never transpiled. The annotation
-and additional source must be in a separate archive and should be a dependency.
-
-
-
-# Super sourcing
-
-The Google Web Tookit (GWT) provides a feature to allow two definitions of a java file to exist. One will be a compiled
-by javac and used in a regular JRE environment, the second will become the alternate which will be translated to javascript.
-A different alternative is to use shading which is mentioned below in the `Shade` section.
-
-
-
-# Dependencies declaration
-
-The `vertispan/j2clmavenplugin` assumes some core dependencies are implied with defaults, meaning these dependencies are
-not present in any form in the POM. This plugin requires that every single dependency be eventually declared directly
-by the parent project or its dependencies eventually declare them in their respective POMs. This tries to keep faithful,
-to how regular Maven java projects work and satisfy their dependencies.
-
-A sample POM with the minimal dependencies and this plugin declaration is present as `sample.pom.xml`.
-
-As a guide the following dependencies below may be considered a minimal requirement, and these were the implied or default
-dependencies that were defaulted.
+[TODO Incremental watch](https://github.com/mP1/j2cl-maven-plugin/issues/534)
 
 
 
@@ -162,12 +130,10 @@ Sample required plugin repositories
 
 ## Plugin
 
-Sample plugins declaration to use this Maven Plugin. The parameters under the `configuration` are described in further
-detail below. This assumes a property has also been defined to match the version in (j2cl-uber)](https://lgtm.com/projects/g/mP1/j2cl-uber)
+A sample plugin declaration follows which mentions all parameters. The numerous parameters are used by the plugin during
+the orchestration and processing of the source and other files to eventually produce the output directory which will be
+filled with the equivalent javascript.
 
-
-
-Plugin definition
 ```xml
  <plugin>
     <groupId>walkingkooka</groupId>
@@ -212,9 +178,9 @@ Plugin definition
                     ECMASCRIPT_2019,
                     STABLE
                 -->
-                <language-out>ECMASCRIPT_2016</language-out>
-                <!-- when true a sources sub directory will appear below the main javascript -->
-                <sourceMaps>sources/</sourceMaps>
+              <language-out>ECMASCRIPT_2016</language-out>
+              <!-- when true a sources sub-directory will appear below the main javascript -->
+              <sourceMaps>sources/</sourceMaps>
                 <thread-pool-size>0</thread-pool-size>
 
                 <classpath-required>
@@ -231,39 +197,10 @@ Plugin definition
 
 
 
-## Dependencies
-
-The fragment below contains two uber depdencies that take care of the many minimal dependencies that are required by a j2cl
-application and unit tests.
-
-```xml
-<dependencies>
-    <dependency>
-        <groupId>walkingkooka</groupId>
-        <artifactId>j2cl-uber</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-        <groupId>walkingkooka</groupId>
-        <artifactId>j2cl-uber-test</artifactId>
-        <version>1.0-SNAPSHOT</version>
-        <scope>test</scope>
-    </dependency>
-</dependencies>
-```
-
-
-
-# Maven plugin parameters
-
-Many parameters are actually used to tweak and configure the Closure compiler. Refer to the Closure documentation for
-more information.
-
-
 ## browser-log-level
 
-This option is only available within tests, and controls which browser console messages are printed after each individual test
+This option is only available within the `test` task, and controls the log level of test messages that will appear in
+the browser console.
 (`classpathscope=test`).
 
 - NONE
@@ -320,9 +257,10 @@ are not supported by the html unit javascript engine.
 ## classpath-required
 
 A list of artifacts that will be added to all classpaths. The first entry will be used as the bootstrap archive. If a
-dependency is present here but absent in `javascript-source-required` then it will never appear when js files are required.
+dependency is present here but absent in `javascript-source-required` then it will never appear when js files are
+required.
 
-The snippet below is a good starting point and forcibly includes a few minimally required artifacts.
+The snippet below is a good starting point and forcibly includes a few required artifacts.
 
 ```xml
 <classpath-required>
@@ -333,9 +271,8 @@ The snippet below is a good starting point and forcibly includes a few minimally
 
 - Maven coordinates may have a wildcard in the version.
 
-
-
-Archives with the following conditions will automatically marked as equivalent to adding a `classpath-required` entry.
+Archives with the following conditions will be automatically marked as equivalent to adding a `classpath-required`
+entry.
 
 - Annotation processors.
 - JRE classes (including bootstrap).
@@ -357,8 +294,10 @@ The suggested value is typically `compile`, for more info click [here](https://m
 
 ## compilation-level
 
-A closure compiler parameter that controls the compilation process, for more info click [here](https://developers.google.com/closure/compiler/docs/compilation_levels#enable-app). 
-The Closure Compiler lets you choose from three levels of compilation, ranging from simple removal of whitespace and comments to aggressive code transformations.
+A closure compiler parameter that controls the closure task, for more info
+click [here](https://developers.google.com/closure/compiler/docs/compilation_levels#enable-app). The Closure Compiler
+lets you choose from three levels of compilation, ranging from simple removal of whitespace and comments to aggressive
+code transformations.
 
 ```xml
 <compilation-level>ADVANCED</compilation-level>
@@ -414,35 +353,32 @@ For more info click [here](http://googleclosure.blogspot.com/2010/10/pretty-prin
 
 ## ignored-dependencies
 
-A list of artifacts that will not be processed. This is used to avoid processing any bootstrap and jre artifacts, 
-as they come pre-processed, or only contain annotations that are not required during transpiling (j2cl) but necessary
-for compiling (javac).
+A list of artifacts that will not be processed. This is used to avoid processing any bootstrap and jre artifacts, as
+they come pre-processed, or only contain annotations that are not required during transpiling (j2cl) but necessary for
+compiling (javac).
 
-```xml
+```
 <ignored-dependencies>
     <!-- dependencies below only contain annotations -->
     <param>group1:artifact2:*</param>
     <param>group1:artifact2:version3</param>
 </ignored-dependencies>
+
 ```
 
 - Maven coordinates may have a wildcard in the version.
+- Archives with the following conditions will automatically marked as equivalent to adding an `ignored-dependencies`
+  entry.
+  - Annotation processors.
+  - Dependency where classifier=sources pairs another dependency.
+  - JRE classes & javascript (including bootstrap).
+  - Only annotation class files.
 
-
-
-Archives with the following conditions will automatically marked as equivalent to adding a `ignored-dependencies` entry.
-
-- Annotation processors.
-- Dependency where `classifier=sources` pairs another dependency.
-- JRE classes & javascript (including bootstrap).
-- Only annotation class files.
-- If the file `.walkingkooka-j2cl-maven-plugin-ignored-dependency.txt` is present.
+[see](#Ignored dependencies)
 
 ## initial-script-filename
 
-The path to the initial script filename (`classpathscope=compile`).
-
-
+The path to the initial script filename.
 
 ## javascript-source-required
 
@@ -455,28 +391,27 @@ and the later includes numerous classes and mostly annotations that provide hint
 The snippet below is a good starting point and forcibly includes a few minimally required artifacts.
 
 ```xml
+
 <javascript-source-required>
-    <param>group1:artifact2:filetype3:classifier4:version5</param>
+  <param>group1:artifact2:filetype3:classifier4:version5</param>
 </javascript-source-required>
 ```
 
 - Maven coordinates may have a wildcard in the version.
+- Archives with the following conditions will automatically marked as equivalent to adding
+  a `javascript-source-required` entry.
+  - Archives with only JRE javascript (including bootstrap).
 
-
-
-Archives with the following conditions will automatically marked as equivalent to adding a `javascript-source-required` entry.
-
-- Archives with only JRE javascript (including bootstrap).
-
-
+[see](#Javascript source required file(s))
 
 ## java-compiler-arguments
 
 This may be used to pass additional arguments to javac such as an annotation processor argument.
 
 ```xml
+
 <java-compiler-arguments>
-    <param>-Aannotation-processor-argument=value</param>
+  <param>-Aannotation-processor-argument=value</param>
 </java-compiler-arguments>
 ```
 
@@ -484,9 +419,10 @@ This may be used to pass additional arguments to javac such as an annotation pro
 
 ## language-out
 
-The output language of the resulting javascript.
+The output language (javascript variant) of the resulting javascript.
 
-For a detailed list of available language out options click [here](https://github.com/google/closure-compiler/wiki/Flags-and-Options).
+For a detailed list of available language out options
+click [here](https://github.com/google/closure-compiler/wiki/Flags-and-Options).
 
 The xml snippet below includes all currently available options, only one may be set, more than one is an error.
 
@@ -504,15 +440,17 @@ The xml snippet below includes all currently available options, only one may be 
 
 
 ## output
+
 This path is the final location of the final javascript (`classpathscope=compile`).
 
 
 
 ## source-maps
 
-Accepts a relative path to the target of directory `initial-script-filename` where source files will be copied. This will
-typically be a sub directory perhaps called `sources` under the same directory receiving the main javascript output file.
-Click [here](https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Use_a_source_map) for more details about `.map`
+Accepts a relative path to the target of directory of `initial-script-filename` where source files will be copied. This
+will typically be a sub-directory perhaps called `sources` under the same directory receiving the main javascript output
+file. Click [here](https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Use_a_source_map) for more details
+about `.map`
 files and how source maps work.
 
 ```xml
@@ -564,81 +502,83 @@ cost of longer build times.
 <thread-pool-size>0</thread-pool-size>
 ```
 
-
-
 # Special files
 
-
+A variety of txt files that used by one or more tasks and typically appear somewhere in a source root.
 
 ## Classpath required file(s)
 
-A dependency archive with a `.walkingkooka-j2cl-maven-plugin-classpath-required.txt` file in its root is equivalent to
-adding an `classpath-required` entry to the plugin pom.
+An artifact that will provide *.class files and will be added to the classpath of several tasks:
 
+- JAVAC_COMPILE
+- JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE
+- TRANSPILE_JAVA_TO_JAVASCRIPT
 
+There are several ways to mark an artifact:
 
-## Ignored dependency file(s)
+- A file called `.walkingkooka-j2cl-maven-plugin-classpath-required.txt` in the root - content are ignored.
+- Adding the artifact maven coords to the maven task configuration `classpath-required`.
 
-A dependency archive with a `.walkingkooka-j2cl-maven-plugin-ignored-dependency.txt` file in its root is equivalent to
-adding an `ignored-dependency` entry to the plugin pom.
+## Ignored dependency(s)
 
+An ignored artifact will have its java source, class files and other files ignored.
 
+There are several ways to ignore an artifact:
+
+- A file called '`.walkingkooka-j2cl-maven-plugin-ignored-dependency.txt`' in the root - contents are ignored.
+- Adding the artifact maven coords to the maven task configuration `ignored-dependency`.
 
 ## Ignored file(s)
 
-A facility that is almost identical to `.gitignore` files is also supported and honoured when source files are processed.
-If a `.walkingkooka-j2cl-maven-plugin-ignored-files.txt` is present in a source directory all patterns within it are honoured
-for the current and sub directories.
-
-The actual patterns are PathMatcher [glob patterns](https://docs.oracle.com/javase/tutorial/essential/io/fileOps.html#glob)
-without the leading `glob:` prefix.
+A text file called ``.walkingkooka-j2cl-maven-plugin-ignored-files.txt`` with file paths or glob patterns that will
+result in any matched files being ignored.
 
 - Blank lines are ignored
 - Lines beginning with HASH are considered to be comments and are ignored.
 - All other lines are used to build a glob pattern, using the java snippet directly below
 - No support is provided for escaping of any sort.
 
+This ignore file is used during the tasks:
 
+- JAVAC_COMPILE
+- JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE
+- TRANSPILE_JAVA_TO_JAVASCRIPT
 
-### Processing
-
-Files are ignored before the Google preprocessor attempts to remove classes and class members are annotated with `@Gwt-Incompatible`.
-
-
+All other files will be compiled or transpiled.
 
 ### Sample .walkingkooka-j2cl-maven-plugin-ignored-files.txt
 
 ```text
-# This is a comment and ignored. The two blank lines are also ignored.
+# This is a comment and ignored. The following two blank lines are also ignored.
 
 
-# The two patterns will ignore files in this and any sub directories.
+# The two glob patterns will ignore files in this and any sub directories.
 IgnoredFile1.*
 sub2/IgnoredFile2.*
 ``` 
 
-
-
 ## Javascript source required file(s)
 
-A dependency archive with a `.walkingkooka-j2cl-maven-plugin-javascript-source-required.txt` file in its root is equivalent to
-adding an `javascript-source-required` entry to the plugin pom.
+A javascript source required artifact will contain javascript files that need processing by the Closure compiler.
 
+There are several ways to ignore an artifact:
 
-
+- A file called `.walkingkooka-j2cl-maven-plugin-javascript-source-required.txt` in the root - contents are ignored.
+- Adding the artifact maven coords to the maven task configuration `javascript-source-required`.
 
 # Shade file(s)
 
-The shade file is useful for shading classes belonging to package and all sub packages. This useful feature helps when
-developing missing or incoplete JRE classes such as `java.util.Base64`. This feature supports the ability to create
-a replacement under a different package allowing regular JRE unit tests to be written that compare results when invoking
-the real `java.util.Base64` and a class with similar methods but under a different package.
+Shading is useful particularly when developing emulation of JRE that are not baked in. Shading is a useful feature that
+allows the source and class files for both the JRE and authored replacement to co-exist and be unit test together.
 
+## Sample
 
- 
-## Sample .walkingkooka-j2cl-maven-plugin-shade.txt
+An example where shading is utilized is the replacement/emulation of `java.util.Base64`
+with [walkingkooka.j2cl.java.util.Base64](https://github.com/mP1/j2cl-java-util-Base64/blob/master/src/main/java/walkingkooka/j2cl/java/util/Base64.java)
+with tests that exercise the features by executing the same parameters against the inbuild .
 
-The properties file content. This example will eventually change packages starting with `example.java.util` to `java.util`.
+The properties file content. This example will eventually change packages starting with `example.java.util`
+to `java.util`.
 
 ```txt
 example.java.util=java.util
@@ -663,24 +603,38 @@ class Base64 {
 }
 ```
 
-The source after task 5 processing.
+The source after shading.
 ```java
 package java.util;
 
 class Base64 {
-    class Decoder {
+  class Decoder {
 
-    }
+  }
 
-    class Encoder {
+  class Encoder {
 
-    }
+  }
 }
 ```
 
+# Public files
+
+A text file called ``.walkingkooka-j2cl-maven-plugin-public-files.txt`` with file paths or glob patterns that will
+copied to the output.
+
+- Blank lines are ignored
+- Lines beginning with HASH are considered to be comments and are ignored.
+- All other lines are used to build a glob pattern, using the java snippet directly below
+- No support is provided for escaping of any sort.
+
+This ignore file is used during the tasks:
+
+- OUTPUT_ASSEMBLE
+
 ## Sample .walkingkooka-j2cl-maven-plugin-public-files.txt
 
-This file must appear in the root of the artifact and can be used to copy files to the final assembly output.
+The file below will copy the index.html and gif files to the ouptut directory.
 
 ```text
 # This is a comment and ignored. The two blank lines are also ignored.
@@ -894,14 +848,32 @@ numerous warning level messages. All the parameters and paths to files are above
 
 ![Sample output](draw-vertispan-connected-closure-compiler-output-directory.png)
 
- 
-
-
 # Samples
 
 Samples of all the various files mentioned above are available under [samples](samples/)
 
+## Dependencies
 
+The Maven POM fragment declares two dependencies which should provide the minimal required dependencies for an
+application.
+
+```xml
+
+<dependencies>
+  <dependency>
+    <groupId>walkingkooka</groupId>
+    <artifactId>j2cl-uber</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </dependency>
+
+  <dependency>
+    <groupId>walkingkooka</groupId>
+    <artifactId>j2cl-uber-test</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <scope>test</scope>
+  </dependency>
+</dependencies>
+```
 
 # Contributions
 
