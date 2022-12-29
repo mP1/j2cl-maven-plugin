@@ -183,11 +183,12 @@ public final class J2clTaskHash<C extends J2clMavenContext> implements J2clTask<
         logger.indent();
 
         for (final Path root : roots) {
+            logger.line(root.toString());
+
             hashItemNames.add("compile-source-root: " + root.getFileName());
             this.hashDirectoryTree(
                     root,
-                    hash,
-                    logger
+                    hash
             );
         }
 
@@ -196,21 +197,13 @@ public final class J2clTaskHash<C extends J2clMavenContext> implements J2clTask<
     }
 
     private void hashDirectoryTree(final Path root,
-                                   final HashBuilder hash,
-                                   final TreeLogger logger) throws IOException {
-        logger.line(root.toString());
-        logger.indent();
-
+                                   final HashBuilder hash) throws IOException {
         Files.walkFileTree(
                 root,
                 new FileVisitor<>() {
                     @Override
                     public FileVisitResult preVisitDirectory(final Path path,
                                                              final BasicFileAttributes basicFileAttributes) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debugLine(path.getFileName() + " (dir)");
-                            logger.indent();
-                        }
                         return FileVisitResult.CONTINUE;
                     }
 
@@ -230,15 +223,10 @@ public final class J2clTaskHash<C extends J2clMavenContext> implements J2clTask<
                     @Override
                     public FileVisitResult postVisitDirectory(final Path path,
                                                               final IOException cause) {
-                        if (logger.isDebugEnabled()) {
-                            logger.outdent();
-                        }
                         return FileVisitResult.CONTINUE;
                     }
-                });
-
-        logger.outdent();
-        logger.flush();
+                }
+        );
     }
 
     @Override
