@@ -859,7 +859,6 @@ The Maven POM fragment declares two dependencies which should provide the minima
 application.
 
 ```xml
-
 <dependencies>
   <dependency>
     <groupId>walkingkooka</groupId>
@@ -872,6 +871,29 @@ application.
     <artifactId>j2cl-uber-test</artifactId>
     <version>1.0-SNAPSHOT</version>
     <scope>test</scope>
+  </dependency>
+</dependencies>
+```
+
+Note that a dependency with a `classifier=sources` will always be removed from the dependencies prior to actual task
+processing.
+
+A dependency that includes the following dependencies will have the second automatically removed.
+
+```xml
+
+<dependencies>
+  <dependency>
+    <groupId>javax.validation</groupId>
+    <artifactId>validation-api</artifactId>
+    <version>1.0.0.GA</version>
+    <scope>compile</scope>
+  </dependency>
+  <dependency>
+    <groupId>javax.validation</groupId>
+    <artifactId>validation-api</artifactId>
+    <version>1.0.0.GA</version>
+    <classifier>sources</classifier>
   </dependency>
 </dependencies>
 ```
