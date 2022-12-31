@@ -263,9 +263,10 @@ required.
 The snippet below is a good starting point and forcibly includes a few required artifacts.
 
 ```xml
+
 <classpath-required>
-    <param>group-id-1:artifact-id-2:*</param>
-    <param>group-id-1:artifact-id-2:version-3</param>
+  <param>group1:artifact2:*</param>
+  <param>group1:artifact2:version3</param>
 </classpath-required>
 ```
 
@@ -357,13 +358,12 @@ A list of artifacts that will not be processed. This is used to avoid processing
 they come pre-processed, or only contain annotations that are not required during transpiling (j2cl) but necessary for
 compiling (javac).
 
-```
-<ignored-dependencies>
-    <!-- dependencies below only contain annotations -->
-    <param>group1:artifact2:*</param>
-    <param>group1:artifact2:version3</param>
-</ignored-dependencies>
+```xml
 
+<ignored-dependencies>
+  <param>group1:artifact2:*</param>
+  <param>group1:artifact2:version3</param>
+</ignored-dependencies>
 ```
 
 - Maven coordinates may have a wildcard in the version.
@@ -393,7 +393,8 @@ The snippet below is a good starting point and forcibly includes a few minimally
 ```xml
 
 <javascript-source-required>
-  <param>group1:artifact2:filetype3:classifier4:version5</param>
+  <param>group1:artifact2:*</param>
+  <param>group1:artifact2:version3</param>
 </javascript-source-required>
 ```
 
