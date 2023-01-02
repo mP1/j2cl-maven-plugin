@@ -190,7 +190,7 @@ public final class J2clTaskHash<C extends J2clMavenContext> implements J2clTask<
         for (final Path root : roots) {
             logger.line(root.toString());
 
-            hashItemNames.add("compile-source-root: " + root.getFileName());
+            hashItemNames.add("compile-source-root: " + root.toAbsolutePath());
             this.hashDirectoryTree(
                     root,
                     hash
