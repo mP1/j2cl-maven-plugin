@@ -138,21 +138,17 @@ final class J2clMojoWatchMavenContext extends J2clMavenContext {
     private final J2clPath initialScriptFilename;
 
     @Override
-    public HashBuilder computeHash(final Set<String> hashItemNames) {
-        final HashBuilder hash = this.computeHash0(hashItemNames);
-
-        this.entryPoints.forEach(
-                e -> {
-                    hashItemNames.add("entry-points: " + e);
-                    hash.append(e);
-                }
-        );
-
-        final String initialScriptFilename = this.initialScriptFilename.toString();
-        hashItemNames.add("initial-script-filename: " + initialScriptFilename);
-        hash.append(initialScriptFilename);
-
-        return hash;
+    public void computeHash(final J2clArtifact artifact,
+                            final HashBuilder hash,
+                            final Set<String> hashItemNames) {
+        if (false == artifact.isDependency()) {
+            this.computeEntryPointAndInitialScriptFilenameHash(
+                    this.entryPoints,
+                    this.initialScriptFilename,
+                    hashItemNames,
+                    hash
+            );
+        }
     }
 
     /**

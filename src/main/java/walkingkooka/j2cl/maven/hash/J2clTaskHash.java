@@ -70,7 +70,12 @@ public final class J2clTaskHash<C extends J2clMavenContext> implements J2clTask<
                                   final C context,
                                   final TreeLogger logger) throws Exception {
         final Set<String> hashItemNames = Sets.sorted();
-        final HashBuilder hash = context.computeHash(hashItemNames);
+        final HashBuilder hash = HashBuilder.empty();
+        context.computeHash(
+                artifact,
+                hash,
+                hashItemNames
+        );
 
         this.hashDependencies(artifact, hash, hashItemNames, logger);
         this.hashArtifactSources(artifact, hash, hashItemNames, logger);

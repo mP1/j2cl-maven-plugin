@@ -149,14 +149,14 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
     }
 
     @Override
-    public HashBuilder computeHash(final Set<String> hashItemNames) {
-        final HashBuilder hash = this.computeHash0(hashItemNames);
-
-        // no need to include browser or testTimeout in hash as these do no affect generated js
-        hashItemNames.add("test-classname: " + this.testClassName);
-        hash.append(this.testClassName);
-
-        return hash;
+    public void computeHash(final J2clArtifact artifact,
+                            final HashBuilder hash,
+                            final Set<String> hashItemNames) {
+        if (false == artifact.isDependency()) {
+            // no need to include browser or testTimeout in hash as these do no affect generated js
+            hashItemNames.add("test-classname: " + this.testClassName);
+            hash.append(this.testClassName);
+        }
     }
 
     J2clMojoTestMavenContext setProject(final J2clArtifact project) {
