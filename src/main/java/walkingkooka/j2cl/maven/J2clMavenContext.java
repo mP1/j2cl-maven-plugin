@@ -95,6 +95,22 @@ public abstract class J2clMavenContext implements Context {
         this.logger = logger;
     }
 
+    final void computeEntryPointAndInitialScriptFilenameHash(final List<String> entryPoints,
+                                                             final J2clPath initialScriptFilename,
+                                                             final Set<String> hashItemNames,
+                                                             final HashBuilder hash) {
+        entryPoints.forEach(
+                e -> {
+                    hashItemNames.add("entry-points: " + e);
+                    hash.append(e);
+                }
+        );
+
+        final String initialScriptFilenameString = initialScriptFilename.toString();
+        hashItemNames.add("initial-script-filename: " + initialScriptFilenameString);
+        hash.append(initialScriptFilenameString);
+    }
+
     /**
      * Classpath scope used to filter artifacts.
      */
@@ -600,25 +616,29 @@ public abstract class J2clMavenContext implements Context {
      * Returns a sha1 hash in hex digits that uniquely identifies this request using components.
      * Requests should cache the hash for performance reasons.
      */
-    public abstract HashBuilder computeHash(final Set<String> hashItemsNames);
+    public abstract void computeHash(final J2clArtifact artifact,
+                                     final HashBuilder hash,
+                                     final Set<String> hashItemNames);
 
     /**
      * Creates a {@link HashBuilder} and hashes most of the properties of a request.
      */
-    final HashBuilder computeHash0(final Set<String> hashItemNames) {
-        final HashBuilder hash = HashBuilder.empty();
+    final void computeHash0(final J2clArtifact artifact,
+                            final HashBuilder hash,
+                            final Set<String> hashItemNames) {
+        if (artifact.isDependency()) {
+            final J2clClasspathScope scope = this.scope();
+            hashItemNames.add("scope: " + scope);
+            hash.append(scope);
 
-        final J2clClasspathScope scope = this.scope();
-        hashItemNames.add("scope: " + scope);
-        hash.append(scope);
+            final J2clSourcesKind sourcesKind = this.sourcesKind();
+            hashItemNames.add("sources-kind: " + sourcesKind);
+            hash.append(sourcesKind);
+        }
 
         final CompilationLevel level = this.level;
         hashItemNames.add("level: " + level);
         hash.append(scope);
-
-        final J2clSourcesKind sourcesKind = this.sourcesKind();
-        hashItemNames.add("sources-kind: " + sourcesKind);
-        hash.append(sourcesKind);
 
         this.defines.forEach((k, v) -> {
             hashItemNames.add("define: " + k + "=" + v);
@@ -660,8 +680,6 @@ public abstract class J2clMavenContext implements Context {
             hashItemNames.add("javascript-source-required: " + j);
             hash.append(j.toString());
         });
-
-        return hash;
     }
 
     // verify...........................................................................................................

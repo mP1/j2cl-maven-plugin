@@ -19,13 +19,29 @@ package walkingkooka.j2cl.maven;
 
 
 import org.apache.maven.plugins.annotations.Parameter;
+import walkingkooka.j2cl.maven.hash.HashBuilder;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 abstract class J2clMojoBuildWatch extends J2clMojoBuildTestWatch {
+
+    final void computeEntryPointAndInitialScriptFilenameHash(final Set<String> hashItemNames,
+                                                             final HashBuilder hash) {
+        this.entryPoints().forEach(
+                e -> {
+                    hashItemNames.add("entry-points: " + e);
+                    hash.append(e);
+                }
+        );
+
+        final String initialScriptFilenameString = this.initialScriptFilename().toString();
+        hashItemNames.add("initial-script-filename: " + initialScriptFilenameString);
+        hash.append(initialScriptFilenameString);
+    }
 
     // entry-points.....................................................................................................
 
