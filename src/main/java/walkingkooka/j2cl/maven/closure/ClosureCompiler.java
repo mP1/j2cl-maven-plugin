@@ -286,26 +286,28 @@ class ClosureCompiler {
 
     private static void logCommandLineArguments(final Map<String, Collection<String>> arguments,
                                                 final TreeLogger logger) {
-        logger.line("Command line argument(s)");
-        logger.indent();
-        {
-            for (final Map.Entry<String, Collection<String>> keyAndValue : arguments.entrySet()) {
-                logger.indent();
-                {
-                    final String key = keyAndValue.getKey();
-                    logger.line(key);
+        if (logger.isDebugEnabled()) {
+            logger.line("Command line argument(s)");
+            logger.indent();
+            {
+                for (final Map.Entry<String, Collection<String>> keyAndValue : arguments.entrySet()) {
                     logger.indent();
+                    {
+                        final String key = keyAndValue.getKey();
+                        logger.line(key);
+                        logger.indent();
 
-                    for (final String value : keyAndValue.getValue()) {
-                        logger.line(value);
+                        for (final String value : keyAndValue.getValue()) {
+                            logger.debugLine(value);
+                        }
+                        logger.outdent();
                     }
                     logger.outdent();
                 }
-                logger.outdent();
+                logger.endOfList();
             }
-            logger.endOfList();
+            logger.outdent();
         }
-        logger.outdent();
     }
 
     /**
