@@ -621,15 +621,15 @@ class Base64 {
 
 # Public files
 
-A text file called ``.walkingkooka-j2cl-maven-plugin-public-files.txt`` with file paths or glob patterns that will
-copied to the output.
+A text file called `.walkingkooka-j2cl-maven-plugin-public-files.txt` with file paths or glob patterns that will copied
+to the output directory.
 
 - Blank lines are ignored
 - Lines beginning with HASH are considered to be comments and are ignored.
 - All other lines are used to build a glob pattern, using the java snippet directly below
 - No support is provided for escaping of any sort.
 
-This ignore file is used during the tasks:
+This file is used during the tasks:
 
 - OUTPUT_ASSEMBLE
 
