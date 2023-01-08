@@ -281,17 +281,11 @@ public final class J2clPath implements Comparable<J2clPath> {
      * Builds a new path holding the ignore file. Note that ignored files are simply ignored with no logging happening.
      */
     public Optional<PathMatcher> ignoredFiles() throws IOException {
-        return this.append(IGNORED_FILES)
+        return this.append(J2clArtifact.IGNORED_FILES)
                 .pathMatcher(
                         this
                 );
     }
-
-    /**
-     * The name of the ignore file which is used during the unpack phase to filter files.
-     */
-    // @VisibleForTesting
-    static final String IGNORED_FILES = FILE_PREFIX + "-ignored-files.txt";
 
     /**
      * Tries to read this file turning each non comment / non empty line into a {@link PathMatcher}.
@@ -360,17 +354,11 @@ public final class J2clPath implements Comparable<J2clPath> {
      * Returns a {@link PathMatcher} for all the patterns within any present public files.
      */
     public Optional<PathMatcher> publicFiles() throws IOException {
-        return this.append(PUBLIC_FILES)
+        return this.append(J2clArtifact.PUBLIC_FILES)
                 .pathMatcher(
                         this
                 );
     }
-
-    /**
-     * A text file that contains zero or more paths/file patterns that will be used to copy matching files during
-     * the {@link J2clTaskKind#OUTPUT_ASSEMBLE} task. This will probably match assets like images, supporting javascript and so on.
-     */
-    private static final String PUBLIC_FILES = FILE_PREFIX + "-public-files.txt";
 
     public J2clPath parent() {
         return new J2clPath(this.path().getParent());
