@@ -184,7 +184,7 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
     private final List<J2clTaskKind> DEPENDENCY_TASKS = Lists.of(
             J2clTaskKind.HASH,
             J2clTaskKind.UNPACK,
-            J2clTaskKind.JAVAC_COMPILE,
+            J2clTaskKind.JAVAC_ANNOTATION_PROCESSORS_ENABLED,
             J2clTaskKind.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE,
             J2clTaskKind.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE,
             J2clTaskKind.SHADE_JAVA_SOURCE,
@@ -194,7 +194,7 @@ public final class J2clMojoTestMavenContext extends J2clMavenContext {
 
     private final List<J2clTaskKind> PROJECT_TASKS = Lists.of(
             J2clTaskKind.HASH,
-            J2clTaskKind.JAVAC_COMPILE,
+            J2clTaskKind.JAVAC_ANNOTATION_PROCESSORS_ENABLED,
             J2clTaskKind.GWT_INCOMPATIBLE_STRIP_JAVA_SOURCE,
             J2clTaskKind.JAVAC_COMPILE_GWT_INCOMPATIBLE_STRIPPED_JAVA_SOURCE,
             J2clTaskKind.SHADE_JAVA_SOURCE,

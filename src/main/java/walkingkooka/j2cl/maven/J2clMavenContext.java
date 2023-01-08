@@ -234,7 +234,7 @@ public abstract class J2clMavenContext implements Context {
     public abstract J2clPath compiledBinaries(final J2clArtifact artifact);
 
     final J2clPath compiledBinariesTaskDirectory(final J2clArtifact artifact) {
-        return artifact.taskDirectory(J2clTaskKind.JAVAC_COMPILE)
+        return artifact.taskDirectory(J2clTaskKind.JAVAC_ANNOTATION_PROCESSORS_ENABLED)
                 .output();
     }
 

@@ -62,7 +62,7 @@ public enum J2clTaskKind {
     /**
      * Calls javac on the unpack directory along with its dependencies on the classpath.
      */
-    JAVAC_COMPILE {
+    JAVAC_ANNOTATION_PROCESSORS_ENABLED {
         @Override
         J2clTask<? super J2clMavenContext> task() {
             return J2clTasks.compileJavaSource();

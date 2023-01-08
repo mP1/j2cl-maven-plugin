@@ -62,7 +62,7 @@ public final class J2clTaskJavacCompilerUnpackedSource<C extends J2clMavenContex
 
     @Override
     List<J2clTaskKind> compiledBinaryTasks() {
-        return Lists.of(J2clTaskKind.JAVAC_COMPILE);
+        return Lists.of(J2clTaskKind.JAVAC_ANNOTATION_PROCESSORS_ENABLED);
     }
 
     @Override
