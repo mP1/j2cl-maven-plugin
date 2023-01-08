@@ -24,12 +24,10 @@ import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.log.TreeFormat;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.reflect.PackageName;
-import walkingkooka.text.CharSequences;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemAlreadyExistsException;
@@ -47,7 +45,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -434,53 +431,16 @@ public final class J2clPath implements Comparable<J2clPath> {
      * Builds a new path holding the shade mapping file.
      */
     J2clPath shadeFile() {
-        return this.append(SHADE_FILE);
+        return this.append(J2clArtifact.SHADE_FILE);
     }
 
     /**
-     * The name of the shade file used during {@link J2clTaskKind#SHADE_JAVA_SOURCE} and the package prefix to be removed.
-     */
-    public static final String SHADE_FILE = FILE_PREFIX + "-shade.txt";
-
-    /**
-     * Used to read the {@link #SHADE_FILE} properties file. Note the {@link Map} keeps entries in the file order.
+     * Used to read the {@link J2clArtifact#SHADE_FILE} properties file. Note the {@link Map} keeps entries in the file order.
      */
     Map<PackageName, PackageName> readShadeFile() throws IOException {
-        final File file = this.file();
-
-        try (final InputStream content = new FileInputStream(file)) {
-            final Map<PackageName, PackageName> map = Maps.ordered();
-            final Properties properties = new Properties() {
-
-                private static final long serialVersionUID = -7831642683636345017L;
-
-                // not necessary to override setProperty but just in case future load call setProperty and not put
-
-                @Override
-                public synchronized Object setProperty(final String key, final String value) {
-                    return map.put(
-                            this.checkPackage(key, "key"),
-                            this.checkPackage(value, "value")
-                    );
-                }
-
-                private PackageName checkPackage(final String value,
-                                                 final String label) {
-                    try {
-                        return PackageName.with(value);
-                    } catch (final Exception cause) {
-                        throw new IllegalStateException("Invalid property " + label + " (package name) " + CharSequences.quoteAndEscape(value) + " in " + file.getAbsolutePath());
-                    }
-                }
-
-                @Override
-                public synchronized Object put(final Object key, final Object value) {
-                    return this.setProperty((String) key, (String) value);
-                }
-            };
-            properties.load(content);
-            return map;
-        }
+        return J2clArtifactShadeFile.readShadeFile(
+                new FileInputStream(this.file())
+        );
     }
 
     /**

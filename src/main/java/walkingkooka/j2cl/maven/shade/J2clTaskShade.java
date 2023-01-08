@@ -74,7 +74,7 @@ abstract class J2clTaskShade<C extends J2clMavenContext> implements J2clTask<C> 
         if (artifact.isIgnored()) {
             result = J2clTaskResult.SKIPPED;
         } else {
-            logger.line(J2clPath.SHADE_FILE);
+            logger.line(J2clArtifact.SHADE_FILE);
             logger.indent();
             {
                 final Map<PackageName, PackageName> shadeMappings = artifact.shadeMappings();
