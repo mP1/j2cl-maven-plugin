@@ -25,6 +25,7 @@ import org.junit.rules.TemporaryFolder;
 import walkingkooka.HashCodeEqualsDefinedTesting2;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.compare.ComparableTesting2;
+import walkingkooka.reflect.PackageName;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;
@@ -234,12 +235,28 @@ public final class J2clPathTest implements ComparableTesting2<J2clPath>, HashCod
 
     @Test
     public void testShadeFileRead() throws Exception {
-        this.checkEquals(Maps.of("package1", "package2"), this.writeShadeFile("package1=package2").readShadeFile());
+        this.checkEquals(
+                Maps.of(
+                        PackageName.with("package1"),
+                        PackageName.with("package2")
+                ),
+                this.writeShadeFile("package1=package2")
+                        .readShadeFile()
+        );
     }
 
     @Test
     public void testShadeFileRead2() throws Exception {
-        this.checkEquals(Maps.of("package1", "package2", "package3", "package4"), this.writeShadeFile("package1=package2\npackage3=package4").readShadeFile());
+        this.checkEquals(
+                Maps.of(
+                        PackageName.with("package1"),
+                        PackageName.with("package2"),
+                        PackageName.with("package3"),
+                        PackageName.with("package4")
+                ),
+                this.writeShadeFile("package1=package2\npackage3=package4")
+                        .readShadeFile()
+        );
     }
 
     @Test
@@ -264,7 +281,10 @@ public final class J2clPathTest implements ComparableTesting2<J2clPath>, HashCod
     }
 
     private void readShadeFileFails(final String content) {
-        assertThrows(J2clException.class, () -> this.writeShadeFile(content).readShadeFile());
+        assertThrows(
+                IllegalStateException.class,
+                () -> this.writeShadeFile(content).readShadeFile()
+        );
     }
 
     @Test

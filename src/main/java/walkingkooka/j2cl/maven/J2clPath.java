@@ -445,11 +445,11 @@ public final class J2clPath implements Comparable<J2clPath> {
     /**
      * Used to read the {@link #SHADE_FILE} properties file. Note the {@link Map} keeps entries in the file order.
      */
-    Map<String, String> readShadeFile() throws IOException {
+    Map<PackageName, PackageName> readShadeFile() throws IOException {
         final File file = this.file();
 
         try (final InputStream content = new FileInputStream(file)) {
-            final Map<String, String> map = Maps.ordered();
+            final Map<PackageName, PackageName> map = Maps.ordered();
             final Properties properties = new Properties() {
 
                 private static final long serialVersionUID = -7831642683636345017L;
@@ -458,16 +458,18 @@ public final class J2clPath implements Comparable<J2clPath> {
 
                 @Override
                 public synchronized Object setProperty(final String key, final String value) {
-                    this.checkPackage(key, "key");
-                    this.checkPackage(value, "value");
-                    return map.put(key, value);
+                    return map.put(
+                            this.checkPackage(key, "key"),
+                            this.checkPackage(value, "value")
+                    );
                 }
 
-                private void checkPackage(final String value, final String label) {
+                private PackageName checkPackage(final String value,
+                                                 final String label) {
                     try {
-                        PackageName.with(value);
+                        return PackageName.with(value);
                     } catch (final Exception cause) {
-                        throw new J2clException("Invalid property " + label + " (package name) " + CharSequences.quoteAndEscape(value) + " in " + file.getAbsolutePath());
+                        throw new IllegalStateException("Invalid property " + label + " (package name) " + CharSequences.quoteAndEscape(value) + " in " + file.getAbsolutePath());
                     }
                 }
 

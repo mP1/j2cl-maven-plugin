@@ -27,6 +27,7 @@ import walkingkooka.j2cl.maven.J2clTaskKind;
 import walkingkooka.j2cl.maven.J2clTaskResult;
 import walkingkooka.j2cl.maven.log.TreeFormat;
 import walkingkooka.j2cl.maven.log.TreeLogger;
+import walkingkooka.reflect.PackageName;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;
@@ -76,7 +77,7 @@ abstract class J2clTaskShade<C extends J2clMavenContext> implements J2clTask<C> 
             logger.line(J2clPath.SHADE_FILE);
             logger.indent();
             {
-                final Map<String, String> shadeMappings = artifact.shadeMappings();
+                final Map<PackageName, PackageName> shadeMappings = artifact.shadeMappings();
 
                 if (!shadeMappings.isEmpty()) {
                     this.copyAndShade(
@@ -107,7 +108,7 @@ abstract class J2clTaskShade<C extends J2clMavenContext> implements J2clTask<C> 
      */
     private void copyAndShade(final J2clArtifact artifact,
                               final J2clPath root,
-                              final Map<String, String> shade,
+                              final Map<PackageName, PackageName> shade,
                               final J2clPath output,
                               final C context,
                               final TreeLogger logger) throws Exception {
@@ -122,19 +123,19 @@ abstract class J2clTaskShade<C extends J2clMavenContext> implements J2clTask<C> 
         final Set<J2clPath> nonShadedFiles = Sets.sorted();
         nonShadedFiles.addAll(files);
 
-            for (final Entry<String, String> mapping : shade.entrySet()) {
-                final String find = mapping.getKey();
-                final String replace = mapping.getValue();
+        for (final Entry<PackageName, PackageName> mapping : shade.entrySet()) {
+            final String find = mapping.getKey().value();
+            final String replace = mapping.getValue().value();
 
-                final J2clPath shadeDirectory = replace.isEmpty() ?
-                        output :
-                        output.append(replace.replace('.', File.separatorChar));
+            final J2clPath shadeDirectory = replace.isEmpty() ?
+                    output :
+                    output.append(replace.replace('.', File.separatorChar));
 
-                final Set<J2clPath> shadedFiles = Sets.sorted();
-                final J2clPath shadedRoot = root.append(find.replace('.', File.separatorChar));
+            final Set<J2clPath> shadedFiles = Sets.sorted();
+            final J2clPath shadedRoot = root.append(find.replace('.', File.separatorChar));
 
-                // filter only files belonging to and under shade source root
-                possibleFiles.stream()
+            // filter only files belonging to and under shade source root
+            possibleFiles.stream()
                         .filter(f -> f.path().startsWith(shadedRoot.path()))
                         .forEach(shadedFiles::add);
 
@@ -201,7 +202,7 @@ abstract class J2clTaskShade<C extends J2clMavenContext> implements J2clTask<C> 
      * Reads the file and shades the source text or class file type references.
      */
     abstract byte[] shade(final byte[] content,
-                          final Map<String, String> mappings);
+                          final Map<PackageName, PackageName> mappings);
 
     /**
      * This is invoked after and files are copy and shaded, the primary use case is copying javascript files
