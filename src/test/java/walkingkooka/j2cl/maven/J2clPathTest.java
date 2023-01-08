@@ -125,7 +125,7 @@ public final class J2clPathTest implements ComparableTesting2<J2clPath>, HashCod
                 .toPath();
 
         Files.write(
-                folder.resolve(J2clPath.IGNORED_FILES),
+                folder.resolve(J2clArtifact.IGNORED_FILES),
                 "*.txt".getBytes(StandardCharsets.UTF_8)
         );
 

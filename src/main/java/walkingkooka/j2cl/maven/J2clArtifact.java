@@ -1138,9 +1138,20 @@ public final class J2clArtifact implements Comparable<J2clArtifact> {
     public final static String IGNORED_DEPENDENCY_FILE = J2clPath.FILE_PREFIX + "-ignored-dependency.txt";
 
     /**
+     * The name of the ignore file which is used during the unpack phase to filter files.
+     */
+    public static final String IGNORED_FILES = J2clPath.FILE_PREFIX + "-ignored-files.txt";
+
+    /**
      * A marker file that indicates an artifact is required during javascript operations by this plugin.
      */
     public final static String JAVASCRIPT_SOURCE_REQUIRED_FILE = J2clPath.FILE_PREFIX + "-javascript-source-required.txt";
+
+    /**
+     * A text file that contains zero or more paths/file patterns that will be used to copy matching files during
+     * the {@link J2clTaskKind#OUTPUT_ASSEMBLE} task. This will probably match assets like images, supporting javascript and so on.
+     */
+    public static final String PUBLIC_FILES = J2clPath.FILE_PREFIX + "-public-files.txt";
 
     /**
      * The name of the shade file used during {@link J2clTaskKind#SHADE_JAVA_SOURCE} and the package prefix to be removed.
