@@ -1142,6 +1142,11 @@ public final class J2clArtifact implements Comparable<J2clArtifact> {
      */
     public final static String JAVASCRIPT_SOURCE_REQUIRED_FILE = J2clPath.FILE_PREFIX + "-javascript-source-required.txt";
 
+    /**
+     * The name of the shade file used during {@link J2clTaskKind#SHADE_JAVA_SOURCE} and the package prefix to be removed.
+     */
+    public static final String SHADE_FILE = J2clPath.FILE_PREFIX + "-shade.txt";
+
     private final static String CLASSPATH_REQUIRED_PATH = "/" + CLASSPATH_REQUIRED_FILE;
     private final static String IGNORED_DEPENDENCY_PATH = "/" + IGNORED_DEPENDENCY_FILE;
     private final static String JAVASCRIPT_SOURCE_REQUIRED_PATCH = "/" + JAVASCRIPT_SOURCE_REQUIRED_FILE;
