@@ -1037,14 +1037,14 @@ public final class J2clArtifact implements Comparable<J2clArtifact> {
             try (final FileSystem zip = FileSystems.newFileSystem(URI.create("jar:" + file.file().toURI()), Collections.emptyMap())) {
                 annotationProcessor = Files.exists(zip.getPath(META_INF_SERVICES_PROCESSOR));
 
-                classpathRequiredFile = Files.exists(zip.getPath(CLASSFILE_REQUIRED));
+                classpathRequiredFile = Files.exists(zip.getPath(CLASSPATH_REQUIRED_PATH));
 
-                ignoredFile = Files.exists(zip.getPath(IGNORED_DEPENDENCY));
+                ignoredFile = Files.exists(zip.getPath(IGNORED_DEPENDENCY_PATH));
 
                 jreJavascriptBootstrapFiles = Files.exists(zip.getPath(JAVASCRIPT_BOOTSTRAP));
                 jreJavascriptFiles = Files.exists(zip.getPath(JAVASCRIPT_FILE));
 
-                javascriptSourceRequiredFile = Files.exists(zip.getPath(JAVASCRIPT_SOURCE_REQUIRED));
+                javascriptSourceRequiredFile = Files.exists(zip.getPath(JAVASCRIPT_SOURCE_REQUIRED_PATCH));
 
                 jreBootstrapClassFiles = Files.exists(zip.getPath(JAVA_BOOTSTRAP_CLASSFILE));
                 jreClassFiles = Files.exists(zip.getPath(JAVA_CLASSFILE));
@@ -1126,13 +1126,29 @@ public final class J2clArtifact implements Comparable<J2clArtifact> {
         this.jreClassFiles = jreClassFiles;
     }
 
-    private final static String CLASSFILE_REQUIRED = "/" + J2clPath.FILE_PREFIX + "-classpath-required.txt";
-    private final static String IGNORED_DEPENDENCY = "/" + J2clPath.FILE_PREFIX + "-ignored-dependency.txt";
+    /**
+     * A marker file that indicates an artifact is required on the classpath by tasks in this plugin.
+     */
+    public final static String CLASSPATH_REQUIRED_FILE = J2clPath.FILE_PREFIX + "-classpath-required.txt";
+
+    /**
+     * A marker file that indicates an artifact should be ignored and not processed by this plugin.
+     */
+    public final static String IGNORED_DEPENDENCY_FILE = J2clPath.FILE_PREFIX + "-ignored-dependency.txt";
+
+    /**
+     * A marker file that indicates an artifact is required during javascript operations by this plugin.
+     */
+    public final static String JAVASCRIPT_SOURCE_REQUIRED_FILE = J2clPath.FILE_PREFIX + "-javascript-source-required.txt";
+
+    private final static String CLASSPATH_REQUIRED_PATH = "/" + CLASSPATH_REQUIRED_FILE;
+    private final static String IGNORED_DEPENDENCY_PATH = "/" + IGNORED_DEPENDENCY_FILE;
+    private final static String JAVASCRIPT_SOURCE_REQUIRED_PATCH = "/" + JAVASCRIPT_SOURCE_REQUIRED_FILE;
+
     private final static String JAVA_BOOTSTRAP_CLASSFILE = "/java/lang/invoke/MethodType.class";
     private final static String JAVA_CLASSFILE = "/java/lang/Class.class";
     private final static String JAVASCRIPT_BOOTSTRAP = "/closure/goog/base.js";
     private final static String JAVASCRIPT_FILE = "/java/lang/Class.java.js";
-    private final static String JAVASCRIPT_SOURCE_REQUIRED = "/" + J2clPath.FILE_PREFIX + "-javascript-source-required.txt";
     private final static String META_INF_SERVICES_PROCESSOR = "/META-INF/services/" + javax.annotation.processing.Processor.class.getName();
 
     /**
