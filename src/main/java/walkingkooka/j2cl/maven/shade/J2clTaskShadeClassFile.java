@@ -24,6 +24,7 @@ import walkingkooka.j2cl.maven.J2clTask;
 import walkingkooka.j2cl.maven.J2clTaskKind;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.javashader.JavaShaders;
+import walkingkooka.reflect.PackageName;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -60,13 +61,14 @@ public final class J2clTaskShadeClassFile<C extends J2clMavenContext> extends J2
 
     @Override
     byte[] shade(final byte[] content,
-                 final Map<String, String> mappings) {
+                 final Map<PackageName, PackageName> mappings) {
         return shadeClassFile(content, mappings);
     }
 
     private static byte[] shadeClassFile(final byte[] content,
-                                         final Map<String, String> mappings) {
-        return JavaShaders.classFilePackageShader().apply(content, mappings);
+                                         final Map<PackageName, PackageName> mappings) {
+        return JavaShaders.classFilePackageShader()
+                .apply(content, mappings);
     }
 
     @Override

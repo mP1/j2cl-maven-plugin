@@ -31,6 +31,7 @@ import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.predicate.Predicates;
+import walkingkooka.reflect.PackageName;
 import walkingkooka.text.CharSequences;
 
 import java.io.File;
@@ -1184,7 +1185,7 @@ public final class J2clArtifact implements Comparable<J2clArtifact> {
 
     // shade............................................................................................................
 
-    public Map<String, String> shadeMappings() throws IOException {
+    public Map<PackageName, PackageName> shadeMappings() throws IOException {
         if (null == this.shadeMappings) {
             this.shadeMappings = this.loadShadeFile();
         }
@@ -1194,10 +1195,10 @@ public final class J2clArtifact implements Comparable<J2clArtifact> {
     /**
      * The cached shade mappings file as a {@link Map}.
      */
-    private Map<String, String> shadeMappings;
+    private Map<PackageName, PackageName> shadeMappings;
 
-    private Map<String, String> loadShadeFile() throws IOException {
-        Map<String, String> mappings = Maps.empty();
+    private Map<PackageName, PackageName> loadShadeFile() throws IOException {
+        Map<PackageName, PackageName> mappings = Maps.empty();
 
         for (final J2clPath path : this.context.sources(this)) {
             final J2clPath shadeFile = path.shadeFile();

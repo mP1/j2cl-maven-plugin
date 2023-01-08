@@ -26,6 +26,7 @@ import walkingkooka.j2cl.maven.J2clTaskKind;
 import walkingkooka.j2cl.maven.log.TreeFormat;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.javashader.JavaShaders;
+import walkingkooka.reflect.PackageName;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -67,7 +68,7 @@ public final class J2clTaskShadeJavaSource<C extends J2clMavenContext> extends J
 
     @Override
     byte[] shade(final byte[] content,
-                 final Map<String, String> shadings) {
+                 final Map<PackageName, PackageName> shadings) {
         return JavaShaders.javaFilePackageShader(Charset.defaultCharset())
                 .apply(content, shadings);
     }
