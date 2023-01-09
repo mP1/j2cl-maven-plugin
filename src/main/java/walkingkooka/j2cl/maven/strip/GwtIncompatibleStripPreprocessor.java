@@ -21,7 +21,6 @@ import com.google.j2cl.common.FrontendUtils.FileInfo;
 import com.google.j2cl.common.Problems;
 import com.google.j2cl.tools.gwtincompatible.GwtIncompatibleStripper;
 import walkingkooka.collect.list.Lists;
-import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clTaskResult;
@@ -38,7 +37,6 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
@@ -219,9 +217,6 @@ final class GwtIncompatibleStripPreprocessor {
                                               final Predicate<Path> include) throws IOException {
         final SortedSet<J2clPath> files = Sets.sorted();
 
-        final Map<Path, PathMatcher> pathToMatchers = Maps.hash();
-        final List<PathMatcher> exclude = Lists.array();
-
         Files.walkFileTree(
                 root.path(),
                 new SimpleFileVisitor<>() {
@@ -229,33 +224,32 @@ final class GwtIncompatibleStripPreprocessor {
                     @Override
                     public FileVisitResult preVisitDirectory(final Path dir,
                                                              final BasicFileAttributes attrs) throws IOException {
-                        final Optional<PathMatcher> maybeIgnoreFile = J2clPath.with(dir)
-                                .ignoredFiles();
-                        if (maybeIgnoreFile.isPresent()) {
-                            final PathMatcher ignoreFile = maybeIgnoreFile.get();
+                        if (0 == this.depth++) {
+                            final Optional<PathMatcher> maybeIgnoreFile = J2clPath.with(dir)
+                                    .ignoredFiles();
+                            if (maybeIgnoreFile.isPresent()) {
+                                final PathMatcher ignoreFile = maybeIgnoreFile.get();
 
-                            pathToMatchers.put(dir, ignoreFile);
-                            exclude.add(ignoreFile);
+                                ignore = ignoreFile;
+                            }
                         }
-
 
                         return FileVisitResult.CONTINUE;
                     }
 
+                    private int depth = 0;
+
                     @Override
                     public FileVisitResult postVisitDirectory(final Path dir,
                                                               final IOException cause) {
-                        final PathMatcher matcher = pathToMatchers.remove(dir);
-                        if (null != matcher) {
-                            exclude.remove(matcher);
-                        }
                         return FileVisitResult.CONTINUE;
                     }
 
                     @Override
                     public FileVisitResult visitFile(final Path file,
                                                      final BasicFileAttributes attributes) {
-                        if (exclude.stream().noneMatch(m -> m.matches(file))) {
+                        final PathMatcher ignore = this.ignore;
+                        if (null == ignore || false == ignore.matches(file)) {
                             if (include.test(file)) {
                                 files.add(J2clPath.with(file));
                             }
@@ -263,7 +257,10 @@ final class GwtIncompatibleStripPreprocessor {
 
                         return FileVisitResult.CONTINUE;
                     }
-                });
+
+                    private PathMatcher ignore = null;
+                }
+        );
 
         return files;
     }
