@@ -1,5 +1,12 @@
 # Patterns in this file should match files in this package and its sub package.
 
-IgnoredFile.*
+#
+# /lib/IgnoredFile1.java
+#
+lib/IgnoredFile1.*
+
+#
+# /lib/sub/IgnoredFile2.java
+#
 **/IgnoredFile2.*
 

@@ -531,8 +531,8 @@ There are several ways to ignore an artifact:
 
 ## Ignored file(s)
 
-A text file called ``.walkingkooka-j2cl-maven-plugin-ignored-files.txt`` with file paths or glob patterns that will
-result in any matched files being ignored.
+A text file called ``.walkingkooka-j2cl-maven-plugin-ignored-files.txt`` in the root - with file paths or glob patterns
+that will result in any matched files being ignored.
 
 - Blank lines are ignored
 - Lines beginning with HASH are considered to be comments and are ignored.
