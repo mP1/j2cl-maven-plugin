@@ -21,14 +21,17 @@ import com.google.j2cl.common.FrontendUtils.FileInfo;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.file.Files2;
 import walkingkooka.j2cl.maven.log.TreeFormat;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.reflect.PackageName;
+import walkingkooka.text.CaseSensitivity;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileSystems;
@@ -294,16 +297,18 @@ public final class J2clPath implements Comparable<J2clPath> {
         PathMatcher pathMatcher = null;
 
         if (this.exists().isPresent()) {
-            final List<PathMatcher> matchers = Files.readAllLines(this.path())
-                    .stream()
-                    .filter(l -> false == l.startsWith("#") | l.trim().length() > 0)
-                    .map(l -> FileSystems.getDefault().getPathMatcher("glob:" + parent + File.separator + l))
-                    .collect(Collectors.toList());
+            final Path path = this.path;
 
-            if (!matchers.isEmpty()) {
-                pathMatcher = (p) -> matchers.stream()
-                        .anyMatch(m -> m.matches(p));
-            }
+            pathMatcher = Files2.relativePathMatcher(
+                    Files2.globPatterns(
+                            new String(
+                                    Files.readAllBytes(path),
+                                    Charset.defaultCharset()
+                            ),
+                            CaseSensitivity.SENSITIVE
+                    ),
+                    parent.path()
+            );
         }
 
         return Optional.ofNullable(pathMatcher);
