@@ -136,36 +136,36 @@ abstract class J2clTaskShade<C extends J2clMavenContext> implements J2clTask<C> 
 
             // filter only files belonging to and under shade source root
             possibleFiles.stream()
-                        .filter(f -> f.path().startsWith(shadedRoot.path()))
-                        .forEach(shadedFiles::add);
+                    .filter(f -> f.path().startsWith(shadedRoot.path()))
+                    .forEach(shadedFiles::add);
 
-                possibleFiles.removeAll(shadedFiles);
+            possibleFiles.removeAll(shadedFiles);
 
-                // else files will be copied below
-                if (find.equals(replace)) {
-                    logger.line("Skipping shade package " + CharSequences.quote(find));
-                } else {
-                    logger.line("Shading package from " + CharSequences.quote(find) + " to " + CharSequences.quote(replace));
-                    logger.indent();
-                    {
-                        // copy and shade java source and copy other files to output.
-                        shadeDirectory.copyFiles(
-                                shadedRoot,
-                                shadedFiles,
-                                contentShader
-                        );
+            // else files will be copied below
+            if (find.equals(replace)) {
+                logger.line("Skipping shade package " + CharSequences.quote(find));
+            } else {
+                logger.line("Shading package from " + CharSequences.quote(find) + " to " + CharSequences.quote(replace));
+                logger.indent();
+                {
+                    // copy and shade java source and copy other files to output.
+                    shadeDirectory.copyFiles(
+                            shadedRoot,
+                            shadedFiles,
+                            contentShader
+                    );
 
-                        logger.paths(
-                                "",
-                                shadedFiles,
-                                TreeFormat.TREE
-                        );
+                    logger.paths(
+                            "",
+                            shadedFiles,
+                            TreeFormat.TREE
+                    );
 
-                        nonShadedFiles.removeAll(shadedFiles);
-                    }
-                    logger.outdent();
+                    nonShadedFiles.removeAll(shadedFiles);
                 }
+                logger.outdent();
             }
+        }
 
         logger.line("Copying other files");
         logger.indent();
