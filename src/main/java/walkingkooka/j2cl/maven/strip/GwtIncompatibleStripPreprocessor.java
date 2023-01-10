@@ -228,9 +228,7 @@ final class GwtIncompatibleStripPreprocessor {
                             final Optional<PathMatcher> maybeIgnoreFile = J2clPath.with(dir)
                                     .ignoredFiles();
                             if (maybeIgnoreFile.isPresent()) {
-                                final PathMatcher ignoreFile = maybeIgnoreFile.get();
-
-                                ignore = ignoreFile;
+                                this.ignore = maybeIgnoreFile.get();
                             }
                         }
 
