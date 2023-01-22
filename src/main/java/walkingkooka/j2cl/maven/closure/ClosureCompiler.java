@@ -299,10 +299,14 @@ class ClosureCompiler {
                         if (!values.isEmpty()) {
                             final String key = keyAndValue.getKey();
                             logger.line(key);
-                            logger.indent();
+                            logger.flush();
 
-                            for (final String value : keyAndValue.getValue()) {
-                                logger.debugLine(value);
+                            logger.indent();
+                            {
+                                for (final String value : keyAndValue.getValue()) {
+                                    logger.debugLine(value);
+                                }
+                                logger.flush();
                             }
                             logger.outdent();
                         }
