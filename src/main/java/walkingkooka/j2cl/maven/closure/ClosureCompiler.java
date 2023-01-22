@@ -281,6 +281,8 @@ class ClosureCompiler {
             logCommandLineArguments(arguments, logger);
         }
         logger.outdent();
+        logger.flush();
+
         return arguments;
     }
 
