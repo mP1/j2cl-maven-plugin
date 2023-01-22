@@ -295,14 +295,17 @@ class ClosureCompiler {
                 for (final Map.Entry<String, Collection<String>> keyAndValue : arguments.entrySet()) {
                     logger.indent();
                     {
-                        final String key = keyAndValue.getKey();
-                        logger.line(key);
-                        logger.indent();
+                        final Collection<String> values = keyAndValue.getValue();
+                        if (!values.isEmpty()) {
+                            final String key = keyAndValue.getKey();
+                            logger.line(key);
+                            logger.indent();
 
-                        for (final String value : keyAndValue.getValue()) {
-                            logger.debugLine(value);
+                            for (final String value : keyAndValue.getValue()) {
+                                logger.debugLine(value);
+                            }
+                            logger.outdent();
                         }
-                        logger.outdent();
                     }
                     logger.outdent();
                 }
