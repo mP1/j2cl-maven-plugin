@@ -387,7 +387,7 @@ final public class TreeLogger {
         this.flush();
     }
 
-    public void log(final CharSequence line) {
+    public synchronized void log(final CharSequence line) {
         this.info.print(line);
     }
 
@@ -398,7 +398,7 @@ final public class TreeLogger {
         );
     }
 
-    public void indentedLine(final CharSequence line) {
+    public synchronized void indentedLine(final CharSequence line) {
         this.indent();
         {
             this.line(line);
@@ -415,12 +415,12 @@ final public class TreeLogger {
         printer.print(line);
     }
 
-    public void emptyLine() {
+    public synchronized void emptyLine() {
         this.info.lineStart();
         this.info.print(this.info.lineEnding());
     }
 
-    public void lineStart() {
+    public synchronized void lineStart() {
         this.info.lineStart();
     }
 
@@ -428,12 +428,12 @@ final public class TreeLogger {
         this.line("*** END ***");
     }
 
-    public void outdent() {
+    public synchronized void outdent() {
         this.debug.outdent();
         this.info.outdent();
     }
 
-    public void flush() {
+    public synchronized void flush() {
         this.debug.flush();
         this.info.flush();
     }
@@ -443,13 +443,13 @@ final public class TreeLogger {
     private final IndentingPrinter info;
 
 
-    public void debug(final CharSequence line) {
+    public synchronized void debug(final CharSequence line) {
         this.debugConsumer.accept(line);
     }
 
     private final Consumer<CharSequence> debugConsumer;
 
-    public void info(final CharSequence line) {
+    public synchronized void info(final CharSequence line) {
         this.infoConsumer.accept(line);
     }
 
