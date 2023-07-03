@@ -152,10 +152,13 @@ final public class TreeLogger {
     }
 
     private StringPath toStringPath(final J2clPath path) {
-        return StringPath.parse(
+        return toStringPath(
                 path.path()
                         .toString()
-                        .replace(File.separatorChar, '/')
+                        .replace(
+                                File.separatorChar,
+                                '/'
+                        )
         );
     }
 
@@ -174,9 +177,24 @@ final public class TreeLogger {
     }
 
     private StringPath toStringPath(final FileInfo fileInfo) {
-        final String targetPath = fileInfo.targetPath().replace(File.separatorChar, '/');
+        return toStringPath(
+                fileInfo.targetPath()
+                        .replace(
+                                File.separatorChar,
+                                '/'
+                        )
+        );
+    }
 
-        return StringPath.parse(targetPath.startsWith("/") ? targetPath : "/" + targetPath);
+    /**
+     * Converts the path into a unix style path, adding a leading slash if necessary.
+     * The actual value is not used to fetch any path from disk, its only used for sorting and pretty printing.
+     */
+    private StringPath toStringPath(final String path) {
+        return StringPath.parse(
+                path.startsWith("/") ?
+                        path :
+                        "/" + path);
     }
 
     private <T> void stringPath(final String label,
