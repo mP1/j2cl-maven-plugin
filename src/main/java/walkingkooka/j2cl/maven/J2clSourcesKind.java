@@ -22,6 +22,7 @@ import org.apache.maven.model.Resource;
 import org.apache.maven.project.MavenProject;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
@@ -93,17 +94,17 @@ public enum J2clSourcesKind {
                 .filter(Objects::nonNull)
                 .flatMap(Collection::stream)
                 .map(mapper)
-                .map(p -> p.startsWith(SEPARATOR) ?
-                        p :
-                        base + SEPARATOR + p
-                ).map(Paths::get)
+                .map(p -> {
+                    final Path path = Paths.get(p);
+                    return path.isAbsolute() ?
+                            path :
+                            Paths.get(base.toString(), p);
+                })
                 .filter(Files::exists)
                 .map(J2clPath::with)
                 .distinct()
                 .collect(Collectors.toList());
     }
-
-    private final static String SEPARATOR = "/";
 
     @SafeVarargs
     private static List<J2clPath> concat(final List<J2clPath>... sources) {
