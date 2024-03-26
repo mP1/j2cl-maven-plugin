@@ -35,11 +35,132 @@ jobs:
       - uses: actions/upload-artifact@v2
         if: failure()
         with:
-          name: build.log
-          path: target/it-tests/junit-test/build.log
+          name: it/formatting-pretty-print/build.log
+          path: target/it/formatting-pretty-print/build.log
 
       - uses: actions/upload-artifact@v2
         if: failure()
         with:
-          name: it-output.txt
-          path: it-output.txt
+          name: it/gwt-timer-j2cl-tests/build.log
+          path: target/it/gwt-timer-j2cl-tests/build.log
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: it/gwt-timer-j2cl-tests-several/build.log
+          path: target/it/gwt-timer-j2cl-tests-several/build.log
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: it/hello-world-reactor/build.log
+          path: target/it/hello-world-reactor/build.log
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: it/ignored-files/build.log
+          path: target/it/ignored-files/build.log
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: it/junit-test/build.log
+          path: target/it/junit-test/build.log
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: it/junit-test-custom-source-dir/build.log
+          path: target/it/junit-test-custom-source-dir/build.log
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: it/junit-test-dependency-graph/build.log
+          path: target/it/junit-test-dependency-graph/build.log
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: it/junit-test-dependency-gwt-incompatible/build.log
+          path: target/it/junit-test-dependency-gwt-incompatible/build.log
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: it/junit-test-jre-class-replaced-shaded/build.log
+          path: target/it/junit-test-jre-class-replaced-shaded/build.log
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: it/junit-test-jre-class-replaced-shaded2/build.log
+          path: target/it/junit-test-jre-class-replaced-shaded2/build.log
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: it/junit-test-jre-class-replaced-shaded3/build.log
+          path: target/it/junit-test-jre-class-replaced-shaded3/build.log
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: it/junit-test-jre-class-replaced-shaded4/build.log
+          path: target/it/junit-test-jre-class-replaced-shaded4/build.log
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: it/junit-test-jre-class-shaded/build.log
+          path: target/it/junit-test-jre-class-shaded/build.log
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: it/junit-test-pom-classpath-required/build.log
+          path: target/it/junit-test-pom-classpath-required/build.log
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: it/junit-test-pom-ignored-dependencies/build.log
+          path: target/it/junit-test-pom-ignored-dependencies/build.log
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: it/junit-test-pom-ignored-dependencies2/build.log
+          path: target/it/junit-test-pom-ignored-dependencies2/build.log
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: it/junit-test-pom-javascript-source-required/build.log
+          path: target/it/junit-test-pom-javascript-source-required/build.log
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: it/language-out-es5/build.log
+          path: target/it/language-out-es5/build.log
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: it/shade/build.log
+          path: target/it/shade/build.log
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: it/super-source/build.log
+          path: target/it/super-source/build.log
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: it/vertispan-connected/build.log
+          path: target/it/vertispan-connected/build.log
+
