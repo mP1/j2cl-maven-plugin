@@ -22,6 +22,7 @@ import com.google.j2cl.common.Problems;
 import com.google.j2cl.tools.gwtincompatible.GwtIncompatibleStripper;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.collect.set.SortedSets;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.J2clTaskResult;
 import walkingkooka.j2cl.maven.log.TreeFormat;
@@ -215,7 +216,7 @@ final class GwtIncompatibleStripPreprocessor {
 
     private static Set<J2clPath> gatherFiles0(final J2clPath root,
                                               final Predicate<Path> include) throws IOException {
-        final SortedSet<J2clPath> files = Sets.sorted();
+        final SortedSet<J2clPath> files = SortedSets.tree();
 
         Files.walkFileTree(
                 root.path(),

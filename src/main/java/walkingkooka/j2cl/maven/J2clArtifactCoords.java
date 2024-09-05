@@ -21,7 +21,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.model.Dependency;
-import walkingkooka.collect.set.Sets;
+import walkingkooka.collect.set.SortedSets;
 import walkingkooka.j2cl.maven.unpack.J2clTaskUnpack;
 import walkingkooka.text.CharSequences;
 
@@ -40,7 +40,7 @@ final class J2clArtifactCoords implements Comparable<J2clArtifactCoords> {
      * Creates a sorted {@link Set} to hold coords.
      */
     static Set<J2clArtifactCoords> set() {
-        return Sets.sorted();
+        return SortedSets.tree();
     }
 
     /**

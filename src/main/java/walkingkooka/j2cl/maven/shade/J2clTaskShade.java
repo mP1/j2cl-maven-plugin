@@ -17,7 +17,7 @@
 
 package walkingkooka.j2cl.maven.shade;
 
-import walkingkooka.collect.set.Sets;
+import walkingkooka.collect.set.SortedSets;
 import walkingkooka.j2cl.maven.J2clArtifact;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
@@ -117,10 +117,10 @@ abstract class J2clTaskShade<C extends J2clMavenContext> implements J2clTask<C> 
 
         final Set<J2clPath> files = root.gatherFiles(J2clPath.ALL_FILES.and(filter));
 
-        final Set<J2clPath> possibleFiles = Sets.sorted();
+        final Set<J2clPath> possibleFiles = SortedSets.tree();
         possibleFiles.addAll(files);
 
-        final Set<J2clPath> nonShadedFiles = Sets.sorted();
+        final Set<J2clPath> nonShadedFiles = SortedSets.tree();
         nonShadedFiles.addAll(files);
 
         for (final Entry<PackageName, PackageName> mapping : shade.entrySet()) {
@@ -131,7 +131,7 @@ abstract class J2clTaskShade<C extends J2clMavenContext> implements J2clTask<C> 
                     output :
                     output.append(replace.replace('.', File.separatorChar));
 
-            final Set<J2clPath> shadedFiles = Sets.sorted();
+            final Set<J2clPath> shadedFiles = SortedSets.tree();
             final J2clPath shadedRoot = root.append(find.replace('.', File.separatorChar));
 
             // filter only files belonging to and under shade source root

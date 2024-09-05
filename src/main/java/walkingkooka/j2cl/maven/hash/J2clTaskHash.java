@@ -18,7 +18,7 @@
 package walkingkooka.j2cl.maven.hash;
 
 import com.google.common.collect.Lists;
-import walkingkooka.collect.set.Sets;
+import walkingkooka.collect.set.SortedSets;
 import walkingkooka.j2cl.maven.J2clArtifact;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
@@ -69,7 +69,7 @@ public final class J2clTaskHash<C extends J2clMavenContext> implements J2clTask<
                                   final J2clTaskKind kind,
                                   final C context,
                                   final TreeLogger logger) throws Exception {
-        final Set<String> hashItemNames = Sets.sorted();
+        final Set<String> hashItemNames = SortedSets.tree();
         final HashBuilder hash = HashBuilder.empty();
         context.computeHash(
                 artifact,

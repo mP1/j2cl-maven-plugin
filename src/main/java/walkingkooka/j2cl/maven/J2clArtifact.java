@@ -29,6 +29,7 @@ import org.objectweb.asm.Opcodes;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.collect.set.SortedSets;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.predicate.Predicates;
 import walkingkooka.reflect.PackageName;
@@ -566,7 +567,7 @@ public final class J2clArtifact implements Comparable<J2clArtifact> {
         this.context.verifyClasspathRequiredJavascriptSourceRequiredIgnoredDependencies(
                 all.stream()
                         .map(J2clArtifact::coords)
-                        .collect(Collectors.toCollection(Sets::sorted)),
+                        .collect(Collectors.toCollection(SortedSets::tree)),
                 this,
                 logger
         );
@@ -708,7 +709,7 @@ public final class J2clArtifact implements Comparable<J2clArtifact> {
                 this.dependencies().stream()
                         .filter(filter)
                         .map(J2clArtifact::toString)
-                        .collect(Collectors.toCollection(Sets::sorted))
+                        .collect(Collectors.toCollection(SortedSets::tree))
         );
     }
 

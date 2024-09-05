@@ -18,6 +18,7 @@
 package walkingkooka.j2cl.maven.output;
 
 import walkingkooka.collect.set.Sets;
+import walkingkooka.collect.set.SortedSets;
 import walkingkooka.j2cl.maven.J2clArtifact;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
@@ -121,7 +122,7 @@ public final class J2clTaskOutputAssembler<C extends J2clMavenContext> implement
         }
         logger.outdent();
 
-        final Set<J2clPath> destinationFiles = Sets.sorted();
+        final Set<J2clPath> destinationFiles = SortedSets.tree();
         destinationFiles.addAll(closureCompileDestinationFiles);
         destinationFiles.addAll(unpackPublicDestinationFiles);
 
