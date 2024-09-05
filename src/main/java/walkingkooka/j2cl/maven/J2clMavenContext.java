@@ -22,7 +22,7 @@ import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
 import walkingkooka.Context;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
-import walkingkooka.collect.set.Sets;
+import walkingkooka.collect.set.SortedSets;
 import walkingkooka.j2cl.maven.closure.ClosureFormattingOption;
 import walkingkooka.j2cl.maven.hash.HashBuilder;
 import walkingkooka.j2cl.maven.log.MavenLogger;
@@ -307,7 +307,7 @@ public abstract class J2clMavenContext implements Context {
         if (false == this.tasks.containsKey(artifact)) {
 
             // keep transitive dependencies alphabetical sorted for better readability when trySubmitTasks pretty prints queue processing.
-            final Set<J2clArtifact> required = Sets.sorted();
+            final Set<J2clArtifact> required = SortedSets.tree();
 
             this.tasks.put(artifact, required);
 

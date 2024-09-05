@@ -29,7 +29,7 @@ import org.apache.maven.project.ProjectBuilder;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
-import walkingkooka.collect.set.Sets;
+import walkingkooka.collect.set.SortedSets;
 import walkingkooka.j2cl.maven.closure.ClosureFormattingOption;
 import walkingkooka.j2cl.maven.log.TreeLogger;
 import walkingkooka.text.CharSequences;
@@ -222,7 +222,7 @@ abstract class J2clMojoBuildTestWatch extends J2clMojo {
     final Set<String> javaCompilerArguments() {
         return this.javaCompilerArguments.stream()
                 .map(String::trim)
-                .collect(Collectors.toCollection(Sets::sorted));
+                .collect(Collectors.toCollection(SortedSets::tree));
     }
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")

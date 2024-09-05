@@ -20,6 +20,7 @@ package walkingkooka.j2cl.maven;
 import org.junit.jupiter.api.Test;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.collect.set.SortedSets;
 import walkingkooka.reflect.ClassTesting2;
 import walkingkooka.reflect.JavaVisibility;
 
@@ -170,7 +171,7 @@ public final class J2clArtifactGraphCalculatorTest implements ClassTesting2<J2cl
     private Set<J2clArtifactCoords> transformCsv(final String csv) {
         return Arrays.stream(csv.isEmpty() ? new String[0] : csv.split(","))
                 .map(J2clArtifactCoords::parse)
-                .collect(Collectors.toCollection(Sets::sorted));
+                .collect(Collectors.toCollection(SortedSets::tree));
     }
 
     private void runAndCheck0(final Map<J2clArtifactCoords, Set<J2clArtifactCoords>> flat,

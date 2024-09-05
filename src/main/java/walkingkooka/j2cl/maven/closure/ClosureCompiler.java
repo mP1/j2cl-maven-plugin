@@ -26,6 +26,7 @@ import com.google.javascript.jscomp.DependencyOptions;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.collect.set.SortedSets;
 import walkingkooka.j2cl.maven.J2clArtifact;
 import walkingkooka.j2cl.maven.J2clMavenContext;
 import walkingkooka.j2cl.maven.J2clPath;
@@ -163,7 +164,9 @@ class ClosureCompiler {
                     defines,
                     entryPoints,
                     externs,
-                    formatting.stream().map(ClosureFormattingOption::name).collect(Collectors.toCollection(Sets::sorted)),
+                    formatting.stream()
+                            .map(ClosureFormattingOption::name)
+                            .collect(Collectors.toCollection(SortedSets::tree)),
                     languageOut,
                     sourceMaps,
                     unitedSourceRoot,
@@ -250,7 +253,7 @@ class ClosureCompiler {
 
             arguments.put("--compilation_level", Sets.of(compilationLevel.name()));
             {
-                final Set<String> definesSet = Sets.sorted();
+                final Set<String> definesSet = SortedSets.tree();
                 if (compilationLevel == CompilationLevel.BUNDLE) {
                     definesSet.add("goog.ENABLE_DEBUG_LOADER=false");
                 }

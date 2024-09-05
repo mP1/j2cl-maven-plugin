@@ -23,7 +23,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import walkingkooka.collect.list.Lists;
-import walkingkooka.collect.set.Sets;
+import walkingkooka.collect.set.SortedSets;
 import walkingkooka.j2cl.maven.log.BrowserLogLevel;
 import walkingkooka.j2cl.maven.log.MavenLogger;
 import walkingkooka.j2cl.maven.log.TreeLogger;
@@ -147,7 +147,7 @@ public final class J2clMojoTest extends J2clMojoBuildTestWatch {
                 logger.line(testSourceRootPath.toAbsolutePath().toString());
                 logger.indent();
                 {
-                    final Set<String> tests = Sets.sorted();
+                    final Set<String> tests = SortedSets.tree();
                     final List<PathMatcher> pathMatchers = this.tests(testSourceRootPath);
 
                     Files.walkFileTree(testSourceRootPath, new SimpleFileVisitor<>() {

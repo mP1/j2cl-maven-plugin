@@ -21,6 +21,7 @@ import com.google.j2cl.common.FrontendUtils.FileInfo;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;
+import walkingkooka.collect.set.SortedSets;
 import walkingkooka.file.Files2;
 import walkingkooka.j2cl.maven.log.TreeFormat;
 import walkingkooka.j2cl.maven.log.TreeLogger;
@@ -273,7 +274,7 @@ public final class J2clPath implements Comparable<J2clPath> {
         return Files.find(this.path(), Integer.MAX_VALUE, (p, a) -> filter.test(p))
                 .map(J2clPath::with)
                 .sorted()
-                .collect(Collectors.toCollection(Sets::sorted));
+                .collect(Collectors.toCollection(SortedSets::tree));
     }
 
     public boolean isFile() {
