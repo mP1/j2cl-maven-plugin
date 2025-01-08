@@ -32,14 +32,14 @@ final class J2clArtifactCoordsComparator implements Comparator<J2clArtifactCoord
 
     @Override
     public int compare(final J2clArtifactCoords l, final J2clArtifactCoords r) {
-            int result = l.groupId().compareTo(r.groupId());
+        int result = l.groupId().compareTo(r.groupId());
+        if (0 == result) {
+            result = l.artifactId().compareTo(r.artifactId());
             if (0 == result) {
-                result = l.artifactId().compareTo(r.artifactId());
-                if (0 == result) {
-                    result = l.compareToClassifier().compareTo(r.compareToClassifier());
-                }
+                result = l.compareToClassifier().compareTo(r.compareToClassifier());
             }
-            return result;
+        }
+        return result;
     }
 
     @Override

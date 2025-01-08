@@ -9,9 +9,9 @@ package com.vertispan.draw.connected.client.blank;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,6 +34,7 @@ public class SelectionEvent<T> extends Event<SelectionHandler<T>> {
     public interface SelectionHandler<T> {
         void onSelection(SelectionEvent<T> var1);
     }
+
     public interface HasSelectionHandlers<T> {
         HandlerRegistration addSelectionHandler(SelectionHandler<T> var1);
 
@@ -44,8 +45,8 @@ public class SelectionEvent<T> extends Event<SelectionHandler<T>> {
      * Fires a selection event on all registered handlers in the handler
      * manager.If no such handlers exist, this method will do nothing.
      *
-     * @param <T> the selected item type
-     * @param source the source of the handlers
+     * @param <T>          the selected item type
+     * @param source       the source of the handlers
      * @param selectedItem the selected item
      */
     public static <T> void fire(HasSelectionHandlers<T> source, T selectedItem) {

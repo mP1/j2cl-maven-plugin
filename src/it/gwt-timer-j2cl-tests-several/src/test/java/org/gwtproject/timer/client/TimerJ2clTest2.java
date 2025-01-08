@@ -39,18 +39,18 @@ import org.junit.Test;
 @J2clTestInput(TimerJ2clTest2.class)
 public class TimerJ2clTest2 {
 
-  @Test(timeout = 500)
-  public Promise<Void> testTimerSchedule() {
-    return new Promise<>(
-        (resolve, reject) -> {
-          Timer timer =
-              new Timer() {
-                @Override
-                public void run() {
-                  resolve.onInvoke((Void) null);
-                }
-              };
-          timer.schedule(100);
-        });
-  }
+    @Test(timeout = 500)
+    public Promise<Void> testTimerSchedule() {
+        return new Promise<>(
+                (resolve, reject) -> {
+                    Timer timer =
+                            new Timer() {
+                                @Override
+                                public void run() {
+                                    resolve.onInvoke((Void) null);
+                                }
+                            };
+                    timer.schedule(100);
+                });
+    }
 }

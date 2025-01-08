@@ -65,7 +65,7 @@ final class JavacCompiler {
         options.add(toClasspathStringList(bootstrap));
         options.add("-implicit:none");
 
-        if(false == runAnnotationProcessors) {
+        if (false == runAnnotationProcessors) {
             options.add("-proc:none");
         }
 

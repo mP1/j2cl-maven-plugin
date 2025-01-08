@@ -16,6 +16,7 @@
 package app.java.io;
 
 import jsinterop.annotations.JsType;
+
 /**
  * This file eventually gets translated into java.io.File
  *
@@ -28,7 +29,7 @@ public class File {
     public File(final String path) {
         this.path = path;
     }
-    
+
     @Override
     public String toString() {
         return "!!!" + this.getClass().getName() + " path=" + path;

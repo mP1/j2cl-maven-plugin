@@ -16,6 +16,7 @@
 package app.javaio;
 
 import jsinterop.annotations.JsType;
+
 import java.io.File;
 
 /**
@@ -30,7 +31,7 @@ public class FileInputStream {
     public FileInputStream(final File file) {
         this.file = file;
     }
-    
+
     @Override
     public String toString() {
         return "!!!" + this.getClass().getName() + " " + file.getClass().getName();

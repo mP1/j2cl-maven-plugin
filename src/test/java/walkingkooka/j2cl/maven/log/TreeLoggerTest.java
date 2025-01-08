@@ -166,7 +166,7 @@ public final class TreeLoggerTest implements ClassTesting2<TreeLogger> {
         logger.line("line1");
         logger.indentedLine("line2");
         logger.line("line3");
-        
+
         this.check(
                 logger,
                 "line1" + EOL +

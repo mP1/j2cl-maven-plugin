@@ -17,12 +17,12 @@
 
 package test.javautilprefs;
 
-public class BackingStoreException extends Exception{
+public class BackingStoreException extends Exception {
 
     public BackingStoreException(final String message) {
         super();
     }
-    
+
     @Override
     public String toString() {
         return "Shaded2";
