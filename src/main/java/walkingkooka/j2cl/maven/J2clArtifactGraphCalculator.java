@@ -75,17 +75,17 @@ final class J2clArtifactGraphCalculator {
     }
 
     private void addRequiredToLeaves() {
-        for(final J2clArtifactCoords leaf : this.leaves) {
+        for (final J2clArtifactCoords leaf : this.leaves) {
             Set<J2clArtifactCoords> children = J2clArtifactCoords.set();
 
-            for(final J2clArtifactCoords required : this.required) {
-                if(required.equals(leaf)) {
+            for (final J2clArtifactCoords required : this.required) {
+                if (required.equals(leaf)) {
                     children = Sets.empty();
                     break;
                 }
 
                 final Set<J2clArtifactCoords> graph = this.tree.getOrDefault(required, Sets.empty());
-                if(false == graph.contains(leaf)) {
+                if (false == graph.contains(leaf)) {
                     children.add(required);
                 }
             }
@@ -112,8 +112,8 @@ final class J2clArtifactGraphCalculator {
     private void collectTransitives(final J2clArtifactCoords parent,
                                     final Set<J2clArtifactCoords> children,
                                     final Set<J2clArtifactCoords> collected) {
-        for(final J2clArtifactCoords child : children) {
-            if(false == parent.equals(child) && collected.add(child)) {
+        for (final J2clArtifactCoords child : children) {
+            if (false == parent.equals(child) && collected.add(child)) {
                 this.collectTransitives(parent, this.flat.getOrDefault(child, Sets.empty()), collected);
             }
         }
@@ -153,7 +153,7 @@ final class J2clArtifactGraphCalculator {
                 this.addTransitives0(child, descendants);
             }
         }
-        
+
         return changes;
     }
 

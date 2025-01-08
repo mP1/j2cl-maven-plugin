@@ -9,9 +9,9 @@ package com.vertispan.draw.connected.client.lib;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -83,7 +83,9 @@ public class ConnectedComponent<B, L> implements HasSelectionHandlers<B> {
     private HTMLCanvasElement canvas;
 
     //logic
-    public enum DrawMode {MOVE, DRAW_BOX, DRAW_LINE};
+    public enum DrawMode {MOVE, DRAW_BOX, DRAW_LINE}
+
+    ;
     private DrawMode drawMode;
 
     //wiring
@@ -218,10 +220,12 @@ public class ConnectedComponent<B, L> implements HasSelectionHandlers<B> {
         setDrawMode(DrawMode.DRAW_BOX);
         return null;
     }
+
     private Void drawLine(Event event) {
         setDrawMode(DrawMode.DRAW_LINE);
         return null;
     }
+
     private Void move(Event event) {
         setDrawMode(DrawMode.MOVE);
         return null;
@@ -335,6 +339,7 @@ public class ConnectedComponent<B, L> implements HasSelectionHandlers<B> {
         lines.add(line);
         scheduleFrame();
     }
+
     public void removeLine(L line) {
         lines.remove(line);
         scheduleFrame();
@@ -345,12 +350,14 @@ public class ConnectedComponent<B, L> implements HasSelectionHandlers<B> {
         boxes.put(id, box);
         scheduleFrame();
     }
+
     public void removeBox(B box) {
         String id = boxIdFunct.apply(box);
         boxes.remove(id);
         lines.removeIf(line -> startFunct.apply(line).equals(id) || endFunct.apply(line).equals(id));
         scheduleFrame();
     }
+
     public void updateBox(B box) {
         String id = boxIdFunct.apply(box);
         boxes.put(id, box);
@@ -361,12 +368,14 @@ public class ConnectedComponent<B, L> implements HasSelectionHandlers<B> {
     public List<B> getBoxes() {
         return new ArrayList<>(boxes.values());
     }
+
     public List<L> getLines() {
         return new ArrayList<>(lines);
     }
 
 
     private boolean frameScheduled = false;
+
     private void scheduleFrame() {
         if (frameScheduled) {
             return;
@@ -377,6 +386,7 @@ public class ConnectedComponent<B, L> implements HasSelectionHandlers<B> {
             draw();
         });
     }
+
     private void draw() {
         //casts to get context, bug in elemental2 beta...
         final CanvasRenderingContext2D context = (CanvasRenderingContext2D) (Object) canvas.getContext("2d");

@@ -723,9 +723,9 @@ public final class J2clArtifact implements Comparable<J2clArtifact> {
             final J2clArtifactCoords coords = this.coords();
             this.artifactFile = Optional.of(
                     this.context
-                    .mavenMiddleware()
-                    .mavenFile(coords.toString()
-                    ).orElseThrow(this.archiveFileMissing()));
+                            .mavenMiddleware()
+                            .mavenFile(coords.toString()
+                            ).orElseThrow(this.archiveFileMissing()));
         }
 
         return this.artifactFile;
@@ -955,9 +955,9 @@ public final class J2clArtifact implements Comparable<J2clArtifact> {
      */
     private boolean isBootstrapOrJreFiles() {
         return this.isJreBootstrapClassFiles() ||
-            this.isJreClassFiles() ||
-            this.isJreJavascriptBootstrapFiles() ||
-            this.isJreJavascriptFiles();
+                this.isJreClassFiles() ||
+                this.isJreJavascriptBootstrapFiles() ||
+                this.isJreJavascriptFiles();
     }
 
     // isJreJavascriptBootstrapFiles..................................................................................................
@@ -1185,7 +1185,7 @@ public final class J2clArtifact implements Comparable<J2clArtifact> {
                               final String superName,
                               final String[] interfaces) {
                 if ((access & Constants.ACC_INTERFACE) > 0) {
-                    result[0] =1;
+                    result[0] = 1;
                 }
 
                 // annotations implement java.lang.annotation.Annotation
@@ -1198,7 +1198,7 @@ public final class J2clArtifact implements Comparable<J2clArtifact> {
     }
 
     private final static String ANNOTATION_TYPE = Annotation.class.getName()
-        .replace('.', '/');
+            .replace('.', '/');
 
     // shade............................................................................................................
 
@@ -1327,7 +1327,7 @@ public final class J2clArtifact implements Comparable<J2clArtifact> {
 
             middleware.mavenFile(coords.source().toString()).map(sources::add);
 
-            if(sources.isEmpty()) {
+            if (sources.isEmpty()) {
                 middleware.mavenFile(coords.toString()).map(sources::add);
             }
         }

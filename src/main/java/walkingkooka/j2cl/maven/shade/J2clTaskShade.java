@@ -190,7 +190,7 @@ abstract class J2clTaskShade<C extends J2clMavenContext> implements J2clTask<C> 
                     logger
             );
         }
-            logger.outdent();
+        logger.outdent();
     }
 
     /**
