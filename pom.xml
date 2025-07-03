@@ -464,7 +464,7 @@ and
         <dependency>
             <groupId>com.vertispan.javascript</groupId>
             <artifactId>closure-compiler-unshaded</artifactId>
-            <version>0.2-SNAPSHOT</version>
+            <version>v20230411-1</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.jsinterop</groupId>
