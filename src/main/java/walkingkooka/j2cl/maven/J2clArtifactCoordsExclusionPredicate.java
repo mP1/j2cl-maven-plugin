@@ -32,7 +32,9 @@ final class J2clArtifactCoordsExclusionPredicate implements Predicate<J2clArtifa
 
     @Override
     public boolean test(final J2clArtifactCoords coords) {
-        return this.groupId.equals(coords.groupId()) && this.artifactId.equals(coords.artifactId());
+        return null != coords &&
+                this.groupId.equals(coords.groupId()) &&
+                this.artifactId.equals(coords.artifactId());
     }
 
     private final String groupId;
