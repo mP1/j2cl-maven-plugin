@@ -17,7 +17,7 @@
 
 package walkingkooka.j2cl.maven.log;
 
-import com.google.j2cl.common.FrontendUtils.FileInfo;
+import com.google.j2cl.common.SourceUtils.FileInfo;
 import walkingkooka.NeverError;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.set.Sets;
