@@ -17,7 +17,7 @@
 
 package walkingkooka.j2cl.maven;
 
-import com.google.j2cl.common.FrontendUtils.FileInfo;
+import com.google.j2cl.common.SourceUtils.FileInfo;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.collect.set.Sets;

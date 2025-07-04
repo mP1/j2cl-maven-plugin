@@ -17,9 +17,11 @@
 
 package walkingkooka.j2cl.maven.strip;
 
-import com.google.j2cl.common.FrontendUtils.FileInfo;
+import com.google.j2cl.common.OutputUtils;
 import com.google.j2cl.common.Problems;
+import com.google.j2cl.common.SourceUtils.FileInfo;
 import com.google.j2cl.tools.gwtincompatible.GwtIncompatibleStripper;
+import javaemul.internal.annotations.GwtIncompatible;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.collect.set.SortedSets;
@@ -158,9 +160,19 @@ final class GwtIncompatibleStripPreprocessor {
                 logger.path("Output", output);
 
                 final Problems problems = new Problems();
-                GwtIncompatibleStripper.preprocessFiles(javaFilesInput,
+
+                try (final OutputUtils.Output outputOutput = OutputUtils.initOutput(
                         output.path(),
-                        problems);
+                        problems
+                )) {
+                    GwtIncompatibleStripper.preprocessFiles(
+                            javaFilesInput,
+                            outputOutput,
+                            problems,
+                            GwtIncompatible.class.getSimpleName()
+                    );
+                }
+
                 logger.strings("Message(s)", problems.getMessages());
 
                 final List<String> errors = problems.getErrors();

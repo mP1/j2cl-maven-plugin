@@ -17,10 +17,11 @@
 
 package walkingkooka.j2cl.maven.transpile;
 
-import com.google.j2cl.common.FrontendUtils.FileInfo;
+import com.google.j2cl.common.OutputUtils;
 import com.google.j2cl.common.Problems;
-import com.google.j2cl.frontend.Frontend;
+import com.google.j2cl.common.SourceUtils.FileInfo;
 import com.google.j2cl.transpiler.J2clTranspilerOptions;
+import com.google.j2cl.transpiler.frontend.Frontend;
 import walkingkooka.collect.list.Lists;
 import walkingkooka.j2cl.maven.J2clPath;
 import walkingkooka.j2cl.maven.log.TreeFormat;
@@ -87,22 +88,33 @@ final class J2clTranspiler {
             logger.line("J2clTranspiler");
             logger.indent();
             {
-                final J2clTranspilerOptions options = J2clTranspilerOptions.newBuilder()
-                        .setClasspaths(classpath.stream()
-                                .map(J2clPath::toString)
-                                .collect(Collectors.toList())
-                        )
-                        .setOutput(output.path())
-                        .setEmitReadableLibraryInfo(false)
-                        .setEmitReadableSourceMap(false)
-                        .setFrontend(Frontend.JDT)
-                        .setGenerateKytheIndexingMetadata(false)
-                        .setSources(javaInput)
-                        .setNativeSources(nativeJsInput)
-                        .build();
+                final Problems problems = new Problems();
 
-                final Problems problems = com.google.j2cl.transpiler.J2clTranspiler.transpile(options);
-                success = !problems.hasErrors();
+                try (final OutputUtils.Output outputOutput = OutputUtils.initOutput(
+                        output.path(),
+                        problems
+                )
+                ) {
+                    final J2clTranspilerOptions options = J2clTranspilerOptions.newBuilder()
+                            .setClasspaths(classpath.stream()
+                                    .map(J2clPath::toString)
+                                    .collect(Collectors.toList())
+                            ).setOutput(outputOutput)
+                            .setEmitReadableLibraryInfo(false)
+                            .setEmitReadableSourceMap(false)
+                            .setFrontend(Frontend.JDT)
+                            .setGenerateKytheIndexingMetadata(false)
+                            .setSources(javaInput)
+                            .setNativeSources(nativeJsInput)
+                            .build(problems);
+
+                    com.google.j2cl.transpiler.J2clTranspiler.transpile(
+                            options,
+                            problems
+                    );
+                }
+
+                success = false == problems.hasErrors();
 
                 logger.strings("Error(s)", problems.getErrors());
                 logger.strings("Warnings(s)", problems.getWarnings());
