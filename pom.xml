@@ -578,6 +578,19 @@ and
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-invoker-plugin</artifactId>
                 <version>3.0.1</version>
                 <executions>
@@ -593,10 +606,11 @@ and
                     <cloneProjectsTo>${project.build.directory}/it-tests</cloneProjectsTo>
                     <debug>true</debug>
                     <invokerPropertiesFile>src/it/invoker.properties</invokerPropertiesFile>
+                    <invokerTest>gwt-jar-test</invokerTest>
                     <localRepositoryPath>${project.build.directory}/it-repo</localRepositoryPath>
                     <settingsFile>src/it/settings.xml</settingsFile>
-                    <skipInstallation>true</skipInstallation>
-                    <skipInvocation>true</skipInvocation>
+                    <skipInstallation>false</skipInstallation>
+                    <skipInvocation>false</skipInvocation>
                     <streamLogs>false</streamLogs>
                 </configuration>
             </plugin>
