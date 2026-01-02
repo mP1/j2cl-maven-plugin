@@ -71,9 +71,8 @@ Sample required plugin repositories
     </pluginRepository>
 
     <pluginRepository>
-        <id>google-snapshots</id>
-        <name>google-snapshots</name>
-        <url>https://oss.sonatype.org/content/repositories/google-snapshots/</url>
+      <id>maven.repository.snapshots</id>
+      <url>https://central.sonatype.org/repository/maven-snapshots/</url>
         <releases>
             <enabled>true</enabled>
         </releases>

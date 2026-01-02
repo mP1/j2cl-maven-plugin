@@ -14,9 +14,8 @@
         </repository>
         <!-- mixture of j2cl and google tooling -->
         <repository>
-            <id>google-snapshots</id>
-            <name>google-snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/google-snapshots/</url>
+            <id>maven.repository.snapshots</id>
+            <url>https://central.sonatype.org/repository/maven-snapshots/</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
