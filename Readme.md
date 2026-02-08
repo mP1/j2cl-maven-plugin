@@ -6,8 +6,6 @@
 ![](https://tokei.rs/b1/github/mP1/j2cl-maven-plugin)
 [![J2CL compatible](https://img.shields.io/badge/J2CL-compatible-brightgreen.svg)](https://github.com/mP1/j2cl-central)
 
-
-
 J2CL Maven plugin
 =================
 
@@ -20,8 +18,6 @@ For a full list of contributors, read source and to more click [here](https://gi
 A major difference between the two is this plugin requires most parameters and dependencies to be declared as Maven
 artifacts, nothing is assumed, everything must be declared in the pom in some form. As much as possible nothing is
 defaulted and must be present in the POM.
-
-
 
 # Usage
 
@@ -56,8 +52,6 @@ The plugin supports the following goals
 4. `watch`: builds the project and then watches for file changes and rebuilds
 
 [TODO Incremental watch](https://github.com/mP1/j2cl-maven-plugin/issues/534)
-
-
 
 ## Plugin Repositories
 
@@ -126,8 +120,6 @@ Sample required plugin repositories
 </pluginRepositories>
 ```
 
-
-
 ## Plugin
 
 A sample plugin declaration follows which mentions all parameters. The numerous parameters are used by the plugin during
@@ -195,8 +187,6 @@ filled with the equivalent javascript.
 </plugin>
 ```
 
-
-
 ## browser-log-level
 
 This option is only available within the `test` task, and controls the log level of test messages that will appear in
@@ -235,8 +225,6 @@ INFO: Detected dialect: W3C
 [INFO] 
 ```
 
-
-
 ## browsers
 
 A list of browsers that are used by webdriver to execute transpiled unit tests,(`classpathscope=test`). At least
@@ -252,7 +240,6 @@ one must be selected out of the supported browsers listed below.
 
 If HTML_UNIT is selected the `language-out` should be set to `ECMASCRIPT5` as newer javascript constructs such as class
 are not supported by the html unit javascript engine. 
-
 
 ## classpath-required
 
@@ -280,9 +267,6 @@ entry.
 - Only annotation class files.
 - If the file `.walkingkooka-j2cl-maven-plugin-classpath-required.txt` is present.
 
-
-
-
 ## classpath-scope
 
 The suggested value is typically `compile`, for more info click [here](https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html)
@@ -290,8 +274,6 @@ The suggested value is typically `compile`, for more info click [here](https://m
 ```xml
 <classpath-scope>compile</classpath-scope>
 ```
-
-
 
 ## compilation-level
 
@@ -303,8 +285,6 @@ code transformations.
 ```xml
 <compilation-level>ADVANCED</compilation-level>
 ```
-
-
 
 ## defines
 
@@ -318,8 +298,6 @@ These key value pairs are arguments given only to the Closure compiler. The frag
 </defines>
 ```
 
-
-
 ## entry-points
 
 A Closure compiler argument containing one or more entry point(s) (`classpathscope=compile`).
@@ -328,13 +306,9 @@ A Closure compiler argument containing one or more entry point(s) (`classpathsco
 <entrypoint>helloworld.app</entrypoint>
 ```
 
-
-
 ## externs
 
 Key value pairs that define externs for the Closure compiler. For more info click [here](https://developers.google.com/closure/compiler/docs/api-tutorial3#externs).
-
-
 
 ## formatting
 
@@ -416,8 +390,6 @@ This may be used to pass additional arguments to javac such as an annotation pro
 </java-compiler-arguments>
 ```
 
-
-
 ## language-out
 
 The output language (javascript variant) of the resulting javascript.
@@ -438,13 +410,9 @@ The xml snippet below includes all currently available options, only one may be 
 <language-out>ECMASCRIPT_2019</language-out>
 ```
 
-
-
 ## output
 
 This path is the final location of the final javascript (`classpathscope=compile`).
-
-
 
 ## source-maps
 
@@ -458,7 +426,6 @@ files and how source maps work.
 <source-maps>sources/</source-maps>
 ```
 
-
 ## skip
 
 This is only available when executing tests, and provides an easy switch to turn tests on/off (`skip=true`).
@@ -468,7 +435,6 @@ This is only available when executing tests, and provides an easy switch to turn
 ```
 
 From the command line the property may be set `-Dwalkingkooka.j2cl.maven.plugin.test.skip=true`.
-
 
 ## tests
 
@@ -481,8 +447,6 @@ A block of multiple `test` entries each defining a GLOB pattern to match test su
 </tests>
 ```
 
-
-
 ## test-timeout
 
 The timeout for each test not the entire suite in seconds (`classpathscope=test`).
@@ -490,8 +454,6 @@ The timeout for each test not the entire suite in seconds (`classpathscope=test`
 ```xml
 <test-timeout>60</test-timeout>
 ```
-
-
 
 ## thread-pool-size
 
@@ -838,8 +800,6 @@ walkingkooka:j2cl-maven-plugin-it-junit-test:jar:1.0-TRANSPILE
     Log file
       /Users/miroslav/repos-github/88j2cl-maven-plugin/target/it-tests/junit-test/target/walkingkooka-j2cl-maven-plugin-cache/walkingkooka--j2cl-maven-plugin-it-junit-test--jar--1.0-db1ecd80f01db349f97454549ba798c71e4283fb/7-transpiled-java-to-javascript/log.txt
 ```
-
-
 
 # Cache directory tree structure view
 
